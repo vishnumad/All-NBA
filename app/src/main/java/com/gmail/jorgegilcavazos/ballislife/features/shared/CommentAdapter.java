@@ -1,14 +1,17 @@
 package com.gmail.jorgegilcavazos.ballislife.features.shared;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
@@ -24,11 +27,12 @@ import butterknife.ButterKnife;
  * Adapter used to hold all of the comments from a thread.
  */
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
+
     Context context;
     List<CommentNode> commentsList;
 
-    public CommentAdapter(List<CommentNode> comments) {
-        commentsList = comments;
+    public CommentAdapter(List<CommentNode> commentsList) {
+        this.commentsList = commentsList;
     }
 
     @Override
@@ -41,8 +45,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     @Override
-    public void onBindViewHolder(CommentViewHolder holder, int position) {
-        CommentNode commentNode = commentsList.get(position);
+    public void onBindViewHolder(final CommentViewHolder holder, int position) {
+        final CommentNode commentNode = commentsList.get(position);
 
         Comment comment = commentNode.getComment();
         String author = comment.getAuthor();
@@ -56,7 +60,26 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         holder.timestampTextView.setText(timestamp);
         holder.scoreTextView.setText(context.getString(R.string.points, score));
         holder.flairTextView.setText(flair);
-        setBackgroundAndPadding(commentNode, holder);
+        holder.rlCommentActions.setVisibility(View.GONE);
+        setBackgroundAndPadding(commentNode, holder, false /* dark */);
+
+
+        holder.mCommentInnerRelLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.rlCommentActions.getVisibility() == View.VISIBLE) {
+                    holder.mCommentOuterRelLayout.setBackgroundColor(
+                            ContextCompat.getColor(context, R.color.white));
+                    holder.rlCommentActions.setVisibility(View.GONE);
+                    setBackgroundAndPadding(commentNode, holder, false /* dark */);
+                } else {
+                    holder.rlCommentActions.setVisibility(View.VISIBLE);
+                    holder.mCommentOuterRelLayout.setBackgroundColor(
+                            ContextCompat.getColor(context, R.color.lightGray));
+                    setBackgroundAndPadding(commentNode, holder, true /* dark */);
+                }
+            }
+        });
     }
 
     @Override
@@ -70,7 +93,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         notifyDataSetChanged();
     }
 
-    private void setBackgroundAndPadding(CommentNode commentNode, CommentViewHolder holder) {
+    private void setBackgroundAndPadding(CommentNode commentNode, CommentViewHolder holder,
+                                         boolean dark) {
         int padding_in_dp = 5;
         final float scale = context.getResources().getDisplayMetrics().density;
         int padding_in_px = (int) (padding_in_dp * scale + 0.5F);
@@ -83,20 +107,48 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             int res = (depthFromZero) % 5;
             switch (res) {
                 case 0:
-                    holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderblue);
+                    if (dark) {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderbluedark);
+                    } else {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderblue);
+                    }
                     break;
                 case 1:
-                    holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.bordergreen);
+                    if (dark) {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.bordergreendark);
+                    } else {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.bordergreen);
+                    }
                     break;
-                case 2: //
-                    holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderbrown);
+                case 2:
+                    if (dark) {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderbrowndark);
+                    } else {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderbrown);
+                    }
                     break;
                 case 3:
-                    holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderorange);
+                    if (dark) {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderorangedark);
+                    } else {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderorange);
+                    }
                     break;
                 case 4:
-                    holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderred);
+                    if (dark) {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderreddark);
+                    } else {
+                        holder.mCommentInnerRelLayout.setBackgroundResource(R.drawable.borderred);
+                    }
                     break;
+            }
+        } else {
+            if (dark) {
+                holder.mCommentInnerRelLayout.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.commentBgDark));
+            } else {
+                holder.mCommentInnerRelLayout.setBackgroundColor(
+                        ContextCompat.getColor(context, R.color.commentBgLight));
             }
         }
         // Add padding depending on level.
@@ -105,17 +157,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
 
-        RelativeLayout mCommentOuterRelLayout;
+
+        @BindView(R.id.rl_comment_outer) RelativeLayout mCommentOuterRelLayout;
         @BindView(R.id.comment_inner_relativeLayout) RelativeLayout mCommentInnerRelLayout;
         @BindView(R.id.comment_author) TextView authorTextView;
         @BindView(R.id.comment_score) TextView scoreTextView;
         @BindView(R.id.comment_timestamp) TextView timestampTextView;
         @BindView(R.id.comment_body) TextView bodyTextView;
         @BindView(R.id.comment_flair) TextView flairTextView;
+        @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
 
         public CommentViewHolder(View view) {
             super(view);
-            mCommentOuterRelLayout = (RelativeLayout) view;
             ButterKnife.bind(this, view);
         }
     }

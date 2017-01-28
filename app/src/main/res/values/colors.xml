@@ -34,6 +34,9 @@
     <color name="redditActionColor">#757575</color>
     <color name="redditInfoColor">#A5A5A5</color>
 
+    <color name="commentBgLight">#FFFFFF</color>
+    <color name="commentBgDark">#E5E5E5</color>
+
     <!-- Team colors -->
     <color name="atl">#FF0000</color>
     <color name="bkn">#000000</color>
