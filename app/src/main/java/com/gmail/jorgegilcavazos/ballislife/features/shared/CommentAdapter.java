@@ -17,6 +17,9 @@ import net.dean.jraw.models.CommentNode;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Adapter used to hold all of the comments from a thread.
  */
@@ -101,21 +104,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
-        public TextView authorTextView, scoreTextView, timestampTextView, bodyTextView,
-                flairTextView;
-        public RelativeLayout mCommentOuterRelLayout;
-        public RelativeLayout mCommentInnerRelLayout;
+
+        RelativeLayout mCommentOuterRelLayout;
+        @BindView(R.id.comment_inner_relativeLayout) RelativeLayout mCommentInnerRelLayout;
+        @BindView(R.id.comment_author) TextView authorTextView;
+        @BindView(R.id.comment_score) TextView scoreTextView;
+        @BindView(R.id.comment_timestamp) TextView timestampTextView;
+        @BindView(R.id.comment_body) TextView bodyTextView;
+        @BindView(R.id.comment_flair) TextView flairTextView;
 
         public CommentViewHolder(View view) {
             super(view);
             mCommentOuterRelLayout = (RelativeLayout) view;
-            mCommentInnerRelLayout = (RelativeLayout)
-                    view.findViewById(R.id.comment_inner_relativeLayout);
-            authorTextView = (TextView) view.findViewById(R.id.comment_author);
-            scoreTextView = (TextView) view.findViewById(R.id.comment_score);
-            timestampTextView = (TextView) view.findViewById(R.id.comment_timestamp);
-            bodyTextView = (TextView) view.findViewById(R.id.comment_body);
-            flairTextView = (TextView) view.findViewById(R.id.comment_flair);
+            ButterKnife.bind(this, view);
         }
     }
 }
