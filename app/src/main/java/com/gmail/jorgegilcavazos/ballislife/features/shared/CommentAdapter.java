@@ -12,12 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
+import net.dean.jraw.models.VoteDirection;
 
 import java.util.List;
 
@@ -31,9 +31,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     Context context;
     List<CommentNode> commentsList;
+    OnCommentActionClickListener actionClickListener;
 
-    public CommentAdapter(List<CommentNode> commentsList) {
+    public CommentAdapter(List<CommentNode> commentsList, OnCommentActionClickListener listener) {
         this.commentsList = commentsList;
+        actionClickListener = listener;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     public void onBindViewHolder(final CommentViewHolder holder, int position) {
         final CommentNode commentNode = commentsList.get(position);
 
-        Comment comment = commentNode.getComment();
+        final Comment comment = commentNode.getComment();
         String author = comment.getAuthor();
         String body = comment.getBody();
         String timestamp = DateFormatUtil.formatRedditDate(comment.getCreated());
@@ -85,10 +87,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             public void onClick(View v) {
                 if (holder.scoreTextView.getCurrentTextColor() == colorUpvoted) {
                     holder.scoreTextView.setTextColor(colorNeutral);
-                    // TODO: remove upvote
+                    actionClickListener.onVote(comment, VoteDirection.NO_VOTE);
                 } else {
                     holder.scoreTextView.setTextColor(colorUpvoted);
-                    // TODO: upvote
+                    actionClickListener.onVote(comment, VoteDirection.UPVOTE);
                 }
                 hideActions(holder, commentNode);
             }
@@ -98,10 +100,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             public void onClick(View v) {
                 if (holder.scoreTextView.getCurrentTextColor() == colorDownvoted) {
                     holder.scoreTextView.setTextColor(colorNeutral);
-                    // TODO: remove downvote
+                    actionClickListener.onVote(comment, VoteDirection.NO_VOTE);
                 } else {
                     holder.scoreTextView.setTextColor(colorDownvoted);
-                    // TODO: downvote
+                    actionClickListener.onVote(comment, VoteDirection.DOWNVOTE);
                 }
                 hideActions(holder, commentNode);
             }

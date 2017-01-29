@@ -15,9 +15,12 @@ import android.view.ViewGroup;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.CommentAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentActionClickListener;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
+import net.dean.jraw.models.VoteDirection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPresenter>
-        implements GameThreadView, SwipeRefreshLayout.OnRefreshListener {
+        implements GameThreadView, SwipeRefreshLayout.OnRefreshListener,
+        OnCommentActionClickListener{
     private static final String TAG = "GameThreadFragment";
 
     public static final String HOME_TEAM_KEY = "HOME_TEAM";
@@ -87,7 +91,7 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
-        commentAdapter = new CommentAdapter(new ArrayList<CommentNode>(0));
+        commentAdapter = new CommentAdapter(new ArrayList<CommentNode>(0), this);
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
         rvComments.setAdapter(commentAdapter);
@@ -163,5 +167,10 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
         if (snackbar != null) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public void onVote(Comment comment, VoteDirection voteDirection) {
+        presenter.vote(comment, voteDirection);
     }
 }

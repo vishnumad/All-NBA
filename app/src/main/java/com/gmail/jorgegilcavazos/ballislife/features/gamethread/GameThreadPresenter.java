@@ -9,7 +9,10 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import net.dean.jraw.managers.AccountManager;
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
+import net.dean.jraw.models.VoteDirection;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,9 +79,7 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                             return Observable.just(list);
                         }
 
-                        RedditAuthentication reddit = RedditAuthentication.getInstance();
-                        return new RedditService(reddit.getRedditClient())
-                                .getComments(threadId, type);
+                        return new RedditService().getComments(threadId, type);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -112,5 +113,10 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
         if (isViewAttached()) {
             getView().dismissSnackbar();
         }
+    }
+
+    public void vote(Comment comment, VoteDirection voteDirection) {
+        RedditService service = new RedditService();
+        service.voteComment(comment, voteDirection);
     }
 }

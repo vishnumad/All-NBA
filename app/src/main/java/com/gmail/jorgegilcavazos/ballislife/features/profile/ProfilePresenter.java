@@ -55,7 +55,7 @@ public class ProfilePresenter extends MvpBasePresenter<ProfileView> {
         }
 
         disposables.clear();
-        RedditService redditService = new RedditService(redditClient);
+        RedditService redditService = new RedditService();
 
         Observable<LoggedInAccount> account = redditService.getLoggedInAccount();
         disposables.add(

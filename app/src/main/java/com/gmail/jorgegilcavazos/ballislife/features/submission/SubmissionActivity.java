@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentActionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -33,9 +34,11 @@ import com.google.gson.JsonParser;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.http.SubmissionRequest;
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.VoteDirection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +49,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubmissionActivity extends AppCompatActivity {
+public class SubmissionActivity extends AppCompatActivity implements OnCommentActionClickListener {
     private static final String TAG = "SubmissionActivity";
 
     private Toolbar mToolbar;
@@ -192,7 +195,7 @@ public class SubmissionActivity extends AppCompatActivity {
         for (CommentNode node : iterable) {
             commentNodes.add(node);
         }
-        mAdapter = new CommentAdapter(commentNodes);
+        mAdapter = new CommentAdapter(commentNodes, this);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -249,6 +252,11 @@ public class SubmissionActivity extends AppCompatActivity {
             //stopVideo();
             //Toast.makeText(context, "Error loading video", Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    @Override
+    public void onVote(Comment comment, VoteDirection voteDirection) {
 
     }
 

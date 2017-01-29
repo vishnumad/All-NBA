@@ -1,18 +1,23 @@
 package com.gmail.jorgegilcavazos.ballislife.network.API;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
+import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.SubmissionRequest;
+import net.dean.jraw.managers.AccountManager;
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.LoggedInAccount;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
@@ -25,10 +30,8 @@ import io.reactivex.ObservableOnSubscribe;
 
 public class RedditService {
 
-    private RedditClient redditClient;
+    public RedditService() {
 
-    public RedditService(RedditClient redditClient) {
-        this.redditClient = redditClient;
     }
 
     public Observable<LoggedInAccount> getLoggedInAccount() {
@@ -38,7 +41,7 @@ public class RedditService {
             public void subscribe(ObservableEmitter<LoggedInAccount> e) throws Exception {
                 try {
                     if (!e.isDisposed()) {
-                        e.onNext(redditClient.me());
+                        e.onNext(RedditAuthentication.getInstance().getRedditClient().me());
                         e.onComplete();
                     }
                 } catch (Exception ex) {
@@ -53,10 +56,11 @@ public class RedditService {
     }
 
     public Observable<Listing<Contribution>> getUserContributions() {
+        RedditClient redditClient = RedditAuthentication.getInstance().getRedditClient();
         String where = "overview";
 
-        final UserContributionPaginator paginator = new UserContributionPaginator(redditClient, where,
-                redditClient.getAuthenticatedUser());
+        final UserContributionPaginator paginator = new UserContributionPaginator(redditClient,
+                where, redditClient.getAuthenticatedUser());
         paginator.setLimit(50);
         paginator.setSorting(Sorting.NEW);
 
@@ -87,6 +91,9 @@ public class RedditService {
                 new ObservableOnSubscribe<List<CommentNode>>() {
                     @Override
                     public void subscribe(ObservableEmitter<List<CommentNode>> e) throws Exception {
+                        RedditClient redditClient = RedditAuthentication.getInstance()
+                                .getRedditClient();
+
                         SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
                         switch (type) {
                             case RedditUtils.LIVE_GT_TYPE:
@@ -125,5 +132,34 @@ public class RedditService {
         );
 
         return observable;
+    }
+
+    public void voteComment(Comment comment, VoteDirection direction) {
+        new VoteCommentTask(comment, direction).execute();
+    }
+
+    private static class VoteCommentTask extends AsyncTask<Void, Void, Void> {
+
+        private Comment comment;
+        private VoteDirection direction;
+
+        VoteCommentTask(Comment comment, VoteDirection direction) {
+            this.comment = comment;
+            this.direction = direction;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                AccountManager accountManager = new AccountManager(
+                        RedditAuthentication.getInstance().getRedditClient());
+                try {
+                    accountManager.vote(comment, direction);
+                } catch (Exception e) {
+                    // Non-successful request.
+                }
+            }
+            return null;
+        }
     }
 }
