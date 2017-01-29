@@ -69,15 +69,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             @Override
             public void onClick(View v) {
                 if (holder.rlCommentActions.getVisibility() == View.VISIBLE) {
-                    holder.mCommentOuterRelLayout.setBackgroundColor(
-                            ContextCompat.getColor(context, R.color.white));
-                    holder.rlCommentActions.setVisibility(View.GONE);
-                    setBackgroundAndPadding(commentNode, holder, false /* dark */);
+                    hideActions(holder, commentNode);
                 } else {
-                    holder.rlCommentActions.setVisibility(View.VISIBLE);
-                    holder.mCommentOuterRelLayout.setBackgroundColor(
-                            ContextCompat.getColor(context, R.color.lightGray));
-                    setBackgroundAndPadding(commentNode, holder, true /* dark */);
+                    showActions(holder, commentNode);
                 }
             }
         });
@@ -96,6 +90,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                     holder.scoreTextView.setTextColor(colorUpvoted);
                     // TODO: upvote
                 }
+                hideActions(holder, commentNode);
             }
         });
         holder.btnDownvote.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +103,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                     holder.scoreTextView.setTextColor(colorDownvoted);
                     // TODO: downvote
                 }
+                hideActions(holder, commentNode);
             }
         });
 
@@ -184,6 +180,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         }
         // Add padding depending on level.
         holder.mCommentOuterRelLayout.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
+    }
+
+    private void hideActions(CommentViewHolder holder, CommentNode commentNode) {
+        holder.mCommentOuterRelLayout.setBackgroundColor(
+                ContextCompat.getColor(context, R.color.white));
+        holder.rlCommentActions.setVisibility(View.GONE);
+        setBackgroundAndPadding(commentNode, holder, false /* dark */);
+    }
+
+    private void showActions(CommentViewHolder holder, CommentNode commentNode) {
+        holder.rlCommentActions.setVisibility(View.VISIBLE);
+        holder.mCommentOuterRelLayout.setBackgroundColor(
+                ContextCompat.getColor(context, R.color.lightGray));
+        setBackgroundAndPadding(commentNode, holder, true /* dark */);
     }
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
