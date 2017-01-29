@@ -112,6 +112,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             @Override
             public void onClick(View v) {
                 actionClickListener.onSave(comment);
+                hideActions(holder, commentNode);
             }
         });
 
