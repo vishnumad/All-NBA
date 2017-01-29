@@ -11,9 +11,7 @@ public final class Utilities {
         if (period <= 4) {
             return period + " " + periodName;
         } else {
-            return periodName + overtimePeriod;
+            return overtimePeriod + "OT";
         }
-
-
     }
 }
