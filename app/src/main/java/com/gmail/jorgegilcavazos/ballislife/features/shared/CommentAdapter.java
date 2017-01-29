@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -80,6 +81,36 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                 }
             }
         });
+
+        final int colorUpvoted = ContextCompat.getColor(context, R.color.commentUpvoted);
+        final int colorDownvoted = ContextCompat.getColor(context, R.color.commentDownvoted);
+        final int colorNeutral = ContextCompat.getColor(context, R.color.commentNeutral);
+
+        holder.btnUpvote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.scoreTextView.getCurrentTextColor() == colorUpvoted) {
+                    holder.scoreTextView.setTextColor(colorNeutral);
+                    // TODO: remove upvote
+                } else {
+                    holder.scoreTextView.setTextColor(colorUpvoted);
+                    // TODO: upvote
+                }
+            }
+        });
+        holder.btnDownvote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.scoreTextView.getCurrentTextColor() == colorDownvoted) {
+                    holder.scoreTextView.setTextColor(colorNeutral);
+                    // TODO: remove downvote
+                } else {
+                    holder.scoreTextView.setTextColor(colorDownvoted);
+                    // TODO: downvote
+                }
+            }
+        });
+
     }
 
     @Override
@@ -166,6 +197,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         @BindView(R.id.comment_body) TextView bodyTextView;
         @BindView(R.id.comment_flair) TextView flairTextView;
         @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
+        @BindView(R.id.button_comment_upvote) ImageButton btnUpvote;
+        @BindView(R.id.button_comment_downvote) ImageButton btnDownvote;
+        @BindView(R.id.button_comment_save) ImageButton btnSave;
+        @BindView(R.id.button_comment_reply) ImageButton btnReply;
+        @BindView(R.id.button_comment_options) ImageButton btnOptions;
 
         public CommentViewHolder(View view) {
             super(view);

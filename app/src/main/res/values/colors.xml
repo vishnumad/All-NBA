@@ -36,6 +36,9 @@
 
     <color name="commentBgLight">#FFFFFF</color>
     <color name="commentBgDark">#E5E5E5</color>
+    <color name="commentUpvoted">#FF9800</color>
+    <color name="commentDownvoted">#3F51B5</color>
+    <color name="commentNeutral">#757575</color>
 
     <!-- Team colors -->
     <color name="atl">#FF0000</color>

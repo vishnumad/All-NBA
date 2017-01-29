@@ -44,7 +44,7 @@
                 android:layout_toEndOf="@+id/comment_flair"
                 android:paddingLeft="2dp"
                 android:text="1000 points"
-                android:textColor="@color/secondaryText"
+                android:textColor="@color/commentNeutral"
                 android:textSize="10dp"/>
 
             <TextView
@@ -85,6 +85,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/button_comment_upvote"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
@@ -99,6 +100,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/button_comment_downvote"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
@@ -113,6 +115,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/button_comment_save"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
@@ -127,6 +130,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/button_comment_reply"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
@@ -141,6 +145,7 @@
             android:layout_weight="1">
 
             <ImageButton
+                android:id="@+id/button_comment_options"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerInParent="true"
