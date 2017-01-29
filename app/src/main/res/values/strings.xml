@@ -18,6 +18,9 @@
     <string name="failed_comments_data">Could not load comments</string>
     <string name="mute_game">Mute this game</string>
     <string name="no_comments_found">No comments found</string>
+    <string name="saved">Saved</string>
+    <string name="unsaved">Unsaved</string>
+
 
     <!-- Strings for MainActivity -->
     <string name="action_refresh">Refresh</string>

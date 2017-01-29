@@ -31,9 +31,11 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
 
     private long gameDate;
 
+    private RedditService redditService;
     private CompositeDisposable disposables;
 
     public GameThreadPresenter(long gameDate) {
+        redditService = new RedditService();
         disposables = new CompositeDisposable();
         this.gameDate = gameDate;
     }
@@ -79,7 +81,7 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                             return Observable.just(list);
                         }
 
-                        return new RedditService().getComments(threadId, type);
+                        return redditService.getComments(threadId, type);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -116,7 +118,10 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
     }
 
     public void vote(Comment comment, VoteDirection voteDirection) {
-        RedditService service = new RedditService();
-        service.voteComment(comment, voteDirection);
+        redditService.voteComment(comment, voteDirection);
+    }
+
+    public void save(Comment comment) {
+        redditService.saveComment(comment);
     }
 }

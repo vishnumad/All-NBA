@@ -6,6 +6,7 @@ import android.util.Log;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
+import net.dean.jraw.ApiException;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.SubmissionRequest;
@@ -138,6 +139,10 @@ public class RedditService {
         new VoteCommentTask(comment, direction).execute();
     }
 
+    public void saveComment(Comment comment) {
+        new SaveCommentTask(comment).execute();
+    }
+
     private static class VoteCommentTask extends AsyncTask<Void, Void, Void> {
 
         private Comment comment;
@@ -157,6 +162,29 @@ public class RedditService {
                     accountManager.vote(comment, direction);
                 } catch (Exception e) {
                     // Non-successful request.
+                }
+            }
+            return null;
+        }
+    }
+
+    private static class SaveCommentTask extends AsyncTask<Void, Void, Void> {
+
+        private Comment comment;
+
+        SaveCommentTask(Comment comment) {
+            this.comment = comment;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                AccountManager accountManager = new AccountManager(
+                        RedditAuthentication.getInstance().getRedditClient());
+                try {
+                    accountManager.save(comment);
+                } catch (Exception e) {
+                    // Non.successful request.
                 }
             }
             return null;

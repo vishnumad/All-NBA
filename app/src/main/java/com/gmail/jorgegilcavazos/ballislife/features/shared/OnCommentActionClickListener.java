@@ -7,4 +7,6 @@ public interface OnCommentActionClickListener {
 
     void onVote(Comment comment, VoteDirection voteDirection);
 
+    void onSave(Comment comment);
+
 }

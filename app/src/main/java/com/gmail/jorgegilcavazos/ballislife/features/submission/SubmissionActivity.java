@@ -260,6 +260,11 @@ public class SubmissionActivity extends AppCompatActivity implements OnCommentAc
 
     }
 
+    @Override
+    public void onSave(Comment comment) {
+
+    }
+
     private class FetchFullThreadTask extends AsyncTask<Void, Void, Submission> {
         private String mThreadId;
 

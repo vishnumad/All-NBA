@@ -8,10 +8,12 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.CommentAdapter;
@@ -172,5 +174,11 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
     @Override
     public void onVote(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
+    }
+
+    @Override
+    public void onSave(Comment comment) {
+        Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
+        presenter.save(comment);
     }
 }
