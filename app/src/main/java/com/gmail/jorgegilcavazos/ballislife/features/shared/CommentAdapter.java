@@ -67,6 +67,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         setBackgroundAndPadding(commentNode, holder, false /* dark */);
 
 
+        // On comment click hide/show actions (upvote, downvote, save, etc...).
         holder.mCommentInnerRelLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +82,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         final int colorUpvoted = ContextCompat.getColor(context, R.color.commentUpvoted);
         final int colorDownvoted = ContextCompat.getColor(context, R.color.commentDownvoted);
         final int colorNeutral = ContextCompat.getColor(context, R.color.commentNeutral);
+
+        // Set score color base on vote.
+        if (comment.getVote() == VoteDirection.UPVOTE) {
+            holder.scoreTextView.setTextColor(colorUpvoted);
+        } else if (comment.getVote() == VoteDirection.DOWNVOTE) {
+            holder.scoreTextView.setTextColor(colorDownvoted);
+        } else {
+            holder.scoreTextView.setTextColor(colorNeutral);
+        }
+
+        // Add a "*" to indicate that a comment has been edited.
+        if (comment.hasBeenEdited()) {
+            holder.timestampTextView.setText(timestamp + "*");
+        }
 
         holder.btnUpvote.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,7 +221,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
-
 
         @BindView(R.id.rl_comment_outer) RelativeLayout mCommentOuterRelLayout;
         @BindView(R.id.comment_inner_relativeLayout) RelativeLayout mCommentInnerRelLayout;
