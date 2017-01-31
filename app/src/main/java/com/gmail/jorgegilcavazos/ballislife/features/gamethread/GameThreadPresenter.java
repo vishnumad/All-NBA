@@ -124,4 +124,8 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
     public void save(Comment comment) {
         redditService.saveComment(comment);
     }
+
+    public void reply(int position, Comment parentComment, String text) {
+        redditService.replyToComment(parentComment, text);
+    }
 }

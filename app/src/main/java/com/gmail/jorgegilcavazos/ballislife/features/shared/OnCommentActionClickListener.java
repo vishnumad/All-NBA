@@ -9,4 +9,5 @@ public interface OnCommentActionClickListener {
 
     void onSave(Comment comment);
 
+    void onReply(int position, Comment parentComment);
 }

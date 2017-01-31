@@ -20,6 +20,9 @@
     <string name="no_comments_found">No comments found</string>
     <string name="saved">Saved</string>
     <string name="unsaved">Unsaved</string>
+    <string name="speaking_as">Speaking as: %1$s</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 
 
     <!-- Strings for MainActivity -->

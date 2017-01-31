@@ -143,6 +143,10 @@ public class RedditService {
         new SaveCommentTask(comment).execute();
     }
 
+    public void replyToComment(Comment parent, String text) {
+        new ReplyToCommentTask(parent, text).execute();
+    }
+
     private static class VoteCommentTask extends AsyncTask<Void, Void, Void> {
 
         private Comment comment;
@@ -184,7 +188,32 @@ public class RedditService {
                 try {
                     accountManager.save(comment);
                 } catch (Exception e) {
-                    // Non.successful request.
+                    // Non successful request.
+                }
+            }
+            return null;
+        }
+    }
+
+    private static class ReplyToCommentTask extends AsyncTask<Void, Void, Void> {
+
+        Comment parent;
+        String text;
+
+        ReplyToCommentTask(Comment parent, String text) {
+            this.parent = parent;
+            this.text = text;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                AccountManager accountManger = new AccountManager(
+                        RedditAuthentication.getInstance().getRedditClient());
+                try {
+                    accountManger.reply(parent, text);
+                } catch (Exception e) {
+                    // Non successful request.
                 }
             }
             return null;

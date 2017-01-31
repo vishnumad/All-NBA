@@ -1,11 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -180,5 +183,32 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
     public void onSave(Comment comment) {
         Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
         presenter.save(comment);
+    }
+
+    @Override
+    public void onReply(final int position, final Comment parentComment) {
+        String username = "";
+        final EditText editText = (EditText) LayoutInflater.from(getActivity())
+                .inflate(R.layout.comment_edit_text, null);
+
+        final AlertDialog.Builder commentDialog = new AlertDialog.Builder(getActivity());
+        commentDialog.setTitle(getResources().getString(R.string.speaking_as, username));
+        commentDialog.setView(editText);
+
+        commentDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                presenter.reply(position, parentComment, editText.getText().toString());
+            }
+        });
+        commentDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        commentDialog.show();
     }
 }

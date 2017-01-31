@@ -48,7 +48,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     }
 
     @Override
-    public void onBindViewHolder(final CommentViewHolder holder, int position) {
+    public void onBindViewHolder(final CommentViewHolder holder, final int position) {
         final CommentNode commentNode = commentsList.get(position);
 
         final Comment comment = commentNode.getComment();
@@ -127,6 +127,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             @Override
             public void onClick(View v) {
                 actionClickListener.onSave(comment);
+                hideActions(holder, commentNode);
+            }
+        });
+        holder.btnReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actionClickListener.onReply(position, comment);
                 hideActions(holder, commentNode);
             }
         });

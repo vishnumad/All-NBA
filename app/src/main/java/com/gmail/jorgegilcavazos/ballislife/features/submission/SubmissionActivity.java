@@ -265,6 +265,11 @@ public class SubmissionActivity extends AppCompatActivity implements OnCommentAc
 
     }
 
+    @Override
+    public void onReply(int position, Comment parentComment) {
+
+    }
+
     private class FetchFullThreadTask extends AsyncTask<Void, Void, Submission> {
         private String mThreadId;
 
