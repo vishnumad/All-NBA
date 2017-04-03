@@ -125,7 +125,31 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
         redditService.saveComment(comment);
     }
 
-    public void reply(int position, Comment parentComment, String text) {
-        redditService.replyToComment(parentComment, text);
+    public void reply(final int position, Comment parentComment, final String text) {
+        disposables.clear();
+        disposables.add(redditService.replytoComment(parentComment, text)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<String>() {
+                    @Override
+                    public void onNext(String s) {
+                        if (isViewAttached()) {
+                            //getView().addComment(position, text);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (isViewAttached()) {
+                            getView().showToast("Failed to reply");
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        );
     }
 }

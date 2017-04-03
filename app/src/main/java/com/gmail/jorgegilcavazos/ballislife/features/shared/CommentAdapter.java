@@ -151,6 +151,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         notifyDataSetChanged();
     }
 
+    public void addComment(int position, Comment comment) {
+    }
+
     private void setBackgroundAndPadding(CommentNode commentNode, CommentViewHolder holder,
                                          boolean dark) {
         int padding_in_dp = 5;

@@ -135,6 +135,26 @@ public class RedditService {
         return observable;
     }
 
+    public Observable<String> replytoComment(final Comment parent, final String text) {
+        Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManger = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        e.onNext(accountManger.reply(parent, text));
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                }
+            }
+        });
+
+        return observable;
+    }
+
     public void voteComment(Comment comment, VoteDirection direction) {
         new VoteCommentTask(comment, direction).execute();
     }

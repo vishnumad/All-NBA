@@ -154,6 +154,16 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
     }
 
     @Override
+    public void addComment(int position, Comment comment) {
+        commentAdapter.addComment(position, comment);
+    }
+
+    @Override
+    public void showToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void showSnackbar(boolean canReload) {
         snackbar = Snackbar.make(getView(), R.string.failed_comments_data, Snackbar.LENGTH_INDEFINITE);
         if (canReload) {
