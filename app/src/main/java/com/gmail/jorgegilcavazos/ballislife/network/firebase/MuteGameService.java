@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.Set;
 
 /**
@@ -42,12 +44,18 @@ public class MuteGameService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
 
+        if (intent == null) {
+            return START_NOT_STICKY;
+        }
+
         int id = intent.getIntExtra("id", -1);
         Log.d(TAG, "id: " + id);
         if (id != -1) {
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(id);
+        } else {
+            FirebaseCrash.report(new Exception("ID should not be -1 in MuteGameService.java"));
         }
 
         Set<String> mutedGames = sharedPreferences.getStringSet(KEY_MUTE_GAMES, null);
@@ -59,7 +67,7 @@ public class MuteGameService extends Service {
 
         mutedGamesCopy.add(String.valueOf(id));
         editor.putStringSet(KEY_MUTE_GAMES, mutedGamesCopy);
-        editor.apply();
+        editor.commit();
 
         return START_REDELIVER_INTENT;
     }
