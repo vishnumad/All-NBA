@@ -26,7 +26,8 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerVertical="true"
-                android:background="@drawable/circle_shape" />
+                android:background="@drawable/circle_shape"
+                android:backgroundTint="@color/sas"/>
 
             <TextView
                 android:id="@+id/awaylabel"
@@ -48,7 +49,8 @@
                 android:layout_height="70dp"
                 android:background="@drawable/circle_shape"
                 android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true" />
+                android:layout_alignParentEnd="true"
+                android:backgroundTint="@color/hou"/>
 
             <TextView
                 android:id="@+id/homelabel"
@@ -66,7 +68,7 @@
                 android:layout_alignParentBottom="true"/>
 
             <TextView
-                android:id="@+id/extraLabel"
+                android:id="@+id/text_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/awayicon"
@@ -79,7 +81,7 @@
                 android:gravity="center"/>
 
             <TextView
-                android:id="@+id/extraLabel2"
+                android:id="@+id/text_final"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/awayicon"

@@ -13,7 +13,5 @@ public final class Utilities {
         } else {
             return periodName + overtimePeriod;
         }
-
-
     }
 }
