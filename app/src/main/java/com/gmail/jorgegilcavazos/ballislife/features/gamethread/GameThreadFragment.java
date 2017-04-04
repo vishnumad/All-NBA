@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
@@ -10,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.CommentAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentActionClickListener;
@@ -154,7 +157,7 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
     }
 
     @Override
-    public void addComment(int position, Comment comment) {
+    public void addComment(int position, CommentNode comment) {
         commentAdapter.addComment(position, comment);
     }
 
@@ -185,6 +188,16 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
     }
 
     @Override
+    public void showReplySavedToast() {
+        Toast.makeText(getActivity(), R.string.reply_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showReplyErrorToast() {
+        Toast.makeText(getActivity(), R.string.reply_error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onVote(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }
@@ -197,28 +210,17 @@ public class GameThreadFragment extends MvpFragment<GameThreadView, GameThreadPr
 
     @Override
     public void onReply(final int position, final Comment parentComment) {
-        String username = "";
-        final EditText editText = (EditText) LayoutInflater.from(getActivity())
-                .inflate(R.layout.comment_edit_text, null);
-
-        final AlertDialog.Builder commentDialog = new AlertDialog.Builder(getActivity());
-        commentDialog.setTitle(getResources().getString(R.string.speaking_as, username));
-        commentDialog.setView(editText);
-
-        commentDialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                presenter.reply(position, parentComment, editText.getText().toString());
-            }
-        });
-        commentDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        commentDialog.show();
+        new MaterialDialog.Builder(getContext())
+                .title(R.string.add_comment)
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        presenter.reply(position, parentComment, input.toString());
+                    }
+                })
+                .positiveText("Reply")
+                .negativeText("Cancel")
+                .show();
     }
 }

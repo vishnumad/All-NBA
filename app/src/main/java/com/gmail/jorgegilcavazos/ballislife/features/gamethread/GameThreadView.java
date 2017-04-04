@@ -15,11 +15,15 @@ public interface GameThreadView extends MvpView {
 
     void hideComments();
 
-    void addComment(int position, Comment comment);
+    void addComment(int position, CommentNode comment);
 
     void showToast(String message);
 
     void showSnackbar(boolean canReload);
 
     void dismissSnackbar();
+
+    void showReplySavedToast();
+
+    void showReplyErrorToast();
 }

@@ -1,15 +1,15 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import android.util.Log;
+
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-import net.dean.jraw.managers.AccountManager;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.VoteDirection;
@@ -18,11 +18,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -66,29 +67,28 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
         disposables.clear();
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
-                .flatMap(new Function<List<GameThreadSummary>, Observable<String>>() {
+                .flatMap(new Function<List<GameThreadSummary>, SingleSource<String>>() {
                     @Override
-                    public Observable<String> apply(List<GameThreadSummary> threads) throws Exception {
+                    public SingleSource<String> apply(List<GameThreadSummary> threads) throws Exception {
                         return GameThreadFinderService.findGameThreadInList(threads, type,
                                 homeTeamAbbr, awayTeamAbbr);
                     }
                 })
-                .flatMap(new Function<String, Observable<List<CommentNode>>>() {
+                .flatMap(new Function<String, SingleSource<List<CommentNode>>>() {
                     @Override
-                    public Observable<List<CommentNode>> apply(String threadId) throws Exception {
+                    public SingleSource<List<CommentNode>> apply(String threadId) throws Exception {
                         if (threadId.equals("")) {
                             List<CommentNode> list = new ArrayList<>();
-                            return Observable.just(list);
+                            return Single.just(list);
                         }
-
                         return redditService.getComments(threadId, type);
                     }
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<List<CommentNode>>() {
+                .subscribeWith(new DisposableSingleObserver<List<CommentNode>>() {
                     @Override
-                    public void onNext(List<CommentNode> commentNodes) {
+                    public void onSuccess(List<CommentNode> commentNodes) {
                         getView().setLoadingIndicator(false);
                         if(commentNodes.size() == 0) {
                             getView().showSnackbar(true);
@@ -101,11 +101,6 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                     public void onError(Throwable e) {
                         getView().setLoadingIndicator(false);
                         getView().showSnackbar(true);
-                    }
-
-                    @Override
-                    public void onComplete() {
-
                     }
                 })
         );
@@ -125,29 +120,38 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
         redditService.saveComment(comment);
     }
 
-    public void reply(final int position, Comment parentComment, final String text) {
+    public void reply(final int position, final Comment parentComment, final String text) {
         disposables.clear();
-        disposables.add(redditService.replytoComment(parentComment, text)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<String>() {
+        disposables.add(redditService.replyToComment(parentComment, text)
+                .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
-                    public void onNext(String s) {
+                    public SingleSource<CommentNode> apply(String s) throws Exception {
+                        return redditService.getComment(parentComment.getSubmissionId().substring(3), s);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(new DisposableSingleObserver<CommentNode>() {
+                    @Override
+                    public void onSuccess(CommentNode comment) {
                         if (isViewAttached()) {
-                            //getView().addComment(position, text);
+                            getView().showReplySavedToast();
+                            if (comment != null) {
+                                getView().addComment(position + 1, comment);
+                            }
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
-                            getView().showToast("Failed to reply");
+                            if (e instanceof RedditService.ReplyNotAvailableException) {
+                                getView().showReplySavedToast();
+                            } else {
+                                getView().showReplyErrorToast();
+                            }
+                            Log.d("Presenter", e.toString());
                         }
-                    }
-
-                    @Override
-                    public void onComplete() {
-
                     }
                 })
         );

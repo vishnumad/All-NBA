@@ -36,6 +36,13 @@
     <string name="today_string">Today</string>
     <string name="not_logged">Not logged In</string>
 
+    <!-- GameThread -->
+    <string name="add_comment">Add a comment</string>
+    <string name="type_comment">Type a coment</string>
+    <string name="empty"></string>
+    <string name="reply_saved">Reply saved</string>
+    <string name="reply_error">Error saving reply</string>
+
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>
     <string name="notifications">Notifications</string>

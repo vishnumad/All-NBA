@@ -28,6 +28,9 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 
 public class RedditService {
 
@@ -87,72 +90,105 @@ public class RedditService {
         return observable;
     }
 
-    public Observable<List<CommentNode>> getComments(final String threadId, final String type) {
-        Observable<List<CommentNode>> observable = Observable.create(
-                new ObservableOnSubscribe<List<CommentNode>>() {
-                    @Override
-                    public void subscribe(ObservableEmitter<List<CommentNode>> e) throws Exception {
-                        RedditClient redditClient = RedditAuthentication.getInstance()
-                                .getRedditClient();
-
-                        SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
-                        switch (type) {
-                            case RedditUtils.LIVE_GT_TYPE:
-                                builder.sort(CommentSort.NEW);
-                                break;
-                            case RedditUtils.POST_GT_TYPE:
-                                builder.sort(CommentSort.TOP);
-                                break;
-                            default:
-                                builder.sort(CommentSort.TOP);
-                                break;
-                        }
-
-                        SubmissionRequest submissionRequest = builder.build();
-                        Submission submission = null;
-                        try {
-                            submission = redditClient.getSubmission(submissionRequest);
-
-                            Iterable<CommentNode> iterable = submission.getComments().walkTree();
-                            List<CommentNode> commentNodes = new ArrayList<>();
-                            for (CommentNode node : iterable) {
-                                commentNodes.add(node);
-                            }
-
-                            if (!e.isDisposed()) {
-                                e.onNext(commentNodes);
-                                e.onComplete();
-                            }
-                        } catch (NetworkException ex) {
-                            if (!e.isDisposed()) {
-                                e.onError(ex);
-                            }
-                        }
-                    }
-                }
-        );
-
-        return observable;
-    }
-
-    public Observable<String> replytoComment(final Comment parent, final String text) {
-        Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
+    public Single<List<CommentNode>> getComments(final String threadId, final String type) {
+        return Single.create(new SingleOnSubscribe<List<CommentNode>>() {
             @Override
-            public void subscribe(ObservableEmitter<String> e) throws Exception {
-                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                    AccountManager accountManger = new AccountManager(
-                            RedditAuthentication.getInstance().getRedditClient());
-                    try {
-                        e.onNext(accountManger.reply(parent, text));
-                        e.onComplete();
-                    } catch (Exception ex) {
+            public void subscribe(SingleEmitter<List<CommentNode>> e) throws Exception {
+                RedditClient redditClient = RedditAuthentication.getInstance()
+                        .getRedditClient();
+
+                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+                switch (type) {
+                    case RedditUtils.LIVE_GT_TYPE:
+                        builder.sort(CommentSort.NEW);
+                        break;
+                    case RedditUtils.POST_GT_TYPE:
+                        builder.sort(CommentSort.TOP);
+                        break;
+                    default:
+                        builder.sort(CommentSort.TOP);
+                        break;
+                }
+
+                SubmissionRequest submissionRequest = builder.build();
+                Submission submission = null;
+                try {
+                    submission = redditClient.getSubmission(submissionRequest);
+
+                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                    List<CommentNode> commentNodes = new ArrayList<>();
+                    for (CommentNode node : iterable) {
+                        commentNodes.add(node);
+                    }
+
+                    if (!e.isDisposed()) {
+                        e.onSuccess(commentNodes);
+                    }
+                } catch (NetworkException ex) {
+                    if (!e.isDisposed()) {
                         e.onError(ex);
                     }
                 }
             }
         });
+    }
 
-        return observable;
+    public Single<CommentNode> getComment(final String threadId, final String commentId) {
+        return Single.create(new SingleOnSubscribe<CommentNode>() {
+            @Override
+            public void subscribe(SingleEmitter<CommentNode> e) throws Exception {
+                RedditClient redditClient = RedditAuthentication.getInstance()
+                        .getRedditClient();
+
+                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+                builder.sort(CommentSort.NEW);
+
+                SubmissionRequest submissionRequest = builder.build();
+                Submission submission = null;
+                try {
+                    submission = redditClient.getSubmission(submissionRequest);
+
+                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                    for (CommentNode node : iterable) {
+                        if (node.getComment().getId().equals(commentId)) {
+                            if (!e.isDisposed()) {
+                                e.onSuccess(node);
+                                return;
+                            }
+                        }
+                    }
+
+                    if (!e.isDisposed()) {
+                        e.onError(new ReplyNotAvailableException());
+                    }
+
+                } catch (NetworkException ex) {
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
+                }
+            }
+        });
+    }
+
+    public Single<String> replyToComment(final Comment parent, final String text) {
+        return Single.create(new SingleOnSubscribe<String>() {
+            @Override
+            public void subscribe(SingleEmitter<String> e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManger = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        String id = accountManger.reply(parent, text);
+                        e.onSuccess(id);
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    Single.error(new Exception("Not logged in"));
+                }
+            }
+        });
     }
 
     public void voteComment(Comment comment, VoteDirection direction) {
@@ -161,10 +197,6 @@ public class RedditService {
 
     public void saveComment(Comment comment) {
         new SaveCommentTask(comment).execute();
-    }
-
-    public void replyToComment(Comment parent, String text) {
-        new ReplyToCommentTask(parent, text).execute();
     }
 
     private static class VoteCommentTask extends AsyncTask<Void, Void, Void> {
@@ -215,28 +247,9 @@ public class RedditService {
         }
     }
 
-    private static class ReplyToCommentTask extends AsyncTask<Void, Void, Void> {
-
-        Comment parent;
-        String text;
-
-        ReplyToCommentTask(Comment parent, String text) {
-            this.parent = parent;
-            this.text = text;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                AccountManager accountManger = new AccountManager(
-                        RedditAuthentication.getInstance().getRedditClient());
-                try {
-                    accountManger.reply(parent, text);
-                } catch (Exception e) {
-                    // Non successful request.
-                }
-            }
-            return null;
+    public class ReplyNotAvailableException extends Exception {
+        public ReplyNotAvailableException() {
+            super();
         }
     }
 }
