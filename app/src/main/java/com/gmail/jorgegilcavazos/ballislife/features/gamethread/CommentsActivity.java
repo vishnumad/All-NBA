@@ -59,15 +59,15 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         // Initialize tab layout and add three tabs.
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        tabLayout.addTab(tabLayout.newTab().setText("Game Thread"));
-        tabLayout.addTab(tabLayout.newTab().setText("Box Score"));
-        tabLayout.addTab(tabLayout.newTab().setText("Post Game Thread"));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.box_score));
+        tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
                 tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
-        tabLayout.setOnTabSelectedListener(this);
+        tabLayout.addOnTabSelectedListener(this);
     }
 
     @Override

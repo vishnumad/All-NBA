@@ -45,6 +45,9 @@
     <string name="failed_load_comments">Failed to load comments</string>
     <string name="no_comments_available">No comments to show</string>
     <string name="no_thread_made">No thread has been made for this game</string>
+    <string name="game_thread">Game Thread</string>
+    <string name="box_score">Box Score</string>
+    <string name="post_game_thread">Post Game Thread</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>
