@@ -25,4 +25,6 @@ public class BoxScoreFragment extends Fragment {
         webView.getSettings().setJavaScriptEnabled(true);
         return view;
     }
+
+
 }

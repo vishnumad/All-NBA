@@ -42,6 +42,9 @@
     <string name="empty"></string>
     <string name="reply_saved">Reply saved</string>
     <string name="reply_error">Error saving reply</string>
+    <string name="failed_load_comments">Failed to load comments</string>
+    <string name="no_comments_available">No comments to show</string>
+    <string name="no_thread_made">No thread has been made for this game</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

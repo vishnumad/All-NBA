@@ -7,14 +7,13 @@ import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.VoteDirection;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,32 +27,24 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
+public class GameThreadPresenter {
 
     private long gameDate;
 
+    private GameThreadView view;
     private RedditService redditService;
+    private RedditGameThreadsService gameThreadsService;
     private CompositeDisposable disposables;
 
-    public GameThreadPresenter(long gameDate) {
-        redditService = new RedditService();
-        disposables = new CompositeDisposable();
+    public GameThreadPresenter(GameThreadView view, RedditService redditService, long gameDate) {
+        this.view = view;
+        this.redditService = redditService;
         this.gameDate = gameDate;
     }
 
-    @Override
-    public void detachView(boolean retainInstance) {
-        super.detachView(retainInstance);
-        if (!retainInstance) {
-            disposables.clear();
-        }
-    }
-
-    public void loadComments(final String type,
-                             final String homeTeamAbbr, final String awayTeamAbbr) {
-        getView().setLoadingIndicator(true);
-        getView().hideComments();
-        getView().dismissSnackbar();
+    public void start() {
+        redditService = new RedditService();
+        disposables = new CompositeDisposable();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://nba-app-ca681.firebaseio.com/")
@@ -61,8 +52,15 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        RedditGameThreadsService gameThreadsService = retrofit
-                .create(RedditGameThreadsService.class);
+        gameThreadsService = retrofit.create(RedditGameThreadsService.class);
+    }
+
+    public void loadComments(final String type, final String homeTeamAbbr,
+                             final String awayTeamAbbr) {
+
+        view.setLoadingIndicator(true);
+        view.hideComments();
+        view.hideText();
 
         disposables.clear();
         disposables.add(gameThreadsService.fetchGameThreads(
@@ -77,9 +75,9 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                 .flatMap(new Function<String, SingleSource<List<CommentNode>>>() {
                     @Override
                     public SingleSource<List<CommentNode>> apply(String threadId) throws Exception {
+
                         if (threadId.equals("")) {
-                            List<CommentNode> list = new ArrayList<>();
-                            return Single.just(list);
+                            return Single.error(new ThreadNotFoundException());
                         }
                         return redditService.getComments(threadId, type);
                     }
@@ -89,27 +87,29 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                 .subscribeWith(new DisposableSingleObserver<List<CommentNode>>() {
                     @Override
                     public void onSuccess(List<CommentNode> commentNodes) {
-                        getView().setLoadingIndicator(false);
-                        if(commentNodes.size() == 0) {
-                            getView().showSnackbar(true);
-                        } else {
-                            getView().showComments(commentNodes);
+                        if (isViewAttached()) {
+                            view.setLoadingIndicator(false);
+                            if (commentNodes.size() == 0) {
+                                view.showNoCommentsText();
+                            } else {
+                                view.showComments(commentNodes);
+                            }
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        getView().setLoadingIndicator(false);
-                        getView().showSnackbar(true);
+                        if (isViewAttached()) {
+                            view.setLoadingIndicator(false);
+                            if (e instanceof ThreadNotFoundException) {
+                                view.showNoThreadText();
+                            } else {
+                                view.showFailedToLoadCommentsText();
+                            }
+                        }
                     }
                 })
         );
-    }
-
-    public void dismissSnackbar() {
-        if (isViewAttached()) {
-            getView().dismissSnackbar();
-        }
     }
 
     public void vote(Comment comment, VoteDirection voteDirection) {
@@ -135,9 +135,9 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                     @Override
                     public void onSuccess(CommentNode comment) {
                         if (isViewAttached()) {
-                            getView().showReplySavedToast();
+                            view.showReplySavedToast();
                             if (comment != null) {
-                                getView().addComment(position + 1, comment);
+                                view.addComment(position + 1, comment);
                             }
                         }
                     }
@@ -146,14 +146,25 @@ public class GameThreadPresenter extends MvpBasePresenter<GameThreadView> {
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
                             if (e instanceof RedditService.ReplyNotAvailableException) {
-                                getView().showReplySavedToast();
+                                view.showReplySavedToast();
                             } else {
-                                getView().showReplyErrorToast();
+                                view.showReplyErrorToast();
                             }
                             Log.d("Presenter", e.toString());
                         }
                     }
                 })
         );
+    }
+
+    public void stop() {
+        view = null;
+        if (disposables != null) {
+            disposables.clear();
+        }
+    }
+
+    private boolean isViewAttached() {
+        return view != null;
     }
 }

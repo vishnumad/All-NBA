@@ -2,20 +2,27 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener{
+
+public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     private static final String TAG = "CommentsActivity";
 
     private String homeTeam;
@@ -96,6 +103,7 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         viewPager.setCurrentItem(tab.getPosition());
+
     }
 
     @Override
