@@ -33,8 +33,6 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private Toolbar toolbar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +52,10 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         bundle.putString(BoxScoreFragment.GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
-        setUpToolbar();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(0);
+        }
 
         // Initialize tab layout and add three tabs.
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
@@ -87,17 +88,6 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setUpToolbar(){
-        toolbar = (Toolbar) findViewById(R.id.comments_toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            ActionBar ab = getSupportActionBar();
-            if (ab != null) {
-                ab.setDisplayHomeAsUpEnabled(true);
-            }
-        }
     }
 
     @Override

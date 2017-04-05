@@ -6,17 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".features.main.MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/comments_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:theme="@style/ToolBarStyle"/>
-
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayout"
         android:scrollbars="horizontal"
-        android:layout_below="@+id/comments_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
