@@ -50,6 +50,8 @@
     <string name="box_score">Box Score</string>
     <string name="post_game_thread">Post Game Thread</string>
     <string name="failed_to_save_comment">Could not save comment</string>
+    <string name="reply_to_sub_saved">Reply saved</string>
+    <string name="reply_to_sub_failed">Could not save reply</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

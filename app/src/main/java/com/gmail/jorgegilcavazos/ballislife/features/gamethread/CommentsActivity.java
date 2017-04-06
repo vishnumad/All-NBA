@@ -3,10 +3,9 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
@@ -23,7 +21,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
+        View.OnClickListener {
     private static final String TAG = "CommentsActivity";
 
     private String homeTeam;
@@ -35,6 +34,8 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     @BindView(R.id.tabLayout) TabLayout tabLayout;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
+
+    private PagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +68,12 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         tabLayout.addTab(tabLayout.newTab().setText(R.string.box_score));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
 
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
                 tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
         tabLayout.addOnTabSelectedListener(this);
+
+        fab.setOnClickListener(this);
     }
 
     @Override
@@ -116,5 +119,23 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                addComment();
+                break;
+        }
+    }
+
+    private void addComment() {
+        int pos = viewPager.getCurrentItem();
+        Fragment fragment = pagerAdapter.getItem(pos);
+
+        if (pos == 0 || pos == 2) {
+            ((GameThreadFragment) fragment).replyToThread();
+        }
     }
 }

@@ -235,4 +235,45 @@ public class RedditService {
             }
         });
     }
+
+    public Completable replyToThread(final Submission submission, final String text) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+
+                    try {
+                        accountManager.reply(submission, text);
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    e.onError(new NotLoggedInException());
+                }
+            }
+        });
+    }
+
+    public Single<Submission> getSubmission(final String threadId) {
+        return Single.create(new SingleOnSubscribe<Submission>() {
+            @Override
+            public void subscribe(SingleEmitter<Submission> e) throws Exception {
+                RedditClient redditClient = RedditAuthentication.getInstance()
+                        .getRedditClient();
+
+                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+
+                SubmissionRequest submissionRequest = builder.build();
+
+                try {
+                    e.onSuccess(redditClient.getSubmission(submissionRequest));
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
 }

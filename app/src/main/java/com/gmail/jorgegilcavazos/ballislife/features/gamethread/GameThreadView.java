@@ -34,4 +34,8 @@ public interface GameThreadView extends MvpView {
     void showFailedToSaveToast();
 
     void showNotLoggedInToast();
+
+    void showReplyToSubmissionSavedToast();
+
+    void showReplyToSubmissionFailedToast();
 }

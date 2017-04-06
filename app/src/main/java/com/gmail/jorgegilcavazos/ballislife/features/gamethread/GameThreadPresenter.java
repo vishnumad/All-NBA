@@ -14,11 +14,14 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
+import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -192,6 +195,58 @@ public class GameThreadPresenter {
                                 view.showReplyErrorToast();
                             }
                             Log.d("Presenter", e.toString());
+                        }
+                    }
+                })
+        );
+    }
+
+    public void replyToThread(final String text, final String type, final String homeTeamAbbr,
+                              final String awayTeamAbbr) {
+        disposables.add(gameThreadsService.fetchGameThreads(
+                DateFormatUtil.getNoDashDateString(new Date(gameDate)))
+                .flatMap(new Function<List<GameThreadSummary>, SingleSource<String>>() {
+                    @Override
+                    public SingleSource<String> apply(List<GameThreadSummary> threads) throws Exception {
+                        return GameThreadFinderService.findGameThreadInList(threads, type,
+                                homeTeamAbbr, awayTeamAbbr);
+                    }
+                })
+                .flatMap(new Function<String, SingleSource<Submission>>() {
+                    @Override
+                    public SingleSource<Submission> apply(String threadId) throws Exception {
+                        if (threadId.equals("")) {
+                            return Single.error(new ThreadNotFoundException());
+                        }
+                        return redditService.getSubmission(threadId);
+                    }
+                })
+                .flatMapCompletable(new Function<Submission, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Submission submission) throws Exception {
+                        return redditService.replyToThread(submission, text);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        if (isViewAttached()) {
+                            view.showReplyToSubmissionSavedToast();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (isViewAttached()) {
+                            if (e instanceof ThreadNotFoundException) {
+                                view.showNoThreadText();
+                            } else if (e instanceof NotLoggedInException) {
+                                view.showNotLoggedInToast();
+                            } else {
+                                view.showReplyToSubmissionFailedToast();
+                            }
                         }
                     }
                 })

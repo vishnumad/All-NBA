@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -197,6 +198,16 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
+    public void showReplyToSubmissionSavedToast() {
+        Toast.makeText(getActivity(), R.string.reply_to_sub_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showReplyToSubmissionFailedToast() {
+        Toast.makeText(getActivity(), R.string.reply_to_sub_failed, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onVote(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }
@@ -215,6 +226,21 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         presenter.reply(position, parentComment, input.toString());
+                    }
+                })
+                .positiveText("Reply")
+                .negativeText("Cancel")
+                .show();
+    }
+
+    public void replyToThread() {
+        new MaterialDialog.Builder(getContext())
+                .title(R.string.add_comment)
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        presenter.replyToThread(input.toString(), threadType, homeTeam, awayTeam);
                     }
                 })
                 .positiveText("Reply")
