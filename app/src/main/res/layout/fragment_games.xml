@@ -10,7 +10,8 @@
         android:id="@+id/navigator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryLight">
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary">
 
         <ImageButton
             android:id="@+id/navigator_button_left"
@@ -45,13 +46,14 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/navigator">
+        android:layout_above="@id/navigator">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/games_rv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:listitem="@layout/row_game_no_logos"/>
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <TextView

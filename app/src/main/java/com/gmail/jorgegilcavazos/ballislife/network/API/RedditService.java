@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 
 import net.dean.jraw.ApiException;
 import net.dean.jraw.RedditClient;
@@ -25,6 +27,9 @@ import net.dean.jraw.paginators.UserContributionPaginator;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -191,65 +196,43 @@ public class RedditService {
         });
     }
 
-    public void voteComment(Comment comment, VoteDirection direction) {
-        new VoteCommentTask(comment, direction).execute();
-    }
-
-    public void saveComment(Comment comment) {
-        new SaveCommentTask(comment).execute();
-    }
-
-    private static class VoteCommentTask extends AsyncTask<Void, Void, Void> {
-
-        private Comment comment;
-        private VoteDirection direction;
-
-        VoteCommentTask(Comment comment, VoteDirection direction) {
-            this.comment = comment;
-            this.direction = direction;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                AccountManager accountManager = new AccountManager(
-                        RedditAuthentication.getInstance().getRedditClient());
-                try {
-                    accountManager.vote(comment, direction);
-                } catch (Exception e) {
-                    // Non-successful request.
+    public Completable voteComment(final Comment comment, final VoteDirection direction) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        accountManager.vote(comment, direction);
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    e.onError(new NotLoggedInException());
                 }
             }
-            return null;
-        }
+        });
     }
 
-    private static class SaveCommentTask extends AsyncTask<Void, Void, Void> {
-
-        private Comment comment;
-
-        SaveCommentTask(Comment comment) {
-            this.comment = comment;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                AccountManager accountManager = new AccountManager(
-                        RedditAuthentication.getInstance().getRedditClient());
-                try {
-                    accountManager.save(comment);
-                } catch (Exception e) {
-                    // Non successful request.
+    public Completable saveComment(final Comment comment) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        accountManager.save(comment);
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    e.onError(new NotLoggedInException());
                 }
             }
-            return null;
-        }
-    }
-
-    public class ReplyNotAvailableException extends Exception {
-        public ReplyNotAvailableException() {
-            super();
-        }
+        });
     }
 }

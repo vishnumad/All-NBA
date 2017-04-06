@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -182,13 +183,27 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
+    public void showSavedToast() {
+        Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showFailedToSaveToast() {
+        Toast.makeText(getActivity(), R.string.failed_to_save_comment, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showNotLoggedInToast() {
+        Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onVote(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }
 
     @Override
     public void onSave(Comment comment) {
-        Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
         presenter.save(comment);
     }
 

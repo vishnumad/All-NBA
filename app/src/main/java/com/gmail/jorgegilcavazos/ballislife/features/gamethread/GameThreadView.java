@@ -28,4 +28,10 @@ public interface GameThreadView extends MvpView {
     void showReplySavedToast();
 
     void showReplyErrorToast();
+
+    void showSavedToast();
+
+    void showFailedToSaveToast();
+
+    void showNotLoggedInToast();
 }

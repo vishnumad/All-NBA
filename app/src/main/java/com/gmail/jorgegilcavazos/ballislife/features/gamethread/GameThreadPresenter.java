@@ -7,6 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -22,6 +24,7 @@ import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
@@ -62,7 +65,6 @@ public class GameThreadPresenter {
         view.hideComments();
         view.hideText();
 
-        disposables.clear();
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
                 .flatMap(new Function<List<GameThreadSummary>, SingleSource<String>>() {
@@ -113,15 +115,54 @@ public class GameThreadPresenter {
     }
 
     public void vote(Comment comment, VoteDirection voteDirection) {
-        redditService.voteComment(comment, voteDirection);
+        disposables.add(redditService.voteComment(comment, voteDirection)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (isViewAttached()) {
+                            if (e instanceof NotLoggedInException) {
+                                view.showNotLoggedInToast();
+                            }
+                        }
+                    }
+                })
+        );
     }
 
     public void save(Comment comment) {
-        redditService.saveComment(comment);
+        disposables.add(redditService.saveComment(comment)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        if (isViewAttached()) {
+                            view.showSavedToast();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (isViewAttached()) {
+                            if (e instanceof NotLoggedInException) {
+                                view.showNotLoggedInToast();
+                            } else {
+                                view.showFailedToSaveToast();
+                            }
+                        }
+                    }
+                })
+        );
     }
 
     public void reply(final int position, final Comment parentComment, final String text) {
-        disposables.clear();
         disposables.add(redditService.replyToComment(parentComment, text)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
@@ -145,7 +186,7 @@ public class GameThreadPresenter {
                     @Override
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
-                            if (e instanceof RedditService.ReplyNotAvailableException) {
+                            if (e instanceof ReplyNotAvailableException) {
                                 view.showReplySavedToast();
                             } else {
                                 view.showReplyErrorToast();
