@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -30,13 +31,21 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     private String gameId;
     private long date;
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.tabLayout) TabLayout tabLayout;
+    @BindView(R.id.pager) ViewPager viewPager;
+    @BindView(R.id.fab) FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.comments_activity);
+        ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Intent intent = getIntent();
         homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);
@@ -52,19 +61,12 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         bundle.putString(BoxScoreFragment.GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setElevation(0);
-        }
-
         // Initialize tab layout and add three tabs.
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.box_score));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
                 tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
@@ -93,7 +95,17 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         viewPager.setCurrentItem(tab.getPosition());
-
+        switch (tab.getPosition()) {
+            case 0:
+                fab.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                fab.setVisibility(View.INVISIBLE);
+                break;
+            case 2:
+                fab.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     @Override

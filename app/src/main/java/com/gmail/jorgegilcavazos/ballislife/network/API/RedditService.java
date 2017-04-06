@@ -129,7 +129,7 @@ public class RedditService {
                     if (!e.isDisposed()) {
                         e.onSuccess(commentNodes);
                     }
-                } catch (NetworkException ex) {
+                } catch (Exception ex) {
                     if (!e.isDisposed()) {
                         e.onError(ex);
                     }
