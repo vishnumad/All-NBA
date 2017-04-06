@@ -72,20 +72,26 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         ViewCompat.setBackgroundTintList(holder.barAway, context.getResources().getColorStateList(resKeyAway));
         ViewCompat.setBackgroundTintList(holder.barHome, context.getResources().getColorStateList(resKeyHome));
 
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3,
+                context.getResources().getDisplayMetrics());
+        float awayPct;
+        float homePct;
         try {
             int awayScore = Integer.valueOf(nbaGame.getAwayTeamScore());
             int homeScore = Integer.valueOf(nbaGame.getHomeTeamScore());
-            float awayPct = (float) (awayScore) / (float) (awayScore + homeScore);
-            float homePct = (float) (homeScore) / (float) (awayScore + homeScore);
+            awayPct = (float) (awayScore) / (float) (awayScore + homeScore);
+            homePct = (float) (homeScore) / (float) (awayScore + homeScore);
 
-            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3,
-                    context.getResources().getDisplayMetrics());
-
-            holder.barHome.setLayoutParams(new TableLayout.LayoutParams(0, height, awayPct));
-            holder.barAway.setLayoutParams(new TableLayout.LayoutParams(0, height, homePct));
+            if (awayScore == 0 && homeScore == 0) {
+                awayPct = 0.5f;
+                homePct = 0.5f;
+            }
         } catch (NumberFormatException e) {
-            // Don't set bar views.
+            awayPct = 0.5f;
+            homePct = 0.5f;
         }
+        holder.barHome.setLayoutParams(new TableLayout.LayoutParams(0, height, awayPct));
+        holder.barAway.setLayoutParams(new TableLayout.LayoutParams(0, height, homePct));
 
         holder.tvHomeTeam.setText(nbaGame.getHomeTeamAbbr());
         holder.tvAwayTeam.setText(nbaGame.getAwayTeamAbbr());
