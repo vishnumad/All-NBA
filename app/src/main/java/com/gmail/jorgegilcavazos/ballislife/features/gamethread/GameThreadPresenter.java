@@ -17,8 +17,10 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
@@ -70,10 +72,14 @@ public class GameThreadPresenter {
 
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
-                .flatMap(new Function<List<GameThreadSummary>, SingleSource<String>>() {
+                .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
-                    public SingleSource<String> apply(List<GameThreadSummary> threads) throws Exception {
-                        return GameThreadFinderService.findGameThreadInList(threads, type,
+                    public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
+                        List<GameThreadSummary> threadList = new ArrayList<>();
+                        for (Map.Entry<String, GameThreadSummary> entry : threads.entrySet()) {
+                            threadList.add(entry.getValue());
+                        }
+                        return GameThreadFinderService.findGameThreadInList(threadList, type,
                                 homeTeamAbbr, awayTeamAbbr);
                     }
                 })
@@ -112,6 +118,7 @@ public class GameThreadPresenter {
                                 view.showFailedToLoadCommentsText();
                             }
                         }
+                        Log.d("Presenter", e.toString());
                     }
                 })
         );
@@ -205,10 +212,14 @@ public class GameThreadPresenter {
                               final String awayTeamAbbr) {
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
-                .flatMap(new Function<List<GameThreadSummary>, SingleSource<String>>() {
+                .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
-                    public SingleSource<String> apply(List<GameThreadSummary> threads) throws Exception {
-                        return GameThreadFinderService.findGameThreadInList(threads, type,
+                    public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
+                        List<GameThreadSummary> threadList = new ArrayList<>();
+                        for (Map.Entry<String, GameThreadSummary> entry : threads.entrySet()) {
+                            threadList.add(entry.getValue());
+                        }
+                        return GameThreadFinderService.findGameThreadInList(threadList, type,
                                 homeTeamAbbr, awayTeamAbbr);
                     }
                 })
