@@ -1,5 +1,5 @@
 # NBA Android App
-[![Release status](https://img.shields.io/badge/release-v0.3.0--alpha-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
+[![Release status](https://img.shields.io/badge/release-v0.4.0--alpha-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
 
 Android app for NBA fans. Features live scores, highlights, alerts and Reddit integration for discussions.
 
@@ -13,10 +13,10 @@ Android app for NBA fans. Features live scores, highlights, alerts and Reddit in
 * Standings
 
 ## Screenshots
-<img src="art/games.png" alt="Ready" width="200px;"/>
-<img src="art/game_threads.png" alt="Ready" width="200px;"/>
-<img src="art/reddit_feed.png" alt="Ready" width="200px;"/>
-<img src="art/submission.png" alt="Ready" width="200px;"/>
+<img src="art/games.png" alt="Ready" width="180px;"/>
+<img src="art/game_threads.png" alt="Ready" width="180px;"/>
+<img src="art/reddit_feed.png" alt="Ready" width="180px;"/>
+<img src="art/submission.png" alt="Ready" width="180px;"/>
 
 [More screenshots](http://imgur.com/a/4h75K)
 
@@ -42,9 +42,9 @@ Some resources and libraries that you might find useful:
 * [JRAW](https://github.com/thatJavaNerd/JRAW): the Java Reddit API Wrapper, used throughout the application for integrating any reddit functionalities   
 * [RxJava 2](https://realm.io/news/gotocph-jake-wharton-exploring-rxjava2-android/): A Java implementation of ReactiveX, a library for composing asynchronous and event-based programs by using observable sequences  
 * [Retrofit 2](https://square.github.io/retrofit/): A type-safe HTTP client for Android and Java  
-* [Mosby MVP](http://hannesdorfmann.com/mosby/): A Model-View-Presenter library for android, makes implementing the MVP pattern fast and easy
 * [Butter Knife](http://jakewharton.github.io/butterknife/): Field and method binding for Android views  
-* [Picasso](http://square.github.io/picasso/): A powerful image downloading and caching library for Android
+* [Picasso](http://square.github.io/picasso/): A powerful image downloading and caching library for Android  
+* [Material Dialogs](https://github.com/afollestad/material-dialogs): A beautiful, fluid, and customizable dialogs API
 
 ### What if I don't code?  
 
