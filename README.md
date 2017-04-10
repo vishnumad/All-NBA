@@ -22,7 +22,7 @@ Android app for NBA fans. Features live scores, highlights, alerts and Reddit in
 
 ## Downloads
 
-A public Play Store version will not be available until a stable release is out, but there is an alpha version published, contact me to request an invitation.
+A public Play Store version will not be available until a stable release is out, but there is an alpha version published, [fill out this form to get an invitation](https://goo.gl/forms/vqZOBjkvZjxGOy0k2).
 
 Pre-release APK is available [here](https://github.com/jorgegil96/All-NBA/releases).
 
