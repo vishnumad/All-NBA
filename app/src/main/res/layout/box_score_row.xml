@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/text_min"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="MIN"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_pts"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="PTS"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_reb"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="REB"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_ast"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="AST"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_blk"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="BLK"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_stl"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="STL"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp"/>
+
+    <TextView
+        android:id="@+id/text_to"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="TO"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp" />
+
+    <TextView
+        android:id="@+id/text_pf"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="PF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp" />
+
+    <TextView
+        android:id="@+id/text_fg"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="FG"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp" />
+
+    <TextView
+        android:id="@+id/text_fgp"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:text="FG%"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_margin="3dp" />
+
+</LinearLayout>

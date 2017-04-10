@@ -25,6 +25,10 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         View.OnClickListener {
     private static final String TAG = "CommentsActivity";
 
+    public static final String GAME_ID_KEY = "gameId";
+    public static final String HOME_TEAM_KEY = "homeTeamKey";
+    public static final String AWAY_TEAM_KEY = "awayTeamKey";
+
     private String homeTeam;
     private String awayTeam;
     private String gameId;
@@ -57,9 +61,9 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         setTitle(awayTeam + " @ " + homeTeam);
 
         Bundle bundle = new Bundle();
-        bundle.putString(GameThreadFragment.HOME_TEAM_KEY, homeTeam);
-        bundle.putString(GameThreadFragment.AWAY_TEAM_KEY, awayTeam);
-        bundle.putString(BoxScoreFragment.GAME_ID_KEY, gameId);
+        bundle.putString(HOME_TEAM_KEY, homeTeam);
+        bundle.putString(AWAY_TEAM_KEY, awayTeam);
+        bundle.putString(GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
         // Initialize tab layout and add three tabs.

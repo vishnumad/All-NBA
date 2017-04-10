@@ -35,12 +35,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
+
 public class GameThreadFragment extends Fragment implements GameThreadView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentActionClickListener {
     private static final String TAG = "GameThreadFragment";
-
-    public static final String HOME_TEAM_KEY = "HOME_TEAM";
-    public static final String AWAY_TEAM_KEY = "AWAY_TEAM";
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
 
