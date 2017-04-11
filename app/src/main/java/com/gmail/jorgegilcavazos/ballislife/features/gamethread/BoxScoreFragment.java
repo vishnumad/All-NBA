@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -62,18 +63,24 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     private int teamSelected;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_box_score, container, false);
-        unbinder = ButterKnife.bind(this, view);
-
-        teamSelected = LOAD_HOME;
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         if (getArguments() != null) {
             homeTeam = getArguments().getString(HOME_TEAM_KEY);
             awayTeam = getArguments().getString(AWAY_TEAM_KEY);
             gameId = getArguments().getString(CommentsActivity.GAME_ID_KEY);
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_box_score, container, false);
+        unbinder = ButterKnife.bind(this, view);
+
+        teamSelected = LOAD_HOME;
 
         btnAway.setText(awayTeam);
         btnHome.setText(homeTeam);
