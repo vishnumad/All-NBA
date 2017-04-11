@@ -141,6 +141,17 @@
                 android:padding="15dp">
 
                 <TextView
+                    android:id="@+id/homescore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="75"
+                    android:textSize="25sp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/primaryText"
+                    android:layout_weight="1"/>
+
+                <TextView
                     android:id="@+id/homelabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -151,16 +162,6 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"/>
 
-                <TextView
-                    android:id="@+id/homescore"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="75"
-                    android:textSize="25sp"
-                    android:textAlignment="center"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="@color/primaryText"
-                    android:layout_weight="1"/>
             </LinearLayout>
 
         </RelativeLayout>
