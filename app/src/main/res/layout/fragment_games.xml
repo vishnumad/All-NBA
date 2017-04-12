@@ -10,7 +10,6 @@
         android:id="@+id/navigator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:background="@color/colorPrimary">
 
         <ImageButton
@@ -46,7 +45,7 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/navigator">
+        android:layout_below="@id/navigator">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/games_rv"
