@@ -1,15 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.standings;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.TeamRecord;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.hannesdorfmann.mosby.mvp.MvpView;
-
-import java.util.List;
 
 public interface StandingsView extends MvpView {
 
     void setLoadingIndicator(boolean active);
 
-    void showStandings(List<TeamRecord> eastStandings, List<TeamRecord> westStandings);
+    void showStandings(Standings standings);
 
     void hideStandings();
 

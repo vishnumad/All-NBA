@@ -18,10 +18,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.model.TeamRecord;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,26 +108,75 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
     }
 
     @Override
-    public void showStandings(List<TeamRecord> eastStandings, List<TeamRecord> westStandings) {
+    public void showStandings(Standings standings) {
         tableLayout.removeAllViews();
 
         boolean dark = true;
 
         // EAST rows
         addRow(0, "EAST", "W", "L", "%", "GB", dark);
-        for (TeamRecord tr : eastStandings) {
+        for (Standings.TeamStanding teamStanding : standings.getEast()) {
+            String rank = teamStanding.getSeed();
+            String name = teamStanding.getName();
+            String wins = "";
+            String losses = "";
+            String pct = "";
+            String gb = "";
+
+            for (Standings.StandingStat stat : teamStanding.getStats()) {
+                if (stat.getName().equals("W")) {
+                    wins = stat.getValue();
+                }
+
+                if (stat.getName().equals("L")) {
+                    losses = stat.getValue();
+                }
+
+                if (stat.getName().equals("PCT")) {
+                    pct = stat.getValue();
+                }
+
+                if (stat.getName().equals("GB")) {
+                    gb = stat.getValue();
+                }
+            }
+
             dark = !dark;
-            addRow(tr.getRecord(), tr.getTeamName(), tr.getWins(), tr.getLosses(),
-                    tr.getPercentage(), tr.getGamesBehind(), dark);
+            addRow(Integer.valueOf(rank), name, wins, losses, pct, gb, dark);
         }
+
 
         // WEST rows
         dark = !dark;
         addRow(0, "WEST", "W", "L", "%", "GB", dark);
-        for (TeamRecord tr : westStandings) {
+        for (Standings.TeamStanding teamStanding : standings.getWest()) {
+            String rank = teamStanding.getSeed();
+            String name = teamStanding.getName();
+            String wins = "";
+            String losses = "";
+            String pct = "";
+            String gb = "";
+
+            for (Standings.StandingStat stat : teamStanding.getStats()) {
+                if (stat.getName().equals("W")) {
+                    wins = stat.getValue();
+                }
+
+                if (stat.getName().equals("L")) {
+                    losses = stat.getValue();
+                }
+
+                if (stat.getName().equals("PCT")) {
+                    pct = stat.getValue();
+                }
+
+                if (stat.getName().equals("GB")) {
+                    gb = stat.getValue();
+                }
+            }
+
             dark = !dark;
-            addRow(tr.getRecord(), tr.getTeamName(), tr.getWins(), tr.getLosses(),
-                    tr.getPercentage(), tr.getGamesBehind(), dark);
+            addRow(Integer.valueOf(rank), name, wins, losses, pct, gb, dark);
         }
 
     }

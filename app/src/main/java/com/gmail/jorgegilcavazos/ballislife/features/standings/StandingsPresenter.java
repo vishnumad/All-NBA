@@ -1,21 +1,17 @@
 package com.gmail.jorgegilcavazos.ballislife.features.standings;
 
-
-import com.gmail.jorgegilcavazos.ballislife.features.model.StandingsResult;
-import com.gmail.jorgegilcavazos.ballislife.features.model.TeamRecord;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.gmail.jorgegilcavazos.ballislife.network.API.NbaStandingsService;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-import java.util.List;
-
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class StandingsPresenter extends MvpBasePresenter<StandingsView> {
 
@@ -41,29 +37,22 @@ public class StandingsPresenter extends MvpBasePresenter<StandingsView> {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://nba-app-ca681.firebaseio.com/")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         NbaStandingsService service = retrofit.create(NbaStandingsService.class);
 
-        Observable<ResponseBody> standings = service.fetchStandings("22016");
+        Single<Standings> standings = service.getStandings("22016");
 
         disposables.clear();
-        disposables.add(
-                standings.subscribeOn(Schedulers.io())
+        disposables.add(standings
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<ResponseBody>() {
+                .subscribeWith(new DisposableSingleObserver<Standings>() {
                     @Override
-                    public void onNext(ResponseBody responseBody) {
+                    public void onSuccess(Standings standings) {
                         getView().setLoadingIndicator(false);
-
-                        StandingsResult result = StandingsUtils.parseStandings(responseBody);
-                        if (result.getException() == null) {
-                            List<TeamRecord> eastStandings = result.getEastStandings();
-                            List<TeamRecord> westStandings = result.getWestStandings();
-                            getView().showStandings(eastStandings, westStandings);
-                        } else {
-                            getView().showSnackbar(true);
-                        }
+                        getView().showStandings(standings);
                     }
 
                     @Override
@@ -71,14 +60,8 @@ public class StandingsPresenter extends MvpBasePresenter<StandingsView> {
                         getView().setLoadingIndicator(false);
                         getView().showSnackbar(true);
                     }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
                 })
         );
-
     }
 
     public void dismissSnackbar() {
