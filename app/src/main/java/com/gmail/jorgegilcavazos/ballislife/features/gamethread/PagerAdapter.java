@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import java.util.HashMap;

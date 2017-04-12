@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
+package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
 import com.gmail.jorgegilcavazos.ballislife.network.API.NbaGamesService;

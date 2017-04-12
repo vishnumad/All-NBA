@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
+package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +14,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.graphics.Typeface.BOLD;
 import static android.graphics.Typeface.NORMAL;
 
 public class StatLineAdapter extends RecyclerView.Adapter<StatLineAdapter.StatLineViewHolder> {

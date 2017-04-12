@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
+package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
