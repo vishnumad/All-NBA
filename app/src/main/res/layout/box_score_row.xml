@@ -9,7 +9,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="MIN"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -19,7 +19,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="PTS"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -29,7 +29,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="REB"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -39,7 +39,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="AST"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -49,7 +49,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="BLK"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -59,7 +59,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="STL"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp"/>
@@ -69,7 +69,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="TO"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp" />
@@ -79,7 +79,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="PF"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp" />
@@ -89,7 +89,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="FG"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp" />
@@ -99,7 +99,7 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="FG%"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_margin="3dp" />
