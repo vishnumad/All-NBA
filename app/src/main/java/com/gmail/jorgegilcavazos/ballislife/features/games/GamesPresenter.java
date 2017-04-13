@@ -1,5 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
+import android.util.Log;
+
+import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.network.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
@@ -11,9 +14,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -53,33 +58,33 @@ public class GamesPresenter extends MvpBasePresenter<GamesView> {
 
         NbaGamesService gamesService = retrofit.create(NbaGamesService.class);
 
-        Observable<List<NbaGame>> games = gamesService.listGames(
+        Single<DayGames> dayGamesSingle = gamesService.getDayGames(
                 DateFormatUtil.getNoDashDateString(selectedDate.getTime()));
 
         disposables.clear();
-        disposables.add(
-                games.subscribeOn(Schedulers.io())
+        disposables.add(dayGamesSingle
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<List<NbaGame>>() {
+                .subscribeWith(new DisposableSingleObserver<DayGames>() {
                     @Override
-                    public void onNext(List<NbaGame> nbaGames) {
+                    public void onSuccess(DayGames dayGames) {
                         getView().setLoadingIndicator(false);
-                        gamesList = nbaGames;
-                        getView().showGames(gamesList);
-                        if (gamesList.size() == 0) {
+                        if (dayGames.getNum_games() == 0) {
                             getView().setNoGamesIndicator(true);
+                        } else {
+                            if (dayGames.getGames() != null && dayGames.getGames().size() > 0) {
+                                getView().showGames(dayGames.getGames());
+                            } else {
+                                getView().showSnackbar(true);
+                            }
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
+                        Log.d("Presenter", e.toString());
                         getView().setLoadingIndicator(false);
                         getView().showSnackbar(true);
-                    }
-
-                    @Override
-                    public void onComplete() {
-
                     }
                 })
         );
