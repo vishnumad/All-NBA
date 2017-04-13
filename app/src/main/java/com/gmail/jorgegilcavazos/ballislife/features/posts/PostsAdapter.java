@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -156,7 +157,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                   final CustomSubmission customSubmission) {
         final Submission submission = customSubmission.getSubmission();
 
-        holder.tvTitle.setText(submission.getTitle());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            holder.tvTitle.setText(Html.fromHtml(submission.getTitle(), Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            holder.tvTitle.setText(Html.fromHtml(submission.getTitle()));
+        }
 
         if (submission.isStickied()) {
             holder.tvTitle.setTextColor(ContextCompat.getColor(context, R.color.stickiedColor));
