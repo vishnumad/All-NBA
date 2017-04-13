@@ -47,9 +47,6 @@
             android:label="Comments"
             android:parentActivityName=".features.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -61,7 +58,7 @@
         <activity
             android:name=".features.submission.SubmissionActivity"
             android:label="@string/title_activity_submission"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".features.profile.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar"/>

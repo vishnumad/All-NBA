@@ -209,10 +209,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     listener.onVote(submission, VoteDirection.NO_VOTE);
                     customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                     setNoVoteColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) - 1));
+                } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    listener.onVote(submission, VoteDirection.UPVOTE);
+                    customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) + 2));
                 } else {
                     listener.onVote(submission, VoteDirection.UPVOTE);
                     customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                     setUpvotedColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) + 1));
                 }
             }
         });
@@ -224,10 +234,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     listener.onVote(submission, VoteDirection.NO_VOTE);
                     customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                     setNoVoteColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) + 1));
+                } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
+                    listener.onVote(submission, VoteDirection.DOWNVOTE);
+                    customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) - 2));
                 } else {
                     listener.onVote(submission, VoteDirection.DOWNVOTE);
                     customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                     setDownvotedColors(holder);
+                    holder.tvPoints.setText(String.valueOf(Integer.valueOf(
+                            holder.tvPoints.getText().toString()) - 1));
                 }
             }
         });
@@ -244,6 +264,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     setSavedColors(holder);
                     customSubmission.setSaved(true);
                 }
+            }
+        });
+
+        holder.btnComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onPostClick(submission);
+            }
+        });
+
+        holder.tvTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onPostClick(submission);
             }
         });
     }
