@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardview_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:src="@drawable/rnbabg"
+            android:scaleType="matrix"/>
+
+        <ImageView
+            android:id="@+id/image_snoo"
+            android:layout_marginTop="35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/rnbasnoo"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:id="@+id/text_rnba"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="r/nba"
+            android:textColor="@color/primaryText"
+            android:textSize="18sp"
+            android:layout_margin="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/image_snoo"/>
+
+        <TextView
+            android:id="@+id/text_subscribers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="554843 subscribers • 8133 fans online"
+            android:textSize="13sp"
+            android:textColor="@color/secondaryText"
+            android:layout_marginBottom="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/text_rnba"/>
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>

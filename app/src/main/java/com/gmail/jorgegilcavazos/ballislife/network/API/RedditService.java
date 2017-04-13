@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 
@@ -22,6 +23,7 @@ import net.dean.jraw.models.LoggedInAccount;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.SubredditPaginator;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.ArrayList;
@@ -272,6 +274,71 @@ public class RedditService {
                     e.onSuccess(redditClient.getSubmission(submissionRequest));
                 } catch (Exception ex) {
                     e.onError(ex);
+                }
+            }
+        });
+    }
+
+    public Single<Listing<Submission>> getSubmissionListing(final String subreddit, final int limit,
+                                                            final Sorting sorting) {
+        return Single.create(new SingleOnSubscribe<Listing<Submission>>() {
+            @Override
+            public void subscribe(SingleEmitter<Listing<Submission>> e) throws Exception {
+                RedditClient redditClient = RedditAuthentication.getInstance()
+                        .getRedditClient();
+
+                if (redditClient.isAuthenticated()) {
+                    SubredditPaginator paginator = new SubredditPaginator(redditClient, subreddit);
+                    paginator.setLimit(limit);
+                    paginator.setSorting(sorting);
+
+                    e.onSuccess(paginator.next(false));
+                } else {
+                    e.onError(new NotAuthenticatedException());
+                }
+            }
+        });
+    }
+
+    public Completable voteSubmission(final Submission submission, final VoteDirection vote) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        accountManager.vote(submission, vote);
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    e.onError(new NotLoggedInException());
+                }
+            }
+        });
+    }
+
+    public Completable saveSubmission(final Submission submission, final boolean saved) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        if (saved) {
+                            accountManager.save(submission);
+                        } else {
+                            accountManager.unsave(submission);
+                        }
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
+                } else {
+                    e.onError(new NotLoggedInException());
                 }
             }
         });

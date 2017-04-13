@@ -1,314 +1,209 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.util.AuthListener;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
-import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
-import net.dean.jraw.paginators.Sorting;
-import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.models.VoteDirection;
 
-public class PostsFragment extends Fragment {
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class PostsFragment extends Fragment implements PostsView,
+        SwipeRefreshLayout.OnRefreshListener {
+
     private static final String TAG = "PostsFragment";
 
-    private Context context;
-    private View rootView;
-    private String type;
-    private ListView postsListView;
-    private LinearLayout spinner, videoProgressLayout;
-    private Snackbar snackbar;
+    public enum ViewType {
+        FULL_CARD, SMALL_CARD, LIST
+    }
 
-    private VideoView videoView;
-    private View background;
-    boolean isPreviewVisible;
+    private static final String VIEW_TYPE = "viewType";
+
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
+
+    private ViewType viewType;
+    private Snackbar snackbar;
+    private PostsAdapter postsAdapter;
+
+    private PostsPresenter presenter;
 
     public PostsFragment() {
 
     }
 
-    public static PostsFragment newInstance() {
-        return new PostsFragment();
+    public static PostsFragment newInstance(ViewType viewType) {
+        PostsFragment fragment = new PostsFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(VIEW_TYPE, viewType);
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        context = getActivity();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            type = getArguments().getString("TYPE");
+            viewType = (ViewType) getArguments().get(VIEW_TYPE);
         }
         setHasOptionsMenu(true);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_posts, container, false);
-        postsListView = (ListView) rootView.findViewById(R.id.postsListView);
-        spinner = (LinearLayout) rootView.findViewById(R.id.linlaHeaderProgress);
-        videoProgressLayout = (LinearLayout) rootView.findViewById(R.id.videoProgressLayout);
-        videoView = (VideoView) rootView.findViewById(R.id.videoView);
-        background = rootView.findViewById(R.id.background);
-        background.setVisibility(View.GONE);
+        View view = inflater.inflate(R.layout.fragment_posts, container, false);
+        ButterKnife.bind(this, view);
 
-        if (Constants.NBA_MATERIAL_ENABLED) {
-            getActivity().setTitle(R.string.reddit_nba_fragment_title);
-        } else {
-            getActivity().setTitle("Discussions");
-        }
-        fetchPosts();
-        return rootView;
-    }
+        swipeRefreshLayout.setOnRefreshListener(this);
 
-    private void fetchPosts() {
-        spinner.setVisibility(View.VISIBLE);
-        postsListView.setVisibility(View.GONE);
-
-        AuthListener listener = new AuthListener() {
+        postsAdapter = new PostsAdapter(null, viewType, new OnPostClickListener() {
             @Override
-            public void onSuccess() {
-                fetchPosts();
+            public void onPostClick(Submission submission) {
+                Intent intent = new Intent(getActivity(), SubmissionActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putString(Constants.THREAD_ID, submission.getId());
+                bundle.putString(Constants.THREAD_TITLE, submission.getTitle());
+                bundle.putString(Constants.THREAD_DESCRIPTION, submission.getSelftext());
+                bundle.putString(Constants.THREAD_AUTHOR, submission.getAuthor());
+                bundle.putString(Constants.THREAD_TIMESTAMP,
+                        DateFormatUtil.formatRedditDate(submission.getCreated()));
+                bundle.putString(Constants.THREAD_SCORE, String.valueOf(submission.getScore()));
+                bundle.putString(Constants.THREAD_NUM_COMMENTS,
+                        String.valueOf(submission.getCommentCount()));
+                bundle.putString(Constants.THREAD_DOMAIN, submission.getDomain());
+                bundle.putString(Constants.THREAD_URL, submission.getUrl());
+                if (submission.getThumbnails() != null) {
+                    bundle.putString(Constants.THREAD_IMAGE,
+                            submission.getThumbnails().getSource().getUrl());
+                } else {
+                    bundle.putString(Constants.THREAD_IMAGE, null);
+                }
+                bundle.putBoolean(Constants.THREAD_SELF, submission.isSelfPost());
+
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
 
             @Override
-            public void onFailure() {
-                spinner.setVisibility(View.GONE);
-                showSnackBar("Could not fetch posts", true /* retry */);
+            public void onVote(Submission submission, VoteDirection voteDirection) {
+                presenter.onVote(submission, voteDirection);
             }
-        };
 
-        new GetSubmissionListing(getActivity(),
-                RedditAuthentication.getInstance().getRedditClient(), "nba", 20,
-                Sorting.HOT, listener).execute();
-    }
-
-    private class GetSubmissionListing extends AsyncTask<Void, Void, Listing<Submission>> {
-        private Context mContext;
-        private RedditClient mRedditClient;
-        private String mSubreddit;
-        private int mLimit;
-        private Sorting mSorting;
-        private AuthListener mListener;
-
-        public GetSubmissionListing(Context context, RedditClient redditClient, String subreddit,
-                                    int limit, Sorting sorting, AuthListener listener) {
-            mContext = context;
-            mRedditClient = redditClient;
-            mSubreddit = subreddit;
-            mLimit = limit;
-            mSorting = sorting;
-            mListener = listener;
-        }
-
-        @Override
-        protected Listing<Submission> doInBackground(Void... params) {
-            if (RedditAuthentication.getInstance().getRedditClient().isAuthenticated()) {
-                SubredditPaginator paginator = new SubredditPaginator(mRedditClient, mSubreddit);
-                paginator.setLimit(mLimit);
-                paginator.setSorting(mSorting);
-                return paginator.next(false);
+            @Override
+            public void onSave(Submission submission, boolean saved) {
+                presenter.onSave(submission, saved);
             }
-            return null;
-        }
+        });
 
-        @Override
-        protected void onPostExecute(Listing<Submission> submissions) {
-            if (submissions == null
-                    || !RedditAuthentication.getInstance().getRedditClient().isAuthenticated()) {
-                Toast.makeText(mContext, "Not authenticated", Toast.LENGTH_SHORT).show();
-                RedditAuthentication.getInstance().authenticate(mContext, mListener);
-            } else {
-                loadPosts(submissions);
-            }
-        }
+        recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewPosts.setAdapter(postsAdapter);
+
+        presenter = new PostsPresenter(new RedditService(), SchedulerProvider.getInstance());
+        presenter.attachView(this);
+        presenter.loadPosts();
+
+        return view;
     }
 
-
-    private void loadPosts(final Listing<Submission> posts) {
-        final String STREAMABLE_URL = "https://streamable.com/";
-        final String STREAMABLE_VIDEO_URL = "http://cdn.streamable.com/video/mp4/";
-        final String YOUTUBE_DOMAIN = "youtube.com";
-        final String SELF_POST_NBA_DOMAIN = "self.nba";
-        Log.d(TAG, "loaded");
-        if (context != null) {
-
-            postsListView.setAdapter(new PostsAdapter(context, posts, type));
-            Log.d(TAG, "adapter set");
-            postsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Log.d(TAG, "clicked");
-                    Submission post = posts.get(position);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(Constants.THREAD_ID, post.getId());
-                    bundle.putString(Constants.THREAD_TITLE, post.getTitle());
-                    bundle.putString(Constants.THREAD_DESCRIPTION, post.getSelftext());
-                    bundle.putString(Constants.THREAD_AUTHOR, post.getAuthor());
-                    bundle.putString(Constants.THREAD_TIMESTAMP,
-                            DateFormatUtil.formatRedditDate(post.getCreated()));
-                    bundle.putString(Constants.THREAD_SCORE, String.valueOf(post.getScore()));
-                    bundle.putString(Constants.THREAD_NUM_COMMENTS,
-                            String.valueOf(post.getCommentCount()));
-                    bundle.putString(Constants.THREAD_DOMAIN, post.getDomain());
-                    bundle.putString(Constants.THREAD_URL, post.getUrl());
-                    if (post.getThumbnails() != null) {
-                        bundle.putString(Constants.THREAD_IMAGE,
-                                post.getThumbnails().getSource().getUrl());
-                    } else {
-                        bundle.putString(Constants.THREAD_IMAGE, null);
-                    }
-                    bundle.putBoolean(Constants.THREAD_SELF, post.isSelfPost());
-
-                    Intent submissionIntent = new Intent(getActivity(), SubmissionActivity.class);
-                    submissionIntent.putExtras(bundle);
-                    startActivity(submissionIntent);
-
-                    String url = post.getUrl();
-                    String domain = post.getDomain();
-                    switch (domain) {
-                        case Constants.STREAMABLE_DOMAIN:
-                            url = url.replace(STREAMABLE_URL, STREAMABLE_VIDEO_URL);
-                            url = url + ".mp4";
-                            playVideo(url);
-                            break;
-                        case YOUTUBE_DOMAIN:
-                            //TODO: Set up youtube player https://developers.google.com/youtube/android/player/
-                            Toast.makeText(context, "Youtube video still not ready", Toast.LENGTH_SHORT).show();
-                            break;
-                        case SELF_POST_NBA_DOMAIN:
-                            Toast.makeText(context, "Text post", Toast.LENGTH_SHORT).show();
-                            break;
-                        default:
-                            Toast.makeText(context, "Not a video", Toast.LENGTH_SHORT).show();
-
-                    }
-                }
-            });
-
-            spinner.setVisibility(View.GONE);
-            postsListView.setVisibility(View.VISIBLE);
-        }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenter.detachView();
+        presenter.stop();
+        dismissSnackbar();
     }
 
-    private void playVideo(String url) {
-        //TODO: handle null pointer exception
-        ((MainActivity) getActivity()).getSupportActionBar().hide();
-
-        videoView.setVisibility(View.VISIBLE);
-        videoView.setZOrderOnTop(true); //HIDE
-        postsListView.setEnabled(false);
-        background.setVisibility(View.VISIBLE);
-        videoProgressLayout.setVisibility(View.VISIBLE);
-        isPreviewVisible = true;
-        try {
-            Uri uri = Uri.parse(url);
-            videoView.setMediaController(new android.widget.MediaController(context));
-            videoView.setVideoURI(uri);
-            videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    videoProgressLayout.setVisibility(View.GONE);
-                    videoView.setZOrderOnTop(false); //SHOW
-                }
-            });
-            videoView.start();
-        } catch (Exception e) {
-            // TODO: Handle exception
-            stopVideo();
-            Toast.makeText(context, "Error loading video", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void stopVideo() {
-        //TODO: Handle null pointer exception
-        ((MainActivity) getActivity()).getSupportActionBar().show();
-
-        videoView.stopPlayback();
-        videoView.setZOrderOnTop(true); //HIDE
-        videoView.setVisibility(View.GONE);
-        postsListView.setEnabled(true);
-        background.setVisibility(View.GONE);
-        videoProgressLayout.setVisibility(View.GONE);
-        isPreviewVisible = false;
-    }
-
-    private void showSnackBar(String message, boolean retry) {
-        snackbar = Snackbar.make(rootView, message,
-                Snackbar.LENGTH_INDEFINITE);
-        if (retry) {
-            snackbar.setAction("RETRY", new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    fetchPosts();
-                }
-            });
-        }
-        snackbar.show();
-    }
-
-    private void dismissSnackbar() {
-        if (snackbar != null && snackbar.isShown()) {
-            snackbar.dismiss();
-        }
-    }
-
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                stopVideo();
-                spinner.setVisibility(View.VISIBLE);
-                fetchPosts();
+                presenter.loadPosts();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean isPreviewVisible() {
-        return isPreviewVisible;
+    @Override
+    public void onRefresh() {
+        presenter.loadPosts();
+    }
+
+    @Override
+    public void setLoadingIndicator(boolean active) {
+        swipeRefreshLayout.setRefreshing(active);
+    }
+
+    @Override
+    public void showPosts(List<CustomSubmission> submissions) {
+        postsAdapter.setData(submissions);
+        recyclerViewPosts.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hidePosts() {
+        recyclerViewPosts.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showPostsLoadingFailedSnackbar() {
+        snackbar = Snackbar.make(getView(), R.string.posts_loading_failed,
+                Snackbar.LENGTH_INDEFINITE);
+
+        snackbar.setAction(R.string.retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.loadPosts();
+            }
+        });
+    }
+
+    @Override
+    public void dismissSnackbar() {
+        if (snackbar != null && snackbar.isShown()) {
+            snackbar.dismiss();
+        }
+    }
+
+    @Override
+    public void showNotAuthenticatedToast() {
+        Toast.makeText(getActivity(), R.string.not_authenticated, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPause() {
-        dismissSnackbar();
         super.onPause();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+    public interface OnPostClickListener {
+        void onPostClick(Submission submission);
 
-    @Override
-    public void onDestroy() {
-        RedditAuthentication.getInstance().cancelReAuthTaskIfRunning();
-        RedditAuthentication.getInstance().cancelUserlessAuthTaskIfRunning();
-        super.onDestroy();
+        void onVote(Submission submission, VoteDirection voteDirection);
+
+        void onSave(Submission submission, boolean saved);
     }
 }

@@ -235,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setPostsFragment() {
+        setTitle("r/NBA");
         PostsFragment postsFragment = null;
         if (selectedFragment == POSTS_FRAGMENT_ID) {
             postsFragment = (PostsFragment)
@@ -242,10 +243,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (postsFragment == null) {
-            postsFragment = PostsFragment.newInstance();
-            Bundle bundle = new Bundle();
-            bundle.putString("TYPE", "small");
-            postsFragment.setArguments(bundle);
+            postsFragment = PostsFragment.newInstance(PostsFragment.ViewType.FULL_CARD);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     postsFragment, R.id.fragment);
         }

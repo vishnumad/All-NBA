@@ -55,6 +55,11 @@
     <string name="box_score_not_available">Box Score not availabke</string>
     <string name="failed_to_load_box_score">Failed to load box score</string>
 
+    <!-- Posts -->
+    <string name="not_authenticated">Reconnecting to Reddit</string>
+    <string name="posts_loading_failed">Failed to load posts</string>
+    <string name="save">Save</string>
+
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>
     <string name="notifications">Notifications</string>
