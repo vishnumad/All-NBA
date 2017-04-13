@@ -174,11 +174,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         if (submission.isSelfPost()) {
-            holder.tvDomain.setText("• self");
+            holder.tvDomain.setText("self");
             holder.ivThumbnail.setVisibility(View.GONE);
         } else {
             String domain = submission.getDomain();
-            holder.tvDomain.setText("• " + domain);
+            holder.tvDomain.setText(domain);
             if (highResThumbnailUrl != null) {
                 holder.ivThumbnail.setVisibility(View.VISIBLE);
                 Picasso.with(context)

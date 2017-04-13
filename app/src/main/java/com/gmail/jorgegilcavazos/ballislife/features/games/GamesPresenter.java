@@ -82,7 +82,6 @@ public class GamesPresenter extends MvpBasePresenter<GamesView> {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("Presenter", e.toString());
                         getView().setLoadingIndicator(false);
                         getView().showSnackbar(true);
                     }
