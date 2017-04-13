@@ -59,6 +59,7 @@
     <string name="not_authenticated">Reconnecting to Reddit</string>
     <string name="posts_loading_failed">Failed to load posts</string>
     <string name="save">Save</string>
+    <string name="subscriber_count">%1$s subscribers • %2$s fans online</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

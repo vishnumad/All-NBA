@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -21,7 +22,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
-import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
@@ -118,13 +118,14 @@ public class PostsFragment extends Fragment implements PostsView,
             public void onSave(Submission submission, boolean saved) {
                 presenter.onSave(submission, saved);
             }
-        });
+        }, null);
 
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewPosts.setAdapter(postsAdapter);
 
         presenter = new PostsPresenter(new RedditService(), SchedulerProvider.getInstance());
         presenter.attachView(this);
+        presenter.loadSubscriberCount();
         presenter.loadPosts();
 
         return view;
@@ -142,6 +143,7 @@ public class PostsFragment extends Fragment implements PostsView,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                presenter.loadSubscriberCount();
                 presenter.loadPosts();
                 return true;
         }
@@ -150,6 +152,7 @@ public class PostsFragment extends Fragment implements PostsView,
 
     @Override
     public void onRefresh() {
+        presenter.loadSubscriberCount();
         presenter.loadPosts();
     }
 
@@ -192,6 +195,11 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void showNotAuthenticatedToast() {
         Toast.makeText(getActivity(), R.string.not_authenticated, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSubscribers(SubscriberCount subscriberCount) {
+        postsAdapter.setSubscriberCount(subscriberCount);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
@@ -31,6 +32,26 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
+    }
+
+    public void loadSubscriberCount() {
+        disposables.add(service.getSubscriberCount("nba")
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableSingleObserver<SubscriberCount>() {
+                    @Override
+                    public void onSuccess(SubscriberCount subscriberCount) {
+                        if (isViewAttached()) {
+                            view.showSubscribers(subscriberCount);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                })
+        );
     }
 
     public void loadPosts() {

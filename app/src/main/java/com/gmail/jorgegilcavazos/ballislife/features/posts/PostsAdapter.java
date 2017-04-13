@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -35,12 +36,15 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<CustomSubmission> postsList;
     private PostsFragment.ViewType type;
     private PostsFragment.OnPostClickListener listener;
+    private SubscriberCount subscriberCount;
 
     public PostsAdapter(List<CustomSubmission> postsList, PostsFragment.ViewType type,
-                        PostsFragment.OnPostClickListener listener) {
+                        PostsFragment.OnPostClickListener listener,
+                        SubscriberCount subscriberCount) {
         this.postsList = postsList;
         this.type = type;
         this.listener = listener;
+        this.subscriberCount = subscriberCount;
     }
 
     @Override
@@ -79,7 +83,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
             HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
-            headerViewHolder.tvSubscribers.setText("554843 subscribers • 8133 fans online");
+
+            if (subscriberCount != null) {
+                String subscribers = String.valueOf(subscriberCount.getSubscribers());
+                String activeUsers = String.valueOf(subscriberCount.getActiveUsers());
+
+                headerViewHolder.tvSubscribers.setText(context.getString(R.string.subscriber_count,
+                        subscribers, activeUsers));
+            } else {
+                headerViewHolder.tvSubscribers.setText(context.getString(R.string.subscriber_count,
+                        String.valueOf(554843), String.valueOf(8133)));
+            }
         } else {
             CustomSubmission submission = postsList.get(position - 1);
 
@@ -99,6 +113,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void setData(List<CustomSubmission> submissions) {
         postsList = submissions;
+        notifyDataSetChanged();
+    }
+
+    public void setSubscriberCount(SubscriberCount subscriberCount) {
+        this.subscriberCount = subscriberCount;
         notifyDataSetChanged();
     }
 

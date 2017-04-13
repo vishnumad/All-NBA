@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.network.API;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
@@ -21,6 +22,7 @@ import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.LoggedInAccount;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.Subreddit;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.SubredditPaginator;
@@ -339,6 +341,25 @@ public class RedditService {
                     }
                 } else {
                     e.onError(new NotLoggedInException());
+                }
+            }
+        });
+    }
+
+    public Single<SubscriberCount> getSubscriberCount(final String subreddit) {
+        return Single.create(new SingleOnSubscribe<SubscriberCount>() {
+            @Override
+            public void subscribe(SingleEmitter<SubscriberCount> e) throws Exception {
+                RedditClient client = RedditAuthentication.getInstance().getRedditClient();
+
+                try {
+                    Subreddit rnba = client.getSubreddit(subreddit);
+                    Long subscribers = rnba.getSubscriberCount();
+                    int activeUsers = rnba.getAccountsActive();
+
+                    e.onSuccess(new SubscriberCount(subscribers, activeUsers));
+                } catch (Exception ex) {
+                    e.onError(ex);
                 }
             }
         });

@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface PostsView {
     void dismissSnackbar();
 
     void showNotAuthenticatedToast();
+
+    void showSubscribers(SubscriberCount subscriberCount);
 
 }
