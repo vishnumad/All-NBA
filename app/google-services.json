@@ -19,7 +19,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.gmail.jorgegilcavazos.ballislife",
-            "certificate_hash": "3178B10965D8367D2A9BC83AA8D69D42016CFB33"
+            "certificate_hash": "3178b10965d8367d2a9bc83aa8d69d42016cfb33"
           }
         },
         {
@@ -44,6 +44,37 @@
               "client_type": 3
             }
           ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589040447717:android:cddcb253a600fc42",
+        "android_client_info": {
+          "package_name": "com.gmail.jorgegilcavazos.ballislife.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "589040447717-u96jrk11onge36ecbst17d4bedto1tei.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBy_XxDy9NXnpM-Rp44LLQAI-twdKIFwbU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2
