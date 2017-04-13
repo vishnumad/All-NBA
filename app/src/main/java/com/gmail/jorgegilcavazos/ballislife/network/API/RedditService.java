@@ -1,8 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.network.API;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -10,7 +7,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedExcep
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 
-import net.dean.jraw.ApiException;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.SubmissionRequest;
