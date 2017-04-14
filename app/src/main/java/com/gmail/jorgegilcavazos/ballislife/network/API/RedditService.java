@@ -6,6 +6,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
@@ -216,10 +218,10 @@ public class RedditService {
                         String id = accountManger.reply(parent, text);
                         e.onSuccess(id);
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        e.onError(new ReplyToCommentException());
                     }
                 } else {
-                    Single.error(new Exception("Not logged in"));
+                    Single.error(new NotLoggedInException());
                 }
             }
         });
@@ -265,19 +267,18 @@ public class RedditService {
         });
     }
 
-    public Completable replyToThread(final Submission submission, final String text) {
-        return Completable.create(new CompletableOnSubscribe() {
+    public Single<String> replyToThread(final Submission submission, final String text) {
+        return Single.create(new SingleOnSubscribe<String>() {
             @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
+            public void subscribe(SingleEmitter<String> e) throws Exception {
                 if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                     AccountManager accountManager = new AccountManager(
                             RedditAuthentication.getInstance().getRedditClient());
 
                     try {
-                        accountManager.reply(submission, text);
-                        e.onComplete();
+                        e.onSuccess(accountManager.reply(submission, text));
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        e.onError(new ReplyToThreadException());
                     }
                 } else {
                     e.onError(new NotLoggedInException());

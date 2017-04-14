@@ -38,4 +38,6 @@ public interface GameThreadView extends MvpView {
     void showReplyToSubmissionSavedToast();
 
     void showReplyToSubmissionFailedToast();
+
+    void showSavingToast();
 }

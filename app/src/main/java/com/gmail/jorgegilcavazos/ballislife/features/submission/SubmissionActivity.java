@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
@@ -111,6 +112,36 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
+    public void addComment(CommentNode comment, int position) {
+        threadAdapter.addComment(position, comment);
+    }
+
+    @Override
+    public void showErrorAddingComment() {
+        Toast.makeText(this, R.string.saving_failed, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showNotLoggedInError() {
+        Toast.makeText(this, R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSavingToast() {
+        Toast.makeText(this, R.string.saving, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSavedToast() {
+        Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showErrorSavingToast() {
+        Toast.makeText(this, R.string.saving_failed, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onRefresh() {
         presenter.loadComments(threadId);
     }
@@ -136,8 +167,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                         presenter.onReplyToComment(position, parentComment, input.toString());
                     }
                 })
-                .positiveText("Reply")
-                .negativeText("Cancel")
+                .positiveText(R.string.reply)
+                .negativeText(R.string.cancel)
                 .show();
     }
 
@@ -181,8 +212,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                         }
                     }
                 })
-                .positiveText("Reply")
-                .negativeText("Cancel")
+                .positiveText(R.string.reply)
+                .negativeText(R.string.cancel)
                 .show();
     }
 }

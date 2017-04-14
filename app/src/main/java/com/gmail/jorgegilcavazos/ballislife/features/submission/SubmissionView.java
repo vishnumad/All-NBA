@@ -10,4 +10,16 @@ public interface SubmissionView {
     void setLoadingIndicator(boolean active);
 
     void showComments(List<CommentNode> commentNodes, Submission submission);
+
+    void addComment(CommentNode comment, int position);
+
+    void showErrorAddingComment();
+
+    void showNotLoggedInError();
+
+    void showSavingToast();
+
+    void showSavedToast();
+
+    void showErrorSavingToast();
 }

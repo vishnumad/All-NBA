@@ -207,6 +207,11 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
+    public void showSavingToast() {
+        Toast.makeText(getActivity(), R.string.saving, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onVoteComment(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }
@@ -227,8 +232,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
                         presenter.reply(position, parentComment, input.toString());
                     }
                 })
-                .positiveText("Reply")
-                .negativeText("Cancel")
+                .positiveText(R.string.reply)
+                .negativeText(R.string.cancel)
                 .show();
     }
 
@@ -242,8 +247,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
                         presenter.replyToThread(input.toString(), threadType, homeTeam, awayTeam);
                     }
                 })
-                .positiveText("Reply")
-                .negativeText("Cancel")
+                .positiveText(R.string.reply)
+                .negativeText(R.string.cancel)
                 .show();
     }
 }

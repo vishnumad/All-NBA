@@ -9,6 +9,7 @@ import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -22,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -117,7 +117,6 @@ public class GameThreadPresenter {
                                 view.showFailedToLoadCommentsText();
                             }
                         }
-                        Log.d("Presenter", e.toString());
                     }
                 })
         );
@@ -146,6 +145,7 @@ public class GameThreadPresenter {
     }
 
     public void save(Comment comment) {
+        view.showSavingToast();
         disposables.add(redditService.saveComment(comment)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -172,6 +172,7 @@ public class GameThreadPresenter {
     }
 
     public void reply(final int position, final Comment parentComment, final String text) {
+        view.showSavingToast();
         disposables.add(redditService.replyToComment(parentComment, text)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
@@ -208,6 +209,7 @@ public class GameThreadPresenter {
 
     public void replyToThread(final String text, final String type, final String homeTeamAbbr,
                               final String awayTeamAbbr) {
+        view.showSavingToast();
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
@@ -230,19 +232,26 @@ public class GameThreadPresenter {
                         return redditService.getSubmission(threadId, null);
                     }
                 })
-                .flatMapCompletable(new Function<Submission, CompletableSource>() {
+                .flatMap(new Function<Submission, SingleSource<CommentNode>>() {
                     @Override
-                    public CompletableSource apply(Submission submission) throws Exception {
-                        return redditService.replyToThread(submission, text);
+                    public SingleSource<CommentNode> apply(final Submission submission) throws Exception {
+                        return redditService.replyToThread(submission, text)
+                                    .flatMap(new Function<String, SingleSource<CommentNode>>() {
+                                        @Override
+                                        public SingleSource<CommentNode> apply(String commentId) throws Exception {
+                                            return redditService.getComment(submission.getId(), commentId);
+                                        }
+                                    });
                     }
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableCompletableObserver() {
+                .subscribeWith(new DisposableSingleObserver<CommentNode>() {
                     @Override
-                    public void onComplete() {
+                    public void onSuccess(CommentNode commentNode) {
                         if (isViewAttached()) {
-                            view.showReplyToSubmissionSavedToast();
+                            view.showSavedToast();
+                            view.addComment(0, commentNode);
                         }
                     }
 
@@ -253,8 +262,10 @@ public class GameThreadPresenter {
                                 view.showNoThreadText();
                             } else if (e instanceof NotLoggedInException) {
                                 view.showNotLoggedInToast();
-                            } else {
+                            } else if (e instanceof ReplyToThreadException){
                                 view.showReplyToSubmissionFailedToast();
+                            } else if (e instanceof ReplyNotAvailableException) {
+                                view.showSavedToast();
                             }
                         }
                     }

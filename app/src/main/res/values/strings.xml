@@ -24,6 +24,8 @@
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="not_logged_in">You must log in first</string>
+    <string name="saving_failed">Saving failed</string>
+    <string name="reply">Reply</string>
 
 
     <!-- Strings for MainActivity -->
@@ -36,6 +38,7 @@
     <string name="highlights_fragment_title">Highlights</string>
     <string name="today_string">Today</string>
     <string name="not_logged">Not logged In</string>
+    <string name="saving">Saving</string>
 
     <!-- GameThread -->
     <string name="add_comment">Add a comment</string>
