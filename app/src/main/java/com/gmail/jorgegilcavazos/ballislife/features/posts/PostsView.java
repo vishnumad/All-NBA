@@ -19,6 +19,8 @@ public interface PostsView {
 
     void showNotAuthenticatedToast();
 
+    void showNotLoggedInToast();
+
     void showSubscribers(SubscriberCount subscriberCount);
 
 }

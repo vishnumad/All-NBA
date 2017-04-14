@@ -6,6 +6,7 @@ import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -57,7 +58,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public void loadPosts() {
         view.setLoadingIndicator(true);
         view.dismissSnackbar();
-        disposables.add(service.getSubmissionListing("nba", 20, Sorting.HOT)
+        disposables.add(service.getSubmissionListing("nba", 25, Sorting.HOT)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
@@ -80,6 +81,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                         if (isViewAttached()) {
                             if (e instanceof NotAuthenticatedException) {
                                 view.showNotAuthenticatedToast();
+                                // TODO: do something about it. Re-start auth?
                             } else {
                                 view.showPostsLoadingFailedSnackbar();
                             }
@@ -91,6 +93,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void onVote(Submission submission, VoteDirection direction) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         disposables.add(service.voteSubmission(submission, direction)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -109,6 +116,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void onSave(Submission submission, boolean saved) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         disposables.add(service.saveSubmission(submission, saved)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())

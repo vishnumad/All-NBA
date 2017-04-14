@@ -161,6 +161,11 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void showNotLoggedInToast() {
+        Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void showSubscribers(SubscriberCount subscriberCount) {
         postsAdapter.setSubscriberCount(subscriberCount);
     }
