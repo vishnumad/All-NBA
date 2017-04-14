@@ -212,17 +212,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
-    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
-        presenter.vote(comment, voteDirection);
-    }
-
-    @Override
-    public void onSaveComment(Comment comment) {
-        presenter.save(comment);
-    }
-
-    @Override
-    public void onReplyToComment(final int position, final Comment parentComment) {
+    public void openReplyToCommentDialog(final int position, final Comment parentComment) {
         new MaterialDialog.Builder(getContext())
                 .title(R.string.add_comment)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
@@ -237,7 +227,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
                 .show();
     }
 
-    public void replyToThread() {
+    @Override
+    public void openReplyToThreadDialog() {
         new MaterialDialog.Builder(getContext())
                 .title(R.string.add_comment)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
@@ -250,5 +241,24 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
                 .positiveText(R.string.reply)
                 .negativeText(R.string.cancel)
                 .show();
+    }
+
+    @Override
+    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
+        presenter.vote(comment, voteDirection);
+    }
+
+    @Override
+    public void onSaveComment(Comment comment) {
+        presenter.save(comment);
+    }
+
+    @Override
+    public void onReplyToComment(final int position, final Comment parentComment) {
+        presenter.replyToCommentBtnClick(position, parentComment);
+    }
+
+    public void replyToThread() {
+        presenter.replyToThreadBtnClick();
     }
 }

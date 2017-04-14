@@ -1,13 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
-import android.util.Log;
-
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
@@ -123,6 +121,11 @@ public class GameThreadPresenter {
     }
 
     public void vote(Comment comment, VoteDirection voteDirection) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         disposables.add(redditService.voteComment(comment, voteDirection)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -134,17 +137,18 @@ public class GameThreadPresenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            if (e instanceof NotLoggedInException) {
-                                view.showNotLoggedInToast();
-                            }
-                        }
+
                     }
                 })
         );
     }
 
     public void save(Comment comment) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         view.showSavingToast();
         disposables.add(redditService.saveComment(comment)
                 .subscribeOn(Schedulers.io())
@@ -160,11 +164,7 @@ public class GameThreadPresenter {
                     @Override
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
-                            if (e instanceof NotLoggedInException) {
-                                view.showNotLoggedInToast();
-                            } else {
-                                view.showFailedToSaveToast();
-                            }
+                            view.showFailedToSaveToast();
                         }
                     }
                 })
@@ -172,6 +172,11 @@ public class GameThreadPresenter {
     }
 
     public void reply(final int position, final Comment parentComment, final String text) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         view.showSavingToast();
         disposables.add(redditService.replyToComment(parentComment, text)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
@@ -209,6 +214,11 @@ public class GameThreadPresenter {
 
     public void replyToThread(final String text, final String type, final String homeTeamAbbr,
                               final String awayTeamAbbr) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
         view.showSavingToast();
         disposables.add(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate)))
@@ -260,8 +270,6 @@ public class GameThreadPresenter {
                         if (isViewAttached()) {
                             if (e instanceof ThreadNotFoundException) {
                                 view.showNoThreadText();
-                            } else if (e instanceof NotLoggedInException) {
-                                view.showNotLoggedInToast();
                             } else if (e instanceof ReplyToThreadException){
                                 view.showReplyToSubmissionFailedToast();
                             } else if (e instanceof ReplyNotAvailableException) {
@@ -271,6 +279,24 @@ public class GameThreadPresenter {
                     }
                 })
         );
+    }
+
+    public void replyToCommentBtnClick(int position, Comment parentComment) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
+        view.openReplyToCommentDialog(position, parentComment);
+    }
+
+    public void replyToThreadBtnClick() {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
+        view.openReplyToThreadDialog();
     }
 
     public void stop() {

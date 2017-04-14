@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
 
@@ -22,4 +23,8 @@ public interface SubmissionView {
     void showSavedToast();
 
     void showErrorSavingToast();
+
+    void openReplyToCommentDialog(int position, Comment parentComment);
+
+    void openReplyToSubmissionDialog();
 }

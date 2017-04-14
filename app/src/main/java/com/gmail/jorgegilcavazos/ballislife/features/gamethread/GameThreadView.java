@@ -40,4 +40,8 @@ public interface GameThreadView extends MvpView {
     void showReplyToSubmissionFailedToast();
 
     void showSavingToast();
+
+    void openReplyToCommentDialog(int position, Comment parentComment);
+
+    void openReplyToThreadDialog();
 }

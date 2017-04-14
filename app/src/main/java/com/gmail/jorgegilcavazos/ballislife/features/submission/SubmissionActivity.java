@@ -156,8 +156,14 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         presenter.onSaveComment(comment);
     }
 
+
     @Override
-    public void onReplyToComment(final int position, final Comment parentComment) {
+    public void onReplyToComment(int position, Comment parentComment) {
+        presenter.onReplyToCommentBtnClick(position, parentComment);
+    }
+
+    @Override
+    public void openReplyToCommentDialog(final int position, final Comment parentComment) {
         new MaterialDialog.Builder(this)
                 .title(R.string.add_comment)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
@@ -201,6 +207,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     public void onReplyToThread() {
+        presenter.onReplyToThreadBtnClick();
+    }
+
+    @Override
+    public void openReplyToSubmissionDialog() {
         new MaterialDialog.Builder(this)
                 .title(R.string.add_comment)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)

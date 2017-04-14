@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
@@ -67,6 +68,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onVoteSubmission(Submission submission, VoteDirection vote) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
         disposables.add(service.voteSubmission(submission, vote)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -85,6 +91,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onSaveSubmission(Submission submission, boolean saved) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
         view.showSavingToast();
         disposables.add(service.saveSubmission(submission, saved)
                 .subscribeOn(schedulerProvider.io())
@@ -108,6 +119,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onVoteComment(Comment comment, VoteDirection vote) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
         disposables.add(service.voteComment(comment, vote)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -126,6 +142,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onSaveComment(Comment comment) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
         view.showSavingToast();
         disposables.add(service.saveComment(comment)
                 .subscribeOn(schedulerProvider.io())
@@ -146,6 +167,15 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                     }
                 })
         );
+    }
+
+    public void onReplyToCommentBtnClick(int position, Comment parent) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
+        view.openReplyToCommentDialog(position, parent);
     }
 
     public void onReplyToComment(final int position, final Comment parent, String text) {
@@ -182,6 +212,15 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                     }
                 })
         );
+    }
+
+    public void onReplyToThreadBtnClick() {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
+        view.openReplyToSubmissionDialog();
     }
 
     public void onReplyToThread(String text, final Submission submission) {
