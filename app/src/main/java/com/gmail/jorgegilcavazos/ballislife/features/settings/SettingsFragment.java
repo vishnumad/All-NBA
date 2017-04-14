@@ -164,6 +164,7 @@ public class SettingsFragment extends PreferenceFragment
                 RedditAuthentication reddit = RedditAuthentication.getInstance();
                 if (reddit.isUserLoggedIn()) {
                     reddit.deAuthenticateUser(redditPrefs)
+                            .andThen(reddit.authenticate(redditPrefs))
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.ui())
                             .subscribeWith(new DisposableCompletableObserver() {

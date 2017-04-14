@@ -107,7 +107,6 @@ public class RedditAuthentication {
         }
 
         clearRefreshTokenInPrefs(sharedPreferences);
-
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
         return redditService.deAuthenticate(mRedditClient, credentials);
     }
