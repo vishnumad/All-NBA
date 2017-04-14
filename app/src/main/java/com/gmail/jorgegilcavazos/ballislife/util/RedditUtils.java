@@ -1,6 +1,14 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+
+import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
+import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 
 import java.util.List;
 
@@ -91,5 +99,39 @@ public final class RedditUtils {
         String capsTeam = fullTeamName.toUpperCase(); // Ex. "SAN ANTONIO SPURS".
         String capsName = capsTeam.substring(capsTeam.lastIndexOf(" ") + 1); // Ex. "SPURS".
         return capsTitle.contains(capsName);
+    }
+
+    public static void setUpvotedColors(Context context, final FullCardViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentUpvoted));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
+    }
+
+    public static void setDownvotedColors(Context context, final FullCardViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentDownvoted));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
+    }
+
+    public static void setNoVoteColors(Context context, final FullCardViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+    }
+
+    public static void setSavedColors(Context context, final FullCardViewHolder holder) {
+        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.amber));
+    }
+
+    public static void setUnsavedColors(Context context, final FullCardViewHolder holder) {
+        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
     }
 }

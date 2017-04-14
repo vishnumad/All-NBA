@@ -23,50 +23,18 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView_submission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-            <VideoView
-                android:id="@+id/submission_video"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"/>
-
-            <LinearLayout
-                android:id="@+id/submission_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-                <include layout="@layout/submission_header"/>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/submission_rv"
-                    android:scrollbars="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    tools:listitem="@layout/comment_layout">
-
-                </android.support.v7.widget.RecyclerView>
-
-            </LinearLayout>
-
-
-
-        </FrameLayout>
-
-    </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

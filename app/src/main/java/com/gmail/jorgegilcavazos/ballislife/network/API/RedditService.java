@@ -138,6 +138,35 @@ public class RedditService {
         });
     }
 
+    public Single<List<CommentNode>> getComments(final String threadId, final CommentSort sorting) {
+        return Single.create(new SingleOnSubscribe<List<CommentNode>>() {
+            @Override
+            public void subscribe(SingleEmitter<List<CommentNode>> e) throws Exception {
+                RedditClient redditClient = RedditAuthentication.getInstance()
+                        .getRedditClient();
+
+                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+                builder.sort(sorting);
+
+                SubmissionRequest submissionRequest = builder.build();
+                Submission submission = null;
+                try {
+                    submission = redditClient.getSubmission(submissionRequest);
+
+                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                    List<CommentNode> commentNodes = new ArrayList<>();
+                    for (CommentNode node : iterable) {
+                        commentNodes.add(node);
+                    }
+
+                    e.onSuccess(commentNodes);
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
+
     public Single<CommentNode> getComment(final String threadId, final String commentId) {
         return Single.create(new SingleOnSubscribe<CommentNode>() {
             @Override
@@ -257,7 +286,7 @@ public class RedditService {
         });
     }
 
-    public Single<Submission> getSubmission(final String threadId) {
+    public Single<Submission> getSubmission(final String threadId, final CommentSort sort) {
         return Single.create(new SingleOnSubscribe<Submission>() {
             @Override
             public void subscribe(SingleEmitter<Submission> e) throws Exception {
@@ -265,8 +294,12 @@ public class RedditService {
                         .getRedditClient();
 
                 SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+                if (sort != null) {
+                    builder.sort(sort);
+                }
 
                 SubmissionRequest submissionRequest = builder.build();
+                Submission submission = null;
 
                 try {
                     e.onSuccess(redditClient.getSubmission(submissionRequest));

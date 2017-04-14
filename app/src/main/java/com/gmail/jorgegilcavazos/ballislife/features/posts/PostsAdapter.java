@@ -3,21 +3,21 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Submission;
@@ -36,11 +36,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context context;
     private List<CustomSubmission> postsList;
     private PostsFragment.ViewType type;
-    private PostsFragment.OnPostClickListener listener;
+    private OnSubmissionClickListener listener;
     private SubscriberCount subscriberCount;
 
     public PostsAdapter(List<CustomSubmission> postsList, PostsFragment.ViewType type,
-                        PostsFragment.OnPostClickListener listener,
+                        OnSubmissionClickListener listener,
                         SubscriberCount subscriberCount) {
         this.postsList = postsList;
         this.type = type;
@@ -122,28 +122,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    class FullCardViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.text_title) TextView tvTitle;
-        @BindView(R.id.text_author) TextView tvAuthor;
-        @BindView(R.id.text_timestamp) TextView tvTimestamp;
-        @BindView(R.id.text_domain) TextView tvDomain;
-        @BindView(R.id.image_thumbnail) ImageView ivThumbnail;
-        @BindView(R.id.button_upvote) ImageButton btnUpvote;
-        @BindView(R.id.text_points) TextView tvPoints;
-        @BindView(R.id.button_downvote) ImageButton btnDownvote;
-        @BindView(R.id.button_comments) ImageButton btnComments;
-        @BindView(R.id.text_comments) TextView tvComments;
-        @BindView(R.id.button_save) ImageButton btnSave;
-        //@BindView(R.id.text_save) TextView tvSave;
-
-        public FullCardViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
-
-    class HeaderViewHolder extends RecyclerView.ViewHolder {
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.text_subscribers) TextView tvSubscribers;
 
@@ -172,17 +151,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         if (submission.getVote() == VoteDirection.UPVOTE) {
-            setUpvotedColors(holder);
+            RedditUtils.setUpvotedColors(context, holder);
         } else if (submission.getVote() == VoteDirection.DOWNVOTE) {
-            setDownvotedColors(holder);
+            RedditUtils.setDownvotedColors(context, holder);
         } else {
-            setNoVoteColors(holder);
+            RedditUtils.setNoVoteColors(context, holder);
         }
 
         if (submission.isSaved()) {
-            setSavedColors(holder);
+            RedditUtils.setSavedColors(context, holder);
         } else {
-            setUnsavedColors(holder);
+            RedditUtils.setUnsavedColors(context, holder);
         }
 
         holder.tvPoints.setText(String.valueOf(submission.getScore()));
@@ -230,21 +209,21 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    listener.onVote(submission, VoteDirection.NO_VOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
                     customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(holder);
+                    RedditUtils.setNoVoteColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) - 1));
                 } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    listener.onVote(submission, VoteDirection.UPVOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.UPVOTE);
                     customSubmission.setVoteDirection(VoteDirection.UPVOTE);
-                    setUpvotedColors(holder);
+                    RedditUtils.setUpvotedColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) + 2));
                 } else {
-                    listener.onVote(submission, VoteDirection.UPVOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.UPVOTE);
                     customSubmission.setVoteDirection(VoteDirection.UPVOTE);
-                    setUpvotedColors(holder);
+                    RedditUtils.setUpvotedColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) + 1));
                 }
@@ -255,21 +234,21 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    listener.onVote(submission, VoteDirection.NO_VOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
                     customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(holder);
+                    RedditUtils.setNoVoteColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) + 1));
                 } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                    listener.onVote(submission, VoteDirection.DOWNVOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
                     customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
-                    setDownvotedColors(holder);
+                    RedditUtils.setDownvotedColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) - 2));
                 } else {
-                    listener.onVote(submission, VoteDirection.DOWNVOTE);
+                    listener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
                     customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
-                    setDownvotedColors(holder);
+                    RedditUtils.setDownvotedColors(context, holder);
                     holder.tvPoints.setText(String.valueOf(Integer.valueOf(
                             holder.tvPoints.getText().toString()) - 1));
                 }
@@ -280,12 +259,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.isSaved()) {
-                    listener.onSave(submission, false);
-                    setUnsavedColors(holder);
+                    listener.onSaveSubmission(submission, false);
+                    RedditUtils.setUnsavedColors(context, holder);
                     customSubmission.setSaved(false);
                 } else {
-                    listener.onSave(submission, true);
-                    setSavedColors(holder);
+                    listener.onSaveSubmission(submission, true);
+                    RedditUtils.setSavedColors(context, holder);
                     customSubmission.setSaved(true);
                 }
             }
@@ -294,50 +273,16 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.btnComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onPostClick(submission);
+                listener.onSubmissionClick(submission);
             }
         });
 
         holder.tvTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onPostClick(submission);
+                listener.onSubmissionClick(submission);
             }
         });
-    }
-
-    private void setUpvotedColors(final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentUpvoted));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
-    }
-
-    private void setDownvotedColors(final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentDownvoted));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
-    }
-
-    private void setNoVoteColors(final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
-    }
-
-    private void setSavedColors(final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.amber));
-    }
-
-    private void setUnsavedColors(final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
     }
 
 }

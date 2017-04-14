@@ -1,134 +1,85 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.VideoView;
 
-import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentActionClickListener;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.CommentAdapter;
-import com.gmail.jorgegilcavazos.ballislife.util.MyDebug;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.squareup.picasso.Picasso;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
-import net.dean.jraw.http.SubmissionRequest;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
-import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubmissionActivity extends AppCompatActivity implements OnCommentActionClickListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
+        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
+        View.OnClickListener {
     private static final String TAG = "SubmissionActivity";
 
-    private Toolbar mToolbar;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private TextView mTitleTextView;
-    private TextView mDescriptionTextView;
-    private TextView mAuthorTextView;
-    private TextView mTimestampTextView;
-    private TextView mScoreTextView;
-    private TextView mCommentCntTextView;
-    private ImageView mSubmissionImageView;
-    private VideoView mVideoView;
-    private FloatingActionButton mFab;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.fab) FloatingActionButton fab;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.recyclerView_submission) RecyclerView submissionRecyclerView;
 
     private String threadId;
-    private String threadDomain;
-    private String threadUrl;
 
-    private FetchFullThreadTask fetchFullThreadTask;
-    private FetchStreamableTask fetchStreamableTask;
+    private CustomSubmission customSubmission;
+    private ThreadAdapter threadAdapter;
+    private SubmissionPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submission);
-        setUpToolbar();
+        ButterKnife.bind(this);
 
-        if (Constants.NBA_MATERIAL_ENABLED) {
-            setTitle(getString(R.string.rnba));
-        } else  {
-            setTitle("");
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        setTitle(getString(R.string.rnba));
 
         Bundle extras = getIntent().getExtras();
-        threadId = extras.getString(Constants.THREAD_ID);
-        threadDomain = extras.getString(Constants.THREAD_DOMAIN);
-        threadUrl = extras.getString(Constants.THREAD_URL);
-
-        mTitleTextView = (TextView) findViewById(R.id.submission_title);
-        mDescriptionTextView = (TextView) findViewById(R.id.submission_description);
-        mAuthorTextView = (TextView) findViewById(R.id.submission_author);
-        mTimestampTextView = (TextView) findViewById(R.id.submission_timestamp);
-        mScoreTextView = (TextView) findViewById(R.id.submission_score);
-        mCommentCntTextView = (TextView) findViewById(R.id.submission_num_comments);
-        mSubmissionImageView = (ImageView) findViewById(R.id.submission_image);
-        mVideoView = (VideoView) findViewById(R.id.submission_video);
-        mVideoView.setVisibility(View.INVISIBLE);
-        loadSubmissionDetails(extras);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.submission_rv);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mRecyclerView.setNestedScrollingEnabled(false);
-        } else {
-            ViewCompat.setNestedScrollingEnabled(mRecyclerView, false);
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            threadId = extras.getString(Constants.THREAD_ID);
+            customSubmission = (CustomSubmission) extras
+                    .getSerializable(Constants.THREAD_SUBMISSION);
         }
 
-        mSubmissionImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openLink(threadUrl, threadDomain);
-            }
-        });
+        fab.setOnClickListener(this);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        threadAdapter = new ThreadAdapter(new ArrayList<CommentNode>(), true, this, this,
+                customSubmission);
+        submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        submissionRecyclerView.setAdapter(threadAdapter);
 
-        fetchFullThreadTask = new FetchFullThreadTask(threadId);
-        fetchFullThreadTask.execute();
+        presenter = new SubmissionPresenter(new RedditService(), SchedulerProvider.getInstance());
+        presenter.attachView(this);
+        presenter.loadComments(threadId);
     }
 
     @Override
@@ -143,214 +94,95 @@ public class SubmissionActivity extends AppCompatActivity implements OnCommentAc
 
     @Override
     protected void onDestroy() {
-        if (fetchFullThreadTask != null) {
-            fetchFullThreadTask.cancel(true);
-        }
-        if (fetchStreamableTask != null) {
-            fetchStreamableTask.cancel(true);
-        }
         super.onDestroy();
-    }
-
-    private void setUpToolbar(){
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (mToolbar != null) {
-            setSupportActionBar(mToolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
-    }
-
-    private void loadSubmissionDetails(Bundle extras) {
-        mTitleTextView.setText(extras.getString(Constants.THREAD_TITLE));
-        mAuthorTextView.setText(extras.getString(Constants.THREAD_AUTHOR));
-        mTimestampTextView.setText(extras.getString(Constants.THREAD_TIMESTAMP));
-        mScoreTextView.setText(extras.getString(Constants.THREAD_SCORE));
-        mCommentCntTextView.setText(extras.getString(Constants.THREAD_NUM_COMMENTS));
-
-        if (extras.getBoolean(Constants.THREAD_SELF)) {
-            mSubmissionImageView.setVisibility(View.GONE);
-        } else {
-            String imageUrl = extras.getString(Constants.THREAD_IMAGE);
-            if (imageUrl != null) {
-                Picasso.with(this).load(imageUrl).fit().centerCrop().into(mSubmissionImageView);
-            } else {
-                mSubmissionImageView.setVisibility(View.GONE);
-            }
-        }
-
-        String description = extras.getString(Constants.THREAD_DESCRIPTION);
-        if (description.equals("")) {
-            mDescriptionTextView.setVisibility(View.GONE);
-        } else {
-            mDescriptionTextView.setText(description);
-        }
-    }
-
-    private void getComments(Submission submission) {
-        Iterable<CommentNode> iterable = submission.getComments().walkTree();
-        List<CommentNode> commentNodes = new ArrayList<>();
-        for (CommentNode node : iterable) {
-            commentNodes.add(node);
-        }
-        mAdapter = new CommentAdapter(commentNodes, this);
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
-    private void openLink(String url, String domain) {
-        if (domain.equals(Constants.STREAMABLE_DOMAIN)) {
-            playStreamable(url);
-        }
-        playStreamable(url);
-    }
-
-    private void playStreamable(String url) {
-        String streamableId = url.substring(url.lastIndexOf('/') + 1);
-        fetchStreamableTask = new FetchStreamableTask("dng6");
-        fetchStreamableTask.execute();
-    }
-
-    private void playVideo(String url, int width, int height) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        mFab.hide();
-
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int displayH = displayMetrics.heightPixels;
-        int displayW = displayMetrics.widthPixels;
-
-        mVideoView.setVisibility(View.VISIBLE);
-        //mVideoView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
-        //mVideoView.setZOrderOnTop(true); //HIDE
-        //background.setVisibility(GamesView.VISIBLE);
-        //videoProgressLayout.setVisibility(GamesView.VISIBLE);
-        //isPreviewVisible = true;
-        Uri uri = Uri.parse(url);
-
-        try {
-
-            mVideoView.setMediaController(new android.widget.MediaController(this));
-            mVideoView.setVideoURI(uri);
-            mVideoView.requestFocus();
-            mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    //videoProgressLayout.setVisibility(GamesView.GONE);
-                    //mVideoView.setZOrderOnTop(false); //SHOW
-                    mSubmissionImageView.setVisibility(View.GONE);
-                }
-            });
-            mVideoView.start();
-        } catch (Exception e) {
-            // TODO: Handle exception
-            //stopVideo();
-            //Toast.makeText(context, "Error loading video", Toast.LENGTH_SHORT).show();
-        }
-
+        presenter.detachView();
+        presenter.stop();
     }
 
     @Override
-    public void onVote(Comment comment, VoteDirection voteDirection) {
-
+    public void setLoadingIndicator(boolean active) {
+        swipeRefreshLayout.setRefreshing(active);
     }
 
     @Override
-    public void onSave(Comment comment) {
-
+    public void showComments(List<CommentNode> commentNodes, Submission submission) {
+        threadAdapter.swap(commentNodes);
+        threadAdapter.setSubmission(submission);
     }
 
     @Override
-    public void onReply(int position, Comment parentComment) {
-
+    public void onRefresh() {
+        presenter.loadComments(threadId);
     }
 
-    private class FetchFullThreadTask extends AsyncTask<Void, Void, Submission> {
-        private String mThreadId;
-
-        public FetchFullThreadTask(String threadId) {
-            mThreadId = threadId;
-        }
-
-        @Override
-        protected Submission doInBackground(Void... params) {
-            SubmissionRequest.Builder b = new SubmissionRequest.Builder(mThreadId);
-            b.sort(CommentSort.HOT);
-            SubmissionRequest sr = b.build();
-
-            return RedditAuthentication.getInstance().getRedditClient().getSubmission(sr);
-        }
-
-        @Override
-        protected void onPostExecute(Submission submission) {
-            getComments(submission);
-        }
+    @Override
+    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
+        presenter.onVoteComment(comment, voteDirection);
     }
 
-    private class FetchStreamableTask extends AsyncTask<Void, Void, Streamable> {
-        String mStreamableId;
+    @Override
+    public void onSaveComment(Comment comment) {
+        presenter.onSaveComment(comment);
+    }
 
-        public FetchStreamableTask(String streamableId) {
-            mStreamableId = streamableId;
-        }
+    @Override
+    public void onReplyToComment(final int position, final Comment parentComment) {
+        new MaterialDialog.Builder(this)
+                .title(R.string.add_comment)
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        presenter.onReplyToComment(position, parentComment, input.toString());
+                    }
+                })
+                .positiveText("Reply")
+                .negativeText("Cancel")
+                .show();
+    }
 
-        @Override
-        protected Streamable doInBackground(Void... params) {
-            String streamableUrl = Constants.STREAMABLE_API_URL + mStreamableId;
-            try {
-                URL url = new URL(streamableUrl);
-                HttpURLConnection request = (HttpURLConnection) url.openConnection();
-                request.setRequestMethod("GET");
-                request.connect();
+    @Override
+    public void onSubmissionClick(Submission submission) {
+        // No action on submission click.
+    }
 
-                JsonParser jsonParser = new JsonParser();
-                JsonElement root = jsonParser.parse(new InputStreamReader((InputStream)
-                        request.getContent()));
-                JsonObject jsonObject = root.getAsJsonObject();
-                Streamable streamable = new Streamable(jsonObject);
-                return  streamable;
-            } catch (MalformedURLException e) {
-                if (MyDebug.LOG) {
-                    Log.e(TAG, "Failed to convert string to URL. ", e);
-                }
-            } catch (IOException e) {
-                if (MyDebug.LOG) {
-                    Log.e(TAG, "Failed to open URL connection. ", e);
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Streamable streamable) {
-            String videoUrl = null;
-            int videoWidth = -1;
-            int videoHeight = -1;
-
-            if (streamable.getMobileVideoUrl() != null) {
-                videoUrl = streamable.getMobileVideoUrl();
-                videoWidth = streamable.getMobileVideoWidth();
-                videoHeight = streamable.getMobileVideoHeight();
-            }
-            if (videoUrl == null && streamable.getDesktopVideoUrl() != null) {
-                videoUrl = streamable.getDesktopVideoUrl();
-                videoWidth = streamable.getDesktopVideoWidth();
-                videoHeight = streamable.getDesktopVideoHeight();
-            }
-
-            if (videoUrl != null && videoWidth != -1 && videoHeight != -1) {
-                playVideo(videoUrl, videoWidth, videoHeight);
-            } else {
-                if (MyDebug.LOG) {
-                    Log.e(TAG, "Could not get video from Streamable.");
-                }
-            }
+    @Override
+    public void onVoteSubmission(Submission submission, VoteDirection voteDirection) {
+        if (submission != null) {
+            presenter.onVoteSubmission(submission, voteDirection);
         }
     }
 
+    @Override
+    public void onSaveSubmission(Submission submission, boolean saved) {
+        if (submission != null) {
+            presenter.onSaveSubmission(submission, saved);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                onReplyToThread();
+                break;
+        }
+    }
+
+    public void onReplyToThread() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.add_comment)
+                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        if (customSubmission.getSubmission() != null) {
+                            presenter.onReplyToThread(input.toString(), customSubmission.getSubmission());
+                        }
+                    }
+                })
+                .positiveText("Reply")
+                .negativeText("Cancel")
+                .show();
+    }
 }

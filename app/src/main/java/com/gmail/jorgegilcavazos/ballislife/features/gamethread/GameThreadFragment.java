@@ -10,7 +10,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +19,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.CommentAdapter;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentActionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 
 import net.dean.jraw.models.Comment;
@@ -39,7 +38,7 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
 
 public class GameThreadFragment extends Fragment implements GameThreadView,
-        SwipeRefreshLayout.OnRefreshListener, OnCommentActionClickListener {
+        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener {
     private static final String TAG = "GameThreadFragment";
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
@@ -49,7 +48,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     @BindView(R.id.text_message) TextView tvMessage;
 
     private RecyclerView.LayoutManager lmComments;
-    private CommentAdapter commentAdapter;
+    private ThreadAdapter threadAdapter;
     private Unbinder unbinder;
 
     private String homeTeam, awayTeam, threadType;
@@ -88,10 +87,10 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
-        commentAdapter = new CommentAdapter(new ArrayList<CommentNode>(0), this);
+        threadAdapter = new ThreadAdapter(new ArrayList<CommentNode>(0), false, this);
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
-        rvComments.setAdapter(commentAdapter);
+        rvComments.setAdapter(threadAdapter);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             rvComments.setNestedScrollingEnabled(false);
@@ -135,7 +134,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     @Override
     public void showComments(List<CommentNode> comments) {
-        commentAdapter.swap(comments);
+        threadAdapter.swap(comments);
         rvComments.setVisibility(View.VISIBLE);
     }
 
@@ -146,7 +145,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     @Override
     public void addComment(int position, CommentNode comment) {
-        commentAdapter.addComment(position, comment);
+        threadAdapter.addComment(position, comment);
     }
 
     @Override
@@ -208,17 +207,17 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
-    public void onVote(Comment comment, VoteDirection voteDirection) {
+    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }
 
     @Override
-    public void onSave(Comment comment) {
+    public void onSaveComment(Comment comment) {
         presenter.save(comment);
     }
 
     @Override
-    public void onReply(final int position, final Comment parentComment) {
+    public void onReplyToComment(final int position, final Comment parentComment) {
         new MaterialDialog.Builder(getContext())
                 .title(R.string.add_comment)
                 .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)

@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -201,7 +200,6 @@ public class GameThreadPresenter {
                             } else {
                                 view.showReplyErrorToast();
                             }
-                            Log.d("Presenter", e.toString());
                         }
                     }
                 })
@@ -229,7 +227,7 @@ public class GameThreadPresenter {
                         if (threadId.equals("")) {
                             return Single.error(new ThreadNotFoundException());
                         }
-                        return redditService.getSubmission(threadId);
+                        return redditService.getSubmission(threadId, null);
                     }
                 })
                 .flatMapCompletable(new Function<Submission, CompletableSource>() {
