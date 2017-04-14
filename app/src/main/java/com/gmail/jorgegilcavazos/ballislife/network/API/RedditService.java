@@ -12,6 +12,9 @@ import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadExceptio
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.SubmissionRequest;
+import net.dean.jraw.http.oauth.Credentials;
+import net.dean.jraw.http.oauth.OAuthData;
+import net.dean.jraw.http.oauth.OAuthHelper;
 import net.dean.jraw.managers.AccountManager;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -388,6 +391,75 @@ public class RedditService {
                     int activeUsers = rnba.getAccountsActive();
 
                     e.onSuccess(new SubscriberCount(subscribers, activeUsers));
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
+
+    public Completable userlessAuthentication(final RedditClient reddit,
+                                              final Credentials credentials) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                try {
+                    OAuthData oAuthData = reddit.getOAuthHelper().easyAuth(credentials);
+                    reddit.authenticate(oAuthData);
+                    e.onComplete();
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
+
+    public Completable userAuthentication(final RedditClient reddit, final Credentials credentials,
+                                          final String url) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                OAuthHelper oAuthHelper = reddit.getOAuthHelper();
+
+                try {
+                    OAuthData oAuthData = oAuthHelper.onUserChallenge(url, credentials);
+                    reddit.authenticate(oAuthData);
+                    e.onComplete();
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
+
+    public Completable refreshToken(final RedditClient reddit, final Credentials credentials,
+                                          final String refreshToken) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                OAuthHelper helper = reddit.getOAuthHelper();
+                helper.setRefreshToken(refreshToken);
+
+                try {
+                    OAuthData oAuthData = helper.refreshToken(credentials);
+                    reddit.authenticate(oAuthData);
+                    e.onComplete();
+                } catch (Exception ex) {
+                    e.onError(ex);
+                }
+            }
+        });
+    }
+
+    public Completable deAuthenticate(final RedditClient reddit, final Credentials credentials) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                OAuthHelper helper = reddit.getOAuthHelper();
+                try {
+                    helper.revokeAccessToken(credentials);
+                    reddit.deauthenticate();
+                    e.onComplete();
                 } catch (Exception ex) {
                     e.onError(ex);
                 }

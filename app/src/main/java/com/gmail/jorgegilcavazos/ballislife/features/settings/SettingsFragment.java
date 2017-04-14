@@ -13,9 +13,16 @@ import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Set;
+
+import io.reactivex.observers.DisposableCompletableObserver;
+
+import static android.content.Context.MODE_PRIVATE;
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
@@ -24,15 +31,6 @@ public class SettingsFragment extends PreferenceFragment
     // Should match string values in strings.xml
     public static final String KEY_PREF_CGA_TOPICS = "pref_cga_topics";
     public static final String KEY_PREF_START_TOPICS = "pref_start_topics";
-
-    private final RedditAuthentication.DeAuthTask.OnDeAuthTaskCompleted deAuthListener =
-            new RedditAuthentication.DeAuthTask.OnDeAuthTaskCompleted() {
-        @Override
-        public void onSuccess() {
-            RedditAuthentication.getInstance().clearRefreshTokenInPrefs(getActivity());
-            initLogInStatusText();
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,13 +154,30 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     private void initListeners() {
+        final SharedPreferences redditPrefs = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
+        final BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
+
         Preference logInStatusPref = findPreference("log_in_status_pref");
         logInStatusPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 RedditAuthentication reddit = RedditAuthentication.getInstance();
                 if (reddit.isUserLoggedIn()) {
-                    reddit.deAuthenticateUser(getActivity(), deAuthListener);
+                    reddit.deAuthenticateUser(redditPrefs)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.ui())
+                            .subscribeWith(new DisposableCompletableObserver() {
+                                @Override
+                                public void onComplete() {
+                                    initLogInStatusText();
+                                    // TODO check view is attached
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+
+                                }
+                            });
                 } else {
                     Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(loginIntent);

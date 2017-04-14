@@ -1,25 +1,24 @@
 package com.gmail.jorgegilcavazos.ballislife.features.login;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.util.AuthListener;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.util.MyDebug;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import java.net.URL;
 
 import butterknife.BindView;
+import io.reactivex.observers.DisposableCompletableObserver;
+
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -36,24 +35,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         setTitle("Log in to Reddit");
 
-        final AuthListener authListener = new AuthListener() {
-            @Override
-            public void onSuccess() {
-                if (MyDebug.LOG) {
-                    Log.d(TAG, "success");
-                }
-                RedditAuthentication.getInstance().saveRefreshTokenInPrefs(getApplicationContext());
-                finish();
-            }
+        final BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
 
-            @Override
-            public void onFailure() {
-                if (MyDebug.LOG) {
-                    Log.d(TAG, "failed");
-                }
-                finish();
-            }
-        };
+        final SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
         URL authURL = RedditAuthentication.getInstance().getAuthorizationUrl();
         webView = (WebView) findViewById(R.id.login_webview);
@@ -65,10 +49,22 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.d(TAG, "started: " + url);
                 if (url.contains("code=")) {
                     webView.stopLoading();
-                    RedditAuthentication.getInstance().authenticateWithUser(url, authListener);
+                    RedditAuthentication.getInstance().authenticateUser(url, preferences)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.ui())
+                            .subscribeWith(new DisposableCompletableObserver() {
+                                @Override
+                                public void onComplete() {
+                                    finish();
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    finish();
+                                }
+                            });
                     //TODO: show spinner
                 }
             }
@@ -88,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        RedditAuthentication.getInstance().cancelUserAuthTaskIfRunning();
         webView.destroy();
         super.onDestroy();
     }

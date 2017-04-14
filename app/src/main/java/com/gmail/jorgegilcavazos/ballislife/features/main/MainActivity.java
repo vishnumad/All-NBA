@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,22 +19,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
-import com.gmail.jorgegilcavazos.ballislife.util.AuthListener;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.GoogleApiAvailability;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import net.dean.jraw.RedditClient;
+
+import io.reactivex.observers.DisposableCompletableObserver;
+
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -71,22 +72,29 @@ public class MainActivity extends AppCompatActivity {
         loadNavigationHeaderContent();
         checkGooglePlayServicesAvailable();
 
-        AuthListener listener = new AuthListener() {
-            @Override
-            public void onSuccess() {
-                RedditAuthentication.getInstance().saveRefreshTokenInPrefs(getApplicationContext());
-                loadRedditUsername();
-            }
+        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
-            @Override
-            public void onFailure() {
-
-            }
-        };
+        BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
 
         if (!RedditAuthentication.getInstance().getRedditClient().isAuthenticated()) {
-            RedditAuthentication.getInstance().authenticate(this, listener);
+            RedditAuthentication.getInstance().authenticate(preferences)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        // TODO: check that view is still attached.
+                        loadRedditUsername();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
         }
+
+
 
         // Set default to GamesFragment.
         selectedFragment = GAMES_FRAGMENT_ID;
@@ -389,12 +397,5 @@ public class MainActivity extends AppCompatActivity {
                 navigationView.getMenu().getItem(0).setChecked(true);
                 break;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        RedditAuthentication.getInstance().cancelReAuthTaskIfRunning();
-        RedditAuthentication.getInstance().cancelUserlessAuthTaskIfRunning();
-        super.onDestroy();
     }
 }
