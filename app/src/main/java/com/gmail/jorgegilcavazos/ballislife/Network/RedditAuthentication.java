@@ -50,7 +50,7 @@ public class RedditAuthentication {
 
     private RedditAuthentication() {
         mRedditClient = new RedditClient(UserAgent.of("android",
-                "com.gmail.jorgegilcavazos.ballislife", "v0.1.0", "jorgegil96"));
+                "com.gmail.jorgegilcavazos.ballislife", "v0.4.1", "Obi-Wan_Ginobili"));
     }
 
     public static RedditAuthentication getInstance() {
