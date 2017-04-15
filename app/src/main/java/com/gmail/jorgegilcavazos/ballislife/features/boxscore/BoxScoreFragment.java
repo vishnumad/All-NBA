@@ -158,7 +158,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         }
 
         playerAdapter.setData(players);
-        statLineAdapter.setData(values.getHls().getPstsg());
+        statLineAdapter.setData(values.getVls().getPstsg());
 
         layoutBoxScore.setVisibility(View.VISIBLE);
     }
