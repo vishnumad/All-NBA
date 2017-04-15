@@ -136,6 +136,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                   final CustomSubmission customSubmission) {
         final Submission submission = customSubmission.getSubmission();
 
+        holder.tvBody.setVisibility(View.GONE);
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             holder.tvTitle.setText(Html.fromHtml(submission.getTitle(), Html.FROM_HTML_MODE_LEGACY));
         } else {

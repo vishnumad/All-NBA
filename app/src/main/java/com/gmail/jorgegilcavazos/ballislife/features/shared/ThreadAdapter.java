@@ -110,9 +110,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             cardViewHolder.tvPoints.setText(String.valueOf(customSubmission.getScore()));
 
             if (customSubmission.isSelfPost()) {
+                cardViewHolder.tvBody.setVisibility(View.VISIBLE);
+                cardViewHolder.tvBody.setText(RedditUtils.bindSnuDown(customSubmission.getSelfTextHtml()));
                 cardViewHolder.tvDomain.setText("self");
                 cardViewHolder.ivThumbnail.setVisibility(View.GONE);
             } else {
+                cardViewHolder.tvBody.setVisibility(View.GONE);
                 String domain = customSubmission.getDomain();
                 cardViewHolder.tvDomain.setText(domain);
                 if (customSubmission.getThumbnail() != null) {

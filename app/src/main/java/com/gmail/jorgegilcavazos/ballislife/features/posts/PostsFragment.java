@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -194,7 +195,8 @@ public class PostsFragment extends Fragment implements PostsView,
                 submission.getCommentCount(),
                 highResThumbnailUrl,
                 submission.getVote(),
-                submission.isSaved()
+                submission.isSaved(),
+                submission.data("selftext_html")
         );
 
         bundle.putSerializable(Constants.THREAD_SUBMISSION, customSubmission);

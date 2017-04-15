@@ -24,6 +24,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.button_comments) ImageButton btnComments;
     public @BindView(R.id.text_comments) TextView tvComments;
     public @BindView(R.id.button_save) ImageButton btnSave;
+    public @BindView(R.id.text_body) TextView tvBody;
 
     public FullCardViewHolder(View itemView) {
         super(itemView);
