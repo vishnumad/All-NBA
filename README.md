@@ -13,13 +13,7 @@ Android app for NBA fans. Features live scores, highlights, alerts and Reddit in
 * Standings
 
 ## Screenshots
-<img src="art/v0.5.0/bil_mockup_1.jpeg" alt="Ready" width="20%;"/>
-<img src="art/v0.5.0/bil_mockup_2.jpeg" alt="Ready" width="20%;"/>
-<img src="art/v0.5.0/bil_mockup_3.jpeg" alt="Ready" width="20%;"/>
-<img src="art/v0.5.0/bil_mockup_4.jpeg" alt="Ready" width="20%;"/>
-<img src="art/v0.5.0/bil_mockup_5.jpeg" alt="Ready" width="20%;"/>
-
-[More screenshots](http://imgur.com/a/4h75K)
+<img src="art/v0.5.0/bil_mockup_1.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_2.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_3.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_4.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_5.jpeg" alt="Ready" width="19%;"/>
 
 ## Downloads
 
