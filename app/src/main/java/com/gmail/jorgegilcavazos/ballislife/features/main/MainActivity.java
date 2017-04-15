@@ -34,6 +34,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import net.dean.jraw.RedditClient;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 
 import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences myPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceListener;
 
+    private CompositeDisposable disposables;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,14 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
 
-        if (!RedditAuthentication.getInstance().getRedditClient().isAuthenticated()) {
-            RedditAuthentication.getInstance().authenticate(preferences)
+        disposables = new CompositeDisposable();
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        // TODO: check that view is still attached.
                         loadRedditUsername();
                     }
 
@@ -91,10 +93,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onError(Throwable e) {
 
                     }
-                });
-        }
-
-
+                })
+        );
 
         // Set default to GamesFragment.
         selectedFragment = GAMES_FRAGMENT_ID;
@@ -114,6 +114,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposables.clear();
     }
 
     @Override

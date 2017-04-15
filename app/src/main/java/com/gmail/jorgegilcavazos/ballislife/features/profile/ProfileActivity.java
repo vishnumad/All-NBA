@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+
 public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
         implements ProfileView, SwipeRefreshLayout.OnRefreshListener,
         AppBarLayout.OnOffsetChangedListener {
@@ -54,7 +56,7 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
     @NonNull
     @Override
     public ProfilePresenter createPresenter() {
-        return new ProfilePresenter();
+        return new ProfilePresenter(getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE));
     }
 
     @Override

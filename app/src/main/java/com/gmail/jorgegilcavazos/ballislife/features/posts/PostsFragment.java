@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -31,6 +32,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.content.Context.MODE_PRIVATE;
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class PostsFragment extends Fragment implements PostsView,
         SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener {
@@ -87,7 +91,10 @@ public class PostsFragment extends Fragment implements PostsView,
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewPosts.setAdapter(postsAdapter);
 
-        presenter = new PostsPresenter(new RedditService(), SchedulerProvider.getInstance());
+        SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
+                MODE_PRIVATE);
+
+        presenter = new PostsPresenter(new RedditService(), preferences, SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();
         presenter.loadPosts();

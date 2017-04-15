@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
+import android.content.SharedPreferences;
+
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
@@ -19,10 +21,14 @@ public class ProfilePresenter extends MvpBasePresenter<ProfileView> {
 
     private CompositeDisposable disposables;
     private RedditClient redditClient;
+    private SharedPreferences preferences;
+    private RedditService redditService;
 
-    public ProfilePresenter() {
+    public ProfilePresenter(SharedPreferences preferences) {
         disposables = new CompositeDisposable();
         redditClient = RedditAuthentication.getInstance().getRedditClient();
+        this.preferences = preferences;
+        redditService = new RedditService();
     }
 
     @Override
@@ -57,9 +63,9 @@ public class ProfilePresenter extends MvpBasePresenter<ProfileView> {
         disposables.clear();
         RedditService redditService = new RedditService();
 
-        Observable<LoggedInAccount> account = redditService.getLoggedInAccount();
-        disposables.add(
-                account.subscribeOn(Schedulers.io())
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.getLoggedInAccount())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<LoggedInAccount>() {
                     @Override
@@ -86,9 +92,9 @@ public class ProfilePresenter extends MvpBasePresenter<ProfileView> {
                 })
         );
 
-        Observable<Listing<Contribution>> contributions = redditService.getUserContributions();
-        disposables.add(
-                contributions.subscribeOn(Schedulers.io())
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.getUserContributions())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<Listing<Contribution>>() {
                     @Override

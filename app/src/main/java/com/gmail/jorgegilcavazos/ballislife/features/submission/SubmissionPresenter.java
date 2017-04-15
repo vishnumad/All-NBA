@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
+import android.content.SharedPreferences;
+
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
@@ -27,11 +29,14 @@ import io.reactivex.observers.DisposableSingleObserver;
 public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     private RedditService service;
+    private SharedPreferences preferences;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
 
-    public SubmissionPresenter(RedditService service, BaseSchedulerProvider schedulerProvider) {
+    public SubmissionPresenter(RedditService service, SharedPreferences preferences,
+                               BaseSchedulerProvider schedulerProvider) {
         this.service = service;
+        this.preferences = preferences;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
@@ -39,7 +44,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void loadComments(String threadId) {
         view.setLoadingIndicator(true);
-        disposables.add(service.getSubmission(threadId, CommentSort.HOT)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.getSubmission(threadId, CommentSort.HOT))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Submission>() {
@@ -73,7 +79,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        disposables.add(service.voteSubmission(submission, vote)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.voteSubmission(submission, vote))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -97,7 +104,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         }
 
         view.showSavingToast();
-        disposables.add(service.saveSubmission(submission, saved)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.saveSubmission(submission, saved))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -124,7 +132,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        disposables.add(service.voteComment(comment, vote)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.voteComment(comment, vote))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -148,7 +157,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         }
 
         view.showSavingToast();
-        disposables.add(service.saveComment(comment)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.saveComment(comment))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -180,7 +190,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onReplyToComment(final int position, final Comment parent, String text) {
         view.showSavingToast();
-        disposables.add(service.replyToComment(parent, text)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.replyToComment(parent, text))
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String s) throws Exception {
@@ -225,7 +236,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onReplyToThread(String text, final Submission submission) {
         view.showSavingToast();
-        disposables.add(service.replyToThread(submission, text)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.replyToThread(submission, text))
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String commentId) throws Exception {

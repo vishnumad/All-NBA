@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import android.content.SharedPreferences;
+
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
@@ -39,12 +41,15 @@ public class GameThreadPresenter {
     private GameThreadView view;
     private RedditService redditService;
     private RedditGameThreadsService gameThreadsService;
+    private SharedPreferences preferences;
     private CompositeDisposable disposables;
 
-    public GameThreadPresenter(GameThreadView view, RedditService redditService, long gameDate) {
+    public GameThreadPresenter(GameThreadView view, RedditService redditService, long gameDate,
+                               SharedPreferences preferences) {
         this.view = view;
         this.redditService = redditService;
         this.gameDate = gameDate;
+        this.preferences = preferences;
     }
 
     public void start() {
@@ -67,8 +72,9 @@ public class GameThreadPresenter {
         view.hideComments();
         view.hideText();
 
-        disposables.add(gameThreadsService.fetchGameThreads(
-                DateFormatUtil.getNoDashDateString(new Date(gameDate)))
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(gameThreadsService.fetchGameThreads(
+                DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
                     public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
@@ -126,7 +132,8 @@ public class GameThreadPresenter {
             return;
         }
 
-        disposables.add(redditService.voteComment(comment, voteDirection)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.voteComment(comment, voteDirection))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -150,7 +157,8 @@ public class GameThreadPresenter {
         }
 
         view.showSavingToast();
-        disposables.add(redditService.saveComment(comment)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.saveComment(comment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -178,7 +186,8 @@ public class GameThreadPresenter {
         }
 
         view.showSavingToast();
-        disposables.add(redditService.replyToComment(parentComment, text)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.replyToComment(parentComment, text))
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String s) throws Exception {
@@ -220,8 +229,9 @@ public class GameThreadPresenter {
         }
 
         view.showSavingToast();
-        disposables.add(gameThreadsService.fetchGameThreads(
-                DateFormatUtil.getNoDashDateString(new Date(gameDate)))
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(gameThreadsService.fetchGameThreads(
+                DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
                     public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {

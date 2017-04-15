@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -34,8 +35,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class GameThreadFragment extends Fragment implements GameThreadView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener {
@@ -98,7 +101,10 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
             ViewCompat.setNestedScrollingEnabled(rvComments, false);
         }
 
-        presenter = new GameThreadPresenter(this, new RedditService(), gameDate);
+        SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
+                MODE_PRIVATE);
+
+        presenter = new GameThreadPresenter(this, new RedditService(), gameDate, preferences);
         presenter.start();
         presenter.loadComments(threadType, homeTeam, awayTeam);
 

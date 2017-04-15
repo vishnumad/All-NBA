@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
-import android.util.Log;
+import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
@@ -25,18 +25,22 @@ import io.reactivex.observers.DisposableSingleObserver;
 public class PostsPresenter extends BasePresenter<PostsView> {
 
     private RedditService service;
+    private SharedPreferences preferences;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
 
-    public PostsPresenter(RedditService service, BaseSchedulerProvider schedulerProvider) {
+    public PostsPresenter(RedditService service, SharedPreferences preferences,
+                          BaseSchedulerProvider schedulerProvider) {
         this.service = service;
+        this.preferences = preferences;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
     }
 
     public void loadSubscriberCount() {
-        disposables.add(service.getSubscriberCount("nba")
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.getSubscriberCount("nba"))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<SubscriberCount>() {
@@ -58,7 +62,8 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public void loadPosts() {
         view.setLoadingIndicator(true);
         view.dismissSnackbar();
-        disposables.add(service.getSubmissionListing("nba", 25, Sorting.HOT)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.getSubmissionListing("nba", 25, Sorting.HOT))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
@@ -98,7 +103,8 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(service.voteSubmission(submission, direction)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.voteSubmission(submission, direction))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -121,7 +127,8 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(service.saveSubmission(submission, saved)
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.saveSubmission(submission, saved))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {

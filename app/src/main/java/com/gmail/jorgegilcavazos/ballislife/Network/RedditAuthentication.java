@@ -67,6 +67,10 @@ public class RedditAuthentication {
      * authenticates without a user context.
      */
     public Completable authenticate(final SharedPreferences sharedPreferences) {
+        if (mRedditClient.isAuthenticated()) {
+            return Completable.complete();
+        }
+
         String refreshToken = getRefreshTokenFromPrefs(sharedPreferences);
         if (refreshToken == null) {
             Credentials credentials = Credentials.userlessApp(CLIENT_ID, UUID.randomUUID());

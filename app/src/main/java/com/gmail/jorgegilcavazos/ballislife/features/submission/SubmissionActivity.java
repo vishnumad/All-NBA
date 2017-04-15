@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +34,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
@@ -78,7 +81,10 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         submissionRecyclerView.setAdapter(threadAdapter);
 
-        presenter = new SubmissionPresenter(new RedditService(), SchedulerProvider.getInstance());
+        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
+
+        presenter = new SubmissionPresenter(new RedditService(), preferences,
+                SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadComments(threadId);
     }
