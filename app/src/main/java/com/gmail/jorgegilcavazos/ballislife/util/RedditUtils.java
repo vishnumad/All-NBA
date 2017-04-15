@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.util;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.text.Html;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
@@ -89,6 +90,37 @@ public final class RedditUtils {
         }
 
         return "";
+    }
+
+    public static CharSequence bindSnuDown(String rawHtml) {
+        rawHtml = rawHtml.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
+                .replace("&apos;", "'").replace("&amp;", "&").replace("<li><p>", "<p>• ")
+                .replace("</li>", "<br>").replaceAll("<li.*?>", "•").replace("<p>", "<div>")
+                .replace("</p>","</div>");
+        rawHtml = rawHtml.substring(0, rawHtml.lastIndexOf("\n") );
+
+        return trim(Html.fromHtml(noTrailingwhiteLines(rawHtml)));
+    }
+
+    public static CharSequence trim(CharSequence s) {
+        int start = 0;
+        int end = s.length();
+        while (start < end && Character.isWhitespace(s.charAt(start))) {
+            start++;
+        }
+
+        while (end > start && Character.isWhitespace(s.charAt(end - 1))) {
+            end--;
+        }
+
+        return s.subSequence(start, end);
+    }
+
+    public static String noTrailingwhiteLines(String text) {
+        while (text.charAt(text.length() - 1) == '\n') {
+            text = text.substring(0, text.length() - 1);
+        }
+        return text;
     }
 
     /**

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Comment;
@@ -127,7 +128,7 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         holder.postTitleTextView.setText(comment.getSubmissionTitle());
         holder.authorTextView.setText(comment.getAuthor());
-        holder.bodyTextView.setText(comment.getBody());
+        holder.bodyTextView.setText(RedditUtils.bindSnuDown(comment.data("body_html")));
         holder.timestampTextView.setText(DateFormatUtil.formatRedditDate(comment.getCreated()));
         holder.scoreTextView.setText(context.getString(R.string.points,
                 String.valueOf(comment.getScore())));

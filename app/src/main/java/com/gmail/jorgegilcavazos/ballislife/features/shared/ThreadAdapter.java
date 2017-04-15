@@ -210,7 +210,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             final Comment comment = commentNode.getComment();
             String author = comment.getAuthor();
-            String body = comment.getBody();
+            CharSequence body = RedditUtils.bindSnuDown(comment.data("body_html"));
             String timestamp = DateFormatUtil.formatRedditDate(comment.getCreated());
             String score = String.valueOf(comment.getScore());
             String flair = RedditUtils.parseNbaFlair(String.valueOf(comment.getAuthorFlair()));
