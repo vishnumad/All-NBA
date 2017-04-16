@@ -271,6 +271,12 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         );
     }
 
+    public void onContentClick(String url) {
+        if (url != null) {
+            view.openContentTab(url);
+        }
+    }
+
     public void stop() {
         if (disposables != null) {
             disposables.clear();

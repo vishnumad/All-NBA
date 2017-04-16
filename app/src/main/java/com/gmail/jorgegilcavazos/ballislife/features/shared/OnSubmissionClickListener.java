@@ -10,4 +10,6 @@ public interface OnSubmissionClickListener {
     void onVoteSubmission(Submission submission, VoteDirection voteDirection);
 
     void onSaveSubmission(Submission submission, boolean saved);
+
+    void onContentClick(String url);
 }

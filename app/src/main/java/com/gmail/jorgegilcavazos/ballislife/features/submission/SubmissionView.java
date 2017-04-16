@@ -27,4 +27,6 @@ public interface SubmissionView {
     void openReplyToCommentDialog(int position, Comment parentComment);
 
     void openReplyToSubmissionDialog();
+
+    void openContentTab(String url);
 }

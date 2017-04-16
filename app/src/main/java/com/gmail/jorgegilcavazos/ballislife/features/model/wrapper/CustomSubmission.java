@@ -20,6 +20,7 @@ public class CustomSubmission implements Serializable {
     private VoteDirection voteDirection;
     private boolean saved;
     private String selfTextHtml;
+    private String url;
 
     public CustomSubmission(Submission submission, VoteDirection voteDirection, boolean saved) {
         this.submission = submission;
@@ -30,7 +31,7 @@ public class CustomSubmission implements Serializable {
     public CustomSubmission(String title, String author, String timestamp, String domain,
                             boolean selfPost, boolean stickied, int score, int commentCount,
                             String thumbnail, VoteDirection voteDirection, boolean saved,
-                            String selfTextHtml) {
+                            String selfTextHtml, String url) {
         this.title = title;
         this.author = author;
         this.timestamp = timestamp;
@@ -43,6 +44,7 @@ public class CustomSubmission implements Serializable {
         this.voteDirection = voteDirection;
         this.saved = saved;
         this.selfTextHtml = selfTextHtml;
+        this.url = url;
     }
 
     public Submission getSubmission() {
@@ -147,5 +149,13 @@ public class CustomSubmission implements Serializable {
 
     public void setSelfTextHtml(String selfTextHtml) {
         this.selfTextHtml = selfTextHtml;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

@@ -1,9 +1,12 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -204,6 +207,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
+    public void onContentClick(String url) {
+        presenter.onContentClick(url);
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
@@ -232,5 +240,13 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                 .positiveText(R.string.reply)
                 .negativeText(R.string.cancel)
                 .show();
+    }
+
+    @Override
+    public void openContentTab(String url) {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse(url));
     }
 }

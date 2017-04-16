@@ -2,9 +2,12 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -179,6 +182,14 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void openContentTab(String url) {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+    }
+
+    @Override
     public void onSubmissionClick(Submission submission) {
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
 
@@ -203,7 +214,8 @@ public class PostsFragment extends Fragment implements PostsView,
                 highResThumbnailUrl,
                 submission.getVote(),
                 submission.isSaved(),
-                submission.data("selftext_html")
+                submission.data("selftext_html"),
+                submission.getUrl()
         );
 
         bundle.putSerializable(Constants.THREAD_SUBMISSION, customSubmission);
@@ -221,5 +233,10 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onSaveSubmission(Submission submission, boolean saved) {
         presenter.onSave(submission, saved);
+    }
+
+    @Override
+    public void onContentClick(String url) {
+        presenter.onContentClick(url);
     }
 }

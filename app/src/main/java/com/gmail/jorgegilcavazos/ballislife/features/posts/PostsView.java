@@ -23,4 +23,6 @@ public interface PostsView {
 
     void showSubscribers(SubscriberCount subscriberCount);
 
+    void openContentTab(String url);
+
 }

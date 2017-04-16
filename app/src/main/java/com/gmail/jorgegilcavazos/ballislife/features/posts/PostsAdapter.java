@@ -181,11 +181,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (submission.isSelfPost()) {
             holder.tvDomain.setText("self");
             holder.ivThumbnail.setVisibility(View.GONE);
+            holder.containerLink.setVisibility(View.GONE);
         } else {
             String domain = submission.getDomain();
             holder.tvDomain.setText(domain);
             if (highResThumbnailUrl != null) {
                 holder.ivThumbnail.setVisibility(View.VISIBLE);
+                holder.containerLink.setVisibility(View.GONE);
                 Picasso.with(context)
                         .load(highResThumbnailUrl)
                         .into(holder.ivThumbnail);
@@ -204,6 +206,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             } else {
                 holder.ivThumbnail.setVisibility(View.GONE);
+                holder.containerLink.setVisibility(View.VISIBLE);
+                holder.tvDomainLink.setText(submission.getDomain());
+                holder.tvLink.setText(submission.getUrl());
             }
         }
 
@@ -283,6 +288,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 listener.onSubmissionClick(submission);
+            }
+        });
+
+        holder.ivThumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onContentClick(submission.getUrl());
+            }
+        });
+
+        holder.containerLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onContentClick(submission.getUrl());
             }
         });
     }

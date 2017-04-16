@@ -114,17 +114,22 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 cardViewHolder.tvBody.setText(RedditUtils.bindSnuDown(customSubmission.getSelfTextHtml()));
                 cardViewHolder.tvDomain.setText("self");
                 cardViewHolder.ivThumbnail.setVisibility(View.GONE);
+                cardViewHolder.containerLink.setVisibility(View.GONE);
             } else {
                 cardViewHolder.tvBody.setVisibility(View.GONE);
                 String domain = customSubmission.getDomain();
                 cardViewHolder.tvDomain.setText(domain);
                 if (customSubmission.getThumbnail() != null) {
                     cardViewHolder.ivThumbnail.setVisibility(View.VISIBLE);
+                    cardViewHolder.containerLink.setVisibility(View.GONE);
                     Picasso.with(context)
                             .load(customSubmission.getThumbnail())
                             .into(cardViewHolder.ivThumbnail);
                 } else {
                     cardViewHolder.ivThumbnail.setVisibility(View.GONE);
+                    cardViewHolder.containerLink.setVisibility(View.VISIBLE);
+                    cardViewHolder.tvDomainLink.setText(customSubmission.getDomain());
+                    cardViewHolder.tvLink.setText(customSubmission.getUrl());
                 }
             }
 
@@ -198,6 +203,20 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         RedditUtils.setSavedColors(context, cardViewHolder);
                         customSubmission.setSaved(true);
                     }
+                }
+            });
+
+            cardViewHolder.ivThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    submissionClickListener.onContentClick(customSubmission.getUrl());
+                }
+            });
+
+            cardViewHolder.containerLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    submissionClickListener.onContentClick(customSubmission.getUrl());
                 }
             });
 

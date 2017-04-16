@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -25,6 +26,9 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.text_comments) TextView tvComments;
     public @BindView(R.id.button_save) ImageButton btnSave;
     public @BindView(R.id.text_body) TextView tvBody;
+    public @BindView(R.id.content_link) LinearLayout containerLink;
+    public @BindView(R.id.text_domain_link) TextView tvDomainLink;
+    public @BindView(R.id.text_link) TextView tvLink;
 
     public FullCardViewHolder(View itemView) {
         super(itemView);
