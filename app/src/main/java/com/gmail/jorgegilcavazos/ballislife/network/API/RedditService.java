@@ -323,11 +323,16 @@ public class RedditService {
                         .getRedditClient();
 
                 if (redditClient.isAuthenticated()) {
-                    SubredditPaginator paginator = new SubredditPaginator(redditClient, subreddit);
-                    paginator.setLimit(limit);
-                    paginator.setSorting(sorting);
 
-                    e.onSuccess(paginator.next(false));
+                    try {
+                        SubredditPaginator paginator = new SubredditPaginator(redditClient, subreddit);
+                        paginator.setLimit(limit);
+                        paginator.setSorting(sorting);
+
+                        e.onSuccess(paginator.next(false));
+                    } catch (Exception ex) {
+                        e.onError(ex);
+                    }
                 } else {
                     e.onError(new NotAuthenticatedException());
                 }
