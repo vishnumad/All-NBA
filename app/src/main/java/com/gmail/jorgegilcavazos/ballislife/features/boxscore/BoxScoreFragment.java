@@ -154,7 +154,12 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         List<String> players = new ArrayList<>();
 
         for (StatLine statLine : values.getVls().getPstsg()) {
-            players.add(statLine.getFn().substring(0, 1) + ". " + statLine.getLn());
+            // Some players don't have a first name, like Nene.
+            if (statLine.getFn() != null && statLine.getFn().length() >= 1) {
+                players.add(statLine.getFn().substring(0, 1) + ". " + statLine.getLn());
+            } else {
+                players.add(statLine.getLn());
+            }
         }
 
         playerAdapter.setData(players);
@@ -168,7 +173,12 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         List<String> players = new ArrayList<>();
 
         for (StatLine statLine : values.getHls().getPstsg()) {
-            players.add(statLine.getFn().substring(0, 1) + ". " + statLine.getLn());
+            // Some players don't have a first name, like Nene.
+            if (statLine.getFn() != null && statLine.getFn().length() >= 1) {
+                players.add(statLine.getFn().substring(0, 1) + ". " + statLine.getLn());
+            } else {
+                players.add(statLine.getLn());
+            }
         }
 
         playerAdapter.setData(players);
