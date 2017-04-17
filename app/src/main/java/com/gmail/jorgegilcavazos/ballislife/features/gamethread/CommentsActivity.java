@@ -139,7 +139,10 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         Fragment fragment = pagerAdapter.getItem(pos);
 
         if (pos == 0 || pos == 2) {
-            ((GameThreadFragment) fragment).replyToThread();
+            GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
+            if (gameThreadFragment.isAdded() && gameThreadFragment.isVisible()) {
+                gameThreadFragment.replyToThread();
+            }
         }
     }
 }

@@ -265,6 +265,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     public void replyToThread() {
-        presenter.replyToThreadBtnClick();
+        if (presenter != null) {
+            presenter.replyToThreadBtnClick();
+        }
     }
 }
