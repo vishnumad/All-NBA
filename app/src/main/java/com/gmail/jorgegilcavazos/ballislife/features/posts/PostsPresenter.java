@@ -10,10 +10,12 @@ import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
+import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.SubredditPaginator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     private SharedPreferences preferences;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
+    private SubredditPaginator paginator;
 
     public PostsPresenter(RedditService service, SharedPreferences preferences,
                           BaseSchedulerProvider schedulerProvider) {
@@ -62,36 +65,81 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public void loadPosts() {
         view.setLoadingIndicator(true);
         view.dismissSnackbar();
+
+        RedditClient redditClient = RedditAuthentication.getInstance()
+                .getRedditClient();
+        paginator = new SubredditPaginator(redditClient, "nba");
+        paginator.setLimit(25);
+        paginator.setSorting(Sorting.HOT);
+
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(service.getSubmissionListing("nba", 25, Sorting.HOT))
+                .andThen(service.getSubmissionListing(paginator))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
                     @Override
                     public void onSuccess(Listing<Submission> submissions) {
+                        if (submissions.isEmpty()) {
+                            view.showNothingToShowToast();
+                            return;
+                        }
+
                         List<CustomSubmission> customSubmissions = new ArrayList<>();
                         for (Submission submission : submissions) {
                             customSubmissions.add(new CustomSubmission(submission,
                                     submission.getVote(), submission.isSaved()));
                         }
 
-                        if (isViewAttached()) {
-                            view.showPosts(customSubmissions);
-                            view.setLoadingIndicator(false);
-                        }
+                        view.showPosts(customSubmissions);
+                        view.setLoadingIndicator(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            if (e instanceof NotAuthenticatedException) {
-                                view.showNotAuthenticatedToast();
-                                // TODO: do something about it. Re-start auth?
-                            } else {
-                                view.showPostsLoadingFailedSnackbar();
-                            }
-                            view.setLoadingIndicator(false);
+                        if (e instanceof NotAuthenticatedException) {
+                            view.showNotAuthenticatedToast();
+                        } else {
+                            view.showPostsLoadingFailedSnackbar(PostsFragment.TYPE_FIRST_LOAD);
                         }
+                        view.setLoadingIndicator(false);
+                    }
+                })
+        );
+    }
+
+    public void loadMorePosts() {
+        if (paginator == null) {
+            return;
+        }
+
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(service.getSubmissionListing(paginator))
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
+                    @Override
+                    public void onSuccess(Listing<Submission> submissions) {
+                        if (submissions.isEmpty()) {
+                            view.showNothingToShowToast();
+                            return;
+                        }
+
+                        List<CustomSubmission> customSubmissions = new ArrayList<>();
+                        for (Submission submission : submissions) {
+                            customSubmissions.add(new CustomSubmission(submission,
+                                    submission.getVote(), submission.isSaved()));
+                        }
+                        view.addPosts(customSubmissions);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (e instanceof NotAuthenticatedException) {
+                            view.showNotAuthenticatedToast();
+                        } else {
+                            view.showPostsLoadingFailedSnackbar(PostsFragment.TYPE_LOAD_MORE);
+                        }
+                        view.setLoadingFailed(true);
                     }
                 })
         );

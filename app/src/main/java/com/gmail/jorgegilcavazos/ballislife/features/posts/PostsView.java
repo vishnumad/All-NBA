@@ -11,9 +11,9 @@ public interface PostsView {
 
     void showPosts(List<CustomSubmission> submissions);
 
-    void hidePosts();
+    void addPosts(List<CustomSubmission> submissions);
 
-    void showPostsLoadingFailedSnackbar();
+    void showPostsLoadingFailedSnackbar(int loadType);
 
     void dismissSnackbar();
 
@@ -24,5 +24,9 @@ public interface PostsView {
     void showSubscribers(SubscriberCount subscriberCount);
 
     void openContentTab(String url);
+
+    void setLoadingFailed(boolean failed);
+
+    void showNothingToShowToast();
 
 }

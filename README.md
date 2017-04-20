@@ -36,7 +36,7 @@ Fix a bug, add a new feature or make the code prettier!
 Some resources and libraries that you might find useful:
 * [JRAW](https://github.com/thatJavaNerd/JRAW): the Java Reddit API Wrapper, used throughout the application for integrating any reddit functionalities   
 * [RxJava 2](https://realm.io/news/gotocph-jake-wharton-exploring-rxjava2-android/): A Java implementation of ReactiveX, a library for composing asynchronous and event-based programs by using observable sequences  
-* [Retrofit 2](https://square.github.io/retrofit/): A type-safe HTTP client for Android and Java  
+* [Retrofit 2](https://square.github.io/retrofit/): A contentViewType-safe HTTP client for Android and Java
 * [Butter Knife](http://jakewharton.github.io/butterknife/): Field and method binding for Android views  
 * [Picasso](http://square.github.io/picasso/): A powerful image downloading and caching library for Android  
 * [Material Dialogs](https://github.com/afollestad/material-dialogs): A beautiful, fluid, and customizable dialogs API

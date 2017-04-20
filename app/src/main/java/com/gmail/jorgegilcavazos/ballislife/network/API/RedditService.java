@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.network.API;
 
+import android.util.Log;
+
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -336,6 +338,16 @@ public class RedditService {
                 } else {
                     e.onError(new NotAuthenticatedException());
                 }
+            }
+        });
+    }
+
+    public Single<Listing<Submission>> getSubmissionListing(final SubredditPaginator paginator) {
+        return Single.create(new SingleOnSubscribe<Listing<Submission>>() {
+            @Override
+            public void subscribe(SingleEmitter<Listing<Submission>> e) throws Exception {
+                Log.d("RedditService", "providing next page");
+                e.onSuccess(paginator.next(false));
             }
         });
     }

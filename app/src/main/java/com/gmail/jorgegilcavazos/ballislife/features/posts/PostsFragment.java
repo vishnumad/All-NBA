@@ -11,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,9 +39,13 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class PostsFragment extends Fragment implements PostsView,
-        SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener {
+        SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener,
+        PostsAdapter.OnLoadMoreListener {
 
     private static final String TAG = "PostsFragment";
+
+    public static final int TYPE_FIRST_LOAD = 0;
+    public static final int TYPE_LOAD_MORE = 1;
 
     public enum ViewType {
         FULL_CARD, SMALL_CARD, LIST
@@ -89,8 +92,8 @@ public class PostsFragment extends Fragment implements PostsView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        postsAdapter = new PostsAdapter(null, viewType, this, null);
-
+        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this);
+        postsAdapter.setLoadMoreListener(this);
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewPosts.setAdapter(postsAdapter);
 
@@ -142,21 +145,27 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void hidePosts() {
-        recyclerViewPosts.setVisibility(View.GONE);
+    public void addPosts(List<CustomSubmission> submissions) {
+        postsAdapter.addData(submissions);
     }
 
     @Override
-    public void showPostsLoadingFailedSnackbar() {
-        snackbar = Snackbar.make(getView(), R.string.posts_loading_failed,
-                Snackbar.LENGTH_INDEFINITE);
-
-        snackbar.setAction(R.string.retry, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.loadPosts();
-            }
-        });
+    public void showPostsLoadingFailedSnackbar(final int loadType) {
+        if (getView() != null) {
+            snackbar = Snackbar.make(getView(), R.string.posts_loading_failed,
+                    Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(R.string.retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (loadType == TYPE_FIRST_LOAD) {
+                        presenter.loadPosts();
+                    } else {
+                        presenter.loadMorePosts();
+                    }
+                }
+            });
+            snackbar.show();
+        }
     }
 
     @Override
@@ -187,6 +196,16 @@ public class PostsFragment extends Fragment implements PostsView,
         builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+    }
+
+    @Override
+    public void setLoadingFailed(boolean failed) {
+        postsAdapter.setLoadingFailed(failed);
+    }
+
+    @Override
+    public void showNothingToShowToast() {
+        Toast.makeText(getActivity(), R.string.nothing_to_show, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -238,5 +257,10 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onContentClick(String url) {
         presenter.onContentClick(url);
+    }
+
+    @Override
+    public void onLoadMore() {
+        presenter.loadMorePosts();
     }
 }

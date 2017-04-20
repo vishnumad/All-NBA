@@ -8,15 +8,16 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.squareup.picasso.Picasso;
@@ -31,52 +32,60 @@ import butterknife.ButterKnife;
 
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int HEADER = 0;
-    private static final int CONTENT = 1;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_CONTENT = 1;
+    private static final int TYPE_LOADING = 2;
 
     private Context context;
     private List<CustomSubmission> postsList;
-    private PostsFragment.ViewType type;
-    private OnSubmissionClickListener listener;
+    private PostsFragment.ViewType contentViewType;
+    private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
+    private OnLoadMoreListener loadMoreListener;
+    private boolean isLoading = false;
+    private boolean loadingFailed = false;
 
-    public PostsAdapter(List<CustomSubmission> postsList, PostsFragment.ViewType type,
-                        OnSubmissionClickListener listener,
-                        SubscriberCount subscriberCount) {
+    public PostsAdapter(Context context,
+                        List<CustomSubmission> postsList,
+                        PostsFragment.ViewType contentViewType,
+                        OnSubmissionClickListener submissionClickListener) {
+        this.context = context;
         this.postsList = postsList;
-        this.type = type;
-        this.listener = listener;
-        this.subscriberCount = subscriberCount;
+        this.contentViewType = contentViewType;
+        this.submissionClickListener = submissionClickListener;
     }
 
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {
-            return HEADER;
+            return TYPE_HEADER;
+        } else if (position == getItemCount() - 1) {
+            return TYPE_LOADING;
         }
-        return CONTENT;
+
+        return TYPE_CONTENT;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
 
         View view;
 
-        if (viewType == HEADER) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rnba_header_layout,
-                    parent, false);
+        if (viewType == TYPE_HEADER) {
+            view = inflater.inflate(R.layout.rnba_header_layout, parent, false);
             return new HeaderViewHolder(view);
+        } else if (viewType == TYPE_LOADING) {
+            view = inflater.inflate(R.layout.row_load_more, parent, false);
+            return new LoadHolder(view);
         }
 
-        switch (type) {
+        switch (contentViewType) {
             case FULL_CARD:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_layout_large,
-                        parent, false);
+                view = inflater.inflate(R.layout.post_layout_large, parent, false);
                 return new FullCardViewHolder(view);
             default:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_layout_large,
-                        parent, false);
+                view = inflater.inflate(R.layout.post_layout_large, parent, false);
                 return new FullCardViewHolder(view);
         }
     }
@@ -84,22 +93,24 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
-            HeaderViewHolder headerViewHolder = (HeaderViewHolder) holder;
+            ((HeaderViewHolder) holder).bindData(context, subscriberCount);
+        } else if (holder instanceof LoadHolder) {
+            LoadHolder loadHolder = (LoadHolder) holder;
+            // Load more items if scroll position is last and is not already loading.
+            if (position >= getItemCount() - 1 && !isLoading && !loadingFailed && loadMoreListener != null
+                    && postsList != null && !postsList.isEmpty()) {
+                isLoading = true;
+                loadMoreListener.onLoadMore();
+            }
 
-            if (subscriberCount != null) {
-                String subscribers = String.valueOf(subscriberCount.getSubscribers());
-                String activeUsers = String.valueOf(subscriberCount.getActiveUsers());
-
-                headerViewHolder.tvSubscribers.setText(context.getString(R.string.subscriber_count,
-                        subscribers, activeUsers));
+            if (isLoading) {
+                loadHolder.progressBar.setVisibility(View.VISIBLE);
             } else {
-                headerViewHolder.tvSubscribers.setText(context.getString(R.string.subscriber_count,
-                        String.valueOf(554843), String.valueOf(8133)));
+                loadHolder.progressBar.setVisibility(View.GONE);
             }
         } else {
             CustomSubmission submission = postsList.get(position - 1);
-
-            switch (type) {
+            switch (contentViewType) {
                 case FULL_CARD:
                     FullCardViewHolder myHolder = (FullCardViewHolder) holder;
                     setFullCardViews(myHolder, submission);
@@ -110,24 +121,76 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return null != postsList ? postsList.size() + 1 : 1;
+        return null != postsList ? postsList.size() + 2 : 2;
+    }
+
+    public void notifyDataChanged() {
+        isLoading = false;
+        notifyDataSetChanged();
     }
 
     public void setData(List<CustomSubmission> submissions) {
+        loadingFailed = false;
         postsList = submissions;
-        notifyDataSetChanged();
+        notifyDataChanged();
+    }
+
+    public void addData(List<CustomSubmission> submissions) {
+        if (postsList != null) {
+            loadingFailed = false;
+            postsList.addAll(submissions);
+            notifyDataChanged();
+        }
     }
 
     public void setSubscriberCount(SubscriberCount subscriberCount) {
         this.subscriberCount = subscriberCount;
-        notifyDataSetChanged();
+        notifyDataChanged();
     }
+
+    public void setLoadMoreListener(OnLoadMoreListener loadMoreListener) {
+        this.loadMoreListener = loadMoreListener;
+    }
+
+    public void setLoadingFailed(boolean failed) {
+        loadingFailed = failed;
+        notifyDataChanged();
+    }
+
+    interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
+    /* View Holders **/
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.text_subscribers) TextView tvSubscribers;
 
         public HeaderViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void bindData(Context context, SubscriberCount subscriberCount) {
+            if (subscriberCount != null) {
+                String subscribers = String.valueOf(subscriberCount.getSubscribers());
+                String activeUsers = String.valueOf(subscriberCount.getActiveUsers());
+
+                tvSubscribers.setText(context.getString(R.string.subscriber_count,
+                        subscribers, activeUsers));
+            } else {
+                tvSubscribers.setText(context.getString(R.string.subscriber_count,
+                        String.valueOf(554843), String.valueOf(8133)));
+            }
+        }
+    }
+
+    static class LoadHolder extends  RecyclerView.ViewHolder {
+
+        @BindView(R.id.progressBar) ProgressBar progressBar;
+
+        public LoadHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
@@ -217,7 +280,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    listener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
@@ -225,7 +288,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 holder.tvPoints.getText().toString()) - 1));
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    listener.onVoteSubmission(submission, VoteDirection.UPVOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.UPVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
@@ -233,7 +296,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 holder.tvPoints.getText().toString()) + 2));
                     }
                 } else {
-                    listener.onVoteSubmission(submission, VoteDirection.UPVOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.UPVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
@@ -248,7 +311,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    listener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.NO_VOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
@@ -256,7 +319,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 holder.tvPoints.getText().toString()) + 1));
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                    listener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
@@ -264,7 +327,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 holder.tvPoints.getText().toString()) - 2));
                     }
                 } else {
-                    listener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
+                    submissionClickListener.onVoteSubmission(submission, VoteDirection.DOWNVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
@@ -279,13 +342,13 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             @Override
             public void onClick(View v) {
                 if (customSubmission.isSaved()) {
-                    listener.onSaveSubmission(submission, false);
+                    submissionClickListener.onSaveSubmission(submission, false);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         RedditUtils.setUnsavedColors(context, holder);
                         customSubmission.setSaved(false);
                     }
                 } else {
-                    listener.onSaveSubmission(submission, true);
+                    submissionClickListener.onSaveSubmission(submission, true);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         RedditUtils.setSavedColors(context, holder);
                         customSubmission.setSaved(true);
@@ -297,28 +360,28 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.btnComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onSubmissionClick(submission);
+                submissionClickListener.onSubmissionClick(submission);
             }
         });
 
         holder.tvTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onSubmissionClick(submission);
+                submissionClickListener.onSubmissionClick(submission);
             }
         });
 
         holder.ivThumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onContentClick(submission.getUrl());
+                submissionClickListener.onContentClick(submission.getUrl());
             }
         });
 
         holder.containerLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onContentClick(submission.getUrl());
+                submissionClickListener.onContentClick(submission.getUrl());
             }
         });
     }

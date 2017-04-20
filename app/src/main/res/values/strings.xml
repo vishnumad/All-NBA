@@ -26,6 +26,7 @@
     <string name="not_logged_in">You must first log in</string>
     <string name="saving_failed">Saving failed</string>
     <string name="reply">Reply</string>
+    <string name="nothing_to_show">Nothing to show</string>
 
 
     <!-- Strings for MainActivity -->
