@@ -46,12 +46,8 @@ import io.reactivex.SingleOnSubscribe;
 
 public class RedditService {
 
-    public RedditService() {
-
-    }
-
     public Observable<LoggedInAccount> getLoggedInAccount() {
-        Observable<LoggedInAccount> observable = Observable.create(
+        return Observable.create(
                 new ObservableOnSubscribe<LoggedInAccount>() {
             @Override
             public void subscribe(ObservableEmitter<LoggedInAccount> e) throws Exception {
@@ -67,8 +63,6 @@ public class RedditService {
                 }
             }
         });
-
-        return observable;
     }
 
     public Observable<Listing<Contribution>> getUserContributions() {
@@ -145,35 +139,6 @@ public class RedditService {
         });
     }
 
-    public Single<List<CommentNode>> getComments(final String threadId, final CommentSort sorting) {
-        return Single.create(new SingleOnSubscribe<List<CommentNode>>() {
-            @Override
-            public void subscribe(SingleEmitter<List<CommentNode>> e) throws Exception {
-                RedditClient redditClient = RedditAuthentication.getInstance()
-                        .getRedditClient();
-
-                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
-                builder.sort(sorting);
-
-                SubmissionRequest submissionRequest = builder.build();
-                Submission submission = null;
-                try {
-                    submission = redditClient.getSubmission(submissionRequest);
-
-                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
-                    List<CommentNode> commentNodes = new ArrayList<>();
-                    for (CommentNode node : iterable) {
-                        commentNodes.add(node);
-                    }
-
-                    e.onSuccess(commentNodes);
-                } catch (Exception ex) {
-                    e.onError(ex);
-                }
-            }
-        });
-    }
-
     public Single<CommentNode> getComment(final String threadId, final String commentId) {
         return Single.create(new SingleOnSubscribe<CommentNode>() {
             @Override
@@ -223,10 +188,14 @@ public class RedditService {
                         String id = accountManger.reply(parent, text);
                         e.onSuccess(id);
                     } catch (Exception ex) {
-                        e.onError(new ReplyToCommentException());
+                        if (!e.isDisposed()) {
+                            e.onError(new ReplyToCommentException());
+                        }
                     }
                 } else {
-                    Single.error(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -243,10 +212,14 @@ public class RedditService {
                         accountManager.vote(comment, direction);
                         e.onComplete();
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        if (!e.isDisposed()) {
+                            e.onError(ex);
+                        }
                     }
                 } else {
-                    e.onError(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -263,10 +236,14 @@ public class RedditService {
                         accountManager.save(comment);
                         e.onComplete();
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        if (!e.isDisposed()) {
+                            e.onError(ex);
+                        }
                     }
                 } else {
-                    e.onError(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -283,10 +260,14 @@ public class RedditService {
                     try {
                         e.onSuccess(accountManager.reply(submission, text));
                     } catch (Exception ex) {
-                        e.onError(new ReplyToThreadException());
+                        if (!e.isDisposed()) {
+                            e.onError(new ReplyToThreadException());
+                        }
                     }
                 } else {
-                    e.onError(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -317,38 +298,17 @@ public class RedditService {
         });
     }
 
-    public Single<Listing<Submission>> getSubmissionListing(final String subreddit, final int limit,
-                                                            final Sorting sorting) {
-        return Single.create(new SingleOnSubscribe<Listing<Submission>>() {
-            @Override
-            public void subscribe(SingleEmitter<Listing<Submission>> e) throws Exception {
-                RedditClient redditClient = RedditAuthentication.getInstance()
-                        .getRedditClient();
-
-                if (redditClient.isAuthenticated()) {
-
-                    try {
-                        SubredditPaginator paginator = new SubredditPaginator(redditClient, subreddit);
-                        paginator.setLimit(limit);
-                        paginator.setSorting(sorting);
-
-                        e.onSuccess(paginator.next(false));
-                    } catch (Exception ex) {
-                        e.onError(ex);
-                    }
-                } else {
-                    e.onError(new NotAuthenticatedException());
-                }
-            }
-        });
-    }
-
     public Single<Listing<Submission>> getSubmissionListing(final SubredditPaginator paginator) {
         return Single.create(new SingleOnSubscribe<Listing<Submission>>() {
             @Override
             public void subscribe(SingleEmitter<Listing<Submission>> e) throws Exception {
-                Log.d("RedditService", "providing next page");
-                e.onSuccess(paginator.next(false));
+                try {
+                    e.onSuccess(paginator.next(false));
+                } catch (Exception ex) {
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
+                }
             }
         });
     }
@@ -364,10 +324,14 @@ public class RedditService {
                         accountManager.vote(submission, vote);
                         e.onComplete();
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        if (!e.isDisposed()) {
+                            e.onError(ex);
+                        }
                     }
                 } else {
-                    e.onError(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -388,10 +352,14 @@ public class RedditService {
                         }
                         e.onComplete();
                     } catch (Exception ex) {
-                        e.onError(ex);
+                        if (!e.isDisposed()) {
+                            e.onError(ex);
+                        }
                     }
                 } else {
-                    e.onError(new NotLoggedInException());
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
                 }
             }
         });
@@ -410,7 +378,9 @@ public class RedditService {
 
                     e.onSuccess(new SubscriberCount(subscribers, activeUsers));
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });
@@ -426,7 +396,9 @@ public class RedditService {
                     reddit.authenticate(oAuthData);
                     e.onComplete();
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });
@@ -444,7 +416,9 @@ public class RedditService {
                     reddit.authenticate(oAuthData);
                     e.onComplete();
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });
@@ -463,7 +437,9 @@ public class RedditService {
                     reddit.authenticate(oAuthData);
                     e.onComplete();
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });
@@ -479,7 +455,9 @@ public class RedditService {
                     reddit.deauthenticate();
                     e.onComplete();
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });
