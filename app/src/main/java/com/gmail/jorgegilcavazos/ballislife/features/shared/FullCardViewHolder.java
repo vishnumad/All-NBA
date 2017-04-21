@@ -53,7 +53,8 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
                   final OnSubmissionClickListener submissionClickListener) {
 
         String title, author, timestamp, commentCount, score, selfTextHtml, domain, thumbnail,
-                highResThumbnail, thumbnailToShow, url;
+                highResThumbnail, thumbnailToShow;
+        final String url;
         boolean isSelf, isStickied, isSaved;
         VoteDirection vote;
 
@@ -257,6 +258,20 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        ivThumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submissionClickListener.onContentClick(url);
+            }
+        });
+
+        containerLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submissionClickListener.onContentClick(url);
+            }
+        });
+
         if (isDisplayedInList) {
             // Enable buttons to navigate to SubmissionActivity.
             btnComments.setOnClickListener(new View.OnClickListener() {
@@ -270,20 +285,6 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(View v) {
                     submissionClickListener.onSubmissionClick(customSubmission.getSubmission());
-                }
-            });
-
-            ivThumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onContentClick(customSubmission.getSubmission().getUrl());
-                }
-            });
-
-            containerLink.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onContentClick(customSubmission.getSubmission().getUrl());
                 }
             });
         }
