@@ -3,7 +3,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.shared;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmiss
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
-import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -42,7 +40,7 @@ import butterknife.ButterKnife;
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int TYPE_SUB_HEADER = 0;
+    private static final int TYPE_SUBMISSION_HEADER = 0;
     private static final int TYPE_COMMENT = 1;
 
     private Context context;
@@ -80,7 +78,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return TYPE_COMMENT;
         } else {
             if (position == 0) {
-                return TYPE_SUB_HEADER;
+                return TYPE_SUBMISSION_HEADER;
             } else {
                 return TYPE_COMMENT;
             }
@@ -93,7 +91,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         View view;
 
-        if (viewType == TYPE_SUB_HEADER) {
+        if (viewType == TYPE_SUBMISSION_HEADER) {
             view = inflater.inflate(R.layout.post_layout_large, parent, false);
             return new FullCardViewHolder(view);
         } else {
