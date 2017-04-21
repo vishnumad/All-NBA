@@ -29,4 +29,8 @@ public interface PostsView {
 
     void showNothingToShowToast();
 
+    void openStreamable(String shortcode);
+
+    void showContentUnavailableToast();
+
 }

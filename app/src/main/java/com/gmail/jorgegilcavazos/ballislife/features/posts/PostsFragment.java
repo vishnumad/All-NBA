@@ -17,14 +17,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Submission;
@@ -206,6 +207,18 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void showNothingToShowToast() {
         Toast.makeText(getActivity(), R.string.nothing_to_show, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void openStreamable(String shortcode) {
+        Intent intent = new Intent(getActivity(), VideoPlayerActivity.class);
+        intent.putExtra(VideoPlayerActivity.SHORTCODE, shortcode);
+        startActivity(intent);
+    }
+
+    @Override
+    public void showContentUnavailableToast() {
+        Toast.makeText(getActivity(), R.string.content_not_available, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -14,4 +14,16 @@ public final class Utilities {
             return overtimePeriod + "OT";
         }
     }
+
+    public static String getStreamableShortcodeFromUrl(String url) {
+        final String streamableUrl = "streamable.com/";
+
+        int i = url.indexOf(streamableUrl);
+
+        if (i == -1) {
+            return null;
+        }
+
+        return url.substring(i + streamableUrl.length());
+    }
 }

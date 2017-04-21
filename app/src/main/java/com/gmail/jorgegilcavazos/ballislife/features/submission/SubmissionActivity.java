@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,10 +19,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -251,5 +254,17 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.launchUrl(this, Uri.parse(url));
+    }
+
+    @Override
+    public void openStreamable(String shortcode) {
+        Intent intent = new Intent(SubmissionActivity.this, VideoPlayerActivity.class);
+        intent.putExtra(VideoPlayerActivity.SHORTCODE, shortcode);
+        startActivity(intent);
+    }
+
+    @Override
+    public void showContentUnavailableToast() {
+        Toast.makeText(this, R.string.content_not_available, Toast.LENGTH_SHORT).show();
     }
 }

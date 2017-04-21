@@ -7,6 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -195,7 +197,18 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
     public void onContentClick(String url) {
         if (url != null) {
-            view.openContentTab(url);
+            if (url.contains(Constants.STREAMABLE_DOMAIN)) {
+                String shortCode = Utilities.getStreamableShortcodeFromUrl(url);
+                if (shortCode != null) {
+                    view.openStreamable(shortCode);
+                } else {
+                    view.openContentTab(url);
+                }
+            } else {
+                view.openContentTab(url);
+            }
+        } else {
+            view.showContentUnavailableToast();
         }
     }
 

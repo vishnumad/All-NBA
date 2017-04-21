@@ -29,4 +29,8 @@ public interface SubmissionView {
     void openReplyToSubmissionDialog();
 
     void openContentTab(String url);
+
+    void openStreamable(String shortcode);
+
+    void showContentUnavailableToast();
 }
