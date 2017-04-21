@@ -86,11 +86,13 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game_thread, container, false);
-
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
-        threadAdapter = new ThreadAdapter(new ArrayList<CommentNode>(0), false, this);
+
+        threadAdapter = new ThreadAdapter(getActivity(), new ArrayList<CommentNode>(), false);
+        threadAdapter.setCommentClickListener(this);
+        
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
         rvComments.setAdapter(threadAdapter);

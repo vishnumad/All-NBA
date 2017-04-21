@@ -79,8 +79,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(new ArrayList<CommentNode>(), true, this, this,
-                customSubmission);
+        threadAdapter = new ThreadAdapter(this, new ArrayList<CommentNode>(), true);
+        threadAdapter.setCommentClickListener(this);
+        threadAdapter.setSubmissionClickListener(this);
+        threadAdapter.setCustomSubmission(customSubmission);
+
         submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         submissionRecyclerView.setAdapter(threadAdapter);
 

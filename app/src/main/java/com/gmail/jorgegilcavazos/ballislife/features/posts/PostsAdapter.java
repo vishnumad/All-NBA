@@ -109,11 +109,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 loadHolder.progressBar.setVisibility(View.GONE);
             }
         } else {
-            CustomSubmission submission = postsList.get(position - 1);
+            CustomSubmission customSubmission = postsList.get(position - 1);
             switch (contentViewType) {
                 case FULL_CARD:
-                    FullCardViewHolder myHolder = (FullCardViewHolder) holder;
-                    setFullCardViews(myHolder, submission);
+                    ((FullCardViewHolder) holder).bindData(context, customSubmission, true,
+                            submissionClickListener);
                     break;
             }
         }

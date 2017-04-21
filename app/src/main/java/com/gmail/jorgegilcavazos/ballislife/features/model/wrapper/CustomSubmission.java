@@ -17,6 +17,7 @@ public class CustomSubmission implements Serializable {
     private int score;
     private int commentCount;
     private String thumbnail;
+    private String highResThumbnail;
     private VoteDirection voteDirection;
     private boolean saved;
     private String selfTextHtml;
@@ -30,8 +31,8 @@ public class CustomSubmission implements Serializable {
 
     public CustomSubmission(String title, String author, String timestamp, String domain,
                             boolean selfPost, boolean stickied, int score, int commentCount,
-                            String thumbnail, VoteDirection voteDirection, boolean saved,
-                            String selfTextHtml, String url) {
+                            String thumbnail, String highResThumbnail, VoteDirection voteDirection,
+                            boolean saved, String selfTextHtml, String url) {
         this.title = title;
         this.author = author;
         this.timestamp = timestamp;
@@ -41,6 +42,7 @@ public class CustomSubmission implements Serializable {
         this.score = score;
         this.commentCount = commentCount;
         this.thumbnail = thumbnail;
+        this.highResThumbnail = highResThumbnail;
         this.voteDirection = voteDirection;
         this.saved = saved;
         this.selfTextHtml = selfTextHtml;
@@ -125,6 +127,14 @@ public class CustomSubmission implements Serializable {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getHighResThumbnail() {
+        return highResThumbnail;
+    }
+
+    public void setHighResThumbnail(String highResThumbnail) {
+        this.highResThumbnail = highResThumbnail;
     }
 
     public VoteDirection getVoteDirection() {

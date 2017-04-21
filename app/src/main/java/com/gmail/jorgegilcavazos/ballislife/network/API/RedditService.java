@@ -305,12 +305,13 @@ public class RedditService {
                 }
 
                 SubmissionRequest submissionRequest = builder.build();
-                Submission submission = null;
 
                 try {
                     e.onSuccess(redditClient.getSubmission(submissionRequest));
                 } catch (Exception ex) {
-                    e.onError(ex);
+                    if (!e.isDisposed()) {
+                        e.onError(ex);
+                    }
                 }
             }
         });

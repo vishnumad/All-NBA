@@ -218,7 +218,7 @@ public class PostsFragment extends Fragment implements PostsView,
         try {
             highResThumbnailUrl = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
         } catch (NullPointerException e) {
-            highResThumbnailUrl = submission.getThumbnail();
+            highResThumbnailUrl = null;
         }
 
         CustomSubmission customSubmission = new CustomSubmission(
@@ -230,6 +230,7 @@ public class PostsFragment extends Fragment implements PostsView,
                 submission.isStickied(),
                 submission.getScore(),
                 submission.getCommentCount(),
+                submission.getThumbnail(),
                 highResThumbnailUrl,
                 submission.getVote(),
                 submission.isSaved(),

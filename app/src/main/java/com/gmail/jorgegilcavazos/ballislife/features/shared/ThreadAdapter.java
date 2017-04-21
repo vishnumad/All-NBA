@@ -42,201 +42,71 @@ import butterknife.ButterKnife;
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int HEADER = 0;
-    private static final int CONTENT = 1;
+    private static final int TYPE_SUB_HEADER = 0;
+    private static final int TYPE_COMMENT = 1;
 
     private Context context;
     private List<CommentNode> commentsList;
     private boolean hasHeader;
     private OnCommentClickListener commentClickListener;
     private OnSubmissionClickListener submissionClickListener;
-
     private CustomSubmission customSubmission;
 
-    public ThreadAdapter(List<CommentNode> commentsList, boolean hasHeader,
-                         OnCommentClickListener commentClickListener) {
+    public ThreadAdapter(Context context, List<CommentNode> commentsList, boolean hasHeader) {
+        this.context = context;
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
+    }
+
+    public void setCommentClickListener(OnCommentClickListener commentClickListener) {
         this.commentClickListener = commentClickListener;
     }
 
-    public ThreadAdapter(List<CommentNode> commentsList, boolean hasHeader,
-                         OnCommentClickListener commentClickListener,
-                         OnSubmissionClickListener submissionClickListener,
-                         CustomSubmission customSubmission) {
-        this.commentsList = commentsList;
-        this.hasHeader = hasHeader;
-        this.commentClickListener = commentClickListener;
+    public void setSubmissionClickListener(OnSubmissionClickListener submissionClickListener) {
         this.submissionClickListener = submissionClickListener;
+    }
+
+    public void setCustomSubmission(CustomSubmission customSubmission) {
         this.customSubmission = customSubmission;
+    }
+
+    public void setSubmission(Submission submission) {
+        customSubmission.setSubmission(submission);
     }
 
     @Override
     public int getItemViewType(int position) {
         if (!hasHeader) {
-            return CONTENT;
+            return TYPE_COMMENT;
+        } else {
+            if (position == 0) {
+                return TYPE_SUB_HEADER;
+            } else {
+                return TYPE_COMMENT;
+            }
         }
-
-        if (position == 0) {
-            return HEADER;
-        }
-        return CONTENT;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+
         View view;
 
-        if (viewType == HEADER) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_layout_large,
-                    parent, false);
+        if (viewType == TYPE_SUB_HEADER) {
+            view = inflater.inflate(R.layout.post_layout_large, parent, false);
             return new FullCardViewHolder(view);
+        } else {
+            view = inflater.inflate(R.layout.comment_layout, parent, false);
+            return new CommentViewHolder(view);
         }
-
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_layout,
-                parent, false);
-        return new CommentViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FullCardViewHolder) {
-            final FullCardViewHolder cardViewHolder = (FullCardViewHolder) holder;
-
-            cardViewHolder.tvTitle.setText(Html.fromHtml(customSubmission.getTitle()));
-            cardViewHolder.tvAuthor.setText(customSubmission.getAuthor());
-            cardViewHolder.tvTimestamp.setText(customSubmission.getTimestamp());
-            cardViewHolder.tvComments.setText(String.valueOf(customSubmission.getCommentCount()));
-            cardViewHolder.tvPoints.setText(String.valueOf(customSubmission.getScore()));
-
-            if (customSubmission.isSelfPost()) {
-                cardViewHolder.tvBody.setVisibility(View.VISIBLE);
-                cardViewHolder.tvBody.setText(RedditUtils.bindSnuDown(customSubmission.getSelfTextHtml()));
-                cardViewHolder.tvDomain.setText("self");
-                cardViewHolder.ivThumbnail.setVisibility(View.GONE);
-                cardViewHolder.containerLink.setVisibility(View.GONE);
-            } else {
-                cardViewHolder.tvBody.setVisibility(View.GONE);
-                String domain = customSubmission.getDomain();
-                cardViewHolder.tvDomain.setText(domain);
-                if (customSubmission.getThumbnail() != null) {
-                    cardViewHolder.ivThumbnail.setVisibility(View.VISIBLE);
-                    cardViewHolder.containerLink.setVisibility(View.GONE);
-                    Picasso.with(context)
-                            .load(customSubmission.getThumbnail())
-                            .into(cardViewHolder.ivThumbnail);
-                } else {
-                    cardViewHolder.ivThumbnail.setVisibility(View.GONE);
-                    cardViewHolder.containerLink.setVisibility(View.VISIBLE);
-                    cardViewHolder.tvDomainLink.setText(customSubmission.getDomain());
-                    cardViewHolder.tvLink.setText(customSubmission.getUrl());
-                }
-            }
-
-            cardViewHolder.btnUpvote.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.NO_VOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
-                            RedditUtils.setNoVoteColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) - 1));
-                        }
-                    } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.UPVOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            customSubmission.setVoteDirection(VoteDirection.UPVOTE);
-                            RedditUtils.setUpvotedColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) + 2));
-                        }
-                    } else {
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.UPVOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            customSubmission.setVoteDirection(VoteDirection.UPVOTE);
-                            RedditUtils.setUpvotedColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) + 1));
-                        }
-                    }
-                }
-            });
-
-            cardViewHolder.btnDownvote.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.NO_VOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
-                            RedditUtils.setNoVoteColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) + 1));
-                        }
-                    } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.DOWNVOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
-                            RedditUtils.setDownvotedColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) - 2));
-                        }
-                    } else {
-                        submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
-                                VoteDirection.DOWNVOTE);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
-                            RedditUtils.setDownvotedColors(context, cardViewHolder);
-                            cardViewHolder.tvPoints.setText(String.valueOf(Integer.valueOf(
-                                    cardViewHolder.tvPoints.getText().toString()) - 1));
-                        }
-                    }
-                }
-            });
-
-            cardViewHolder.btnSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (customSubmission.isSaved()) {
-                        submissionClickListener.onSaveSubmission(customSubmission.getSubmission(),
-                                false);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            RedditUtils.setUnsavedColors(context, cardViewHolder);
-                            customSubmission.setSaved(false);
-                        }
-                    } else {
-                        submissionClickListener.onSaveSubmission(customSubmission.getSubmission(),
-                                true);
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
-                            RedditUtils.setSavedColors(context, cardViewHolder);
-                            customSubmission.setSaved(true);
-                        }
-                    }
-                }
-            });
-
-            cardViewHolder.ivThumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onContentClick(customSubmission.getUrl());
-                }
-            });
-
-            cardViewHolder.containerLink.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onContentClick(customSubmission.getUrl());
-                }
-            });
-
+            ((FullCardViewHolder) holder).bindData(context, customSubmission, false,
+                    submissionClickListener);
         } else {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
@@ -362,10 +232,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void addComment(int position, CommentNode comment) {
         commentsList.add(position, comment);
         notifyDataSetChanged();
-    }
-
-    public void setSubmission(Submission submission) {
-        customSubmission.setSubmission(submission);
     }
 
     private void setBackgroundAndPadding(CommentNode commentNode, CommentViewHolder holder,
