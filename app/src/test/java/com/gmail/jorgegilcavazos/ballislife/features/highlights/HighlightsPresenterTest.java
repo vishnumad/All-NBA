@@ -14,7 +14,9 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Single;
 
@@ -43,18 +45,19 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testLoadHighlights_hlsAvailable_shouldShowHighlights() {
-        List<Highlight> highlights = new ArrayList<>();
-        highlights.add(new Highlight("1", "Title 1", "url1"));
-        highlights.add(new Highlight("2", "Title 2", "url2"));
-        highlights.add(new Highlight("3", "Title 3", "url3"));
+        Map<String, Highlight> highlightMap = new HashMap<>();
+        highlightMap.put("aaa", new Highlight("1", "Title 1", "url1"));
+        highlightMap.put("bbb", new Highlight("2", "Title 2", "url2"));
+        highlightMap.put("ccc", new Highlight("3", "Title 3", "url3"));
+        List<Highlight> highlightList = new ArrayList<>(highlightMap.values());
 
         Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
-                .thenReturn(Single.just(highlights));
+                .thenReturn(Single.just(highlightMap));
 
         presenter.loadHighlights();
 
         verify(mockView).setLoadingIndicator(true);
-        verify(mockView).showHighlights(highlights);
+        verify(mockView).showHighlights(highlightList);
         verify(mockView).setLoadingIndicator(false);
         verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
@@ -64,7 +67,7 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testLoadHighlights_hlsEmpty_shouldShowNoHighlightsMessage() {
-        List<Highlight> highlights = new ArrayList<>();
+        Map<String, Highlight> highlights = new HashMap<>();
 
         Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
                 .thenReturn(Single.just(highlights));
@@ -82,7 +85,7 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testLoadHighlights_errorLoading_shouldShowErrorMessage() {
-        Single<List<Highlight>> errorSingle = Single.error(new Exception());
+        Single<Map<String, Highlight>> errorSingle = Single.error(new Exception());
         Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
                 .thenReturn(errorSingle);
 
