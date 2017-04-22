@@ -18,11 +18,11 @@
             android:title="Standings"/>
 
         <item
-            android:id="@+id/navigation_item_4"
+            android:id="@+id/navigation_item_3"
             android:icon="@drawable/ic_view_list_black_24dp"
             android:title="Discussions"/>
         <item
-            android:id="@+id/navigation_item_5"
+            android:id="@+id/navigation_item_4"
             android:icon="@drawable/ic_star_black_24dp"
             android:title="Highlights"/>
     </group>

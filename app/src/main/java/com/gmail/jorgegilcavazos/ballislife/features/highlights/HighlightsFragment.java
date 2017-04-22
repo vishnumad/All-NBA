@@ -1,225 +1,136 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
-import android.content.Context;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.HeaderViewListAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HighlightsFragment extends Fragment {
+public class HighlightsFragment extends Fragment implements HighlightsView,
+        SwipeRefreshLayout.OnRefreshListener{
+
     private static final String TAG = "HighlightsFragment";
 
-    //TODO: do not use STREAMABLE API here, change it to a server I can control.
-    String url = "https://streamable.com/ajax/stream/nba?count=10&sort=new&page=";
-    int page = 1;
+    public static final String VIEW_TYPE = "viewType";
+    public static final int VIEW_CARD = 0;
 
-    Context context;
-    View rootView;
-    ListView hlListView;
-    LinearLayout linlaHeaderProgress, videoProgressLayout;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
 
-    Button loadMore;
-    ArrayList<Highlight> hlList;
-
-    VideoView videoView;
-    View background;
-    boolean isPreviewVisible;
-
-
+    private int viewType;
+    private Unbinder unbinder;
+    private HighlightAdapter highlightAdapter;
+    private HighlightsPresenter presenter;
 
     public HighlightsFragment() {
         // Required empty public constructor
     }
 
+    public static HighlightsFragment newInstance(int viewType) {
+        HighlightsFragment fragment = new HighlightsFragment();
+        Bundle args = new Bundle();
+        args.putInt(VIEW_TYPE, viewType);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        context = getActivity();
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            viewType = getArguments().getInt(VIEW_TYPE);
         }
         setHasOptionsMenu(true);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_highlights, container, false);
-        hlListView = (ListView) rootView.findViewById(R.id.HLListView);
-        linlaHeaderProgress = (LinearLayout) rootView.findViewById(R.id.linlaHeaderProgress);
-        videoProgressLayout = (LinearLayout) rootView.findViewById(R.id.videoProgressLayout);
-        videoView = (VideoView) rootView.findViewById(R.id.videoView);
-        background = rootView.findViewById(R.id.background);
-        background.setVisibility(View.GONE);
+        View view = inflater.inflate(R.layout.fragment_highlights, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        loadMore = new Button(context);
-        loadMore.setText("Load More");
-        loadMore.setTextColor(getResources().getColor(R.color.secondaryText));
-        loadMore.setBackgroundColor(getResources().getColor(R.color.white));
-        hlListView.addFooterView(loadMore);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
-        getHL(page, true);
+        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25));
 
-        loadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadMore.setText("Loading...");
-                getHL(page, false);
-            }
-        });
+        rvHighlights.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvHighlights.setAdapter(highlightAdapter);
 
-        return rootView;
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://nba-app-ca681.firebaseio.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        HighlightsService highlightsService = retrofit.create(HighlightsService.class);
+
+        presenter = new HighlightsPresenter(highlightsService, SchedulerProvider.getInstance());
+        presenter.attachView(this);
+        presenter.loadHighlights();
+
+        return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+        presenter.stop();
+        presenter.detachView();
+    }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                stopVideo();
-                page = 1;
-                getHL(page, true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void getHL(int page, final boolean newLoad) {
-        // On first load or reload show spinner
-        if (newLoad) {
-            linlaHeaderProgress.setVisibility(View.VISIBLE);
-            hlListView.setVisibility(View.GONE);
-        }
-
-        /*
-        StringRequest request = new StringRequest(url + page, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                incrementPage();
-                loadHL(response, newLoad);
-                loadMore.setText("Load More");
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loadMore.setText("Load More");
-            }
-        });
-        RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(request);
-        */
+    @Override
+    public void onRefresh() {
+        presenter.loadHighlights();
     }
 
-    public void loadHL(String response, boolean newLoad) {
-        if (context != null) {
-            HLLoader hlLoader = new HLLoader(response);
-
-            // When first load or reload make new list and hide spinner, if not just add new items
-            if (newLoad) {
-                hlList = hlLoader.fetchHighlights();
-
-                hlListView.setAdapter(new HLAdapter(context, hlList));
-
-                hlListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        String vURL = hlList.get(i).videoURL;
-                        playVideo(vURL);
-                    }
-                });
-
-                if (hlList.size() < 5) {
-                    getHL(page, false);
-                } else {
-                    linlaHeaderProgress.setVisibility(View.GONE);
-                    hlListView.setVisibility(View.VISIBLE);
-                }
-
-
-            } else {
-                hlList.addAll(hlLoader.fetchHighlights());
-                ((HLAdapter)((HeaderViewListAdapter) hlListView.getAdapter()).getWrappedAdapter()).notifyDataSetChanged();
-
-                if (hlList.size() < 5) {
-                    getHL(page, false);
-                } else {
-                    linlaHeaderProgress.setVisibility(View.GONE);
-                    hlListView.setVisibility(View.VISIBLE);
-                }
-            }
-
-        }
+    @Override
+    public void setLoadingIndicator(boolean active) {
+        swipeRefreshLayout.setRefreshing(active);
     }
 
-    public void incrementPage() {
-        page++;
+    @Override
+    public void showHighlights(List<Highlight> highlights) {
+        highlightAdapter.setData(highlights);
     }
 
-
-
-
-    public void playVideo(String vURL) {
-        //TODO: handle null pointer exception
-        ((MainActivity) getActivity()).getSupportActionBar().hide();
-
-        videoView.setVisibility(View.VISIBLE);
-        videoView.setZOrderOnTop(true); //HIDE
-        hlListView.setEnabled(false);
-        background.setVisibility(View.VISIBLE);
-        videoProgressLayout.setVisibility(View.VISIBLE);
-        isPreviewVisible = true;
-        try {
-            Uri uri = Uri.parse(vURL);
-            videoView.setMediaController(new android.widget.MediaController(context));
-            videoView.setVideoURI(uri);
-            videoView.requestFocus();
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    videoProgressLayout.setVisibility(View.GONE);
-                    videoView.setZOrderOnTop(false); //SHOW
-                }
-            });
-            videoView.start();
-        } catch (Exception e) {
-            stopVideo();
-            Toast.makeText(context, "Error loading video", Toast.LENGTH_SHORT).show();
-        }
+    @Override
+    public void showNoHighlightsAvailable() {
+        Toast.makeText(getActivity(), "No highlights to show", Toast.LENGTH_SHORT).show();
     }
 
-    public void stopVideo() {
-        //TODO: Handle null pointer exception
-        ((MainActivity) getActivity()).getSupportActionBar().show();
-
-        videoView.stopPlayback();
-        videoView.setZOrderOnTop(true); //HIDE
-        videoView.setVisibility(View.GONE);
-        hlListView.setEnabled(true);
-        background.setVisibility(View.GONE);
-        videoProgressLayout.setVisibility(View.GONE);
-        isPreviewVisible = false;
+    @Override
+    public void showErrorLoadingHighlights() {
+        Toast.makeText(getActivity(), "Error loading highlights", Toast.LENGTH_SHORT).show();
     }
-
-    public boolean isPreviewVisible() {
-        return isPreviewVisible;
-    }
-
 }

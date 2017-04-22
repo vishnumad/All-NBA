@@ -1,23 +1,38 @@
 package com.gmail.jorgegilcavazos.ballislife.features.model;
 
-/**
- * Created by jorgegil on 4/30/16.
- */
 public class Highlight {
 
-    public double dateAdded;
-    public String ext;
-    public String fileID;
-    public int height;
-    public int width;
-    public String videoURL;
-    public String thumbnailURL;
-    public String title;
-    public String redditURL;
+    private String id;
+    private String title;
+    private String hdThumbnail;
 
-    public Highlight() {
-
+    public Highlight(String id, String title, String hdThumbnail) {
+        this.id = id;
+        this.title = title;
+        this.hdThumbnail = hdThumbnail;
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getHdThumbnail() {
+        return hdThumbnail;
+    }
+
+    public void setHdThumbnail(String hdThumbnail) {
+        this.hdThumbnail = hdThumbnail;
+    }
 }

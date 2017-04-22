@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
@@ -50,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int GAMES_FRAGMENT_ID = 1;
     private static final int STANDINGS_FRAGMENT_ID = 2;
-    private static final int POSTS_FRAGMENT_ID = 4;
+    private static final int POSTS_FRAGMENT_ID = 3;
+    private static final int HIGHLIGHTS_FRAGMENT_ID = 4;
 
     Toolbar toolbar;
     ActionBar actionBar;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
             case POSTS_FRAGMENT_ID:
                 setPostsFragment();
                 break;
+            case HIGHLIGHTS_FRAGMENT_ID:
+                setHighlightsFragment();
         }
 
     }
@@ -182,11 +186,12 @@ public class MainActivity extends AppCompatActivity {
                         setStandingsFragment();
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
-                    case R.id.navigation_item_4:
+                    case R.id.navigation_item_3:
                         setPostsFragment();
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
-                    case R.id.navigation_item_5:
+                    case R.id.navigation_item_4:
+                        setHighlightsFragment();
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     case R.id.navigation_item_7:
@@ -263,6 +268,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         selectedFragment = POSTS_FRAGMENT_ID;
+    }
+
+    public void setHighlightsFragment() {
+        setTitle("Highlights");
+        HighlightsFragment highlightsFragment = null;
+        if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
+            highlightsFragment = (HighlightsFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment);
+        }
+
+        if (highlightsFragment == null) {
+            highlightsFragment = HighlightsFragment.newInstance(HighlightsFragment.VIEW_CARD);
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    highlightsFragment, R.id.fragment);
+        }
+
+        selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
     }
 
     /**

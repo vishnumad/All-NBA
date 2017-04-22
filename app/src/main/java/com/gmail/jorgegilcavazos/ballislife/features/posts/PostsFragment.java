@@ -35,6 +35,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
@@ -62,6 +63,7 @@ public class PostsFragment extends Fragment implements PostsView,
     private PostsAdapter postsAdapter;
 
     private PostsPresenter presenter;
+    private Unbinder unbinder;
 
     public PostsFragment() {
 
@@ -89,7 +91,7 @@ public class PostsFragment extends Fragment implements PostsView,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -112,6 +114,7 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        unbinder.unbind();
         presenter.detachView();
         presenter.stop();
         dismissSnackbar();
