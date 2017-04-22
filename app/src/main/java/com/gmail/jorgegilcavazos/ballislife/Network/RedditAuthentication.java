@@ -10,6 +10,7 @@ import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthHelper;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.UUID;
 
 import io.reactivex.Completable;
@@ -42,7 +43,7 @@ public class RedditAuthentication {
 
     private RedditAuthentication() {
         mRedditClient = new RedditClient(UserAgent.of("android",
-                "com.gmail.jorgegilcavazos.ballislife", "v0.4.1", "Obi-Wan_Ginobili"));
+                "com.gmail.jorgegilcavazos.ballislife", "v0.5.3", "Obi-Wan_Ginobili"));
         redditService = new RedditService();
     }
 
@@ -59,6 +60,7 @@ public class RedditAuthentication {
 
     public boolean isUserLoggedIn() {
         return mRedditClient != null && mRedditClient.isAuthenticated()
+                && mRedditClient.getOAuthData().getExpirationDate().after(new Date())
                 && mRedditClient.hasActiveUserContext();
     }
 
@@ -67,7 +69,8 @@ public class RedditAuthentication {
      * authenticates without a user context.
      */
     public Completable authenticate(final SharedPreferences sharedPreferences) {
-        if (mRedditClient.isAuthenticated()) {
+        if (mRedditClient.isAuthenticated()
+                && mRedditClient.getOAuthData().getExpirationDate().after(new Date())) {
             return Completable.complete();
         }
 
