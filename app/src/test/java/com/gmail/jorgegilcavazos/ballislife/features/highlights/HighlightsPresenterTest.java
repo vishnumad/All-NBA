@@ -7,7 +7,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerP
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -64,7 +64,6 @@ public class HighlightsPresenterTest {
         verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsService);
-
     }
 
     @Test
@@ -82,7 +81,6 @@ public class HighlightsPresenterTest {
         verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsService);
-
     }
 
     @Test
@@ -99,7 +97,22 @@ public class HighlightsPresenterTest {
         verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsService);
+    }
 
+    @Test
+    public void testSubscribeToHighlightsClick() {
+        Highlight hl1 = new Highlight("1", "Title 1", "url1", "streamable.com/abcde");
+        Highlight hl2 = new Highlight("2", "Title 2", "url2", "twitter.com/rkeyr");
+        Highlight hl3 = new Highlight("3", "Title 3", "url3", "streamable.com/fghi");
+
+        Observable<Highlight> highlightObservable = Observable.just(hl1, hl2, hl3);
+
+        presenter.subscribeToHighlightsClick(highlightObservable);
+
+        verify(mockView).openStreamable("abcde");
+        verify(mockView).showErrorOpeningStreamable();
+        verify(mockView).openStreamable("fghi");
+        verifyNoMoreInteractions(mockView);
     }
 
 }
