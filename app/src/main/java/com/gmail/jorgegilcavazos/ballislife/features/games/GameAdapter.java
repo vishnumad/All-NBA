@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -168,7 +169,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     public static class GameViewHolder extends RecyclerView.ViewHolder {
 
-        View container;
+        @BindView(R.id.layout_content) RelativeLayout container;
         @BindView(R.id.homelabel) TextView tvHomeTeam;
         @BindView(R.id.awaylabel) TextView tvAwayTeam;
         @BindView(R.id.homescore) TextView tvHomeScore;
@@ -183,13 +184,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         public GameViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            container = view;
         }
     }
 
     public static class GameViewHolderWithBars extends RecyclerView.ViewHolder {
 
-        View container;
+        @BindView(R.id.layout_content) RelativeLayout container;
         @BindView(R.id.homelabel) TextView tvHomeTeam;
         @BindView(R.id.awaylabel) TextView tvAwayTeam;
         @BindView(R.id.homescore) TextView tvHomeScore;
@@ -204,7 +204,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         public GameViewHolderWithBars(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            container = view;
         }
     }
 }
