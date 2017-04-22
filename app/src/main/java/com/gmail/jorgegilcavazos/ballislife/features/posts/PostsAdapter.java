@@ -82,10 +82,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         switch (contentViewType) {
             case FULL_CARD:
-                view = inflater.inflate(R.layout.post_layout_large, parent, false);
+                view = inflater.inflate(R.layout.post_layout_card, parent, false);
                 return new FullCardViewHolder(view);
             default:
-                view = inflater.inflate(R.layout.post_layout_large, parent, false);
+                view = inflater.inflate(R.layout.post_layout_card, parent, false);
                 return new FullCardViewHolder(view);
         }
     }

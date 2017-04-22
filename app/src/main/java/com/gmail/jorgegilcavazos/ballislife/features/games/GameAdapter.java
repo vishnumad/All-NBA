@@ -40,7 +40,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     public GameViewHolderWithBars onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         if (Constants.NBA_MATERIAL_ENABLED) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game,
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_logos,
                     parent, false);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_bars,

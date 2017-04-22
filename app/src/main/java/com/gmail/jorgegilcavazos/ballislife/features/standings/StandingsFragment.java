@@ -65,7 +65,7 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_standings_2, container, false);
+        View view = inflater.inflate(R.layout.fragment_standings, container, false);
         getActivity().setTitle(R.string.standings_fragment_title);
 
         unbinder = ButterKnife.bind(this, view);

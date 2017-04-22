@@ -92,7 +92,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         View view;
 
         if (viewType == TYPE_SUBMISSION_HEADER) {
-            view = inflater.inflate(R.layout.post_layout_large, parent, false);
+            view = inflater.inflate(R.layout.post_layout_card, parent, false);
             return new FullCardViewHolder(view);
         } else {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
