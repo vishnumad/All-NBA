@@ -16,11 +16,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
 
     private Context context;
     private List<Highlight> highlights;
+    private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
 
     public HighlightAdapter(Context context, List<Highlight> highlights) {
         this.context = context;
@@ -30,13 +33,13 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     @Override
     public HighlightHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-
-        return new HighlightHolder(inflater.inflate(R.layout.row_highlight, parent, false));
+        View view = inflater.inflate(R.layout.row_highlight, parent, false);
+        return new HighlightHolder(view);
     }
 
     @Override
     public void onBindViewHolder(HighlightHolder holder, int position) {
-        holder.bindData(context, highlights.get(position));
+        holder.bindData(context, highlights.get(position), viewClickSubject);
     }
 
     @Override
@@ -55,6 +58,10 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         notifyDataSetChanged();
     }
 
+    public Observable<Highlight> getViewClickObservable() {
+        return viewClickSubject;
+    }
+
     static class HighlightHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.image_thumbnail) ImageView ivThumbnail;
@@ -65,12 +72,20 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             ButterKnife.bind(this, itemView);
         }
 
-        void bindData(Context context, Highlight highlight) {
+        void bindData(Context context, final Highlight highlight,
+                      final PublishSubject<Highlight> viewClickSubject) {
             tvTitle.setText(highlight.getTitle());
 
             Picasso.with(context)
                     .load(highlight.getHdThumbnail())
                     .into(ivThumbnail);
+
+            ivThumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewClickSubject.onNext(highlight);
+                }
+            });
         }
     }
 }

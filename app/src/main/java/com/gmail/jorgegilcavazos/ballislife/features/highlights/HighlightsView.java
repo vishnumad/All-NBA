@@ -13,4 +13,8 @@ public interface HighlightsView {
     void showNoHighlightsAvailable();
 
     void showErrorLoadingHighlights();
+
+    void openStreamable(String shortcode);
+
+    void showErrorOpeningStreamable();
 }

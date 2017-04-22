@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +47,11 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_hlsAvailable_shouldShowHighlights() {
         Map<String, Highlight> highlightMap = new HashMap<>();
-        highlightMap.put("aaa", new Highlight("1", "Title 1", "url1"));
-        highlightMap.put("bbb", new Highlight("2", "Title 2", "url2"));
-        highlightMap.put("ccc", new Highlight("3", "Title 3", "url3"));
+        highlightMap.put("aaa", new Highlight("1", "Title 1", "url1", "url1"));
+        highlightMap.put("bbb", new Highlight("2", "Title 2", "url2", "url2"));
+        highlightMap.put("ccc", new Highlight("3", "Title 3", "url3", "url3"));
         List<Highlight> highlightList = new ArrayList<>(highlightMap.values());
+        Collections.reverse(highlightList);
 
         Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
                 .thenReturn(Single.just(highlightMap));

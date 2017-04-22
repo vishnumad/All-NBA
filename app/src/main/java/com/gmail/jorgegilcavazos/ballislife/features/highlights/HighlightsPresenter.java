@@ -5,14 +5,18 @@ import android.util.Log;
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class HighlightsPresenter extends BasePresenter<HighlightsView> {
@@ -23,7 +27,8 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
 
-    public HighlightsPresenter(HighlightsService highlightsService, BaseSchedulerProvider schedulerProvider) {
+    public HighlightsPresenter(HighlightsService highlightsService,
+                               BaseSchedulerProvider schedulerProvider) {
         this.highlightsService = highlightsService;
         this.schedulerProvider = schedulerProvider;
 
@@ -51,7 +56,9 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                         if (highlights.isEmpty()) {
                             view.showNoHighlightsAvailable();
                         } else {
-                            view.showHighlights(new ArrayList<>(highlights.values()));
+                            List<Highlight> highlightList = new ArrayList<>(highlights.values());
+                            Collections.reverse(highlightList);
+                            view.showHighlights(highlightList);
                         }
                         view.setLoadingIndicator(false);
                     }
@@ -60,6 +67,34 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                     public void onError(Throwable e) {
                         view.showErrorLoadingHighlights();
                         view.setLoadingIndicator(false);
+                    }
+                })
+        );
+    }
+
+    public void subscribeToHighlightsClick(Observable<Highlight> highlightsClick) {
+        disposables.add(highlightsClick
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableObserver<Highlight>() {
+                    @Override
+                    public void onNext(Highlight hl) {
+                        String shortCode = Utilities.getStreamableShortcodeFromUrl(hl.getUrl());
+                        if (shortCode != null) {
+                            view.openStreamable(shortCode);
+                        } else {
+                            view.showErrorOpeningStreamable();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showErrorOpeningStreamable();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 })
         );

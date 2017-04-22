@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -88,6 +90,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         presenter = new HighlightsPresenter(highlightsService, SchedulerProvider.getInstance());
         presenter.attachView(this);
+        presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.loadHighlights();
 
         return view;
@@ -133,4 +136,17 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public void showErrorLoadingHighlights() {
         Toast.makeText(getActivity(), "Error loading highlights", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void openStreamable(String shortcode) {
+        Intent intent = new Intent(getActivity(), VideoPlayerActivity.class);
+        intent.putExtra(VideoPlayerActivity.SHORTCODE, shortcode);
+        startActivity(intent);
+    }
+
+    @Override
+    public void showErrorOpeningStreamable() {
+        Toast.makeText(getActivity(), "Error loading streamable", Toast.LENGTH_SHORT).show();
+    }
+
 }

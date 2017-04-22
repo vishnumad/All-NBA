@@ -5,11 +5,13 @@ public class Highlight {
     private String id;
     private String title;
     private String hdThumbnail;
+    private String url;
 
-    public Highlight(String id, String title, String hdThumbnail) {
+    public Highlight(String id, String title, String hdThumbnail, String url) {
         this.id = id;
         this.title = title;
         this.hdThumbnail = hdThumbnail;
+        this.url = url;
     }
 
     public String getId() {
@@ -34,5 +36,13 @@ public class Highlight {
 
     public void setHdThumbnail(String hdThumbnail) {
         this.hdThumbnail = hdThumbnail;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
