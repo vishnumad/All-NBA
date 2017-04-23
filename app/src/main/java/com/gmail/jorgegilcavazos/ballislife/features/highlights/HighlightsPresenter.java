@@ -26,6 +26,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     private HighlightsService highlightsService;
     private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
+    private String lastLoadedHLKey;
 
     public HighlightsPresenter(HighlightsService highlightsService,
                                BaseSchedulerProvider schedulerProvider) {
@@ -36,18 +37,24 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     }
 
     public void loadHighlights() {
+        lastLoadedHLKey = "";
+        view.resetScrollState();
+
+        // This params query the 20 most recently posted streamables.
         String orderBy = "\"$key\"";
         String startAt = "";
-        String limitToLast = String.valueOf(5);
+        String endAt = null;
+        String limitToLast = String.valueOf(20);
 
         view.setLoadingIndicator(true);
-        disposables.add(highlightsService.getHighlights(orderBy, startAt, limitToLast)
+        disposables.add(highlightsService.getHighlights(orderBy, startAt, endAt, limitToLast)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .doOnError(new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(TAG, throwable.toString());
+                        Log.e(TAG, throwable.getLocalizedMessage());
                     }
                 })
                 .subscribeWith(new DisposableSingleObserver<Map<String, Highlight>>() {
@@ -56,9 +63,14 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                         if (highlights.isEmpty()) {
                             view.showNoHighlightsAvailable();
                         } else {
+                            // Save last key for pagination.
+                            for (Map.Entry<String, Highlight> entry : highlights.entrySet()) {
+                                lastLoadedHLKey = entry.getKey();
+                                break;
+                            }
                             List<Highlight> highlightList = new ArrayList<>(highlights.values());
                             Collections.reverse(highlightList);
-                            view.showHighlights(highlightList);
+                            view.showHighlights(highlightList, true);
                         }
                         view.setLoadingIndicator(false);
                     }
@@ -67,6 +79,52 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                     public void onError(Throwable e) {
                         view.showErrorLoadingHighlights();
                         view.setLoadingIndicator(false);
+                    }
+                })
+        );
+    }
+
+    public void loadMoreHighlights() {
+        // This params query the 26 most recently posted streamables, ending on the last saved key.
+        String orderBy = "\"$key\"";
+        String startAt = null;
+        String endAt = "\"" + lastLoadedHLKey + "\"";
+        String limitToLast = String.valueOf(21);
+
+        disposables.add(highlightsService.getHighlights(orderBy, startAt, endAt, limitToLast)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, throwable.toString());
+                        Log.e(TAG, throwable.getLocalizedMessage());
+                    }
+                })
+                .subscribeWith(new DisposableSingleObserver<Map<String, Highlight>>() {
+                    @Override
+                    public void onSuccess(Map<String, Highlight> highlights) {
+                        if (highlights.isEmpty()) {
+                            view.showNoHighlightsAvailable();
+                        } else {
+                            // Save last key for pagination.
+                            for (Map.Entry<String, Highlight> entry : highlights.entrySet()) {
+                                lastLoadedHLKey = entry.getKey();
+                                break;
+                            }
+                            List<Highlight> highlightList = new ArrayList<>(highlights.values());
+
+                            // Last one from this list is already shown in the recycler view.
+                            highlightList.remove(highlightList.size() - 1);
+
+                            Collections.reverse(highlightList);
+                            view.showHighlights(highlightList, false);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showErrorLoadingHighlights();
                     }
                 })
         );

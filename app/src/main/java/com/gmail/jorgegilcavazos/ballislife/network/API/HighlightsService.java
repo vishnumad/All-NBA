@@ -12,6 +12,7 @@ public interface HighlightsService {
 
     @GET("streamables.json")
     Single<Map<String, Highlight>> getHighlights(@Query("orderBy") String orderBy,
-                              @Query("startAt") String startAt,
-                              @Query("limitToLast") String limitToLast);
+                                                 @Query("startAt") String startAt,
+                                                 @Query("endAt") String endAt,
+                                                 @Query("limitToLast") String limitToLast);
 }

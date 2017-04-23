@@ -8,7 +8,7 @@ public interface HighlightsView {
 
     void setLoadingIndicator(boolean active);
 
-    void showHighlights(List<Highlight> highlights);
+    void showHighlights(List<Highlight> highlights, boolean clear);
 
     void showNoHighlightsAvailable();
 
@@ -17,4 +17,6 @@ public interface HighlightsView {
     void openStreamable(String shortcode);
 
     void showErrorOpeningStreamable();
+
+    void resetScrollState();
 }

@@ -53,6 +53,11 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         notifyDataSetChanged();
     }
 
+    public void clearData() {
+        highlights.clear();
+        notifyDataSetChanged();
+    }
+
     public void addData(List<Highlight> highlights) {
         this.highlights.addAll(highlights);
         notifyDataSetChanged();

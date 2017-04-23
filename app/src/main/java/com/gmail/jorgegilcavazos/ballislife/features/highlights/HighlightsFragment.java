@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
@@ -30,7 +32,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HighlightsFragment extends Fragment implements HighlightsView,
-        SwipeRefreshLayout.OnRefreshListener{
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "HighlightsFragment";
 
@@ -44,6 +46,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private Unbinder unbinder;
     private HighlightAdapter highlightAdapter;
     private HighlightsPresenter presenter;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     public HighlightsFragment() {
         // Required empty public constructor
@@ -77,8 +80,18 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25));
 
-        rvHighlights.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        rvHighlights.setLayoutManager(linearLayoutManager);
         rvHighlights.setAdapter(highlightAdapter);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                presenter.loadMoreHighlights();
+            }
+        };
+
+        rvHighlights.addOnScrollListener(scrollListener);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://nba-app-ca681.firebaseio.com/")
@@ -107,6 +120,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
+                presenter.loadHighlights();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -123,8 +137,12 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public void showHighlights(List<Highlight> highlights) {
-        highlightAdapter.setData(highlights);
+    public void showHighlights(List<Highlight> highlights, boolean clear) {
+        if (clear) {
+            highlightAdapter.setData(highlights);
+        } else {
+            highlightAdapter.addData(highlights);
+        }
     }
 
     @Override
@@ -147,6 +165,11 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void showErrorOpeningStreamable() {
         Toast.makeText(getActivity(), "Error loading streamable", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void resetScrollState() {
+        scrollListener.resetState();
     }
 
 }
