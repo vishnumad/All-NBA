@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 
@@ -35,6 +36,7 @@ public class RedditAuthentication {
     public static final String CLIENT_ID = "XDtA2eYVKp1wWA";
     public static final String REDIRECT_URL = "http://localhost/authorize_callback";
     public static final String REDDIT_TOKEN_KEY = "REDDIT_TOKEN";
+    public static final String TOKEN_EXPIRATION_KEY = "TOKEN_EXPIRATION";
 
     private static RedditAuthentication mInstance = null;
 
@@ -69,22 +71,35 @@ public class RedditAuthentication {
      * authenticates without a user context.
      */
     public Completable authenticate(final SharedPreferences sharedPreferences) {
-        if (mRedditClient.isAuthenticated()
-                && mRedditClient.getOAuthData().getExpirationDate().after(new Date())) {
+        if (mRedditClient.isAuthenticated() && isTokenValid(sharedPreferences)) {
+            Log.d(TAG, "Is authenticated and token is valid");
             return Completable.complete();
         }
 
         String refreshToken = getRefreshTokenFromPrefs(sharedPreferences);
         if (refreshToken == null) {
+            Log.d(TAG, "Starting userless auth");
             Credentials credentials = Credentials.userlessApp(CLIENT_ID, UUID.randomUUID());
-            return redditService.userlessAuthentication(mRedditClient, credentials);
+            return redditService.userlessAuthentication(mRedditClient, credentials)
+                    .doOnComplete(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            Log.d(TAG, "Finished userless auth, saving expiration token date");
+                            saveTokenExpirationInPrefs(sharedPreferences, mRedditClient
+                                    .getOAuthData().data("expires_in", Integer.class) * 1000);
+                        }
+                    });
         } else {
+            Log.d(TAG, "Starting refreshing token");
             Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
             return redditService.refreshToken(mRedditClient, credentials, refreshToken)
                     .doOnComplete(new Action() {
                         @Override
                         public void run() throws Exception {
+                            Log.d(TAG, "Finished refreshing token, saving token and expiration");
                             saveRefreshTokenInPrefs(sharedPreferences);
+                            saveTokenExpirationInPrefs(sharedPreferences, mRedditClient
+                                    .getOAuthData().data("expires_in", Integer.class) * 1000);
                         }
                     });
         }
@@ -95,12 +110,16 @@ public class RedditAuthentication {
      * preferences file.
      */
     public Completable authenticateUser(String url, final SharedPreferences sharedPreferences) {
+        Log.d(TAG, "Starting user auth");
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
         return redditService.userAuthentication(mRedditClient, credentials, url)
                 .doOnComplete(new Action() {
                     @Override
                     public void run() throws Exception {
+                        Log.d(TAG, "Finished user auth, saving refresh token and expiration");
                         saveRefreshTokenInPrefs(sharedPreferences);
+                        saveTokenExpirationInPrefs(sharedPreferences, mRedditClient
+                                .getOAuthData().data("expires_in", Integer.class) * 1000);
                     }
                 });
     }
@@ -114,6 +133,7 @@ public class RedditAuthentication {
         }
 
         clearRefreshTokenInPrefs(sharedPreferences);
+        clearTokenExpirationInPrefs(sharedPreferences);
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
         return redditService.deAuthenticate(mRedditClient, credentials);
     }
@@ -142,6 +162,30 @@ public class RedditAuthentication {
     public void clearRefreshTokenInPrefs(SharedPreferences sharedPreferences) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(REDDIT_TOKEN_KEY);
+        editor.apply();
+    }
+
+    private boolean isTokenValid(SharedPreferences sharedPreferences) {
+        long expirationLong = getTokenExpirationFromPrefs(sharedPreferences);
+        if (expirationLong == -1) {
+            return false;
+        }
+        return new Date(expirationLong).after(new Date());
+    }
+
+    private long getTokenExpirationFromPrefs(SharedPreferences sharedPreferences) {
+        return sharedPreferences.getLong(TOKEN_EXPIRATION_KEY, -1);
+    }
+
+    private void saveTokenExpirationInPrefs(SharedPreferences sharedPreferences, long duration) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putLong(TOKEN_EXPIRATION_KEY, new Date().getTime() + duration);
+        editor.apply();
+    }
+
+    private void clearTokenExpirationInPrefs(SharedPreferences sharedPreferences) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(TOKEN_EXPIRATION_KEY);
         editor.apply();
     }
 }
