@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,11 +17,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.data.firebase.MyMessagingService;
-import com.hannesdorfmann.mosby.mvp.MvpFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,12 +32,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Displays a list of {@link NbaGame}s for the selected date.
  */
-public class GamesFragment extends MvpFragment<GamesView, GamesPresenter>
-        implements GamesView, SwipeRefreshLayout.OnRefreshListener {
+public class GamesFragment extends Fragment implements GamesView,
+        SwipeRefreshLayout.OnRefreshListener {
     public final static String TAG = "GamesFragment";
 
     public final static String GAME_THREAD_HOME = "GAME_THREAD_HOME";
@@ -55,13 +60,10 @@ public class GamesFragment extends MvpFragment<GamesView, GamesPresenter>
     private Snackbar snackbar;
     private Unbinder unbinder;
 
+    private GamesPresenter presenter;
+
     public GamesFragment() {
         // Required empty public constructor.
-    }
-
-    @Override
-    public GamesPresenter createPresenter() {
-        return new GamesPresenter();
     }
 
     public static GamesFragment newInstance() {
@@ -72,13 +74,11 @@ public class GamesFragment extends MvpFragment<GamesView, GamesPresenter>
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        presenter.loadGames();
         getActivity().registerReceiver(scoresUpdateReceiver,
                 new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
     }
@@ -112,6 +112,18 @@ public class GamesFragment extends MvpFragment<GamesView, GamesPresenter>
             }
         });
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://nba-app-ca681.firebaseio.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NbaGamesService nbaGamesService = retrofit.create(NbaGamesService.class);
+
+        presenter = new GamesPresenter(nbaGamesService, SchedulerProvider.getInstance());
+        presenter.attachView(this);
+        presenter.loadGames();
+
         return view;
     }
 
@@ -129,6 +141,8 @@ public class GamesFragment extends MvpFragment<GamesView, GamesPresenter>
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+        presenter.stop();
+        presenter.detachView();
     }
 
     @Override

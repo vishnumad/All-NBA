@@ -1,12 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
-import com.hannesdorfmann.mosby.mvp.MvpView;
 
 import java.util.Calendar;
 import java.util.List;
 
-public interface GamesView extends MvpView {
+public interface GamesView {
 
     void setLoadingIndicator(boolean active);
 
