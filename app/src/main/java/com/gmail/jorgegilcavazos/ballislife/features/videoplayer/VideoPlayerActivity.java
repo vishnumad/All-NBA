@@ -3,14 +3,12 @@ package com.gmail.jorgegilcavazos.ballislife.features.videoplayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
-import com.gmail.jorgegilcavazos.ballislife.network.API.StreamableService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.StreamableService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 

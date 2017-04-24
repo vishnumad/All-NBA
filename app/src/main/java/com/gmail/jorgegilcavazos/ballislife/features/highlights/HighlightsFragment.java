@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HighlightsFragment extends Fragment implements HighlightsView,
         SwipeRefreshLayout.OnRefreshListener {
@@ -87,24 +84,18 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                presenter.loadMoreHighlights();
+                presenter.loadHighlights(false);
             }
         };
 
         rvHighlights.addOnScrollListener(scrollListener);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://nba-app-ca681.firebaseio.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        HighlightsRepository highlightsRepository = new HighlightsRepositoryImpl(10);
 
-        HighlightsService highlightsService = retrofit.create(HighlightsService.class);
-
-        presenter = new HighlightsPresenter(highlightsService, SchedulerProvider.getInstance());
+        presenter = new HighlightsPresenter(highlightsRepository, SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
-        presenter.loadHighlights();
+        presenter.loadHighlights(true);
 
         return view;
     }
@@ -120,7 +111,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                presenter.loadHighlights();
+                presenter.loadHighlights(true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -128,7 +119,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void onRefresh() {
-        presenter.loadHighlights();
+        presenter.loadHighlights(true);
     }
 
     @Override
@@ -147,12 +138,12 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void showNoHighlightsAvailable() {
-        Toast.makeText(getActivity(), "No highlights to show", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.no_highlights_to_show, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showErrorLoadingHighlights() {
-        Toast.makeText(getActivity(), "Error loading highlights", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.error_loading_highlights, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -164,7 +155,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void showErrorOpeningStreamable() {
-        Toast.makeText(getActivity(), "Error loading streamable", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.error_loading_streamable, Toast.LENGTH_SHORT).show();
     }
 
     @Override

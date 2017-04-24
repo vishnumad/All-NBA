@@ -3,10 +3,10 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
-import com.gmail.jorgegilcavazos.ballislife.network.API.GameThreadFinderService;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditGameThreadsService;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.API.GameThreadFinderService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditGameThreadsService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;

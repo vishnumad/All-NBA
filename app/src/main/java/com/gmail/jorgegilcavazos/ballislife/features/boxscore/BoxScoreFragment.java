@@ -20,7 +20,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
-import com.gmail.jorgegilcavazos.ballislife.network.API.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 

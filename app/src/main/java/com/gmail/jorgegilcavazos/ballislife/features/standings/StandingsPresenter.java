@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.standings;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
-import com.gmail.jorgegilcavazos.ballislife.network.API.NbaStandingsService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 

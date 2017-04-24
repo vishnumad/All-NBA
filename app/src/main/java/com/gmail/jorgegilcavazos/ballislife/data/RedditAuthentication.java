@@ -1,8 +1,8 @@
-package com.gmail.jorgegilcavazos.ballislife.network;
+package com.gmail.jorgegilcavazos.ballislife.data;
 
 import android.content.SharedPreferences;
 
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.UserAgent;

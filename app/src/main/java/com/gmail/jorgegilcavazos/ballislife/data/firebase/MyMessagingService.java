@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.network.firebase;
+package com.gmail.jorgegilcavazos.ballislife.data.firebase;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;

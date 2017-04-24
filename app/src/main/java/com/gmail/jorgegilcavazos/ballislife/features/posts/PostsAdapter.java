@@ -16,7 +16,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;

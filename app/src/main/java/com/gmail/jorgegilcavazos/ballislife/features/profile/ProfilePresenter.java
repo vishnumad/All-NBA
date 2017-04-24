@@ -2,8 +2,8 @@ package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
 import android.content.SharedPreferences;
 
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import net.dean.jraw.RedditClient;
@@ -11,7 +11,6 @@ import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.LoggedInAccount;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;

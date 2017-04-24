@@ -19,13 +19,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
@@ -41,7 +40,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,

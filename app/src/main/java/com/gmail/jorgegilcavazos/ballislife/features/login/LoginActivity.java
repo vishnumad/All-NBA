@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
@@ -18,7 +18,7 @@ import java.net.URL;
 import butterknife.BindView;
 import io.reactivex.observers.DisposableCompletableObserver;
 
-import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";

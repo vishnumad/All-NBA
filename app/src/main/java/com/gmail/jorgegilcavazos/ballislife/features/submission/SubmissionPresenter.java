@@ -3,9 +3,8 @@ package com.gmail.jorgegilcavazos.ballislife.features.submission;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
-import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;

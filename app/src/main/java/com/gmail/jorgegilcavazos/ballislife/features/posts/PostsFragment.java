@@ -23,7 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmiss
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class PostsFragment extends Fragment implements PostsView,
         SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener,

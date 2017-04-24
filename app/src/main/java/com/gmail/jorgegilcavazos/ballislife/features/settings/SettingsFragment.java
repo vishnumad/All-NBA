@@ -9,7 +9,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
-import com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -22,7 +22,7 @@ import java.util.Set;
 import io.reactivex.observers.DisposableCompletableObserver;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{

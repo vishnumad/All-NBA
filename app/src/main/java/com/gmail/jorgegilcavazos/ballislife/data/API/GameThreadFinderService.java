@@ -1,13 +1,10 @@
-package com.gmail.jorgegilcavazos.ballislife.network.API;
+package com.gmail.jorgegilcavazos.ballislife.data.API;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
 import io.reactivex.SingleEmitter;
 import io.reactivex.SingleOnSubscribe;

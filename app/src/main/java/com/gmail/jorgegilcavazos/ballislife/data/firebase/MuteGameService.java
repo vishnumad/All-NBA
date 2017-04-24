@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.network.firebase;
+package com.gmail.jorgegilcavazos.ballislife.data.firebase;
 
 import android.app.NotificationManager;
 import android.app.Service;

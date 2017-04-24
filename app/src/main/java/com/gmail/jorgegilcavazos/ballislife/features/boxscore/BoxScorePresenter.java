@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
-import com.gmail.jorgegilcavazos.ballislife.network.API.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import io.reactivex.disposables.CompositeDisposable;

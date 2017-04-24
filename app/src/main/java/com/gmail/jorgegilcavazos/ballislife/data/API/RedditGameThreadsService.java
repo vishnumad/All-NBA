@@ -1,11 +1,9 @@
-package com.gmail.jorgegilcavazos.ballislife.network.API;
+package com.gmail.jorgegilcavazos.ballislife.data.API;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 
-import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Path;

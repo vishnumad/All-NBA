@@ -22,7 +22,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
-import com.gmail.jorgegilcavazos.ballislife.network.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -38,7 +38,7 @@ import butterknife.Unbinder;
 import static android.content.Context.MODE_PRIVATE;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
-import static com.gmail.jorgegilcavazos.ballislife.network.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class GameThreadFragment extends Fragment implements GameThreadView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener {

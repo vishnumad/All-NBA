@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
+import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
-import com.gmail.jorgegilcavazos.ballislife.network.API.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
 
 import org.junit.Before;
@@ -13,15 +13,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -32,71 +28,87 @@ public class HighlightsPresenterTest {
     HighlightsView mockView;
 
     @Mock
-    HighlightsService mockHighlightsService;
+    HighlightsRepositoryImpl mockHighlightsRepository;
 
     HighlightsPresenter presenter;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        presenter = new HighlightsPresenter(mockHighlightsService,
+        presenter = new HighlightsPresenter(mockHighlightsRepository,
                 new TrampolineSchedulerProvider());
         presenter.attachView(mockView);
     }
 
     @Test
     public void testLoadHighlights_hlsAvailable_shouldShowHighlights() {
-        Map<String, Highlight> highlightMap = new HashMap<>();
-        highlightMap.put("aaa", new Highlight("1", "Title 1", "url1", "url1"));
-        highlightMap.put("bbb", new Highlight("2", "Title 2", "url2", "url2"));
-        highlightMap.put("ccc", new Highlight("3", "Title 3", "url3", "url3"));
-        List<Highlight> highlightList = new ArrayList<>(highlightMap.values());
-        Collections.reverse(highlightList);
+        List<Highlight> highlightList = new ArrayList<>();
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1"));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2"));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3"));
+        Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
 
-        Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
-                .thenReturn(Single.just(highlightMap));
-
-        presenter.loadHighlights();
+        presenter.loadHighlights(true); // reset to get first batch.
 
         verify(mockView).setLoadingIndicator(true);
-        verify(mockView).showHighlights(highlightList);
+        verify(mockView).resetScrollState();
+        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).next();
+        verify(mockView).showHighlights(highlightList, true);
         verify(mockView).setLoadingIndicator(false);
-        verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
-        verifyNoMoreInteractions(mockHighlightsService);
+        verifyNoMoreInteractions(mockHighlightsRepository);
     }
+
 
     @Test
     public void testLoadHighlights_hlsEmpty_shouldShowNoHighlightsMessage() {
-        Map<String, Highlight> highlights = new HashMap<>();
+        List<Highlight> highlightList = new ArrayList<>();
+        Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
 
-        Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
-                .thenReturn(Single.just(highlights));
-
-        presenter.loadHighlights();
+        presenter.loadHighlights(true); // reset to get first batch.
 
         verify(mockView).setLoadingIndicator(true);
+        verify(mockView).resetScrollState();
+        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).next();
         verify(mockView).showNoHighlightsAvailable();
         verify(mockView).setLoadingIndicator(false);
-        verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
-        verifyNoMoreInteractions(mockHighlightsService);
+        verifyNoMoreInteractions(mockHighlightsRepository);
     }
 
     @Test
     public void testLoadHighlights_errorLoading_shouldShowErrorMessage() {
-        Single<Map<String, Highlight>> errorSingle = Single.error(new Exception());
-        Mockito.when(mockHighlightsService.getHighlights(anyString(), anyString(), anyString()))
-                .thenReturn(errorSingle);
+        Single<List<Highlight>> errorSingle = Single.error(new Exception());
+        Mockito.when(mockHighlightsRepository.next()).thenReturn(errorSingle);
 
-        presenter.loadHighlights();
+        presenter.loadHighlights(true); // reset to get first batch.
 
         verify(mockView).setLoadingIndicator(true);
+        verify(mockView).resetScrollState();
+        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).next();
         verify(mockView).showErrorLoadingHighlights();
         verify(mockView).setLoadingIndicator(false);
-        verify(mockHighlightsService).getHighlights(anyString(), anyString(), anyString());
         verifyNoMoreInteractions(mockView);
-        verifyNoMoreInteractions(mockHighlightsService);
+        verifyNoMoreInteractions(mockHighlightsRepository);
+    }
+
+    @Test
+    public void testLoadHighlights_loadSecondPage_showShowHighlights() {
+        List<Highlight> highlightList = new ArrayList<>();
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1"));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2"));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3"));
+        Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
+
+        presenter.loadHighlights(false);
+
+        verify(mockHighlightsRepository).next();
+        verify(mockView).showHighlights(highlightList, false);
+        verifyNoMoreInteractions(mockHighlightsRepository);
+        verifyNoMoreInteractions(mockView);
     }
 
     @Test
