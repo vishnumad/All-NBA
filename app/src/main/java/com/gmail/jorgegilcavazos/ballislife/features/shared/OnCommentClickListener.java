@@ -9,5 +9,7 @@ public interface OnCommentClickListener {
 
     void onSaveComment(Comment comment);
 
+    void onUnsaveComment(Comment comment);
+
     void onReplyToComment(int position, Comment parentComment);
 }

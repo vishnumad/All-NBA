@@ -156,7 +156,6 @@ public class GameThreadPresenter {
             return;
         }
 
-        view.showSavingToast();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.saveComment(comment))
                 .subscribeOn(Schedulers.io())
@@ -164,16 +163,32 @@ public class GameThreadPresenter {
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        if (isViewAttached()) {
-                            view.showSavedToast();
-                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            view.showFailedToSaveToast();
-                        }
+                    }
+                })
+        );
+    }
+
+    public void unsave(Comment comment) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInToast();
+            return;
+        }
+
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.unsaveComment(comment))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                     }
                 })
         );

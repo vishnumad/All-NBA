@@ -159,7 +159,6 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        view.showSavingToast();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.saveComment(comment))
                 .subscribeOn(schedulerProvider.io())
@@ -177,6 +176,28 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                         if (isViewAttached()) {
                             view.showErrorSavingToast();
                         }
+                    }
+                })
+        );
+    }
+
+    public void onUnsaveComment(Comment comment) {
+        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+            view.showNotLoggedInError();
+            return;
+        }
+
+        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+                .andThen(redditService.unsaveComment(comment))
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                     }
                 })
         );

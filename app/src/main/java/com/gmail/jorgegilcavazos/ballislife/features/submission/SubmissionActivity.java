@@ -170,6 +170,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         presenter.onSaveComment(comment);
     }
 
+    @Override
+    public void onUnsaveComment(Comment comment) {
+        presenter.onUnsaveComment(comment);
+    }
+
 
     @Override
     public void onReplyToComment(int position, Comment parentComment) {

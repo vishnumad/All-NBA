@@ -58,6 +58,16 @@
                 android:textSize="10dp"/>
 
             <TextView
+                android:id="@+id/comment_saved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/comment_timestamp"
+                android:paddingLeft="2dp"
+                android:text="@string/saved"
+                android:textColor="@color/commentSaved"
+                android:textSize="10dp"/>
+
+            <TextView
                 android:id="@+id/comment_body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

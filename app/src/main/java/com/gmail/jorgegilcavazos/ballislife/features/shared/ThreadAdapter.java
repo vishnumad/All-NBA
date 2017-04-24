@@ -147,6 +147,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.comment_timestamp) TextView timestampTextView;
         @BindView(R.id.comment_body) TextView bodyTextView;
         @BindView(R.id.comment_flair) TextView flairTextView;
+        @BindView(R.id.comment_saved) TextView tvSaved;
         @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
         @BindView(R.id.button_comment_upvote) ImageButton btnUpvote;
         @BindView(R.id.button_comment_downvote) ImageButton btnDownvote;
@@ -205,6 +206,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 scoreTextView.setTextColor(colorNeutral);
             }
 
+            // Show saved text if saved
+            if (comment.isSaved()) {
+                tvSaved.setVisibility(View.VISIBLE);
+            } else {
+                tvSaved.setVisibility(View.GONE);
+            }
+
             // Add a "*" to indicate that a comment has been edited.
             if (comment.hasBeenEdited()) {
                 timestampTextView.setText(timestamp + "*");
@@ -247,7 +255,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             btnSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    commentClickListener.onSaveComment(comment);
+                    if (tvSaved.getVisibility() == View.VISIBLE) {
+                        commentClickListener.onUnsaveComment(comment);
+                        tvSaved.setVisibility(View.GONE);
+                    } else {
+                        commentClickListener.onSaveComment(comment);
+                        tvSaved.setVisibility(View.VISIBLE);
+                    }
                     hideActions(context, commentHolder, commentNode);
                 }
             });

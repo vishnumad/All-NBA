@@ -262,6 +262,11 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     }
 
     @Override
+    public void onUnsaveComment(Comment comment) {
+        presenter.unsave(comment);
+    }
+
+    @Override
     public void onReplyToComment(final int position, final Comment parentComment) {
         presenter.replyToCommentBtnClick(position, parentComment);
     }

@@ -246,6 +246,30 @@ public class RedditService {
         });
     }
 
+    public Completable unsaveComment(final Comment comment) {
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter e) throws Exception {
+                if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    AccountManager accountManager = new AccountManager(
+                            RedditAuthentication.getInstance().getRedditClient());
+                    try {
+                        accountManager.unsave(comment);
+                        e.onComplete();
+                    } catch (Exception ex) {
+                        if (!e.isDisposed()) {
+                            e.onError(ex);
+                        }
+                    }
+                } else {
+                    if (!e.isDisposed()) {
+                        e.onError(new NotLoggedInException());
+                    }
+                }
+            }
+        });
+    }
+
     public Single<String> replyToThread(final Submission submission, final String text) {
         return Single.create(new SingleOnSubscribe<String>() {
             @Override
