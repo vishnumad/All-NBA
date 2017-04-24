@@ -69,6 +69,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     static class HighlightHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.container) View container;
         @BindView(R.id.image_thumbnail) ImageView ivThumbnail;
         @BindView(R.id.text_title) TextView tvTitle;
 
@@ -81,11 +82,16 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
                       final PublishSubject<Highlight> viewClickSubject) {
             tvTitle.setText(highlight.getTitle());
 
-            Picasso.with(context)
-                    .load(highlight.getHdThumbnail())
-                    .into(ivThumbnail);
+            if (highlight.getHdThumbnail() != null) {
+                ivThumbnail.setVisibility(View.VISIBLE);
+                Picasso.with(context)
+                        .load(highlight.getHdThumbnail())
+                        .into(ivThumbnail);
+            } else {
+                ivThumbnail.setVisibility(View.GONE);
+            }
 
-            ivThumbnail.setOnClickListener(new View.OnClickListener() {
+            container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     viewClickSubject.onNext(highlight);
