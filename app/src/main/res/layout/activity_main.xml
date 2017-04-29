@@ -20,6 +20,7 @@
                 android:layout_height="?attr/actionBarSize"
                 android:fitsSystemWindows="true"
                 android:background="?attr/colorPrimary"
+                app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:theme="@style/ToolBarStyle"/>
 

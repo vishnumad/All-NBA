@@ -18,6 +18,7 @@ import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         );
     }
 
-    public void loadPosts() {
+    public void loadPosts(Sorting sorting, TimePeriod timePeriod) {
         view.setLoadingIndicator(true);
         view.dismissSnackbar();
 
@@ -72,7 +73,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                 .getRedditClient();
         paginator = new SubredditPaginator(redditClient, "nba");
         paginator.setLimit(25);
-        paginator.setSorting(Sorting.HOT);
+        paginator.setSorting(sorting);
+
+        if (sorting == Sorting.TOP) {
+            paginator.setTimePeriod(timePeriod);
+        }
 
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(service.getSubmissionListing(paginator))

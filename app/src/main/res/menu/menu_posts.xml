@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_sort"
+        android:orderInCategory="101"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort_white_24dp"
+        app:showAsAction="ifRoom" >
+
+        <menu>
+
+            <item
+                android:id="@+id/action_sort_hot"
+                android:orderInCategory="11"
+                android:title="@string/action_sort_hot"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_new"
+                android:orderInCategory="12"
+                android:title="@string/action_sort_new"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_rising"
+                android:orderInCategory="13"
+                android:title="@string/action_sort_rising"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_controversial"
+                android:orderInCategory="14"
+                android:title="@string/action_sort_controversial"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_top"
+                android:orderInCategory="15"
+                android:title="@string/action_sort_top"
+                app:showAsAction="never" >
+
+                <menu>
+                    <item
+                        android:id="@+id/action_sort_top_hour"
+                        android:orderInCategory="1"
+                        android:title="@string/action_sort_top_hour"
+                        app:showAsAction="never" />
+
+                    <item
+                        android:id="@+id/action_sort_top_day"
+                        android:orderInCategory="2"
+                        android:title="@string/action_sort_top_day"
+                        app:showAsAction="never" />
+
+                    <item
+                        android:id="@+id/action_sort_top_week"
+                        android:orderInCategory="3"
+                        android:title="@string/action_sort_top_week"
+                        app:showAsAction="never" />
+
+                    <item
+                        android:id="@+id/action_sort_top_month"
+                        android:orderInCategory="4"
+                        android:title="@string/action_sort_top_month"
+                        app:showAsAction="never" />
+
+                    <item
+                        android:id="@+id/action_sort_top_year"
+                        android:orderInCategory="5"
+                        android:title="@string/action_sort_top_year"
+                        app:showAsAction="never" />
+
+                    <item
+                        android:id="@+id/action_sort_top_all"
+                        android:orderInCategory="6"
+                        android:title="@string/action_sort_top_all"
+                        app:showAsAction="never" />
+                </menu>
+            </item>
+        </menu>
+    </item>
+
+</menu>

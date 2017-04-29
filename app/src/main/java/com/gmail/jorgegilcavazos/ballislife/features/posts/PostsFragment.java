@@ -9,9 +9,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
+import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.List;
 
@@ -64,6 +69,9 @@ public class PostsFragment extends Fragment implements PostsView,
 
     private PostsPresenter presenter;
     private Unbinder unbinder;
+
+    private Sorting sorting = Sorting.HOT;
+    private TimePeriod timePeriod = TimePeriod.ALL;
 
     public PostsFragment() {
 
@@ -106,7 +114,7 @@ public class PostsFragment extends Fragment implements PostsView,
         presenter = new PostsPresenter(new RedditService(), preferences, SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();
-        presenter.loadPosts();
+        presenter.loadPosts(sorting, timePeriod);
 
         return view;
     }
@@ -121,11 +129,73 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_posts, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadSubscriberCount();
-                presenter.loadPosts();
+                presenter.loadPosts(sorting, timePeriod);
+                return true;
+            case R.id.action_sort_hot:
+                sorting = Sorting.HOT;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("HOT");
+                return true;
+            case R.id.action_sort_new:
+                sorting = Sorting.NEW;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("NEW");
+                return true;
+            case R.id.action_sort_rising:
+                sorting = Sorting.RISING;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("RISING");
+                return true;
+            case R.id.action_sort_controversial:
+                sorting = Sorting.CONTROVERSIAL;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("CONTROVERSIAL");
+                return true;
+            case R.id.action_sort_top_hour:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.HOUR;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: HOUR");
+                return true;
+            case R.id.action_sort_top_day:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.DAY;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: DAY");
+                return true;
+            case R.id.action_sort_top_week:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.WEEK;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: WEEK");
+                return true;
+            case R.id.action_sort_top_month:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.MONTH;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: MONTH");
+                return true;
+            case R.id.action_sort_top_year:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.YEAR;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: YEAR");
+                return true;
+            case R.id.action_sort_top_all:
+                sorting = Sorting.TOP;
+                timePeriod = TimePeriod.ALL;
+                presenter.loadPosts(sorting, timePeriod);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: ALL");
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -134,7 +204,7 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onRefresh() {
         presenter.loadSubscriberCount();
-        presenter.loadPosts();
+        presenter.loadPosts(sorting, timePeriod);
     }
 
     @Override
@@ -162,7 +232,7 @@ public class PostsFragment extends Fragment implements PostsView,
                 @Override
                 public void onClick(View v) {
                     if (loadType == TYPE_FIRST_LOAD) {
-                        presenter.loadPosts();
+                        presenter.loadPosts(sorting, timePeriod);
                     } else {
                         presenter.loadMorePosts();
                     }

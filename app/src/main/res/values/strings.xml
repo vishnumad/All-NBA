@@ -69,6 +69,18 @@
     <string name="posts_loading_failed">Failed to load posts</string>
     <string name="save">Save</string>
     <string name="subscriber_count">%1$s subscribers • %2$s fans online</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_sort_top">Top</string>
+    <string name="action_sort_hot">Hot</string>
+    <string name="action_sort_new">New</string>
+    <string name="action_sort_rising">Rising</string>
+    <string name="action_sort_controversial">Controversial</string>
+    <string name="action_sort_top_hour">Hour</string>
+    <string name="action_sort_top_day">Day</string>
+    <string name="action_sort_top_week">Week</string>
+    <string name="action_sort_top_month">Month</string>
+    <string name="action_sort_top_year">Year</string>
+    <string name="action_sort_top_all">All</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

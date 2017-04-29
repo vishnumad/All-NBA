@@ -222,6 +222,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setGamesFragment() {
+        setTitle("Games");
+        getSupportActionBar().setSubtitle(null);
+
         GamesFragment gamesFragment = null;
         if (selectedFragment == GAMES_FRAGMENT_ID) {
             gamesFragment = (GamesFragment)
@@ -238,6 +241,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setStandingsFragment() {
+        setTitle("Standings");
+        getSupportActionBar().setSubtitle(null);
+
         StandingsFragment standingsFragment = null;
         if (selectedFragment == STANDINGS_FRAGMENT_ID) {
             standingsFragment = (StandingsFragment)
@@ -255,6 +261,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void setPostsFragment() {
         setTitle("r/NBA");
+        getSupportActionBar().setSubtitle(null);
+
         PostsFragment postsFragment = null;
         if (selectedFragment == POSTS_FRAGMENT_ID) {
             postsFragment = (PostsFragment)
@@ -272,6 +280,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void setHighlightsFragment() {
         setTitle("Highlights");
+        getSupportActionBar().setSubtitle(null);
+
         HighlightsFragment highlightsFragment = null;
         if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
             highlightsFragment = (HighlightsFragment)
