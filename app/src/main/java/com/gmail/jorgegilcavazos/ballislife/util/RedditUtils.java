@@ -79,7 +79,6 @@ public final class RedditUtils {
                             && titleContainsTeam(capsTitle, homeTeamFullName)
                             && titleContainsTeam(capsTitle, awayTeamFullName)) {
                         matchingThreads.add(thread);
-                        return thread.getId();
                     }
                     break;
                 case POST_GT_TYPE:
@@ -88,13 +87,12 @@ public final class RedditUtils {
                             && titleContainsTeam(capsTitle, homeTeamFullName)
                             && titleContainsTeam(capsTitle, awayTeamFullName)) {
                         matchingThreads.add(thread);
-                        return thread.getId();
                     }
                     break;
             }
         }
 
-        int maxComments = 0;
+        int maxComments = -1;
         String bestThreadId = "";
         for (GameThreadSummary thread : matchingThreads) {
             if (thread.getNum_comments() > maxComments) {

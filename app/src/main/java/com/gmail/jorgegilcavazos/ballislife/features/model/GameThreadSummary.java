@@ -7,6 +7,16 @@ public class GameThreadSummary {
     private long created_utc;
     private int num_comments;
 
+    public GameThreadSummary() {
+    }
+
+    public GameThreadSummary(String id, String title, long created_utc, int num_comments) {
+        this.id = id;
+        this.title = title;
+        this.created_utc = created_utc;
+        this.num_comments = num_comments;
+    }
+
     public String getId() {
         return id;
     }
