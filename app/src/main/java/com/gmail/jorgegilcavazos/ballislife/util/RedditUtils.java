@@ -11,6 +11,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class RedditUtils {
@@ -66,6 +67,8 @@ public final class RedditUtils {
             return "";
         }
 
+        List<GameThreadSummary> matchingThreads = new ArrayList<>();
+
         for (GameThreadSummary thread : threadList) {
             String capsTitle = thread.getTitle().toUpperCase();
 
@@ -75,6 +78,7 @@ public final class RedditUtils {
                     if (capsTitle.contains("GAME THREAD") && !capsTitle.contains("POST")
                             && titleContainsTeam(capsTitle, homeTeamFullName)
                             && titleContainsTeam(capsTitle, awayTeamFullName)) {
+                        matchingThreads.add(thread);
                         return thread.getId();
                     }
                     break;
@@ -83,13 +87,23 @@ public final class RedditUtils {
                             || capsTitle.contains("POST-GAME THREAD"))
                             && titleContainsTeam(capsTitle, homeTeamFullName)
                             && titleContainsTeam(capsTitle, awayTeamFullName)) {
+                        matchingThreads.add(thread);
                         return thread.getId();
                     }
                     break;
             }
         }
 
-        return "";
+        int maxComments = 0;
+        String bestThreadId = "";
+        for (GameThreadSummary thread : matchingThreads) {
+            if (thread.getNum_comments() > maxComments) {
+                maxComments = thread.getNum_comments();
+                bestThreadId = thread.getId();
+            }
+        }
+
+        return bestThreadId;
     }
 
     public static CharSequence bindSnuDown(String rawHtml) {

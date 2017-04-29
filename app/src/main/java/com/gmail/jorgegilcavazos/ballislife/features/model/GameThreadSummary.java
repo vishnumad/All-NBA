@@ -5,6 +5,7 @@ public class GameThreadSummary {
     private String id;
     private String title;
     private long created_utc;
+    private int num_comments;
 
     public String getId() {
         return id;
@@ -32,5 +33,13 @@ public class GameThreadSummary {
 
     public String toString() {
         return "Id: " + id + " , " + title + " - " + created_utc;
+    }
+
+    public int getNum_comments() {
+        return num_comments;
+    }
+
+    public void setNum_comments(int num_comments) {
+        this.num_comments = num_comments;
     }
 }
