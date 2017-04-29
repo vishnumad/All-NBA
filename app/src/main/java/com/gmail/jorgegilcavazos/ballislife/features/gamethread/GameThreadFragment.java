@@ -97,12 +97,6 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         rvComments.setLayoutManager(lmComments);
         rvComments.setAdapter(threadAdapter);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            rvComments.setNestedScrollingEnabled(false);
-        } else {
-            ViewCompat.setNestedScrollingEnabled(rvComments, false);
-        }
-
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
 
