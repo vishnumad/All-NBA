@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.shared;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,6 +173,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             authorTextView.setText(author);
             bodyTextView.setText(body);
+            bodyTextView.setMovementMethod(LinkMovementMethod.getInstance());
             timestampTextView.setText(timestamp);
             scoreTextView.setText(context.getString(R.string.points, score));
             flairTextView.setText(flair);
