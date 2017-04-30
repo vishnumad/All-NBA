@@ -31,6 +31,7 @@ public class SettingsFragment extends PreferenceFragment
     // Should match string values in strings.xml
     public static final String KEY_PREF_CGA_TOPICS = "pref_cga_topics";
     public static final String KEY_PREF_START_TOPICS = "pref_start_topics";
+    public static final String KEY_ENABLE_ALERTS = "pref_enable_alerts";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

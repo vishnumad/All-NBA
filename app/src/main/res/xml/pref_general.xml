@@ -5,7 +5,6 @@
         android:key="general_category">
 
         <ListPreference
-            android:defaultValue="noteam"
             android:entries="@array/pref_teams_list_titles"
             android:entryValues="@array/pref_teams_list_values"
             android:key="teams_list"
@@ -18,6 +17,11 @@
     <PreferenceCategory
         android:title="@string/notifications"
         android:key="notifications_category">
+
+        <SwitchPreference
+            android:title="@string/pref_enable_alerts"
+            android:key="@string/key_enable_alerts"
+            android:defaultValue="true"/>
 
         <MultiSelectListPreference
             android:title="@string/title_settings_cga"

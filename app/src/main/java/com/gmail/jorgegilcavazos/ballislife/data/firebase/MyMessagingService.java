@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -31,6 +33,11 @@ public class MyMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // If the application is in the foreground handle both data and notification messages here.
+
+        // Ignore notifications if alerts are disabled in settings.
+        if (!areAlertsEnabled()) {
+            return;
+        }
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -128,5 +135,10 @@ public class MyMessagingService extends FirebaseMessagingService {
         }
 
         return false;
+    }
+
+    private boolean areAlertsEnabled() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPrefs.getBoolean(SettingsFragment.KEY_ENABLE_ALERTS, false);
     }
 }
