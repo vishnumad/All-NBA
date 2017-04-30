@@ -60,12 +60,13 @@
             android:name=".features.profile.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <redditService android:name=".network.firebase.MyMessagingService">
+        <service android:name=".data.firebase.MyMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </redditService>
-        <redditService android:name=".network.firebase.MuteGameService" />
+        </service>
+
+        <service android:name=".data.firebase.MuteGameService" />
 
         <activity
             android:name=".features.videoplayer.VideoPlayerActivity"

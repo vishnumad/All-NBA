@@ -367,6 +367,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(mPreferenceListener);
     }

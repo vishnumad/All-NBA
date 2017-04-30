@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -248,6 +249,7 @@ public class GamesFragment extends Fragment implements GamesView,
     private BroadcastReceiver scoresUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got new data");
             String gameData = intent.getStringExtra(MyMessagingService.KEY_SCORES_UPDATED);
             presenter.updateGames(gameData);
         }
