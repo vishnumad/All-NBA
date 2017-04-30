@@ -19,8 +19,8 @@
 
         <item
             android:id="@+id/navigation_item_3"
-            android:icon="@drawable/ic_view_list_black_24dp"
-            android:title="Discussions"/>
+            android:icon="@drawable/ic_forum_black_24dp"
+            android:title="r/NBA"/>
         <item
             android:id="@+id/navigation_item_4"
             android:icon="@drawable/ic_star_black_24dp"
@@ -34,10 +34,6 @@
             android:id="@+id/navigation_item_7"
             android:icon="@drawable/ic_person_black_24dp"
             android:title="Profile"/>
-        <item
-            android:id="@+id/navigation_item_8"
-            android:icon="@drawable/ic_email_black_24dp"
-            android:title="Messages"/>
 
         <item
             android:id="@+id/navigation_item_9"
