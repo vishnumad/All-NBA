@@ -45,10 +45,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         disposables = new CompositeDisposable();
     }
 
-    public void loadComments(String threadId) {
+    public void loadComments(String threadId, CommentSort sorting) {
         view.setLoadingIndicator(true);
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(redditService.getSubmission(threadId, CommentSort.HOT))
+                .andThen(redditService.getSubmission(threadId, sorting))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Submission>() {

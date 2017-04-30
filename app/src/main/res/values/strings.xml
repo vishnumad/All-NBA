@@ -73,6 +73,7 @@
     <string name="action_sort_top">Top</string>
     <string name="action_sort_hot">Hot</string>
     <string name="action_sort_new">New</string>
+    <string name="action_sort_old">Old</string>
     <string name="action_sort_rising">Rising</string>
     <string name="action_sort_controversial">Controversial</string>
     <string name="action_sort_top_hour">Hour</string>

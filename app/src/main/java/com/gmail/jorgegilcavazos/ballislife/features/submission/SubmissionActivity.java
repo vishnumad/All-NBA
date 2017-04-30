@@ -14,23 +14,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
+import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
@@ -58,6 +61,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private ThreadAdapter threadAdapter;
     private SubmissionPresenter presenter;
 
+    private CommentSort sorting = CommentSort.TOP;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setSubtitle("TOP");
         }
 
         setTitle(getString(R.string.rnba));
@@ -94,7 +100,14 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         presenter = new SubmissionPresenter(new RedditService(), preferences,
                 SchedulerProvider.getInstance());
         presenter.attachView(this);
-        presenter.loadComments(threadId);
+        presenter.loadComments(threadId, sorting);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_submission, menu);
+        return true;
     }
 
     @Override
@@ -102,6 +115,31 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_sort_hot:
+                sorting = CommentSort.HOT;
+                presenter.loadComments(threadId, sorting);
+                getSupportActionBar().setSubtitle("HOT");
+                return true;
+            case R.id.action_sort_new:
+                sorting = CommentSort.NEW;
+                presenter.loadComments(threadId, sorting);
+                getSupportActionBar().setSubtitle("NEW");
+                return true;
+            case R.id.action_sort_old:
+                sorting = CommentSort.OLD;
+                presenter.loadComments(threadId, sorting);
+                getSupportActionBar().setSubtitle("OLD");
+                return true;
+            case R.id.action_sort_controversial:
+                sorting = CommentSort.CONTROVERSIAL;
+                presenter.loadComments(threadId, sorting);
+                getSupportActionBar().setSubtitle("CONTROVERSIAL");
+                return true;
+            case R.id.action_sort_top:
+                sorting = CommentSort.TOP;
+                presenter.loadComments(threadId, sorting);
+                getSupportActionBar().setSubtitle("TOP");
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -157,7 +195,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(threadId);
+        presenter.loadComments(threadId, sorting);
     }
 
     @Override
