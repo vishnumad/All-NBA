@@ -49,6 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/box_score_not_available"
+                android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
                 android:textAlignment="center"
                 android:visibility="gone"/>
@@ -71,6 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PLAYER"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:layout_margin="3dp"
                         android:textStyle="bold"/>
