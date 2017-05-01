@@ -1,169 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/rl_comment_outer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/layout_comment_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:paddingLeft="20dp"
+        android:background="?android:selectableItemBackground">
 
-        <RelativeLayout
-            android:id="@+id/comment_inner_relativeLayout"
+        <LinearLayout
+            android:id="@+id/layout_comment_inner_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="10dp"
-            android:background="@color/commentBgLight">
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:background="@color/commentBgLight"
+            android:clickable="false">
 
-            <TextView
-                android:id="@+id/comment_author"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="Author"
-                android:textColor="@color/secondaryText"
-                android:textStyle="bold"
-                android:textSize="10dp"/>
+                android:orientation="horizontal"
+                android:clickable="false">
 
-            <TextView
-                android:id="@+id/comment_flair"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/comment_author"
-                android:paddingLeft="2dp"
-                android:text="Spurs"
-                android:textColor="@color/flairColor"
-                android:textSize="10dp"/>
+                <TextView
+                    android:id="@+id/comment_author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Author"
+                    android:textColor="@color/secondaryText"
+                    android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:clickable="false"/>
 
-            <TextView
-                android:id="@+id/comment_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/comment_flair"
-                android:paddingLeft="2dp"
-                android:text="1000 points"
-                android:textColor="@color/commentNeutral"
-                android:textSize="10dp"/>
+                <TextView
+                    android:id="@+id/comment_flair"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="2dp"
+                    android:text="Spurs"
+                    android:textColor="@color/flairColor"
+                    android:textSize="10sp"
+                    android:clickable="false"/>
 
-            <TextView
-                android:id="@+id/comment_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/comment_score"
-                android:paddingLeft="2dp"
-                android:text="10 hours ago"
-                android:textColor="@color/secondaryText"
-                android:textSize="10dp"/>
+                <TextView
+                    android:id="@+id/comment_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="2dp"
+                    android:text="1000 points"
+                    android:textColor="@color/commentNeutral"
+                    android:textSize="10sp"
+                    android:clickable="false"/>
 
-            <TextView
-                android:id="@+id/comment_saved"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/comment_timestamp"
-                android:paddingLeft="2dp"
-                android:text="@string/saved"
-                android:textColor="@color/commentSaved"
-                android:textSize="10dp"/>
+                <TextView
+                    android:id="@+id/comment_timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="2dp"
+                    android:text="10 hours ago"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="10sp"
+                    android:clickable="false"/>
+
+                <TextView
+                    android:id="@+id/comment_saved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="2dp"
+                    android:text="@string/saved"
+                    android:textColor="@color/commentSaved"
+                    android:textSize="10sp"
+                    android:clickable="false"/>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/comment_body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/comment_author"
-                android:paddingLeft="10dp"
                 android:paddingTop="2dp"
                 android:text="This is a comment"
                 android:textColor="@color/primaryText"
-                android:textSize="12dp"/>
+                android:textSize="12sp"/>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/layout_comment_actions"
-        android:layout_below="@id/rl_comment_outer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+        <ImageButton
+            android:id="@+id/button_comment_upvote"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_upward_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:layout_weight="1"/>
 
-            <ImageButton
-                android:id="@+id/button_comment_upvote"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_arrow_upward_black_24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/white"/>
-        </RelativeLayout>
+        <ImageButton
+            android:id="@+id/button_comment_downvote"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_downward_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:layout_weight="1"/>
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+        <ImageButton
+            android:id="@+id/button_comment_save"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_star_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:layout_weight="1"/>
 
-            <ImageButton
-                android:id="@+id/button_comment_downvote"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_arrow_downward_black_24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/white"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/button_comment_save"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_star_black_24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/white"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/button_comment_reply"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_reply_black_24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/white"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-            <ImageButton
-                android:id="@+id/button_comment_options"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_more_vert_black_24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:tint="@color/white"/>
-        </RelativeLayout>
+        <ImageButton
+            android:id="@+id/button_comment_reply"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_reply_black_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:tint="@color/white"
+            android:layout_weight="1"/>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

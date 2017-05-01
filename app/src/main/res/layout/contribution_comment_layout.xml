@@ -12,7 +12,7 @@
         card_view:cardElevation="4dp">
 
         <RelativeLayout
-            android:id="@+id/comment_inner_relativeLayout"
+            android:id="@+id/layout_comment_inner_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
