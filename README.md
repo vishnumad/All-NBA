@@ -39,7 +39,8 @@ Some resources and libraries that you might find useful:
 * [Retrofit 2](https://square.github.io/retrofit/): A contentViewType-safe HTTP client for Android and Java
 * [Butter Knife](http://jakewharton.github.io/butterknife/): Field and method binding for Android views  
 * [Picasso](http://square.github.io/picasso/): A powerful image downloading and caching library for Android  
-* [Material Dialogs](https://github.com/afollestad/material-dialogs): A beautiful, fluid, and customizable dialogs API
+* [Material Dialogs](https://github.com/afollestad/material-dialogs): A beautiful, fluid, and customizable dialogs API  
+* [EasyVideoPlayer](https://github.com/afollestad/easy-video-player): A simple but powerful view to quickly get video playback working
 
 ### What if I don't code?  
 
