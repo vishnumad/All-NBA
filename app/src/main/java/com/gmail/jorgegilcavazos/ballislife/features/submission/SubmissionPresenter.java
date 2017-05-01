@@ -160,16 +160,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .subscribeWith(new DisposableCompletableObserver() {
                     @Override
                     public void onComplete() {
-                        if (isViewAttached()) {
-                            view.showSavedToast();
-                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            view.showErrorSavingToast();
-                        }
                     }
                 })
         );
