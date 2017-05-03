@@ -59,11 +59,13 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     private static final String VIEW_TYPE = "viewType";
+    private static final String SUBREDDIT = "subreddit";
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
 
     private ViewType viewType;
+    private String subreddit;
     private Snackbar snackbar;
     private PostsAdapter postsAdapter;
 
@@ -77,10 +79,11 @@ public class PostsFragment extends Fragment implements PostsView,
 
     }
 
-    public static PostsFragment newInstance(ViewType viewType) {
+    public static PostsFragment newInstance(ViewType viewType, String subreddit) {
         PostsFragment fragment = new PostsFragment();
         Bundle args = new Bundle();
         args.putSerializable(VIEW_TYPE, viewType);
+        args.putString(SUBREDDIT, subreddit);
         fragment.setArguments(args);
 
         return fragment;
@@ -91,6 +94,7 @@ public class PostsFragment extends Fragment implements PostsView,
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             viewType = (ViewType) getArguments().get(VIEW_TYPE);
+            subreddit = getArguments().getString(SUBREDDIT);
         }
         setHasOptionsMenu(true);
     }
@@ -103,7 +107,7 @@ public class PostsFragment extends Fragment implements PostsView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this);
+        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this, subreddit);
         postsAdapter.setLoadMoreListener(this);
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewPosts.setAdapter(postsAdapter);
@@ -111,7 +115,7 @@ public class PostsFragment extends Fragment implements PostsView,
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
 
-        presenter = new PostsPresenter(new RedditService(), preferences, SchedulerProvider.getInstance());
+        presenter = new PostsPresenter(subreddit, new RedditService(), preferences, SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();
         presenter.loadPosts(sorting, timePeriod);

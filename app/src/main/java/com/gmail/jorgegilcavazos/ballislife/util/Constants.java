@@ -23,4 +23,35 @@ public class Constants {
     public static final String THREAD_SUBMISSION = "THREAD_SUBMISSION";
 
     public static final boolean NBA_MATERIAL_ENABLED = false;
+
+    public static final String SUB_ATL = "AtlantaHawks";
+    public static final String SUB_BKN = "GoNets";
+    public static final String SUB_BOS = "BostonCeltics";
+    public static final String SUB_CHA = "CharlotteHornets";
+    public static final String SUB_CHI = "ChicagoBulls";
+    public static final String SUB_CLE = "ClevelandCavs";
+    public static final String SUB_DAL = "Mavericks";
+    public static final String SUB_DEN = "DenverNuggets";
+    public static final String SUB_DET = "DetroitPistons";
+    public static final String SUB_GSW = "Warriors";
+    public static final String SUB_HOU = "Rockets";
+    public static final String SUB_IND = "Pacers";
+    public static final String SUB_LAC = "LAClippers";
+    public static final String SUB_LAL = "Lakers";
+    public static final String SUB_MEM = "MemphisGrizzlies";
+    public static final String SUB_MIA = "Heat";
+    public static final String SUB_MIL = "MkeBucks";
+    public static final String SUB_MIN = "Timberwolves";
+    public static final String SUB_NOP = "NOLAPelicans";
+    public static final String SUB_NYK = "NYKnicks";
+    public static final String SUB_OKC = "Thunder";
+    public static final String SUB_ORL = "OrlandoMagic";
+    public static final String SUB_PHI = "Sixers";
+    public static final String SUB_PHO = "Suns";
+    public static final String SUB_POR = "RipCity";
+    public static final String SUB_SAC = "Kings";
+    public static final String SUB_SAS = "NBASpurs";
+    public static final String SUB_TOR = "TorontoRaptors";
+    public static final String SUB_UTA = "UtahJazz";
+    public static final String SUB_WAS = "WashingtonWizards";
 }

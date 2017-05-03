@@ -178,4 +178,71 @@ public final class RedditUtils {
         DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
                 ContextCompat.getColor(context, R.color.commentNeutral));
     }
+
+    public static int getTeamLogo(String subreddit) {
+        switch (subreddit) {
+            case Constants.SUB_ATL:
+                return R.drawable.atl;
+            case Constants.SUB_BKN:
+                return R.drawable.bkn;
+            case Constants.SUB_BOS:
+                return R.drawable.bos;
+            case Constants.SUB_CHA:
+                return R.drawable.cha;
+            case Constants.SUB_CHI:
+                return R.drawable.chi;
+            case Constants.SUB_CLE:
+                return R.drawable.cle;
+            case Constants.SUB_DAL:
+                return R.drawable.dal;
+            case Constants.SUB_DEN:
+                return R.drawable.den;
+            case Constants.SUB_DET:
+                return R.drawable.det;
+            case Constants.SUB_GSW:
+                return R.drawable.gsw;
+            case Constants.SUB_HOU:
+                return R.drawable.hou;
+            case Constants.SUB_IND:
+                return R.drawable.ind;
+            case Constants.SUB_LAC:
+                return R.drawable.lac;
+            case Constants.SUB_LAL:
+                return R.drawable.lal;
+            case Constants.SUB_MEM:
+                return R.drawable.mem;
+            case Constants.SUB_MIA:
+                return R.drawable.mia;
+            case Constants.SUB_MIL:
+                return R.drawable.mil;
+            case Constants.SUB_MIN:
+                return R.drawable.min;
+            case Constants.SUB_NOP:
+                return R.drawable.nop;
+            case Constants.SUB_NYK:
+                return R.drawable.nyk;
+            case Constants.SUB_OKC:
+                return R.drawable.okc;
+            case Constants.SUB_ORL:
+                return R.drawable.orl;
+            case Constants.SUB_PHI:
+                return R.drawable.phi;
+            case Constants.SUB_PHO:
+                return R.drawable.phx;
+            case Constants.SUB_POR:
+                return R.drawable.por;
+            case Constants.SUB_SAC:
+                return R.drawable.sac;
+            case Constants.SUB_SAS:
+                return R.drawable.sas;
+            case Constants.SUB_TOR:
+                return R.drawable.tor;
+            case Constants.SUB_UTA:
+                return R.drawable.uta;
+            case Constants.SUB_WAS:
+                return R.drawable.was;
+            default:
+                return R.drawable.rnbasnoo;
+        }
+    }
 }

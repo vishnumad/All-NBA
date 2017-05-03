@@ -17,7 +17,7 @@
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:id="@+id/image_snoo"
+            android:id="@+id/image_logo"
             android:layout_marginTop="35dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:layout_centerHorizontal="true"/>
 
         <TextView
-            android:id="@+id/text_rnba"
+            android:id="@+id/text_subreddit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="r/nba"
@@ -33,7 +33,7 @@
             android:textSize="18sp"
             android:layout_margin="5dp"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/image_snoo"/>
+            android:layout_below="@id/image_logo"/>
 
         <TextView
             android:id="@+id/text_subscribers"
@@ -44,7 +44,7 @@
             android:textColor="@color/secondaryText"
             android:layout_marginBottom="5dp"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/text_rnba"/>
+            android:layout_below="@id/text_subreddit"/>
 
     </RelativeLayout>
 

@@ -8,6 +8,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -42,17 +43,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
     private OnLoadMoreListener loadMoreListener;
+    private String subreddit;
     private boolean isLoading = false;
     private boolean loadingFailed = false;
 
     public PostsAdapter(Context context,
                         List<CustomSubmission> postsList,
                         PostsFragment.ViewType contentViewType,
-                        OnSubmissionClickListener submissionClickListener) {
+                        OnSubmissionClickListener submissionClickListener,
+                        String subreddit) {
         this.context = context;
         this.postsList = postsList;
         this.contentViewType = contentViewType;
         this.submissionClickListener = submissionClickListener;
+        this.subreddit = subreddit;
     }
 
     @Override
@@ -93,7 +97,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).bindData(context, subscriberCount);
+            ((HeaderViewHolder) holder).bindData(context, subscriberCount, subreddit);
         } else if (holder instanceof LoadHolder) {
             LoadHolder loadHolder = (LoadHolder) holder;
             // Load more items if scroll position is last and is not already loading.
@@ -165,6 +169,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.image_logo) ImageView ivLogo;
+        @BindView(R.id.text_subreddit) TextView tvSubreddit;
         @BindView(R.id.text_subscribers) TextView tvSubscribers;
 
         public HeaderViewHolder(View itemView) {
@@ -172,16 +178,21 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ButterKnife.bind(this, itemView);
         }
 
-        void bindData(Context context, SubscriberCount subscriberCount) {
+        void bindData(Context context, SubscriberCount subscriberCount, String subreddit) {
+            ivLogo.setImageResource(RedditUtils.getTeamLogo(subreddit));
+            tvSubreddit.setText("r/" + subreddit);
+
             if (subscriberCount != null) {
                 String subscribers = String.valueOf(subscriberCount.getSubscribers());
                 String activeUsers = String.valueOf(subscriberCount.getActiveUsers());
 
+                tvSubscribers.setVisibility(View.VISIBLE);
                 tvSubscribers.setText(context.getString(R.string.subscriber_count,
                         subscribers, activeUsers));
             } else {
+                tvSubscribers.setVisibility(View.INVISIBLE);
                 tvSubscribers.setText(context.getString(R.string.subscriber_count,
-                        String.valueOf(554843), String.valueOf(8133)));
+                        String.valueOf(0), String.valueOf(0)));
             }
         }
     }

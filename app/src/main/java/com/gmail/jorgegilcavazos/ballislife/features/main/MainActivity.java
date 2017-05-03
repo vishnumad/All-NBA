@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String MY_PREFERENCES = "MyPrefs";
     public static final String FIRST_TIME = "firstTime";
 
-    private static final String SELECTED_FRAGMENT_KEY = "selected_fragment";
+    private static final String SELECTED_FRAGMENT_KEY = "selectedFragment";
+    private static final String SELECTED_SUBREDDIT_KEY = "selectedSubreddit";
 
     private static final int GAMES_FRAGMENT_ID = 1;
     private static final int STANDINGS_FRAGMENT_ID = 2;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     NavigationView navigationView;
 
     int selectedFragment;
+    String subreddit;
     private SharedPreferences myPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceListener;
 
@@ -100,8 +102,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Set default to GamesFragment.
         selectedFragment = GAMES_FRAGMENT_ID;
+        // Default posts fragment subreddit is r/nba
+        subreddit = "nba";
         if (savedInstanceState != null) {
             selectedFragment = savedInstanceState.getInt(SELECTED_FRAGMENT_KEY);
+            subreddit = savedInstanceState.getString(SELECTED_SUBREDDIT_KEY);
         }
 
         switch (selectedFragment) {
@@ -112,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 setStandingsFragment();
                 break;
             case POSTS_FRAGMENT_ID:
-                setPostsFragment();
+                setPostsFragment(subreddit);
                 break;
             case HIGHLIGHTS_FRAGMENT_ID:
                 setHighlightsFragment();
@@ -129,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(SELECTED_FRAGMENT_KEY, selectedFragment);
+        outState.putString(SELECTED_SUBREDDIT_KEY, subreddit);
 
         super.onSaveInstanceState(outState);
     }
@@ -187,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     case R.id.navigation_item_3:
-                        setPostsFragment();
+                        setPostsFragment("nba");
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     case R.id.navigation_item_4:
@@ -211,6 +217,126 @@ public class MainActivity extends AppCompatActivity {
                         Intent settingsIntent = new Intent(getApplicationContext(),
                                 SettingsActivity.class);
                         startActivity(settingsIntent);
+                        return true;
+                    case R.id.nav_atl:
+                        setPostsFragment(Constants.SUB_ATL);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_bkn:
+                        setPostsFragment(Constants.SUB_BKN);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_bos:
+                        setPostsFragment(Constants.SUB_BOS);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_cha:
+                        setPostsFragment(Constants.SUB_CHA);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_chi:
+                        setPostsFragment(Constants.SUB_CHI);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_cle:
+                        setPostsFragment(Constants.SUB_CLE);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_dal:
+                        setPostsFragment(Constants.SUB_DAL);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_den:
+                        setPostsFragment(Constants.SUB_DEN);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_det:
+                        setPostsFragment(Constants.SUB_DET);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_gsw:
+                        setPostsFragment(Constants.SUB_GSW);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_hou:
+                        setPostsFragment(Constants.SUB_HOU);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_ind:
+                        setPostsFragment(Constants.SUB_IND);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_lac:
+                        setPostsFragment(Constants.SUB_LAC);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_lal:
+                        setPostsFragment(Constants.SUB_LAL);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_mem:
+                        setPostsFragment(Constants.SUB_MEM);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_mia:
+                        setPostsFragment(Constants.SUB_MIA);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_mil:
+                        setPostsFragment(Constants.SUB_MIL);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_min:
+                        setPostsFragment(Constants.SUB_MIN);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_nop:
+                        setPostsFragment(Constants.SUB_NOP);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_nyk:
+                        setPostsFragment(Constants.SUB_NYK);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_okc:
+                        setPostsFragment(Constants.SUB_OKC);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_orl:
+                        setPostsFragment(Constants.SUB_ORL);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_phi:
+                        setPostsFragment(Constants.SUB_PHI);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_pho:
+                        setPostsFragment(Constants.SUB_PHO);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_por:
+                        setPostsFragment(Constants.SUB_POR);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_sac:
+                        setPostsFragment(Constants.SUB_SAC);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_sas:
+                        setPostsFragment(Constants.SUB_SAS);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_tor:
+                        setPostsFragment(Constants.SUB_TOR);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_uta:
+                        setPostsFragment(Constants.SUB_UTA);
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        return true;
+                    case R.id.nav_was:
+                        setPostsFragment(Constants.SUB_WAS);
+                        drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     default:
                         setGamesFragment();
@@ -259,8 +385,8 @@ public class MainActivity extends AppCompatActivity {
         selectedFragment = STANDINGS_FRAGMENT_ID;
     }
 
-    public void setPostsFragment() {
-        setTitle("r/NBA");
+    public void setPostsFragment(String subreddit) {
+        setTitle("r/" + subreddit);
         getSupportActionBar().setSubtitle(null);
 
         PostsFragment postsFragment = null;
@@ -269,13 +395,14 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager().findFragmentById(R.id.fragment);
         }
 
-        if (postsFragment == null) {
-            postsFragment = PostsFragment.newInstance(PostsFragment.ViewType.FULL_CARD);
+        if (postsFragment == null || !this.subreddit.equals(subreddit)) {
+            postsFragment = PostsFragment.newInstance(PostsFragment.ViewType.FULL_CARD, subreddit);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     postsFragment, R.id.fragment);
         }
 
         selectedFragment = POSTS_FRAGMENT_ID;
+        this.subreddit = subreddit;
     }
 
     public void setHighlightsFragment() {

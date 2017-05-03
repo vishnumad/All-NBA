@@ -107,6 +107,39 @@
     <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
+    
+    <!-- SUBREDDITS. DO NOT TRANSLATE -->
+    <string name="r_atl">AtlantaHawks</string>
+    <string name="r_bkn">GoNets</string>
+    <string name="r_bos">BostonCeltics</string>
+    <string name="r_cha">CharlotteHornets</string>
+    <string name="r_chi">ChicagoBulls</string>
+    <string name="r_cle">ClevelandCavs</string>
+    <string name="r_dal">Mavericks</string>
+    <string name="r_den">DenverNuggets</string>
+    <string name="r_det">DetroitPistons</string>
+    <string name="r_gsw">Warriors</string>
+    <string name="r_hou">Rockets</string>
+    <string name="r_ind">Pacers</string>
+    <string name="r_lac">LAClippers</string>
+    <string name="r_lal">Lakers</string>
+    <string name="r_mem">MemphisGrizzlies</string>
+    <string name="r_mia">Heat</string>
+    <string name="r_mil">MkeBucks</string>
+    <string name="r_min">Timberwolves</string>
+    <string name="r_nop">NOLAPelicans</string>
+    <string name="r_nyk">NYKnicks</string>
+    <string name="r_okc">Thunder</string>
+    <string name="r_orl">OrlandoMagic</string>
+    <string name="r_phi">Sixers</string>
+    <string name="r_pho">Suns</string>
+    <string name="r_por">RipCity</string>
+    <string name="r_sac">Kings</string>
+    <string name="r_sas">NBASpurs</string>
+    <string name="r_tor">TorontoRaptors</string>
+    <string name="r_uta">UtahJazz</string>
+    <string name="r_was">WashingtonWizards</string>
+
 
     <string-array name="pref_teams_list_titles">
         <item>No team</item>

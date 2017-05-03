@@ -34,9 +34,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
     private SubredditPaginator paginator;
+    private String subreddit;
 
-    public PostsPresenter(RedditService service, SharedPreferences preferences,
+    public PostsPresenter(String subreddit, RedditService service, SharedPreferences preferences,
                           BaseSchedulerProvider schedulerProvider) {
+        this.subreddit = subreddit;
         this.service = service;
         this.preferences = preferences;
         this.schedulerProvider = schedulerProvider;
@@ -46,7 +48,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
     public void loadSubscriberCount() {
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(service.getSubscriberCount("nba"))
+                .andThen(service.getSubscriberCount(subreddit))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<SubscriberCount>() {
@@ -71,7 +73,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         RedditClient redditClient = RedditAuthentication.getInstance()
                 .getRedditClient();
-        paginator = new SubredditPaginator(redditClient, "nba");
+        paginator = new SubredditPaginator(redditClient, subreddit);
         paginator.setLimit(25);
         paginator.setSorting(sorting);
 
