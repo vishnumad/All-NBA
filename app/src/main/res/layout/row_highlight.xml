@@ -5,9 +5,11 @@
     android:id="@+id/container"
     card_view:cardBackgroundColor="@android:color/white"
     card_view:cardElevation="2dp"
-    card_view:cardUseCompatPadding="true"
     android:background="?android:selectableItemBackground"
-    android:clickable="true">
+    android:clickable="true"
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -314,13 +314,13 @@ public class PostsFragment extends Fragment implements PostsView,
         Drawable drawable;
         switch (viewType) {
             case FULL_CARD:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_day_white_24dp);
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_stream_white_24dp);
                 break;
             case LIST:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
                 break;
             default:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_day_white_24dp);
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_stream_white_24dp);
                 break;
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);

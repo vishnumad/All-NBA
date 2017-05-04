@@ -6,7 +6,7 @@
         android:id="@+id/action_change_view"
         android:orderInCategory="100"
         android:title="Change view"
-        android:icon="@drawable/ic_view_day_white_24dp"
+        android:icon="@drawable/ic_view_stream_white_24dp"
         app:showAsAction="ifRoom" />
 
     <item
