@@ -1,10 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Context;
-import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +15,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
-import com.squareup.picasso.Picasso;
-
-import net.dean.jraw.models.Submission;
-import net.dean.jraw.models.VoteDirection;
 
 import java.util.List;
 
@@ -34,7 +26,8 @@ import butterknife.ButterKnife;
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_HEADER = 0;
-    private static final int TYPE_CONTENT = 1;
+    private static final int TYPE_CONTENT_CARD = 1;
+    private static final int TYPE_CONTENT_LIST = 3;
     private static final int TYPE_LOADING = 2;
 
     private Context context;
@@ -67,7 +60,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return TYPE_LOADING;
         }
 
-        return TYPE_CONTENT;
+        switch (contentViewType) {
+            case FULL_CARD:
+                return TYPE_CONTENT_CARD;
+            case LIST:
+                return TYPE_CONTENT_LIST;
+        }
+
+        return TYPE_CONTENT_CARD;
     }
 
     @Override
@@ -84,10 +84,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return new LoadHolder(view);
         }
 
+        Log.d("PostsAdapter", "create vh: " + contentViewType.toString());
         switch (contentViewType) {
             case FULL_CARD:
                 view = inflater.inflate(R.layout.post_layout_card, parent, false);
                 return new FullCardViewHolder(view);
+            case LIST:
+                view = inflater.inflate(R.layout.post_layout_list, parent, false);
+                return new PostListViewHolder(view);
             default:
                 view = inflater.inflate(R.layout.post_layout_card, parent, false);
                 return new FullCardViewHolder(view);
@@ -114,9 +118,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         } else {
             CustomSubmission customSubmission = postsList.get(position - 1);
+            Log.d("PostsAdapter", "type: " + contentViewType.toString());
             switch (contentViewType) {
                 case FULL_CARD:
                     ((FullCardViewHolder) holder).bindData(context, customSubmission, true,
+                            submissionClickListener);
+                    break;
+                case LIST:
+                    ((PostListViewHolder) holder).bindData(context, customSubmission, true,
                             submissionClickListener);
                     break;
             }
@@ -163,6 +172,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     interface OnLoadMoreListener {
         void onLoadMore();
+    }
+
+    public void setContentViewType(PostsFragment.ViewType viewType) {
+        contentViewType = viewType;
+        notifyDataChanged();
     }
 
     /* View Holders **/

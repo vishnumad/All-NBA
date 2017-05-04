@@ -219,6 +219,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         }
     }
 
+    public void onViewTypeSelected(PostsFragment.ViewType viewType, Sorting sorting,
+                                   TimePeriod timePeriod) {
+        view.changeViewType(viewType);
+    }
+
     public void stop() {
         if (disposables != null) {
             disposables.clear();

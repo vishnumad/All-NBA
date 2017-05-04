@@ -32,6 +32,7 @@
     <string name="no_highlights_to_show">No highlights to show</string>
     <string name="error_loading_highlights">Error loading highlights</string>
     <string name="error_loading_streamable">Error loading streamable</string>
+    <string name="num_comments">%1$s comments</string>
 
 
     <!-- Strings for MainActivity -->
@@ -82,6 +83,11 @@
     <string name="action_sort_top_month">Month</string>
     <string name="action_sort_top_year">Year</string>
     <string name="action_sort_top_all">All</string>
+    <string name="change_view">Change View</string>
+    <string name="card_view">Card View</string>
+    <string name="card_view_description">Larger HD images, uses more data</string>
+    <string name="list_view">List View</string>
+    <string name="list_view_description">Smaller thumbnails, uses less data</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

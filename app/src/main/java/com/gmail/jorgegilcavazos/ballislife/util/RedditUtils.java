@@ -4,13 +4,16 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
+import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,6 +172,30 @@ public final class RedditUtils {
         holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
     }
 
+    public static void setUpvotedColors(Context context, final PostListViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentUpvoted));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
+    }
+
+    public static void setDownvotedColors(Context context, final PostListViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentDownvoted));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
+    }
+
+    public static void setNoVoteColors(Context context, final PostListViewHolder holder) {
+        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
+                ContextCompat.getColor(context, R.color.commentNeutral));
+        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+    }
+
     public static void setSavedColors(Context context, final FullCardViewHolder holder) {
         DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
                 ContextCompat.getColor(context, R.color.amber));
@@ -243,6 +270,21 @@ public final class RedditUtils {
                 return R.drawable.was;
             default:
                 return R.drawable.rnbasnoo;
+        }
+    }
+
+    public static String formatScoreToDigits(int score) {
+        Log.d(TAG, score + "");
+        if (score < 1000) {
+            Log.d(TAG, score + " < 1000");
+            return String.valueOf(score);
+        } else {
+            double res = ((double) score) / 1000.0;
+            if (res < 10) {
+                return String.valueOf(res).substring(0, 3) + "k";
+            } else {
+                return String.valueOf(res).substring(0, 2) + "k";
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
@@ -12,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
@@ -74,6 +77,8 @@ public class PostsFragment extends Fragment implements PostsView,
 
     private Sorting sorting = Sorting.HOT;
     private TimePeriod timePeriod = TimePeriod.ALL;
+
+    private Menu menu;
 
     public PostsFragment() {
 
@@ -135,6 +140,7 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_posts, menu);
+        this.menu = menu;
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -144,6 +150,9 @@ public class PostsFragment extends Fragment implements PostsView,
             case R.id.action_refresh:
                 presenter.loadSubscriberCount();
                 presenter.loadPosts(sorting, timePeriod);
+                return true;
+            case R.id.action_change_view:
+                openViewPickerDialog();
                 return true;
             case R.id.action_sort_hot:
                 sorting = Sorting.HOT;
@@ -299,6 +308,25 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void changeViewType(ViewType viewType) {
+        postsAdapter.setContentViewType(viewType);
+
+        Drawable drawable;
+        switch (viewType) {
+            case FULL_CARD:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_day_white_24dp);
+                break;
+            case LIST:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
+                break;
+            default:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_day_white_24dp);
+                break;
+        }
+        menu.findItem(R.id.action_change_view).setIcon(drawable);
+    }
+
+    @Override
     public void onSubmissionClick(Submission submission) {
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
 
@@ -353,5 +381,36 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onLoadMore() {
         presenter.loadMorePosts();
+    }
+
+    private void openViewPickerDialog() {
+        final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
+                .title(R.string.change_view)
+                .customView(R.layout.view_picker_layout, false)
+                .build();
+
+        View view = materialDialog.getCustomView();
+        if (view == null) return;
+
+        View viewTypeCard = view.findViewById(R.id.layout_type_card);
+        View viewTypeList = view.findViewById(R.id.layout_type_list);
+
+        viewTypeCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onViewTypeSelected(ViewType.FULL_CARD, sorting, timePeriod);
+                materialDialog.dismiss();
+            }
+        });
+
+        viewTypeList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onViewTypeSelected(ViewType.LIST, sorting, timePeriod);
+                materialDialog.dismiss();
+            }
+        });
+
+        materialDialog.show();
     }
 }
