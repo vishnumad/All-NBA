@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (postsFragment == null || !this.subreddit.equals(subreddit)) {
-            postsFragment = PostsFragment.newInstance(PostsFragment.ViewType.FULL_CARD, subreddit);
+            postsFragment = PostsFragment.newInstance(subreddit);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     postsFragment, R.id.fragment);
         }

@@ -33,6 +33,6 @@ public interface PostsView {
 
     void showContentUnavailableToast();
 
-    void changeViewType(PostsFragment.ViewType viewType);
+    void changeViewType(int viewType);
 
 }

@@ -13,7 +13,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,12 +23,15 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
@@ -57,23 +59,20 @@ public class PostsFragment extends Fragment implements PostsView,
     public static final int TYPE_FIRST_LOAD = 0;
     public static final int TYPE_LOAD_MORE = 1;
 
-    public enum ViewType {
-        FULL_CARD, SMALL_CARD, LIST
-    }
-
     private static final String VIEW_TYPE = "viewType";
     private static final String SUBREDDIT = "subreddit";
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
 
-    private ViewType viewType;
+    private int viewType;
     private String subreddit;
     private Snackbar snackbar;
     private PostsAdapter postsAdapter;
 
     private PostsPresenter presenter;
     private Unbinder unbinder;
+    private LocalRepository localRepository;
 
     private Sorting sorting = Sorting.HOT;
     private TimePeriod timePeriod = TimePeriod.ALL;
@@ -84,10 +83,9 @@ public class PostsFragment extends Fragment implements PostsView,
 
     }
 
-    public static PostsFragment newInstance(ViewType viewType, String subreddit) {
+    public static PostsFragment newInstance(String subreddit) {
         PostsFragment fragment = new PostsFragment();
         Bundle args = new Bundle();
-        args.putSerializable(VIEW_TYPE, viewType);
         args.putString(SUBREDDIT, subreddit);
         fragment.setArguments(args);
 
@@ -98,9 +96,18 @@ public class PostsFragment extends Fragment implements PostsView,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            viewType = (ViewType) getArguments().get(VIEW_TYPE);
             subreddit = getArguments().getString(SUBREDDIT);
         }
+
+        SharedPreferences localPrefs = getActivity().getSharedPreferences(
+                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
+        localRepository = new AppLocalRepository(localPrefs);
+        if (localRepository.getFavoritePostsViewType() != -1) {
+            viewType = localRepository.getFavoritePostsViewType();
+        } else {
+            viewType = Constants.VIEW_CARD;
+        }
+
         setHasOptionsMenu(true);
     }
 
@@ -119,8 +126,12 @@ public class PostsFragment extends Fragment implements PostsView,
 
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
+        SharedPreferences localPrefs = getActivity().getSharedPreferences(
+                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
+        LocalRepository localRepository = new AppLocalRepository(localPrefs);
 
-        presenter = new PostsPresenter(subreddit, new RedditService(), preferences, SchedulerProvider.getInstance());
+        presenter = new PostsPresenter(subreddit, localRepository, new RedditService(), preferences,
+                SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();
         presenter.loadPosts(sorting, timePeriod);
@@ -142,6 +153,8 @@ public class PostsFragment extends Fragment implements PostsView,
         inflater.inflate(R.menu.menu_posts, menu);
         this.menu = menu;
         super.onCreateOptionsMenu(menu, inflater);
+
+        setViewIcon(viewType);
     }
 
     @Override
@@ -308,22 +321,9 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void changeViewType(ViewType viewType) {
+    public void changeViewType(int viewType) {
         postsAdapter.setContentViewType(viewType);
-
-        Drawable drawable;
-        switch (viewType) {
-            case FULL_CARD:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_stream_white_24dp);
-                break;
-            case LIST:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
-                break;
-            default:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_stream_white_24dp);
-                break;
-        }
-        menu.findItem(R.id.action_change_view).setIcon(drawable);
+        setViewIcon(viewType);
     }
 
     @Override
@@ -398,7 +398,7 @@ public class PostsFragment extends Fragment implements PostsView,
         viewTypeCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(ViewType.FULL_CARD, sorting, timePeriod);
+                presenter.onViewTypeSelected(Constants.VIEW_CARD);
                 materialDialog.dismiss();
             }
         });
@@ -406,11 +406,27 @@ public class PostsFragment extends Fragment implements PostsView,
         viewTypeList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(ViewType.LIST, sorting, timePeriod);
+                presenter.onViewTypeSelected(Constants.VIEW_LIST);
                 materialDialog.dismiss();
             }
         });
 
         materialDialog.show();
+    }
+
+    private void setViewIcon(int viewType) {
+        Drawable drawable;
+        switch (viewType) {
+            case Constants.VIEW_CARD:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                break;
+            case Constants.VIEW_LIST:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
+                break;
+            default:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                break;
+        }
+        menu.findItem(R.id.action_change_view).setIcon(drawable);
     }
 }

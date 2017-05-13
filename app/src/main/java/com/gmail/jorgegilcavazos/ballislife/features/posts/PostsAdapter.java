@@ -16,6 +16,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmiss
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private Context context;
     private List<CustomSubmission> postsList;
-    private PostsFragment.ViewType contentViewType;
+    private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
     private OnLoadMoreListener loadMoreListener;
@@ -42,7 +43,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public PostsAdapter(Context context,
                         List<CustomSubmission> postsList,
-                        PostsFragment.ViewType contentViewType,
+                        int contentViewType,
                         OnSubmissionClickListener submissionClickListener,
                         String subreddit) {
         this.context = context;
@@ -61,9 +62,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         switch (contentViewType) {
-            case FULL_CARD:
+            case Constants.VIEW_CARD:
                 return TYPE_CONTENT_CARD;
-            case LIST:
+            case Constants.VIEW_LIST:
                 return TYPE_CONTENT_LIST;
         }
 
@@ -84,12 +85,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return new LoadHolder(view);
         }
 
-        Log.d("PostsAdapter", "create vh: " + contentViewType.toString());
         switch (contentViewType) {
-            case FULL_CARD:
+            case Constants.VIEW_CARD:
                 view = inflater.inflate(R.layout.post_layout_card, parent, false);
                 return new FullCardViewHolder(view);
-            case LIST:
+            case Constants.VIEW_LIST:
                 view = inflater.inflate(R.layout.post_layout_list, parent, false);
                 return new PostListViewHolder(view);
             default:
@@ -118,13 +118,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         } else {
             CustomSubmission customSubmission = postsList.get(position - 1);
-            Log.d("PostsAdapter", "type: " + contentViewType.toString());
             switch (contentViewType) {
-                case FULL_CARD:
+                case Constants.VIEW_CARD:
                     ((FullCardViewHolder) holder).bindData(context, customSubmission, true,
                             submissionClickListener);
                     break;
-                case LIST:
+                case Constants.VIEW_LIST:
                     ((PostListViewHolder) holder).bindData(context, customSubmission, true,
                             submissionClickListener);
                     break;
@@ -174,7 +173,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void onLoadMore();
     }
 
-    public void setContentViewType(PostsFragment.ViewType viewType) {
+    public void setContentViewType(int viewType) {
         contentViewType = viewType;
         notifyDataChanged();
     }

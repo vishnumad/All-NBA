@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
@@ -29,6 +30,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 
 public class PostsPresenter extends BasePresenter<PostsView> {
 
+    private LocalRepository localRepository;
     private RedditService service;
     private SharedPreferences preferences;
     private CompositeDisposable disposables;
@@ -36,9 +38,10 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     private SubredditPaginator paginator;
     private String subreddit;
 
-    public PostsPresenter(String subreddit, RedditService service, SharedPreferences preferences,
+    public PostsPresenter(String subreddit, LocalRepository localRepository, RedditService service, SharedPreferences preferences,
                           BaseSchedulerProvider schedulerProvider) {
         this.subreddit = subreddit;
+        this.localRepository = localRepository;
         this.service = service;
         this.preferences = preferences;
         this.schedulerProvider = schedulerProvider;
@@ -219,8 +222,8 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         }
     }
 
-    public void onViewTypeSelected(PostsFragment.ViewType viewType, Sorting sorting,
-                                   TimePeriod timePeriod) {
+    public void onViewTypeSelected(int viewType) {
+        localRepository.saveFavoritePostsViewType(viewType);
         view.changeViewType(viewType);
     }
 

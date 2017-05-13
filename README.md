@@ -26,7 +26,7 @@ Pre-release APK is available [here](https://github.com/jorgegil96/All-NBA/releas
 Fix a bug, add a new feature or make the code prettier!
 
 ### Steps to contribute:
-1. Fork the repository
+1. Fork the localRepository
 2. Look at the list of [open issues](https://github.com/jorgegil96/All-NBA/issues), pick one or create a new one (this can be for a bug or wanted feature)
 3. Write code and document it, look at the code around you and try to follow the style and conventions used. The MVP design pattern is used throughout the app.
 4. Write unit tests (if possible)
