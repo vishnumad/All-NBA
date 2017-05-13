@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.main;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.NavigationView;
@@ -9,7 +10,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,16 +18,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
-import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
-import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
+import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
@@ -39,7 +39,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 
 import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
-
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -122,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
             case HIGHLIGHTS_FRAGMENT_ID:
                 setHighlightsFragment();
         }
-
     }
 
     @Override

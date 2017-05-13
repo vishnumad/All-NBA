@@ -8,26 +8,31 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.google.firebase.crash.FirebaseCrash;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
 public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
-        View.OnClickListener {
+        View.OnClickListener, BillingProcessor.IBillingHandler {
     private static final String TAG = "CommentsActivity";
 
     public static final String GAME_ID_KEY = "gameId";
     public static final String HOME_TEAM_KEY = "homeTeamKey";
     public static final String AWAY_TEAM_KEY = "awayTeamKey";
+
+    private static final String LICENSE_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJK4rNHNjwBh9Xc0a29VV+V8UaEfAAoJuBKv9RfbGtCtwFhJI6UPbH/gulND9bX43DRyw5zSrhCaz1eUSm3XbOVMcrnhv4gfNOeLLhzzN9vzcoiOjzI4z+75j45MUWI3M6AmJGHCfl1c0zOCObwz71/BHte5peR/O8nFisMAkdDSGV846xvBiviSTRBlI4HBy1TE+8mFQVYs4bxY6V9bIOqhALCwithQpgZF/TMk1xy9sbz2Ab9NJVaYPqICrco5POEVAPMBTv0QI14M1ECuZQZaNNR9jc6V+fQoVBD2xdetCEjh1fdxb5HBNboWxC5xdLlPpnoZ8dkFENOz1yzoLQIDAQAB"; // PUT YOUR MERCHANT KEY HERE;
 
     private String homeTeam;
     private String awayTeam;
@@ -40,6 +45,8 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     @BindView(R.id.fab) FloatingActionButton fab;
 
     private PagerAdapter pagerAdapter;
+
+    public BillingProcessor billingProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +85,16 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         tabLayout.addOnTabSelectedListener(this);
 
         fab.setOnClickListener(this);
+
+        billingProcessor = new BillingProcessor(this, LICENSE_KEY, this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (billingProcessor != null) {
+            billingProcessor.release();
+        }
     }
 
     @Override
@@ -144,5 +161,36 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
                 gameThreadFragment.replyToThread();
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onProductPurchased(String productId, TransactionDetails details) {
+        Fragment fragment = pagerAdapter.getItem(0);
+        GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
+        if (gameThreadFragment.isAdded()) {
+            gameThreadFragment.isPremium = true;
+        }
+
+        Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+    }
+
+    @Override
+    public void onBillingError(int errorCode, Throwable error) {
+        FirebaseCrash.report(error);
+    }
+
+    @Override
+    public void onBillingInitialized() {
     }
 }

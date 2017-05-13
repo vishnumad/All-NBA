@@ -1,12 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.data.API.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
@@ -22,19 +23,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GameThreadPresenter {
+
+    private static final String TAG = "GameThreadPresenter";
 
     private long gameDate;
 
@@ -66,15 +73,15 @@ public class GameThreadPresenter {
     }
 
     public void loadComments(final String type, final String homeTeamAbbr,
-                             final String awayTeamAbbr) {
+                             final String awayTeamAbbr, boolean stream) {
 
         view.setLoadingIndicator(true);
         view.hideComments();
         view.hideText();
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        Observable<List<CommentNode>> observable = RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(gameThreadsService.fetchGameThreads(
-                DateFormatUtil.getNoDashDateString(new Date(gameDate))))
+                        DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
                     public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
@@ -89,38 +96,50 @@ public class GameThreadPresenter {
                 .flatMap(new Function<String, SingleSource<List<CommentNode>>>() {
                     @Override
                     public SingleSource<List<CommentNode>> apply(String threadId) throws Exception {
-
                         if (threadId.equals("")) {
                             return Single.error(new ThreadNotFoundException());
                         }
                         return redditService.getComments(threadId, type);
                     }
                 })
+                .toObservable();
+
+        if (stream) {
+            observable = observable.repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
+                @Override
+                public ObservableSource<?> apply(Observable<Object> objectObservable) throws Exception {
+                    return objectObservable.delay(10, TimeUnit.SECONDS);
+                }
+            });
+        }
+
+        disposables.clear();
+        disposables.add(observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<List<CommentNode>>() {
+                .subscribeWith(new DisposableObserver<List<CommentNode>>() {
                     @Override
-                    public void onSuccess(List<CommentNode> commentNodes) {
-                        if (isViewAttached()) {
-                            view.setLoadingIndicator(false);
-                            if (commentNodes.size() == 0) {
-                                view.showNoCommentsText();
-                            } else {
-                                view.showComments(commentNodes);
-                            }
+                    public void onNext(List<CommentNode> commentNodes) {
+                        view.setLoadingIndicator(false);
+                        if (commentNodes.size() == 0) {
+                            view.showNoCommentsText();
+                        } else {
+                            view.showComments(commentNodes);
                         }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            view.setLoadingIndicator(false);
-                            if (e instanceof ThreadNotFoundException) {
-                                view.showNoThreadText();
-                            } else {
-                                view.showFailedToLoadCommentsText();
-                            }
+                        view.setLoadingIndicator(false);
+                        if (e instanceof ThreadNotFoundException) {
+                            view.showNoThreadText();
+                        } else {
+                            view.showFailedToLoadCommentsText();
                         }
+                    }
+
+                    @Override
+                    public void onComplete() {
                     }
                 })
         );

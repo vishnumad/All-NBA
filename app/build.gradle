@@ -10,8 +10,8 @@ android {
         applicationId "com.gmail.jorgegilcavazos.ballislife"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 23
-        versionName "0.6.4"
+        versionCode 26
+        versionName "0.6.7"
         multiDexEnabled true
     }
     buildTypes {
@@ -80,6 +80,8 @@ dependencies {
     // Testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.1'
+    // In-app billing
+    compile 'com.anjlab.android.iab.v3:library:1.0.39'
 }
 
 apply plugin: 'com.google.gms.google-services'

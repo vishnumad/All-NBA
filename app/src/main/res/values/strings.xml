@@ -33,6 +33,7 @@
     <string name="error_loading_highlights">Error loading highlights</string>
     <string name="error_loading_streamable">Error loading streamable</string>
     <string name="num_comments">%1$s comments</string>
+    <string name="purchase_complete">Premium features are now available!</string>
 
 
     <!-- Strings for MainActivity -->

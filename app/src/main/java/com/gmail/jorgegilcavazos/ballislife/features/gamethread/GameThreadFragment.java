@@ -1,28 +1,31 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -36,12 +39,12 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class GameThreadFragment extends Fragment implements GameThreadView,
-        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener {
+        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "GameThreadFragment";
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
@@ -56,8 +59,12 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     private String homeTeam, awayTeam, threadType;
     private long gameDate;
+    private boolean stream = false;
+    private Switch streamSwitch;
 
     private GameThreadPresenter presenter;
+
+    public boolean isPremium = false;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -88,6 +95,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         View view = inflater.inflate(R.layout.fragment_game_thread, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+        isPremium = ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium");
+
         swipeRefreshLayout.setOnRefreshListener(this);
 
         threadAdapter = new ThreadAdapter(getActivity(), new ArrayList<CommentNode>(), false);
@@ -102,9 +111,20 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
         presenter = new GameThreadPresenter(this, new RedditService(), gameDate, preferences);
         presenter.start();
-        presenter.loadComments(threadType, homeTeam, awayTeam);
+        presenter.loadComments(threadType, homeTeam, awayTeam, stream);
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (threadType.equals(RedditUtils.LIVE_GT_TYPE)) {
+            inflater.inflate(R.menu.menu_game_thread, menu);
+            streamSwitch = (Switch) menu.findItem(R.id.action_stream).getActionView().findViewById(R.id.switch_stream);
+            streamSwitch.setOnCheckedChangeListener(this);
+            streamSwitch.setChecked(stream);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -118,7 +138,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                presenter.loadComments(threadType, homeTeam, awayTeam);
+                presenter.loadComments(threadType, homeTeam, awayTeam, stream);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -126,7 +146,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(threadType, homeTeam, awayTeam);
+        presenter.loadComments(threadType, homeTeam, awayTeam, stream);
     }
 
     @Override
@@ -268,6 +288,22 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     public void replyToThread() {
         if (presenter != null) {
             presenter.replyToThreadBtnClick();
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            if (!isPremium) {
+                ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(), "premium");
+                streamSwitch.setChecked(false);
+            } else {
+                stream = true;
+                presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+            }
+        } else {
+            stream = false;
+            presenter.loadComments(threadType, homeTeam, awayTeam, stream);
         }
     }
 }
