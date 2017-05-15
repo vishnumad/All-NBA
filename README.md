@@ -1,5 +1,5 @@
 # NBA Android App
-[![Release status](https://img.shields.io/badge/release-v0.6.0--alpha-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
+[![Release status](https://img.shields.io/badge/release-v0.6.8--beta-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
 
 Android app for NBA fans. Features live scores, highlights, alerts and Reddit integration for discussions.
 
@@ -15,11 +15,8 @@ Android app for NBA fans. Features live scores, highlights, alerts and Reddit in
 ## Screenshots
 <img src="art/v0.5.0/bil_mockup_1.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_2.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_3.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_4.jpeg" alt="Ready" width="19%;"/> <img src="art/v0.5.0/bil_mockup_5.jpeg" alt="Ready" width="19%;"/>
 
-## Downloads
-
-A public Play Store version will not be available until a stable release is out, but there is an alpha version published, [fill out this form to get an invitation](https://goo.gl/forms/vqZOBjkvZjxGOy0k2).
-
-Pre-release APK is available [here](https://github.com/jorgegil96/All-NBA/releases).
+## Download
+[<img src="art/playstore.png" alt="Ready" width="19%;"/>](https://play.google.com/store/apps/details?id=com.gmail.jorgegilcavazos.ballislife)
 
 ## Contributing  
 
