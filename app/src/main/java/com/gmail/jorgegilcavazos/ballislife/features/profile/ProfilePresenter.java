@@ -2,143 +2,66 @@ package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
 import android.content.SharedPreferences;
 
+import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
-import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
-import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.LoggedInAccount;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
-public class ProfilePresenter extends MvpBasePresenter<ProfileView> {
+public class ProfilePresenter extends BasePresenter<ProfileView> {
 
     private CompositeDisposable disposables;
-    private RedditClient redditClient;
     private SharedPreferences preferences;
     private RedditService redditService;
+    private BaseSchedulerProvider schedulerProvider;
 
-    public ProfilePresenter(SharedPreferences preferences) {
-        disposables = new CompositeDisposable();
-        redditClient = RedditAuthentication.getInstance().getRedditClient();
+    public ProfilePresenter(RedditService redditService, SharedPreferences preferences,
+                            CompositeDisposable disposables, BaseSchedulerProvider schedulerProvider) {
+        this.redditService = redditService;
         this.preferences = preferences;
-        redditService = new RedditService();
-    }
+        this.disposables = disposables;
+        this.schedulerProvider = schedulerProvider;
 
-    @Override
-    public void detachView(boolean retainInstance) {
-        super.detachView(retainInstance);
-        if (!retainInstance) {
-            disposables.clear();
-        }
-    }
-
-    public void init() {
-        if (isViewAttached()) {
-            try {
-                getView().setToolbarTitle(redditClient.getAuthenticatedUser());
-                getView().setUsername(redditClient.getAuthenticatedUser());
-            } catch (IllegalStateException e) {
-                getView().showSnackbar(true);
-            }
-        }
-        loadUserDetails();
     }
 
     public void loadUserDetails() {
-        if (isViewAttached()) {
-            getView().setLoadingIndicator(true);
-            getView().dismissSnackbar();
-            getView().hideContent();
-            getView().setPostKarmaVisibility(false);
-            getView().setCommentKarmaVisibility(false);
-        }
+        view.setLoadingIndicator(true);
+        view.dismissSnackbar();
+        view.hideContent();
 
         disposables.clear();
-        RedditService redditService = new RedditService();
-
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(redditService.getLoggedInAccount())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<LoggedInAccount>() {
-                    @Override
-                    public void onNext(LoggedInAccount me) {
-                        if (isViewAttached()) {
-                            getView().setCommentKarma(me.getCommentKarma());
-                            getView().setCommentKarmaVisibility(true);
-                            getView().setPostKarma(me.getLinkKarma());
-                            getView().setPostKarmaVisibility(true);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            getView().showSnackbar(true);
-                        }
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                })
-        );
-
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.getUserContributions())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableObserver<Listing<Contribution>>() {
                     @Override
                     public void onNext(Listing<Contribution> contributions) {
-                        if (isViewAttached()) {
-                            getView().setLoadingIndicator(false);
-                            getView().showContent(contributions);
-                        }
+                        view.setLoadingIndicator(false);
+                        view.showContent(contributions);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            getView().setLoadingIndicator(false);
-                            getView().showSnackbar(true);
-                        }
+                        view.setLoadingIndicator(false);
+                        view.showSnackbar(true);
                     }
 
                     @Override
                     public void onComplete() {
-                        if (isViewAttached()) {
-                            getView().setLoadingIndicator(false);
-                        }
                     }
                 })
         );
-
-
     }
 
-    public void onOffsetChanged(float percentage) {
-        final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR  = 0.9f;
-
-        if (isViewAttached()) {
-            if (percentage <= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
-                getView().setToolbarTitle("");
-            } else {
-                try {
-                    getView().setToolbarTitle(redditClient.getAuthenticatedUser());
-                } catch (IllegalStateException e) {
-                    getView().showSnackbar(true);
-                }
-            }
+    public void stop() {
+        if (disposables != null) {
+            disposables.clear();
         }
     }
-
-
 }

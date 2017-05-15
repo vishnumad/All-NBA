@@ -57,9 +57,9 @@
     <string name="failed_load_comments">Failed to load comments</string>
     <string name="no_comments_available">No comments to show</string>
     <string name="no_thread_made">No thread has been made for this game</string>
-    <string name="game_thread">Game Thread</string>
+    <string name="game_thread">Live</string>
     <string name="box_score">Box Score</string>
-    <string name="post_game_thread">Post Game Thread</string>
+    <string name="post_game_thread">Post</string>
     <string name="failed_to_save_comment">Could not save comment</string>
     <string name="reply_to_sub_saved">Reply saved</string>
     <string name="reply_to_sub_failed">Could not save reply</string>
@@ -114,7 +114,7 @@
     <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
-    
+
     <!-- SUBREDDITS. DO NOT TRANSLATE -->
     <string name="r_atl">AtlantaHawks</string>
     <string name="r_bkn">GoNets</string>
@@ -387,6 +387,6 @@
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
-    <string-array name="pref_start_values_def" />
+    <string-array name="pref_start_values_def"/>
 
 </resources>

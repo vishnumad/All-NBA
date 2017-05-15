@@ -2,8 +2,8 @@ package com.gmail.jorgegilcavazos.ballislife.features.login;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -21,9 +21,12 @@ import io.reactivex.observers.DisposableCompletableObserver;
 import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class LoginActivity extends AppCompatActivity {
+
     private static final String TAG = "LoginActivity";
 
     @BindView(R.id.login_webview) WebView webView;
+
+    private int origin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

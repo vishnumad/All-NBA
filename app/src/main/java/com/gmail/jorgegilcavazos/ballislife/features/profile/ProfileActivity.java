@@ -1,13 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,11 +13,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.hannesdorfmann.mosby.mvp.MvpActivity;
+import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
@@ -28,23 +25,17 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
-public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
-        implements ProfileView, SwipeRefreshLayout.OnRefreshListener,
-        AppBarLayout.OnOffsetChangedListener {
+public class ProfileActivity extends AppCompatActivity
+        implements ProfileView, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "ProfileActivity";
 
     @BindView(R.id.profile_coordinator_layout) CoordinatorLayout coordinatorLayout;
-    @BindView(R.id.profile_appbar) AppBarLayout appBarLayout;
-    @BindView(R.id.profile_collapsing_toolbar) CollapsingToolbarLayout collapsingToolbar;
     @BindView(R.id.profile_toolbar) Toolbar toolbar;
-    @BindView(R.id.profile_image) ImageView profileImage;
-    @BindView(R.id.profile_username) TextView usernameTV;
-    @BindView(R.id.profile_post_karma_count) TextView postKarmaTV;
-    @BindView(R.id.profile_comment_karma_count) TextView commentKarmaTV;
     @BindView(R.id.profile_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.profile_recycler_view) RecyclerView recyclerView;
 
@@ -52,11 +43,7 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
     private ContributionsAdapter contributionsAdapter;
     private Snackbar snackbar;
 
-    @NonNull
-    @Override
-    public ProfilePresenter createPresenter() {
-        return new ProfilePresenter(getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE));
-    }
+    private ProfilePresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,20 +51,32 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        appBarLayout.addOnOffsetChangedListener(this);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        setTitle("Profile");
+
         swipeRefreshLayout.setOnRefreshListener(this);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         contributionsAdapter = new ContributionsAdapter(this, new ArrayList<Contribution>());
         recyclerView.setAdapter(contributionsAdapter);
 
-        setUpToolbar();
+        presenter = new ProfilePresenter(new RedditService(),
+                getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE),
+                new CompositeDisposable(),
+                SchedulerProvider.getInstance());
+        presenter.attachView(this);
+        presenter.loadUserDetails();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        presenter.init();
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.stop();
+        presenter.detachView();
     }
 
     @Override
@@ -106,12 +105,6 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
     }
 
     @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        int maxScroll = appBarLayout.getTotalScrollRange();
-        presenter.onOffsetChanged((float) Math.abs(verticalOffset) / (float) maxScroll);
-    }
-
-    @Override
     public void setLoadingIndicator(boolean active) {
         swipeRefreshLayout.setRefreshing(active);
     }
@@ -129,45 +122,7 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
 
     @Override
     public void setToolbarTitle(String title) {
-        collapsingToolbar.setTitle(title);
-    }
-
-    @Override
-    public void setProfileImage(int resId) {
-        profileImage.setImageResource(resId);
-    }
-
-    @Override
-    public void setUsername(String username) {
-        usernameTV.setText(username);
-    }
-
-    @Override
-    public void setPostKarma(int postKarma) {
-        postKarmaTV.setText(String.valueOf(postKarma));
-    }
-
-    @Override
-    public void setPostKarmaVisibility(boolean visible) {
-        if (visible) {
-            postKarmaTV.setVisibility(View.VISIBLE);
-        } else {
-            postKarmaTV.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    @Override
-    public void setCommentKarma(int commentKarma) {
-        commentKarmaTV.setText(String.valueOf(commentKarma));
-    }
-
-    @Override
-    public void setCommentKarmaVisibility(boolean visible) {
-        if (visible) {
-            commentKarmaTV.setVisibility(View.VISIBLE);
-        } else {
-            commentKarmaTV.setVisibility(View.INVISIBLE);
-        }
+        toolbar.setTitle(title);
     }
 
     @Override
@@ -190,16 +145,5 @@ public class ProfileActivity extends MvpActivity<ProfileView, ProfilePresenter>
         if (snackbar != null) {
             snackbar.dismiss();
         }
-    }
-
-    private void setUpToolbar(){
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
-
     }
 }

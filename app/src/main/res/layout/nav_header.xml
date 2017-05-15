@@ -8,7 +8,6 @@ android:theme="@style/ThemeOverlay.AppCompat.Light"
 android:orientation="vertical"
 android:gravity="bottom">
 
-
     <ImageView
         android:id="@+id/favTeamLogo"
         android:layout_width="80dp"

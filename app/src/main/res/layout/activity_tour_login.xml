@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_header"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/colorPrimary"
+        android:weightSum="7">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/whitebballstraight"
+            android:adjustViewBounds="true"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:text="Log in"
+        android:textColor="@color/primaryText"
+        android:textStyle="bold"
+        style="@style/Base.TextAppearance.AppCompat.Headline"
+        android:layout_below="@id/layout_header"/>
+
+    <TextView
+        android:id="@+id/text_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:inputType="textMultiLine"
+        android:text="Would you like to sign in to your Reddit account? \nSigning in with reddit allows you to vote submissions and comments, reply to other users and save your favorite posts."
+        android:textColor="@color/primaryText"
+        android:textSize="16sp"
+        android:layout_below="@id/text_title"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/blackLight"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/text_positive"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="LOG IN"
+            android:textColor="@color/red"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_alignParentEnd="true"
+            android:clickable="true"
+            android:background="?android:selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/text_negative"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="SKIP"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_toStartOf="@id/text_positive"
+            android:clickable="true"
+            android:background="?android:selectableItemBackground"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -99,7 +99,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         recyclerViewPlayers.setAdapter(playerAdapter);
         recyclerViewPlayers.setNestedScrollingEnabled(false);
 
-        statLineAdapter = new StatLineAdapter(new ArrayList<StatLine>());
+        statLineAdapter = new StatLineAdapter(getActivity(), new ArrayList<StatLine>());
         recyclerViewStats.setLayoutManager(new CustomLayoutMaganer(getActivity()));
         recyclerViewStats.setAdapter(statLineAdapter);
 

@@ -27,6 +27,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -37,11 +38,14 @@ import net.dean.jraw.RedditClient;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
+import jonathanfinerty.once.Once;
 
 import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    private static final String showTour = "showTourTag";
 
     public static final String MY_PREFERENCES = "MyPrefs";
     public static final String FIRST_TIME = "firstTime";
@@ -69,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, showTour) && !RedditAuthentication.getInstance().isUserLoggedIn()) {
+            Intent intent = new Intent(this, TourLoginActivity.class);
+            startActivity(intent);
+            Once.markDone(showTour);
+        }
 
         setContentView(R.layout.activity_main);
         setUpToolbar();
@@ -191,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     case R.id.navigation_item_3:
-                        setPostsFragment("nba");
+                        setPostsFragment("NBA");
                         drawerLayout.closeDrawer(GravityCompat.START);
                         return true;
                     case R.id.navigation_item_4:

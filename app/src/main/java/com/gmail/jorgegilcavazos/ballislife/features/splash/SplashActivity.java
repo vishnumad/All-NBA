@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.intro;
+package com.gmail.jorgegilcavazos.ballislife.features.splash;
 
 /**
  * Created by kwangin on 10/13/16.
@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 
-public class IntroActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class IntroActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(IntroActivity.this, MainActivity.class));
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish();
             }
         }, 1000);

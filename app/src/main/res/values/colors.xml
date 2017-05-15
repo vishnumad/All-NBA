@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorPrimaryLight">#E57373</color>
+    <color name="colorAccent">#FF9800</color>
+    <!--
     <color name="colorPrimary">#212121</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorPrimaryLight">#303030</color>
-    <color name="colorAccent">#3F51B5</color>
+    <color name="colorAccent">#3F51B5</color>-->
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#757575</color>
     <color name="accentText">#BABABA</color>
     <color name="colorDivider">#1A000000</color>
     <color name="background">#F9F9F9</color>
 
+    <color name="blackLight">#212121</color>
     <color name="white">#FFFFFF</color>
     <color name="red">#F44336</color>
     <color name="orange">#FF9800</color>
@@ -22,7 +28,7 @@
     <color name="amber">#FFC107</color>
 
     <color name="tricornBlack">#2d2d2e</color>
-    <color name="tricornBlackDark">#212122</color>
+    <color name="tricornBlackDark">#212121</color>
     <color name="tricornBlackLight">#2a2a2a</color>
     <color name="indigo">#3F51B5</color>
     <color name="indigoDark">#303F9F</color>

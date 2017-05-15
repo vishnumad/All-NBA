@@ -16,18 +16,6 @@ public interface ProfileView extends MvpView {
 
     void setToolbarTitle(String title);
 
-    void setProfileImage(int resId);
-
-    void setUsername(String username);
-
-    void setPostKarma(int postKarma);
-
-    void setPostKarmaVisibility(boolean visible);
-
-    void setCommentKarma(int commentKarma);
-
-    void setCommentKarmaVisibility(boolean visible);
-
     void showSnackbar(boolean canReload);
 
     void dismissSnackbar();

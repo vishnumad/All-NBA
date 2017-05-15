@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +20,11 @@ import static android.graphics.Typeface.NORMAL;
 
 public class StatLineAdapter extends RecyclerView.Adapter<StatLineAdapter.StatLineViewHolder> {
 
+    private Context context;
     private List<StatLine> statLines;
 
-    public StatLineAdapter(List<StatLine> statLines) {
+    public StatLineAdapter(Context context, List<StatLine> statLines) {
+        this.context = context;
         this.statLines = statLines;
     }
 
