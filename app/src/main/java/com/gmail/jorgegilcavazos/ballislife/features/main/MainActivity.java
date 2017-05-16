@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, showTour) && !RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, showTour)) {
             Intent intent = new Intent(this, TourLoginActivity.class);
             startActivity(intent);
             Once.markDone(showTour);
