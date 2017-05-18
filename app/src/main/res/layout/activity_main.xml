@@ -23,7 +23,7 @@
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance"
-                app:layout_scrollFlags="scroll|enterAlways"/>
+                app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
         </android.support.design.widget.AppBarLayout>
 
