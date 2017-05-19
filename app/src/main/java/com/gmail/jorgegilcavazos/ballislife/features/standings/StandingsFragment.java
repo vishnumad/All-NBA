@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
@@ -18,15 +19,20 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
-import com.hannesdorfmann.mosby.mvp.MvpFragment;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class StandingsFragment extends MvpFragment<StandingsView, StandingsPresenter>
-        implements StandingsView, SwipeRefreshLayout.OnRefreshListener {
+public class StandingsFragment extends Fragment implements StandingsView,
+        SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "StandingsFragment";
 
     @BindView(R.id.standings_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
@@ -34,6 +40,9 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
 
     private Snackbar snackbar;
     private Unbinder unbinder;
+
+    private StandingsPresenter presenter;
+    private CompositeDisposable disposables;
 
     public StandingsFragment() {
         // Required empty public constructor.
@@ -44,21 +53,10 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
     }
 
     @Override
-    public StandingsPresenter createPresenter() {
-        return new StandingsPresenter();
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        presenter.loadStandings();
     }
 
     @Nullable
@@ -71,6 +69,21 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://nba-app-ca681.firebaseio.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NbaStandingsService service = retrofit.create(NbaStandingsService.class);
+
+        disposables = new CompositeDisposable();
+
+        presenter = new StandingsPresenter(service, SchedulerProvider.getInstance(),
+                disposables);
+        presenter.attachView(this);
+        presenter.loadStandings();
 
         return view;
     }
@@ -88,7 +101,11 @@ public class StandingsFragment extends MvpFragment<StandingsView, StandingsPrese
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (disposables != null) {
+            disposables.clear();
+        }
         unbinder.unbind();
+        presenter.detachView();
     }
 
     @Override
