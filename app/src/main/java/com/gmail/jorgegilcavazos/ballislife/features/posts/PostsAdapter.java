@@ -19,6 +19,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -143,7 +144,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void setData(List<CustomSubmission> submissions) {
         loadingFailed = false;
-        postsList = submissions;
+        if (postsList != null) {
+            postsList.clear();
+        } else {
+            postsList = new ArrayList<>();
+        }
+        postsList.addAll(submissions);
         notifyDataChanged();
     }
 
