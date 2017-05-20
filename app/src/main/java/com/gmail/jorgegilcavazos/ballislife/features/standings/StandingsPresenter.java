@@ -5,10 +5,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class StandingsPresenter extends BasePresenter<StandingsView> {
 
@@ -31,8 +29,8 @@ public class StandingsPresenter extends BasePresenter<StandingsView> {
 
         disposables.clear();
         disposables.add(nbaStandingsService.getStandings("22016")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<Standings>() {
                     @Override
                     public void onSuccess(Standings standings) {
