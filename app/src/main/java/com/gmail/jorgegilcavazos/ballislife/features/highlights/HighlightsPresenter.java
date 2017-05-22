@@ -92,6 +92,29 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         );
     }
 
+    public void subscribeToHighlightsShare(Observable<Highlight> highlightShare) {
+        disposables.add(highlightShare
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableObserver<Highlight>() {
+                    @Override
+                    public void onNext(Highlight highlight) {
+                        view.shareHighlight(highlight);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        );
+    }
+
     public void stop() {
         if (disposables != null) {
             disposables.clear();

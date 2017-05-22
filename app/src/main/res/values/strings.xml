@@ -35,7 +35,6 @@
     <string name="num_comments">%1$s comments</string>
     <string name="purchase_complete">Premium features are now available!</string>
 
-
     <!-- Strings for MainActivity -->
     <string name="action_refresh">Refresh</string>
     <string name="drawer_open">Drawer open</string>
@@ -74,6 +73,9 @@
     <string name="losses_abbrev">L</string>
     <string name="pct_abbrev">%</string>
     <string name="gb_abbrev">GB</string>
+
+    <!-- Highlights -->
+    <string name="share_video">Share video</string>
 
     <!-- Posts -->
     <string name="not_authenticated">Not authenticated</string>

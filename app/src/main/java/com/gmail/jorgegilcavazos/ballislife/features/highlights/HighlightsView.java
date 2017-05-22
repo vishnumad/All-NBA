@@ -19,4 +19,6 @@ public interface HighlightsView {
     void showErrorOpeningStreamable();
 
     void resetScrollState();
+
+    void shareHighlight(Highlight highlight);
 }

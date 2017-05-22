@@ -95,6 +95,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         presenter = new HighlightsPresenter(highlightsRepository, SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
+        presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
         presenter.loadHighlights(true);
 
         return view;
@@ -161,6 +162,15 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void resetScrollState() {
         scrollListener.resetState();
+    }
+
+    @Override
+    public void shareHighlight(Highlight highlight) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, highlight.getUrl());
+        startActivity(Intent.createChooser(shareIntent,
+                getResources().getString(R.string.share_video)));
     }
 
 }
