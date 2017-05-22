@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,20 +23,42 @@ import io.reactivex.subjects.PublishSubject;
 
 public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
 
+    private static final int TYPE_SMALL = 0;
+    private static final int TYPE_LARGE = 1;
+
     private Context context;
     private List<Highlight> highlights;
+    private int contentViewType;
     private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> shareClickSubject = PublishSubject.create();
 
-    public HighlightAdapter(Context context, List<Highlight> highlights) {
+    public HighlightAdapter(Context context, List<Highlight> highlights, int contentViewType) {
         this.context = context;
         this.highlights = highlights;
+        this.contentViewType = contentViewType;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return contentViewType;
     }
 
     @Override
     public HighlightHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.row_highlight, parent, false);
+
+        View view;
+        switch (contentViewType) {
+            case Constants.VIEW_SMALL:
+                view = inflater.inflate(R.layout.row_highlight_small, parent, false);
+                break;
+            case Constants.VIEW_LARGE:
+                view = inflater.inflate(R.layout.row_highlight, parent, false);
+                break;
+            default:
+                throw new IllegalStateException("Highlight view type is neither small nor large");
+        }
+
         return new HighlightHolder(view);
     }
 
@@ -62,6 +85,11 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     public void addData(List<Highlight> highlights) {
         this.highlights.addAll(highlights);
+        notifyDataSetChanged();
+    }
+
+    public void setContentViewType(int viewType) {
+        contentViewType = viewType;
         notifyDataSetChanged();
     }
 

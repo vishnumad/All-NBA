@@ -14,6 +14,7 @@
     <color name="accentText">#BABABA</color>
     <color name="colorDivider">#1A000000</color>
     <color name="background">#F9F9F9</color>
+    <color name="icon">#8D8D8D</color>
 
     <color name="blackLight">#212121</color>
     <color name="white">#FFFFFF</color>

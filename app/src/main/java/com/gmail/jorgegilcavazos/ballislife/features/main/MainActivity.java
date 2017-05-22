@@ -424,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (highlightsFragment == null) {
-            highlightsFragment = HighlightsFragment.newInstance(HighlightsFragment.VIEW_CARD);
+            highlightsFragment = HighlightsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     highlightsFragment, R.id.fragment);
         }

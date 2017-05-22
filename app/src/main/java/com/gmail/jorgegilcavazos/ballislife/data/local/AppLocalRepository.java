@@ -21,4 +21,16 @@ public class AppLocalRepository implements LocalRepository {
     public int getFavoritePostsViewType() {
         return sharedPreferences.getInt(LocalSharedPreferences.POSTS_VIEW_TYPE, -1);
     }
+
+    @Override
+    public void saveFavoriteHighlightViewType(int viewType) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, viewType);
+        editor.apply();
+    }
+
+    @Override
+    public int getFavoriteHighlightViewType() {
+        return sharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, -1);
+    }
 }

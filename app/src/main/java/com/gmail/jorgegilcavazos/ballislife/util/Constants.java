@@ -55,7 +55,11 @@ public class Constants {
     public static final String SUB_UTA = "UtahJazz";
     public static final String SUB_WAS = "WashingtonWizards";
 
-    // Reddit posts view types;
+    // Reddit posts view types
     public static final int VIEW_CARD = 0;
     public static final int VIEW_LIST = 1;
+
+    // Highlights view types
+    public static final int VIEW_SMALL = 0;
+    public static final int VIEW_LARGE = 1;
 }

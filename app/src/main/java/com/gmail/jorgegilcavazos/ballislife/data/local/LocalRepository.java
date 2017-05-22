@@ -5,4 +5,8 @@ public interface LocalRepository {
     void saveFavoritePostsViewType(int viewType);
 
     int getFavoritePostsViewType();
+
+    void saveFavoriteHighlightViewType(int viewType);
+
+    int getFavoriteHighlightViewType();
 }

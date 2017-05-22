@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -18,12 +19,15 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     private static final String TAG = "HighlightsPresenter";
 
     private HighlightsRepository highlightsRepository;
+    private LocalRepository localRepository;
     private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
 
     public HighlightsPresenter(HighlightsRepository highlightsRepository,
+                               LocalRepository localRepository,
                                BaseSchedulerProvider schedulerProvider) {
         this.highlightsRepository = highlightsRepository;
+        this.localRepository = localRepository;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
@@ -107,12 +111,16 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
 
                     }
 
-                    @Override
                     public void onComplete() {
 
                     }
                 })
         );
+    }
+
+    public void onViewTypeSelected(int viewType) {
+        localRepository.saveFavoritePostsViewType(viewType);
+        view.changeViewType(viewType);
     }
 
     public void stop() {

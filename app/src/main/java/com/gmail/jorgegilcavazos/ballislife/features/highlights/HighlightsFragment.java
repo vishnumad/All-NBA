@@ -1,24 +1,34 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import java.util.ArrayList;
@@ -28,13 +38,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class HighlightsFragment extends Fragment implements HighlightsView,
         SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "HighlightsFragment";
 
     public static final String VIEW_TYPE = "viewType";
-    public static final int VIEW_CARD = 0;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
@@ -44,26 +55,31 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private HighlightAdapter highlightAdapter;
     private HighlightsPresenter presenter;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private LocalRepository localRepository;
+    private Menu menu;
 
     public HighlightsFragment() {
         // Required empty public constructor
     }
 
-    public static HighlightsFragment newInstance(int viewType) {
+    public static HighlightsFragment newInstance() {
         HighlightsFragment fragment = new HighlightsFragment();
-        Bundle args = new Bundle();
-        args.putInt(VIEW_TYPE, viewType);
-        fragment.setArguments(args);
-
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            viewType = getArguments().getInt(VIEW_TYPE);
+
+        SharedPreferences localPrefs = getActivity().getSharedPreferences(
+                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
+        localRepository = new AppLocalRepository(localPrefs);
+        if (localRepository.getFavoriteHighlightViewType() != -1) {
+            viewType = localRepository.getFavoriteHighlightViewType();
+        } else {
+            viewType = Constants.VIEW_SMALL;
         }
+
         setHasOptionsMenu(true);
     }
 
@@ -75,7 +91,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25));
+        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25), viewType);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvHighlights.setLayoutManager(linearLayoutManager);
@@ -92,7 +108,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         HighlightsRepository highlightsRepository = new HighlightsRepositoryImpl(10);
 
-        presenter = new HighlightsPresenter(highlightsRepository, SchedulerProvider.getInstance());
+        presenter = new HighlightsPresenter(highlightsRepository, localRepository,
+                SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
@@ -109,10 +126,22 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         presenter.detachView();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_highlights, menu);
+        this.menu = menu;
+        super.onCreateOptionsMenu(menu, inflater);
+
+        setViewIcon(viewType);
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadHighlights(true);
+                return true;
+            case R.id.action_change_view:
+                openViewPickerDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -173,4 +202,55 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 getResources().getString(R.string.share_video)));
     }
 
+    @Override
+    public void changeViewType(int viewType) {
+        highlightAdapter.setContentViewType(viewType);
+        setViewIcon(viewType);
+    }
+
+    private void openViewPickerDialog() {
+        final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
+                .title(R.string.change_view)
+                .customView(R.layout.view_picker_layout, false)
+                .build();
+
+        View view = materialDialog.getCustomView();
+        if (view == null) return;
+
+        View viewTypeCard = view.findViewById(R.id.layout_type_card);
+        View viewTypeList = view.findViewById(R.id.layout_type_list);
+
+        viewTypeCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onViewTypeSelected(Constants.VIEW_LARGE);
+                materialDialog.dismiss();
+            }
+        });
+
+        viewTypeList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onViewTypeSelected(Constants.VIEW_SMALL);
+                materialDialog.dismiss();
+            }
+        });
+
+        materialDialog.show();
+    }
+
+    private void setViewIcon(int viewType) {
+        Drawable drawable;
+        switch (viewType) {
+            case Constants.VIEW_LARGE:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                break;
+            case Constants.VIEW_SMALL:
+                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
+                break;
+            default:
+                throw new IllegalStateException("Highlight view icon neither small nor large");
+        }
+        menu.findItem(R.id.action_change_view).setIcon(drawable);
+    }
 }

@@ -21,4 +21,6 @@ public interface HighlightsView {
     void resetScrollState();
 
     void shareHighlight(Highlight highlight);
+
+    void changeViewType(int viewType);
 }
