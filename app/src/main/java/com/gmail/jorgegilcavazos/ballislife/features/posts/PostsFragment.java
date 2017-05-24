@@ -27,6 +27,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
@@ -42,6 +43,9 @@ import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,6 +66,13 @@ public class PostsFragment extends Fragment implements PostsView,
     private static final String VIEW_TYPE = "viewType";
     private static final String SUBREDDIT = "subreddit";
 
+    @Inject
+    LocalRepository localRepository;
+
+    @Inject
+    @Named("redditSharedPreferences")
+    SharedPreferences redditSharedPreferences;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
 
@@ -72,7 +83,6 @@ public class PostsFragment extends Fragment implements PostsView,
 
     private PostsPresenter presenter;
     private Unbinder unbinder;
-    private LocalRepository localRepository;
 
     private Sorting sorting = Sorting.HOT;
     private TimePeriod timePeriod = TimePeriod.ALL;
@@ -95,13 +105,12 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BallIsLifeApplication.getAppComponent().inject(this);
+
         if (getArguments() != null) {
             subreddit = getArguments().getString(SUBREDDIT);
         }
 
-        SharedPreferences localPrefs = getActivity().getSharedPreferences(
-                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
-        localRepository = new AppLocalRepository(localPrefs);
         if (localRepository.getFavoritePostsViewType() != -1) {
             viewType = localRepository.getFavoritePostsViewType();
         } else {
@@ -124,13 +133,11 @@ public class PostsFragment extends Fragment implements PostsView,
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewPosts.setAdapter(postsAdapter);
 
-        SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
-                MODE_PRIVATE);
-        SharedPreferences localPrefs = getActivity().getSharedPreferences(
-                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
-        LocalRepository localRepository = new AppLocalRepository(localPrefs);
-
-        presenter = new PostsPresenter(subreddit, localRepository, new RedditService(), preferences,
+        presenter = new PostsPresenter(
+                subreddit,
+                localRepository,
+                new RedditService(),
+                redditSharedPreferences,
                 SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();

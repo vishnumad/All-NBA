@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
 
@@ -30,12 +31,15 @@ public class HighlightsPresenterTest {
     @Mock
     HighlightsRepositoryImpl mockHighlightsRepository;
 
+    @Mock
+    LocalRepository mockLocalRepository;
+
     HighlightsPresenter presenter;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        presenter = new HighlightsPresenter(mockHighlightsRepository,
+        presenter = new HighlightsPresenter(mockHighlightsRepository, mockLocalRepository,
                 new TrampolineSchedulerProvider());
         presenter.attachView(mockView);
     }

@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data;
 
 import com.gmail.jorgegilcavazos.ballislife.data.API.HighlightsService;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -20,6 +23,9 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
     public static final String ORDER_KEY = "\"$key\"";
     private static final String START_AT_ALL = "";
 
+    @Inject
+    Retrofit retrofit;
+
     private HighlightsService highlightsService;
     private String lastHighlighKey = "";
     private boolean firstLoad = true;
@@ -27,14 +33,8 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
     private int itemsToLoad;
 
     public HighlightsRepositoryImpl(int itemsToLoad) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         this.itemsToLoad = itemsToLoad;
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://nba-app-ca681.firebaseio.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
         highlightsService = retrofit.create(HighlightsService.class);
     }
 

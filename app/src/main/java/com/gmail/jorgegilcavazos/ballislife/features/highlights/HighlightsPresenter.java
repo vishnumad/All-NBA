@@ -119,7 +119,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     }
 
     public void onViewTypeSelected(int viewType) {
-        localRepository.saveFavoritePostsViewType(viewType);
+        localRepository.saveFavoriteHighlightViewType(viewType);
         view.changeViewType(viewType);
     }
 

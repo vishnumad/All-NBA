@@ -25,14 +25,18 @@ import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +51,15 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     public static final String VIEW_TYPE = "viewType";
 
+    @Inject
+    LocalRepository localRepository;
+
+    @Inject
+    HighlightsRepository highlightsRepository;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
 
@@ -55,7 +68,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private HighlightAdapter highlightAdapter;
     private HighlightsPresenter presenter;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private LocalRepository localRepository;
     private Menu menu;
 
     public HighlightsFragment() {
@@ -70,10 +82,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BallIsLifeApplication.getAppComponent().inject(this);
 
-        SharedPreferences localPrefs = getActivity().getSharedPreferences(
-                LocalSharedPreferences.LOCAL_APP_PREFS, MODE_PRIVATE);
-        localRepository = new AppLocalRepository(localPrefs);
         if (localRepository.getFavoriteHighlightViewType() != -1) {
             viewType = localRepository.getFavoriteHighlightViewType();
         } else {
@@ -106,10 +116,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         rvHighlights.addOnScrollListener(scrollListener);
 
-        HighlightsRepository highlightsRepository = new HighlightsRepositoryImpl(10);
-
         presenter = new HighlightsPresenter(highlightsRepository, localRepository,
-                SchedulerProvider.getInstance());
+                schedulerProvider);
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
