@@ -7,6 +7,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 
 import javax.inject.Singleton;
 
@@ -20,4 +21,5 @@ public interface AppComponent {
     void inject(PostsFragment fragment);
     void inject(AppLocalRepository localRepository);
     void inject(HighlightsRepositoryImpl highlightsRepository);
+    void inject(StandingsFragment fragment);
 }

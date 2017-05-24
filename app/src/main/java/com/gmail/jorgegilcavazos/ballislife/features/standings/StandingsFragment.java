@@ -14,18 +14,19 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.disposables.CompositeDisposable;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class StandingsFragment extends Fragment implements StandingsView,
         SwipeRefreshLayout.OnRefreshListener {
@@ -33,6 +34,12 @@ public class StandingsFragment extends Fragment implements StandingsView,
 
     private static final int EAST = 0;
     private static final int WEST = 1;
+
+    @Inject
+    Retrofit retrofit;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
 
     @BindView(R.id.standings_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.layout_content) LinearLayout layoutContent;
@@ -55,6 +62,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+        BallIsLifeApplication.getAppComponent().inject(this);
         setRetainInstance(true);
     }
 
@@ -65,20 +73,11 @@ public class StandingsFragment extends Fragment implements StandingsView,
         View view = inflater.inflate(R.layout.fragment_standings, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        swipeRefreshLayout.setOnRefreshListener(this);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://nba-app-ca681.firebaseio.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
         NbaStandingsService service = retrofit.create(NbaStandingsService.class);
 
         disposables = new CompositeDisposable();
 
-        presenter = new StandingsPresenter(service, SchedulerProvider.getInstance(),
-                disposables);
+        presenter = new StandingsPresenter(service, schedulerProvider, disposables);
         presenter.attachView(this);
         presenter.loadStandings();
 
