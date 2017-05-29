@@ -70,13 +70,11 @@
         <activity
             android:name=".features.videoplayer.VideoPlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.Dark"/>
 
         <activity
             android:name=".features.tour.TourLoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity android:name=".features.intro.IntroActivity" />
 
         <service android:name=".data.firebase.MyMessagingService">
             <intent-filter>
