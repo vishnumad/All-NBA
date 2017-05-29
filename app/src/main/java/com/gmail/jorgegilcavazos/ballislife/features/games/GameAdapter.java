@@ -12,9 +12,10 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 
 import java.util.List;
@@ -108,7 +109,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         switch (nbaGame.getGameStatus()) {
             case NbaGame.PRE_GAME:
                 holder.tvTime.setVisibility(View.VISIBLE);
-                holder.tvTime.setText(nbaGame.getPeriodStatus());
+                holder.tvTime.setText(DateFormatUtil.localizeGameTime(nbaGame.getPeriodStatus()));
                 break;
             case NbaGame.IN_GAME:
                 holder.tvHomeScore.setVisibility(View.VISIBLE);

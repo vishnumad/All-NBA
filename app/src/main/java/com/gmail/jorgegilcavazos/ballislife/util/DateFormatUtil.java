@@ -2,11 +2,14 @@ package com.gmail.jorgegilcavazos.ballislife.util;
 
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -146,5 +149,27 @@ public final class DateFormatUtil {
     public static String getNoDashDateString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.US);
         return format.format(date);
+    }
+
+    public static String localizeGameTime(String dateETString) {
+        return localizeGameTime(dateETString, TimeZone.getDefault());
+    }
+
+    /**
+     * Returns localized date from game time String (e.g. 9:00 pm ET) -> 7:00 pm of timeZone
+     */
+    public static String localizeGameTime(String dateETString, TimeZone timeZone) {
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+
+        try {
+            Date date = sdf.parse(dateETString);
+            sdf.setTimeZone(timeZone);
+            return sdf.format(date);
+        } catch (ParseException e) {
+            Log.e(TAG, "Error parsing game time date. " + e);
+            FirebaseCrash.report(e);
+        }
+        return null;
     }
 }

@@ -1,10 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Class to test {@link DateFormatUtil}.
@@ -84,5 +87,26 @@ public class DateFormatUtilTest {
         assertEquals("Yesterday", date2);
         assertEquals("Tomorrow", date3);
         assertEquals("Friday, October 14", date4);
+    }
+
+    @Test
+    public void testLocalizeGameTime() {
+        String date1 = "9:00 pm";
+        String date2 = "10:30 pm ET";
+        String date3 = "8:15 am";
+        String date4 = "11:59 am ET";
+        String date5 = "12:00 pm ET";
+
+        String actual1 = DateFormatUtil.localizeGameTime(date1, TimeZone.getTimeZone("America/Mexico_City"));
+        String actual2 = DateFormatUtil.localizeGameTime(date2, TimeZone.getTimeZone("America/Los_Angeles"));
+        String actual3 = DateFormatUtil.localizeGameTime(date3, TimeZone.getTimeZone("America/New_York"));
+        String actual4 = DateFormatUtil.localizeGameTime(date4, TimeZone.getTimeZone("America/Europe/London"));
+        String actual5 = DateFormatUtil.localizeGameTime(date5, TimeZone.getTimeZone("America/Los_Angeles"));
+
+        assertEquals("8:00 PM", actual1);
+        assertEquals("7:30 PM", actual2);
+        assertEquals("8:15 AM", actual3);
+        assertEquals("4:59 PM", actual4);
+        assertEquals("9:00 AM", actual5);
     }
 }

@@ -1,27 +1,23 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.GameUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.Calendar;
-import java.util.List;
 
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 public class GamesPresenter extends BasePresenter<GamesView> {
 
     private NbaGamesService nbaGamesService;
     private BaseSchedulerProvider schedulerProvider;
-    private List<NbaGame> gamesList;
     private Calendar selectedDate;
     private CompositeDisposable disposables;
 
@@ -45,8 +41,8 @@ public class GamesPresenter extends BasePresenter<GamesView> {
 
         disposables.clear();
         disposables.add(dayGamesSingle
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<DayGames>() {
                     @Override
                     public void onSuccess(DayGames dayGames) {
