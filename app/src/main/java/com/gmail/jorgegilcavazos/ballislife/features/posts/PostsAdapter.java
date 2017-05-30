@@ -2,7 +2,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -198,7 +197,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         void bindData(Context context, SubscriberCount subscriberCount, String subreddit) {
-            ivLogo.setImageResource(RedditUtils.getTeamLogo(subreddit));
+            ivLogo.setImageResource(RedditUtils.getTeamSnoo(subreddit));
             tvSubreddit.setText("r/" + subreddit);
 
             if (subscriberCount != null) {

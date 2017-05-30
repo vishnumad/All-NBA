@@ -8,12 +8,9 @@ import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
-import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,6 +265,73 @@ public final class RedditUtils {
                 return R.drawable.uta;
             case Constants.SUB_WAS:
                 return R.drawable.was;
+            default:
+                return R.drawable.rnbasnoo;
+        }
+    }
+
+    public static int getTeamSnoo(String subreddit) {
+        switch (subreddit) {
+            case Constants.SUB_ATL:
+                return R.drawable.atl;
+            case Constants.SUB_BKN:
+                return R.drawable.bkn_snoo;
+            case Constants.SUB_BOS:
+                return R.drawable.bos_snoo;
+            case Constants.SUB_CHA:
+                return R.drawable.cha_snoo;
+            case Constants.SUB_CHI:
+                return R.drawable.chi_snoo;
+            case Constants.SUB_CLE:
+                return R.drawable.cle;
+            case Constants.SUB_DAL:
+                return R.drawable.dal_snoo;
+            case Constants.SUB_DEN:
+                return R.drawable.den_snoo;
+            case Constants.SUB_DET:
+                return R.drawable.det;
+            case Constants.SUB_GSW:
+                return R.drawable.gsw_snoo;
+            case Constants.SUB_HOU:
+                return R.drawable.hou_snoo;
+            case Constants.SUB_IND:
+                return R.drawable.ind_snoo;
+            case Constants.SUB_LAC:
+                return R.drawable.lac_snoo;
+            case Constants.SUB_LAL:
+                return R.drawable.lal_snoo;
+            case Constants.SUB_MEM:
+                return R.drawable.mem_snoo;
+            case Constants.SUB_MIA:
+                return R.drawable.mia_snoo;
+            case Constants.SUB_MIL:
+                return R.drawable.mil_snoo;
+            case Constants.SUB_MIN:
+                return R.drawable.min_snoo;
+            case Constants.SUB_NOP:
+                return R.drawable.nop;
+            case Constants.SUB_NYK:
+                return R.drawable.nyk_snoo;
+            case Constants.SUB_OKC:
+                return R.drawable.okc_snoo;
+            case Constants.SUB_ORL:
+                return R.drawable.orl_snoo;
+            case Constants.SUB_PHI:
+                return R.drawable.phi;
+            case Constants.SUB_PHO:
+                return R.drawable.phx_snoo;
+            case Constants.SUB_POR:
+                return R.drawable.por_snoo;
+            case Constants.SUB_SAC:
+                return R.drawable.sac_snoo;
+            case Constants.SUB_SAS:
+                return R.drawable.sas_snoo;
+            case Constants.SUB_TOR:
+                return R.drawable.tor;
+            case Constants.SUB_UTA:
+                return R.drawable.uta_snoo;
+            case Constants.SUB_WAS:
+                return R.drawable.was_snoo;
             default:
                 return R.drawable.rnbasnoo;
         }
