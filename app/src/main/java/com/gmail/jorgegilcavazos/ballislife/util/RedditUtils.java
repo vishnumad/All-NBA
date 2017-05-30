@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
@@ -33,7 +34,25 @@ public final class RedditUtils {
 
         String[] sections = flair.split("'");
         if (sections.length == EXPECTED_SECTIONS) {
-            return sections[sections.length - 2];
+            return sections[3];
+        }
+        return "";
+    }
+
+    /**
+     * Parses a given /r/NBA flair into a string of the css class.
+     * @param flair usually formatted as "Flair {cssClass='Celtics1', text='The Truth'}"
+     * @return CSS class string, e.g. "Celtics1", or empty string if flair was null or not valid.
+     */
+    public static String parseCssClassFromFlair(String flair) {
+        final int EXPECTED_SECTIONS = 5;
+        if (flair == null) {
+            return "";
+        }
+
+        String[] sections = flair.split("'");
+        if (sections.length == EXPECTED_SECTIONS) {
+            return sections[1];
         }
         return "";
     }
@@ -335,6 +354,290 @@ public final class RedditUtils {
             default:
                 return R.drawable.rnbasnoo;
         }
+    }
+
+    public static int getFlairFromCss(String cssClass) {
+        switch (cssClass) {
+            case "76ers1":
+                return R.drawable.phi;
+            case "76ers2":
+                return R.drawable.phi;
+            case "76ers3":
+                return R.drawable.phi;
+            case "76ers4":
+                return R.drawable.phi;
+            case "76ers5":
+                return R.drawable.phi;
+            case "Bucks1":
+                return R.drawable.mil;
+            case "Bucks2":
+                return R.drawable.mil;
+            case "Bucks3":
+                return R.drawable.mil;
+            case "Bucks4":
+                return R.drawable.mil;
+            case "Bucks5":
+                return R.drawable.mil;
+            case "Bucks6":
+                return R.drawable.mil;
+            case "Bucks7":
+                return R.drawable.mil;
+            case "Bulls":
+                return R.drawable.chi;
+            case "Cavaliers1":
+                return R.drawable.cle;
+            case "Cavaliers2":
+                return R.drawable.cle;
+            case "Cavaliers3":
+                return R.drawable.cle;
+            case "Celtics1":
+                return R.drawable.bos;
+            case "Celtics2":
+                return R.drawable.bos;
+            case "Clippers":
+                return R.drawable.lac;
+            case "Clippers2":
+                return R.drawable.lac;
+            case "Clippers3":
+                return R.drawable.lac;
+            case "Clippers4":
+                return R.drawable.lac;
+            case "Grizzlies":
+                return R.drawable.mem;
+            case "Grizzlies2":
+                return R.drawable.mem;
+            case "VanGrizzlies":
+                return R.drawable.mem;
+            case "VanGrizzlies2":
+                return R.drawable.mem;
+            case "VanGrizzlies3":
+                return R.drawable.mem;
+            case "Hawks1":
+                return R.drawable.atl;
+            case "Hawks2":
+                return R.drawable.atl;
+            case "Hawks3":
+                return R.drawable.atl;
+            case "HawksSecond":
+                return R.drawable.atl;
+            case "Heat":
+                return R.drawable.atl;
+            case "Heat2":
+                return R.drawable.atl;
+            case "Heat3":
+                return R.drawable.atl;
+            case "Pelicans":
+                return R.drawable.nop;
+            case "Pelicans2":
+                return R.drawable.nop;
+            case "Pelicans3":
+                return R.drawable.nop;
+            case "Pelicans4":
+                return R.drawable.nop;
+            case "Pelicans5":
+                return R.drawable.nop;
+            case "Jazz1":
+                return R.drawable.uta;
+            case "Jazz2":
+                return R.drawable.uta;
+            case "Jazz3":
+                return R.drawable.uta;
+            case "Jazz4":
+                return R.drawable.uta;
+            case "Jazz5":
+                return R.drawable.uta;
+            case "Jazz6":
+                return R.drawable.uta;
+            case "Jazz7":
+                return R.drawable.uta;
+            case "Kings1":
+                return R.drawable.sac;
+            case "Kings2":
+                return R.drawable.sac;
+            case "Kings3":
+                return R.drawable.sac;
+            case "Kings4":
+                return R.drawable.sac;
+            case "Kings5":
+                return R.drawable.sac;
+            case "Kings6":
+                return R.drawable.sac;
+            case "Kings7":
+                return R.drawable.sac;
+            case "Kings8":
+                return R.drawable.sac;
+            case "Knicks1":
+                return R.drawable.nyk;
+            case "Knicks2":
+                return R.drawable.nyk;
+            case "Knicks3":
+                return R.drawable.nyk;
+            case "Knicks4":
+                return R.drawable.nyk;
+            case "Knicks5":
+                return R.drawable.nyk;
+            case "KnickerBockers":
+                return R.drawable.nyk;
+            case "Lakers1":
+                return R.drawable.lal;
+            case "Lakers2":
+                return R.drawable.lal;
+            case "Lakers3":
+                return R.drawable.lal;
+            case "MinnLakers":
+                return R.drawable.lal;
+            case "Magic1":
+                return R.drawable.orl;
+            case "Magic2":
+                return R.drawable.orl;
+            case "Magic3":
+                return R.drawable.orl;
+            case "Magic4":
+                return R.drawable.orl;
+            case "Mavs1":
+                return R.drawable.dal;
+            case "Mavs2":
+                return R.drawable.dal;
+            case "Mavs3":
+                return R.drawable.dal;
+            case "Nets1":
+                return R.drawable.bkn;
+            case "Nets2":
+                return R.drawable.bkn;
+            case "Nets3":
+                return R.drawable.bkn;
+            case "Nets4":
+                return R.drawable.bkn;
+            case "Nuggets1":
+                return R.drawable.den;
+            case "Nuggets2":
+                return R.drawable.den;
+            case "Nuggets3":
+                return R.drawable.den;
+            case "Nuggets4":
+                return R.drawable.den;
+            case "Pacers1":
+                return R.drawable.ind;
+            case "Pacers2":
+                return R.drawable.ind;
+            case "Pistons1":
+                return R.drawable.det;
+            case "Pistons2":
+                return R.drawable.det;
+            case "Pistons3":
+                return R.drawable.det;
+            case "Pistons4":
+                return R.drawable.det;
+            case "Raptors1":
+                return R.drawable.tor;
+            case "Raptors2":
+                return R.drawable.tor;
+            case "Raptors3":
+                return R.drawable.tor;
+            case "Raptors4":
+                return R.drawable.tor;
+            case "Raptors5":
+                return R.drawable.tor;
+            case "Raptors6":
+                return R.drawable.tor;
+            case "Raptors7":
+                return R.drawable.tor;
+            case "Raptors8":
+                return R.drawable.tor;
+            case "Raptors9":
+                return R.drawable.tor;
+            case "TorHuskies":
+                return R.drawable.tor;
+            case "Rockets1":
+                return R.drawable.hou;
+            case "Rockets2":
+                return R.drawable.hou;
+            case "Rockets3":
+                return R.drawable.hou;
+            case "SanDiegoRockets":
+                return R.drawable.hou;
+            case "Spurs1":
+                return R.drawable.sas;
+            case "Spurs2":
+                return R.drawable.sas;
+            case "Spurs3":
+                return R.drawable.sas;
+            case "Suns1":
+                return R.drawable.phx;
+            case "Suns2":
+                return R.drawable.phx;
+            case "Suns3":
+                return R.drawable.phx;
+            case "Suns4":
+                return R.drawable.phx;
+            case "Suns5":
+                return R.drawable.phx;
+            case "Suns6":
+                return R.drawable.phx;
+            case "Supersonics1":
+                return R.drawable.sea;
+            case "Supersonics2":
+                return R.drawable.sea;
+            case "Thunder":
+                return R.drawable.okc;
+            case "Timberwolves1":
+                return R.drawable.min;
+            case "Timberwolves2":
+                return R.drawable.min;
+            case "Timberwolves3":
+                return R.drawable.min;
+            case "Timberwolves4":
+                return R.drawable.min;
+            case "TrailBlazers1":
+                return R.drawable.por;
+            case "TrailBlazers2":
+                return R.drawable.por;
+            case "TrailBlazers3":
+                return R.drawable.por;
+            case "TrailBlazers4":
+                return R.drawable.por;
+            case "TrailBlazers5":
+                return R.drawable.por;
+            case "Warriors1":
+                return R.drawable.gsw;
+            case "Warriors2":
+                return R.drawable.gsw;
+            case "Warriors3":
+                return R.drawable.gsw;
+            case "Warriors4":
+                return R.drawable.gsw;
+            case "Wizards":
+                return R.drawable.was;
+            case "Wizards2":
+                return R.drawable.was;
+            case "Wizards3":
+                return R.drawable.was;
+            case "Wizards4":
+                return R.drawable.was;
+            case "Wizards5":
+                return R.drawable.was;
+            case "Wizards6":
+                return R.drawable.was;
+            case "ChaHornets":
+                return R.drawable.cha;
+            case "ChaHornets2":
+                return R.drawable.cha;
+            case "ChaHornets3":
+                return R.drawable.cha;
+            case "ChaHornets4":
+                return R.drawable.cha;
+            case "ChaHornets5":
+                return R.drawable.cha;
+            case "ChaHornets6":
+                return R.drawable.cha;
+            case "NBA":
+                return R.drawable.nba;
+            case "West":
+                return R.drawable.west;
+            case "East":
+                return R.drawable.east;
+        }
+        return -1;
     }
 
     public static String formatScoreToDigits(int score) {

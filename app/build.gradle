@@ -9,8 +9,8 @@ android {
         applicationId "com.gmail.jorgegilcavazos.ballislife"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 29
-        versionName "0.6.10"
+        versionCode 30
+        versionName "0.6.11"
         multiDexEnabled true
     }
     buildTypes {

@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -151,6 +152,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.comment_body) TextView bodyTextView;
         @BindView(R.id.comment_flair) TextView flairTextView;
         @BindView(R.id.comment_saved) TextView tvSaved;
+        @BindView(R.id.image_flair) ImageView ivFlair;
         @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
         @BindView(R.id.button_comment_upvote) ImageButton btnUpvote;
         @BindView(R.id.button_comment_downvote) ImageButton btnDownvote;
@@ -171,6 +173,9 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             String timestamp = DateFormatUtil.formatRedditDate(comment.getCreated());
             String score = String.valueOf(comment.getScore());
             String flair = RedditUtils.parseNbaFlair(String.valueOf(comment.getAuthorFlair()));
+            String cssClass = RedditUtils
+                    .parseCssClassFromFlair(String.valueOf(comment.getAuthorFlair()));
+            int flairRes = RedditUtils.getFlairFromCss(cssClass);
 
             authorTextView.setText(author);
             bodyTextView.setOnTouchListener(new View.OnTouchListener() {
@@ -212,7 +217,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             bodyTextView.setText(body);
             timestampTextView.setText(timestamp);
             scoreTextView.setText(context.getString(R.string.points, score));
-            flairTextView.setText(flair);
+            if (flairRes != -1) {
+                ivFlair.setImageResource(flairRes);
+                ivFlair.setVisibility(View.VISIBLE);
+                flairTextView.setVisibility(View.GONE);
+            } else {
+                flairTextView.setText(flair);
+                ivFlair.setVisibility(View.GONE);
+                flairTextView.setVisibility(View.VISIBLE);
+            }
             rlCommentActions.setVisibility(View.GONE);
 
             setBackgroundAndPadding(context, commentNode, this, false /* dark */);
