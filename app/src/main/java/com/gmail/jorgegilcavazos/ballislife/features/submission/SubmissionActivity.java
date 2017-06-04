@@ -50,12 +50,15 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         View.OnClickListener {
     private static final String TAG = "SubmissionActivity";
 
+    public static final String KEY_SUBREDDIT = "subreddit";
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_submission) RecyclerView submissionRecyclerView;
 
     private String threadId;
+    private String subreddit;
 
     private CustomSubmission customSubmission;
     private ThreadAdapter threadAdapter;
@@ -75,14 +78,15 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
             getSupportActionBar().setSubtitle("TOP");
         }
 
-        setTitle(getString(R.string.rnba));
-
         Bundle extras = getIntent().getExtras();
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
             customSubmission = (CustomSubmission) extras
                     .getSerializable(Constants.THREAD_SUBMISSION);
+            subreddit = extras.getString(KEY_SUBREDDIT);
         }
+
+        setTitle(subreddit);
 
         fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);

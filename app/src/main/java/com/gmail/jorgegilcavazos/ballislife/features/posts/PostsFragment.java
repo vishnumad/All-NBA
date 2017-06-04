@@ -360,6 +360,7 @@ public class PostsFragment extends Fragment implements PostsView,
 
         bundle.putSerializable(Constants.THREAD_SUBMISSION, customSubmission);
         bundle.putString(Constants.THREAD_ID, submission.getId());
+        bundle.putString(SubmissionActivity.KEY_SUBREDDIT, subreddit);
 
         intent.putExtras(bundle);
         startActivity(intent);
