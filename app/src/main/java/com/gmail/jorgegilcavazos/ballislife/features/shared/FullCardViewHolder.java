@@ -45,6 +45,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.content_link) LinearLayout containerLink;
     public @BindView(R.id.text_domain_link) TextView tvDomainLink;
     public @BindView(R.id.text_link) TextView tvLink;
+    public @BindView(R.id.comments_layout) View commentsLayout;
 
     public FullCardViewHolder(View itemView) {
         super(itemView);
@@ -315,7 +316,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
         if (isDisplayedInList) {
             // Enable buttons to navigate to SubmissionActivity.
-            btnComments.setOnClickListener(new View.OnClickListener() {
+            commentsLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     submissionClickListener.onSubmissionClick(customSubmission.getSubmission());

@@ -130,20 +130,16 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:orientation="horizontal"
-            android:layout_below="@id/content_container"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_below="@id/content_container">
 
             <ImageButton
                 android:id="@+id/button_upvote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:src="@drawable/ic_arrow_upward_black_18dp"
                 android:background="?android:selectableItemBackground"
-                android:padding="3dp"
                 android:tint="@color/commentNeutral"/>
 
             <TextView
@@ -159,47 +155,51 @@
 
             <ImageButton
                 android:id="@+id/button_downvote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:src="@drawable/ic_arrow_downward_black_18dp"
                 android:background="?android:selectableItemBackground"
-                android:padding="3dp"
                 android:tint="@color/commentNeutral"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:orientation="horizontal"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/content_container"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_below="@id/content_container">
 
-            <ImageButton
-                android:id="@+id/button_comments"
+            <LinearLayout
+                android:id="@+id/comments_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_forum_black_18dp"
-                android:background="?android:selectableItemBackground"
-                android:padding="3dp"
-                android:tint="@color/commentNeutral"/>
+                android:layout_height="35dp"
+                android:clickable="true"
+                android:background="?android:selectableItemBackground">
 
-            <TextView
-                android:id="@+id/text_comments"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="511"
-                android:textColor="@color/secondaryText"
-                android:textSize="13sp"
-                android:layout_marginEnd="10dp"
-                android:gravity="center"/>
+                <ImageButton
+                    android:id="@+id/button_comments"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_forum_black_18dp"
+                    android:background="@android:color/transparent"
+                    android:tint="@color/commentNeutral"
+                    android:clickable="false"/>
+
+                <TextView
+                    android:id="@+id/text_comments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="511"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <ImageButton
                 android:id="@+id/button_save"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:src="@drawable/ic_bookmark_black_18dp"
                 android:background="?android:selectableItemBackground"
                 android:padding="3dp"
