@@ -21,7 +21,7 @@
             android:id="@+id/gradient"
             android:layout_width="140dp"
             android:layout_height="100dp"
-            android:background="@color/black"/>
+            android:background="@color/white"/>
 
         <ImageView
             android:id="@+id/image_thumbnail"
