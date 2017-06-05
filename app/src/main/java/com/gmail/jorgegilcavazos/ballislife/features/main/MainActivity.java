@@ -418,7 +418,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setHighlightsFragment() {
-        Log.d(TAG, "setting fragment");
         setTitle("Highlights");
         getSupportActionBar().setSubtitle(null);
 
