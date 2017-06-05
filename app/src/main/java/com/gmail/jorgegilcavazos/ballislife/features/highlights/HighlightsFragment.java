@@ -3,12 +3,14 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,7 +44,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     private static final String TAG = "HighlightsFragment";
 
-    public static final String VIEW_TYPE = "viewType";
+    private static final String LIST_STATE = "listState";
+    private static final String ITEMS_LOADES = "itemsLoaded";
 
     @Inject
     LocalRepository localRepository;
@@ -60,8 +63,11 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private Unbinder unbinder;
     private HighlightAdapter highlightAdapter;
     private HighlightsPresenter presenter;
+    private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
+
+    Parcelable listState;
 
     public HighlightsFragment() {
         // Required empty public constructor
@@ -70,6 +76,22 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public static HighlightsFragment newInstance() {
         HighlightsFragment fragment = new HighlightsFragment();
         return fragment;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save layout manager state to restore scroll position after config changes.
+        listState = linearLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LIST_STATE, listState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(LIST_STATE);
+        }
     }
 
     @Override
@@ -83,7 +105,17 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
             viewType = Constants.VIEW_SMALL;
         }
 
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25), viewType);
+
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Load cached data if available, or from network if not.
+        presenter.loadFirstAvailable();
     }
 
     @Override
@@ -94,9 +126,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25), viewType);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvHighlights.setLayoutManager(linearLayoutManager);
         rvHighlights.setAdapter(highlightAdapter);
 
@@ -114,7 +143,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
-        presenter.loadHighlights(true);
 
         return view;
     }
@@ -164,6 +192,12 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
             highlightAdapter.setData(highlights);
         } else {
             highlightAdapter.addData(highlights);
+        }
+
+        // We're coming from a config change, so the state needs to be restored.
+        if (listState != null) {
+            linearLayoutManager.onRestoreInstanceState(listState);
+            listState = null;
         }
     }
 

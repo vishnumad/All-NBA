@@ -11,4 +11,6 @@ public interface HighlightsRepository {
     void reset();
 
     Single<List<Highlight>> next();
+
+    List<Highlight> getCachedHighlights();
 }

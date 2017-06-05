@@ -32,10 +32,13 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
 
     private int itemsToLoad;
 
+    private List<Highlight> cachedHighlights;
+
     public HighlightsRepositoryImpl(int itemsToLoad) {
         BallIsLifeApplication.getAppComponent().inject(this);
         this.itemsToLoad = itemsToLoad;
         highlightsService = retrofit.create(HighlightsService.class);
+        cachedHighlights = new ArrayList<>();
     }
 
     @Override
@@ -63,6 +66,7 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
                         public SingleSource<? extends List<Highlight>> apply(Map<String, Highlight> stringHighlightMap) throws Exception {
                             List<Highlight> highlightList = new ArrayList<>();
                             if (stringHighlightMap.isEmpty()) {
+                                cachedHighlights.addAll(highlightList);
                                 return Single.just(highlightList);
                             } else {
                                 // Save the key of the 1st element (oldest on the map) for pagination.
@@ -82,9 +86,17 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
 
                                 // Reverse items so that they're sorted from most recent to oldest.
                                 Collections.reverse(highlightList);
+                                cachedHighlights.addAll(highlightList);
                                 return Single.just(highlightList);
                             }
                         }
                     });
     }
+
+    @Override
+    public List<Highlight> getCachedHighlights() {
+        return cachedHighlights;
+    }
+
+
 }

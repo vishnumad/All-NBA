@@ -7,6 +7,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -31,6 +32,15 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
+    }
+
+    public void loadFirstAvailable() {
+        List<Highlight> highlights = highlightsRepository.getCachedHighlights();
+        if (highlights.isEmpty()) {
+            loadHighlights(true);
+        } else {
+            view.showHighlights(highlights, true);
+        }
     }
 
     public void loadHighlights(final boolean reset) {

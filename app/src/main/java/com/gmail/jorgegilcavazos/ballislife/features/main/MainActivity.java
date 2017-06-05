@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -417,6 +418,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setHighlightsFragment() {
+        Log.d(TAG, "setting fragment");
         setTitle("Highlights");
         getSupportActionBar().setSubtitle(null);
 
@@ -427,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (highlightsFragment == null) {
+            Log.d(TAG, "creating new instance");
             highlightsFragment = HighlightsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     highlightsFragment, R.id.fragment);
