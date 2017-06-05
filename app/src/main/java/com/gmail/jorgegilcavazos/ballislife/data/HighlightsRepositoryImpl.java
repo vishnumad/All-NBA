@@ -45,6 +45,7 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
     public void reset() {
         firstLoad = true;
         lastHighlighKey = "";
+        cachedHighlights.clear();
     }
 
     @Override
