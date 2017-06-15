@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -105,6 +106,16 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
         rvComments.setAdapter(threadAdapter);
+        rvComments.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0) {
+                    ((CommentsActivity) getActivity()).fab.hide();
+                } else if (dy < 0) {
+                    ((CommentsActivity) getActivity()).fab.show();
+                }
+            }
+        });
 
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);

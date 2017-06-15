@@ -121,13 +121,13 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         viewPager.setCurrentItem(tab.getPosition());
         switch (tab.getPosition()) {
             case 0:
-                fab.setVisibility(View.VISIBLE);
+                fab.show();
                 break;
             case 1:
-                fab.setVisibility(View.INVISIBLE);
+                fab.hide();
                 break;
             case 2:
-                fab.setVisibility(View.VISIBLE);
+                fab.show();
                 break;
         }
     }

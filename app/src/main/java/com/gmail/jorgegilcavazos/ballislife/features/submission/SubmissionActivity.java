@@ -98,6 +98,16 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
         submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         submissionRecyclerView.setAdapter(threadAdapter);
+        submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0) {
+                    fab.hide();
+                } else if (dy < 0) {
+                    fab.show();
+                }
+            }
+        });
 
         SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
