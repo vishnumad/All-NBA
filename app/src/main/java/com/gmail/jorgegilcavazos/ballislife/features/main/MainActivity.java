@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.internal.NavigationMenuView;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -573,6 +574,11 @@ public class MainActivity extends AppCompatActivity {
             default:
                 // Return to games fragment.
                 setGamesFragment();
+                // Expand toolbar in case it's collapsed and empty games recycler doesn't allow
+                // scrolling.
+                if (toolbar.getParent() instanceof AppBarLayout){
+                    ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
+                }
                 navigationView.getMenu().getItem(0).setChecked(true);
                 break;
         }
