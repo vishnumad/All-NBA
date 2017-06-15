@@ -46,6 +46,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.text_domain_link) TextView tvDomainLink;
     public @BindView(R.id.text_link) TextView tvLink;
     public @BindView(R.id.comments_layout) View commentsLayout;
+    public @BindView(R.id.header_layout) View  headerLayout;
 
     public FullCardViewHolder(View itemView) {
         super(itemView);
@@ -323,7 +324,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
                 }
             });
 
-            tvTitle.setOnClickListener(new View.OnClickListener() {
+            headerLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     submissionClickListener.onSubmissionClick(customSubmission.getSubmission());
