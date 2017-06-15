@@ -1,7 +1,9 @@
 package com.gmail.jorgegilcavazos.ballislife.data.local;
 
 import android.content.SharedPreferences;
+import android.support.v4.content.ContextCompat;
 
+import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 
 import javax.inject.Inject;
@@ -39,5 +41,17 @@ public class AppLocalRepository implements LocalRepository {
     @Override
     public int getFavoriteHighlightViewType() {
         return sharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, -1);
+    }
+
+    @Override
+    public void saveUsername(String username) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(LocalSharedPreferences.USERNAME, username);
+        editor.apply();
+    }
+
+    @Override
+    public String getUsername() {
+        return sharedPreferences.getString(LocalSharedPreferences.USERNAME, null);
     }
 }

@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.UserAgent;
@@ -13,6 +15,8 @@ import net.dean.jraw.http.oauth.OAuthHelper;
 import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
+
+import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.functions.Action;
@@ -43,7 +47,11 @@ public class RedditAuthentication {
     private RedditClient mRedditClient;
     private RedditService redditService;
 
+    @Inject
+    LocalRepository localRepository;
+
     private RedditAuthentication() {
+        BallIsLifeApplication.getAppComponent().inject(this);
         mRedditClient = new RedditClient(UserAgent.of("android",
                 "com.gmail.jorgegilcavazos.ballislife", "v0.5.3", "Obi-Wan_Ginobili"));
         redditService = new RedditService();
@@ -100,6 +108,7 @@ public class RedditAuthentication {
                             saveRefreshTokenInPrefs(sharedPreferences);
                             saveTokenExpirationInPrefs(sharedPreferences, mRedditClient
                                     .getOAuthData().data("expires_in", Integer.class) * 1000);
+                            localRepository.saveUsername(mRedditClient.getAuthenticatedUser());
                         }
                     });
         }
@@ -120,6 +129,7 @@ public class RedditAuthentication {
                         saveRefreshTokenInPrefs(sharedPreferences);
                         saveTokenExpirationInPrefs(sharedPreferences, mRedditClient
                                 .getOAuthData().data("expires_in", Integer.class) * 1000);
+                        localRepository.saveUsername(mRedditClient.getAuthenticatedUser());
                     }
                 });
     }
@@ -134,6 +144,7 @@ public class RedditAuthentication {
 
         clearRefreshTokenInPrefs(sharedPreferences);
         clearTokenExpirationInPrefs(sharedPreferences);
+        localRepository.saveUsername(null);
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
         return redditService.deAuthenticate(mRedditClient, credentials);
     }

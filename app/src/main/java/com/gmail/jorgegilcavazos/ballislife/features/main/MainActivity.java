@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
@@ -38,6 +39,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import net.dean.jraw.RedditClient;
+
+import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -61,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int POSTS_FRAGMENT_ID = 3;
     private static final int HIGHLIGHTS_FRAGMENT_ID = 4;
 
+    @Inject
+    LocalRepository localRepository;
+
     Toolbar toolbar;
     ActionBar actionBar;
     DrawerLayout drawerLayout;
@@ -76,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         BallIsLifeApplication.getAppComponent().inject(this);
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, showTour)) {
@@ -453,9 +458,10 @@ public class MainActivity extends AppCompatActivity {
 
         View headerView = navigationView.getHeaderView(0);
         TextView redditUsername = (TextView) headerView.findViewById(R.id.redditUsername);
-        RedditClient redditClient = RedditAuthentication.getInstance().getRedditClient();
-        if (redditClient.isAuthenticated() && redditClient.hasActiveUserContext()) {
-            redditUsername.setText(redditClient.getAuthenticatedUser());
+
+        String username = localRepository.getUsername();
+        if (username != null) {
+            redditUsername.setText(localRepository.getUsername());
         } else {
             redditUsername.setText(R.string.not_logged);
         }

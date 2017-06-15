@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.component;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
@@ -22,4 +23,5 @@ public interface AppComponent {
     void inject(AppLocalRepository localRepository);
     void inject(HighlightsRepositoryImpl highlightsRepository);
     void inject(StandingsFragment fragment);
+    void inject(RedditAuthentication redditAuthentication);
 }

@@ -9,4 +9,8 @@ public interface LocalRepository {
     void saveFavoriteHighlightViewType(int viewType);
 
     int getFavoriteHighlightViewType();
+
+    void saveUsername(String username);
+
+    String getUsername();
 }
