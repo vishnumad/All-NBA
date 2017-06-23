@@ -2,6 +2,10 @@ package com.gmail.jorgegilcavazos.ballislife.features.main;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.internal.NavigationMenuView;
@@ -34,11 +38,12 @@ import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment
 import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import net.dean.jraw.RedditClient;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -64,6 +69,18 @@ public class MainActivity extends AppCompatActivity {
     private static final int POSTS_FRAGMENT_ID = 3;
     private static final int HIGHLIGHTS_FRAGMENT_ID = 4;
 
+    // Shortcuts should match values in xml/shortcuts
+    private static final String SHORTCUT_KEY = "shortcut";
+    private static final String SHORTCUT_RNBA = "shortcut_rnba";
+    private static final String SHORTCUT_HIGHLIGHTS = "shortcut_highlights";
+
+    // Dynamic shortcut
+    private static final String TEAM_SUB_SHORTCUT_ID = "teamSubShortcut";
+    private static final String SHORTCUT_TEAM_SUB = "shortcut_teamsub";
+
+    // Should match value in strings.xml
+    private static final String NO_FAV_TEAM_VAL = "noteam";
+
     @Inject
     LocalRepository localRepository;
 
@@ -76,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     String subreddit;
     private SharedPreferences myPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceListener;
+    private SharedPreferences defaultPreferences;
 
     private CompositeDisposable disposables;
 
@@ -90,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
             Once.markDone(showTour);
         }
 
+        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
+        defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         setContentView(R.layout.activity_main);
         setUpToolbar();
         setUpNavigationView();
@@ -97,8 +118,7 @@ public class MainActivity extends AppCompatActivity {
         setUpPreferences();
         loadNavigationHeaderContent();
         checkGooglePlayServicesAvailable();
-
-        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
+        setupDynamicShortcut();
 
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
 
@@ -126,6 +146,24 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             selectedFragment = savedInstanceState.getInt(SELECTED_FRAGMENT_KEY);
             subreddit = savedInstanceState.getString(SELECTED_SUBREDDIT_KEY);
+        }
+
+        if (getIntent().getExtras() != null) {
+            String shortcut = getIntent().getStringExtra(SHORTCUT_KEY);
+            if (shortcut != null) {
+                if (shortcut.equals(SHORTCUT_RNBA)) {
+                    subreddit = "nba";
+                    selectedFragment = POSTS_FRAGMENT_ID;
+                } else if (shortcut.equals(SHORTCUT_HIGHLIGHTS)) {
+                    selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
+                } else if (shortcut.equals(SHORTCUT_TEAM_SUB)) {
+                    String teamSub = getTeamSubFromFavoritePref();
+                    if (teamSub != null) {
+                        subreddit = teamSub;
+                        selectedFragment = POSTS_FRAGMENT_ID;
+                    }
+                }
+            }
         }
 
         switch (selectedFragment) {
@@ -551,6 +589,34 @@ public class MainActivity extends AppCompatActivity {
         }
         */
         return true;
+    }
+
+    private void setupDynamicShortcut() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            String teamSub = getTeamSubFromFavoritePref();
+            if (teamSub != null) {
+                ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+
+                ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, TEAM_SUB_SHORTCUT_ID)
+                        .setShortLabel(teamSub)
+                        .setLongLabel(teamSub)
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r))
+                        .setIntent(new Intent(this, MainActivity.class)
+                                .setAction(Intent.ACTION_VIEW)
+                                .putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
+                        .build();
+
+                shortcutManager.setDynamicShortcuts(Arrays.asList(shortcutInfo));
+            }
+        }
+    }
+
+    private String getTeamSubFromFavoritePref() {
+        String favTeamVal = defaultPreferences.getString("teams_list", null);
+        if (favTeamVal != null && !favTeamVal.equals(NO_FAV_TEAM_VAL)) {
+            return RedditUtils.getSubredditFromAbbr(favTeamVal);
+        }
+        return null;
     }
 
     @Override

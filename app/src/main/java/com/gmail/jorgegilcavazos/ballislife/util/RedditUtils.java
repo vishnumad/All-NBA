@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
@@ -652,6 +651,74 @@ public final class RedditUtils {
             } else {
                 return String.valueOf(res).substring(0, 2) + "k";
             }
+        }
+    }
+
+    // Should match pref_teams_list_values in strings.xml
+    public static String getSubredditFromAbbr(String abbr) {
+        switch (abbr) {
+            case "atl":
+                return Constants.SUB_ATL;
+            case "bkn":
+                return Constants.SUB_BKN;
+            case "bos":
+                return Constants.SUB_BOS;
+            case "cha":
+                return Constants.SUB_CHA;
+            case "chi":
+                return Constants.SUB_CHI;
+            case "cle":
+                return Constants.SUB_CLE;
+            case "dal":
+                return Constants.SUB_DAL;
+            case "den":
+                return Constants.SUB_DEN;
+            case "det":
+                return Constants.SUB_DET;
+            case "gsw":
+                return Constants.SUB_GSW;
+            case "hou":
+                return Constants.SUB_HOU;
+            case "ind":
+                return Constants.SUB_IND;
+            case "lac":
+                return Constants.SUB_LAC;
+            case "lal":
+                return Constants.SUB_LAL;
+            case "mem":
+                return Constants.SUB_MEM;
+            case "mia":
+                return Constants.SUB_MIA;
+            case "mil":
+                return Constants.SUB_MIL;
+            case "min":
+                return Constants.SUB_MIN;
+            case "nop":
+                return Constants.SUB_NOP;
+            case "nyk":
+                return Constants.SUB_NYK;
+            case "okc":
+                return Constants.SUB_OKC;
+            case "orl":
+                return Constants.SUB_ORL;
+            case "phi":
+                return Constants.SUB_PHI;
+            case "phx":
+                return Constants.SUB_PHO;
+            case "por":
+                return Constants.SUB_POR;
+            case "sac":
+                return Constants.SUB_SAC;
+            case "sas":
+                return Constants.SUB_SAS;
+            case "tor":
+                return Constants.SUB_TOR;
+            case "uta":
+                return Constants.SUB_UTA;
+            case "was":
+                return Constants.SUB_WAS;
+            default:
+                throw new IllegalStateException("Invalid abbreviation for favorite team: " + abbr);
         }
     }
 }

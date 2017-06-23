@@ -10,7 +10,7 @@
             android:key="teams_list"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:title="Favorite Team" />
+            android:title="Favorite Team"/>
 
     </PreferenceCategory>
 

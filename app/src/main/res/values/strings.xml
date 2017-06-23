@@ -100,6 +100,12 @@
     <string name="card_view_description">Larger HD images, uses more data</string>
     <string name="list_view">List View</string>
     <string name="list_view_description">Smaller thumbnails, uses less data</string>
+    
+    <!-- App shortcuts -->
+    <string name="rnba_shortcut_short_label">NBA</string>
+    <string name="rnba_shortcut_long_label">NBA</string>
+    <string name="highlights_shortcut_short_label">Highlights</string>
+    <string name="highlights_shortcut_long_label">Highlights</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>
