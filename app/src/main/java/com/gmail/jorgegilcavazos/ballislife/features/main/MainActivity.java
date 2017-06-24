@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -56,10 +55,8 @@ import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.RED
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String showTour = "showTourTag";
-
-    public static final String MY_PREFERENCES = "MyPrefs";
-    public static final String FIRST_TIME = "firstTime";
+    private static final String SHOW_TOUR = "showTourTag";
+    private static final String SUBSCRIBE_TO_TOPICS = "subscribeToTopics";
 
     private static final String SELECTED_FRAGMENT_KEY = "selectedFragment";
     private static final String SELECTED_SUBREDDIT_KEY = "selectedSubreddit";
@@ -91,9 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     int selectedFragment;
     String subreddit;
-    private SharedPreferences myPreferences;
-    private SharedPreferences.OnSharedPreferenceChangeListener mPreferenceListener;
-    private SharedPreferences defaultPreferences;
 
     private CompositeDisposable disposables;
 
@@ -101,27 +95,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BallIsLifeApplication.getAppComponent().inject(this);
+        setContentView(R.layout.activity_main);
 
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, showTour)) {
+        // Show app tour if first install.
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {
             Intent intent = new Intent(this, TourLoginActivity.class);
             startActivity(intent);
-            Once.markDone(showTour);
+            Once.markDone(SHOW_TOUR);
         }
 
-        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
-        defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        // Subscribe to all default firebase messaging topics if first install.
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, SUBSCRIBE_TO_TOPICS)) {
+            subscribeToDefaultTopics();
+        }
 
-        setContentView(R.layout.activity_main);
         setUpToolbar();
         setUpNavigationView();
         setUpDrawerContent();
-        setUpPreferences();
-        loadNavigationHeaderContent();
-        checkGooglePlayServicesAvailable();
+        loadRedditUsername();
         setupDynamicShortcut();
 
+        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
-
         disposables = new CompositeDisposable();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .subscribeOn(schedulerProvider.io())
@@ -148,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             subreddit = savedInstanceState.getString(SELECTED_SUBREDDIT_KEY);
         }
 
+        // Setup opening fragment if app opened from shorcut.
         if (getIntent().getExtras() != null) {
             String shortcut = getIntent().getStringExtra(SHORTCUT_KEY);
             if (shortcut != null) {
@@ -182,12 +178,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposables.clear();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(SELECTED_FRAGMENT_KEY, selectedFragment);
         outState.putString(SELECTED_SUBREDDIT_KEY, subreddit);
@@ -196,15 +186,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onResume() {
+    protected void onResume() {
         super.onResume();
-        checkGooglePlayServicesAvailable();
         loadRedditUsername();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
+        disposables.clear();
     }
 
     private void setUpToolbar() {
@@ -481,14 +471,6 @@ public class MainActivity extends AppCompatActivity {
         selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
     }
 
-    /**
-     * Sets the logo and username from shared preferences.
-     */
-    private void loadNavigationHeaderContent() {
-        loadRedditUsername();
-        loadTeamLogo();
-    }
-
     private void loadRedditUsername() {
         if (navigationView == null) {
             return;
@@ -505,90 +487,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadTeamLogo() {
-        if (Constants.NBA_MATERIAL_ENABLED) {
-            View headerView = navigationView.getHeaderView(0);
-            ImageView favTeamLogo = (ImageView) headerView.findViewById(R.id.favTeamLogo);
-            favTeamLogo.setImageResource(getFavTeamLogoResource());
-        }
-    }
-
-    /**
-     * Looks for a favorite team saved in shared preferences and returns the resource id for its
-     * logo. If there is no favorite team, the app icon is returned.
-     */
-    private int getFavTeamLogoResource() {
-        String favoriteTeam = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("teams_list", null);
-
-        int resourceId;
-        if (favoriteTeam != null && !favoriteTeam.equals("noteam")) {
-            resourceId = getResources().getIdentifier(favoriteTeam, "drawable", getPackageName());
-        } else {
-            resourceId = R.mipmap.ic_launcher;
-        }
-        return resourceId;
-    }
-
-    private void setUpPreferences() {
-        myPreferences = getSharedPreferences(MY_PREFERENCES, MODE_PRIVATE);
-        // Set default preferences if not set yet
-        if (myPreferences.getBoolean(FIRST_TIME, true)) {
-            SharedPreferences.Editor editor = myPreferences.edit();
-            editor.putBoolean(FIRST_TIME, false);
-            editor.apply();
-            subscribeToDefaultTopics();
-        }
-
-        // Listen for changes to update team logo.
-        mPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                switch (key) {
-                    case "teams_list":
-                        loadTeamLogo();
-                        break;
-                }
-
-            }
-        };
-
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(mPreferenceListener);
-    }
-
     private void subscribeToDefaultTopics() {
         // Subscribe to all CGA topics
         String[] topics = getResources().getStringArray(R.array.pref_cga_values);
         for (String topic : topics) {
             FirebaseMessaging.getInstance().subscribeToTopic(topic);
         }
-    }
-
-    public void setToolbarSubtitle(String subtitle) {
-        if (toolbar != null) {
-            toolbar.setSubtitle(subtitle);
-        }
-    }
-
-    public boolean checkGooglePlayServicesAvailable() {
-        final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-        /*
-        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = googleApiAvailability.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (googleApiAvailability.isUserResolvableError(resultCode)) {
-                googleApiAvailability.getErrorDialog(this, resultCode,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported");
-                finish();
-            }
-            return false;
-        }
-        */
-        return true;
     }
 
     private void setupDynamicShortcut() {
@@ -612,6 +516,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getTeamSubFromFavoritePref() {
+        SharedPreferences defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String favTeamVal = defaultPreferences.getString("teams_list", null);
         if (favTeamVal != null && !favTeamVal.equals(NO_FAV_TEAM_VAL)) {
             return RedditUtils.getSubredditFromAbbr(favTeamVal);
@@ -648,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
                 setGamesFragment();
                 // Expand toolbar in case it's collapsed and empty games recycler doesn't allow
                 // scrolling.
-                if (toolbar.getParent() instanceof AppBarLayout){
+                if (toolbar.getParent() instanceof AppBarLayout) {
                     ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
                 }
                 navigationView.getMenu().getItem(0).setChecked(true);
