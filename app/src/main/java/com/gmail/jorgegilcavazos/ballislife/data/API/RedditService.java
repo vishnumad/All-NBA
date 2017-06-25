@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.API;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
@@ -164,7 +164,6 @@ public class RedditService {
                     if (!e.isDisposed()) {
                         e.onError(new ReplyNotAvailableException());
                     }
-
                 } catch (NetworkException ex) {
                     if (!e.isDisposed()) {
                         e.onError(ex);

@@ -16,8 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
@@ -138,7 +138,19 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addComment(int position, CommentNode comment) {
-        commentsList.add(position, comment);
+        if (position == 0) {
+            // Coming from a reply to thread. Show comment in first position.
+            commentsList.add(0, comment);
+        } else {
+            // Coming from a comment reply, position param is comment adapter position + 1, which
+            // means that if there is a header we need to subtract 1 to place in comment in desired
+            // position.
+            if (hasHeader) {
+                commentsList.add(position - 1, comment);
+            } else {
+                commentsList.add(position, comment);
+            }
+        }
         notifyDataSetChanged();
     }
 

@@ -48,10 +48,8 @@ import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.RED
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
         View.OnClickListener {
-    private static final String TAG = "SubmissionActivity";
-
     public static final String KEY_SUBREDDIT = "subreddit";
-
+    private static final String TAG = "SubmissionActivity";
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
@@ -322,5 +320,10 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void showContentUnavailableToast() {
         Toast.makeText(this, R.string.content_not_available, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void scrollToTop() {
+        submissionRecyclerView.smoothScrollToPosition(0);
     }
 }

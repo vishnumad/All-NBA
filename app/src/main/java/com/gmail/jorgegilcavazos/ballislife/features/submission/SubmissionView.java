@@ -33,4 +33,6 @@ public interface SubmissionView {
     void openStreamable(String shortcode);
 
     void showContentUnavailableToast();
+
+    void scrollToTop();
 }

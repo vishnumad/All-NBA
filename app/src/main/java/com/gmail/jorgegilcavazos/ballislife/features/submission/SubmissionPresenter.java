@@ -10,7 +10,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
-import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import net.dean.jraw.models.Comment;
@@ -21,6 +20,7 @@ import net.dean.jraw.models.VoteDirection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.SingleSource;
 import io.reactivex.disposables.CompositeDisposable;
@@ -204,6 +204,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         view.showSavingToast();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.replyToComment(parent, text))
+                // Comment is not immediately available after being posted in the next call
+                // (probably a small delay from reddit's servers) so we need to wait for a bit
+                // before fetching the posted comment.
+                .delay(3, TimeUnit.SECONDS)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String s) throws Exception {
@@ -215,22 +219,20 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
                     @Override
                     public void onSuccess(CommentNode comment) {
-                        if (isViewAttached()) {
-                            view.showSavedToast();
-                            view.addComment(comment, position + 1);
-                        }
+                        view.addComment(comment, position + 1);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            if (e instanceof NotLoggedInException) {
-                                view.showNotLoggedInError();
-                            } else if (e instanceof ReplyToCommentException) {
-                                view.showErrorAddingComment();
-                            } else {
-                                view.showSavedToast();
-                            }
+                        if (e instanceof NotLoggedInException) {
+                            view.showNotLoggedInError();
+                        } else if (e instanceof ReplyToCommentException) {
+                            view.showErrorAddingComment();
+                        } else if (e instanceof ReplyNotAvailableException) {
+                            // Reply was posted but could not be fetched to display in the UI.
+                            view.showSavedToast();
+                        } else {
+                            view.showErrorSavingToast();
                         }
                     }
                 })
@@ -250,6 +252,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         view.showSavingToast();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.replyToThread(submission, text))
+                // Comment is not immediately available after being posted in the next call
+                // (probably a small delay from reddit's servers) so we need to wait for a bit
+                // before fetching the posted comment.
+                .delay(3, TimeUnit.SECONDS)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String commentId) throws Exception {
@@ -261,22 +267,21 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
                     @Override
                     public void onSuccess(CommentNode comment) {
-                        if (isViewAttached()) {
-                            view.showSavedToast();
-                            view.addComment(comment, 0);
-                        }
+                        view.addComment(comment, 0);
+                        view.scrollToTop();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            if (e instanceof NotLoggedInException) {
-                                view.showNotLoggedInError();
-                            } else if (e instanceof ReplyToThreadException){
-                                view.showErrorAddingComment();
-                            } else if (e instanceof ReplyNotAvailableException) {
-                                view.showSavedToast();
-                            }
+                        if (e instanceof NotLoggedInException) {
+                            view.showNotLoggedInError();
+                        } else if (e instanceof ReplyToCommentException) {
+                            view.showErrorAddingComment();
+                        } else if (e instanceof ReplyNotAvailableException) {
+                            // Reply was posted but could not be fetched to display in the UI.
+                            view.showSavedToast();
+                        } else {
+                            view.showErrorSavingToast();
                         }
                     }
                 })
