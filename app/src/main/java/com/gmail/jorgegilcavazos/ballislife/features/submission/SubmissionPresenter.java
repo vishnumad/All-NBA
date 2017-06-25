@@ -60,17 +60,14 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                             commentNodes.add(node);
                         }
 
-                        if (isViewAttached()) {
-                            view.showComments(commentNodes, submission);
-                            view.setLoadingIndicator(false);
-                        }
+                        view.showComments(commentNodes, submission);
+                        view.setLoadingIndicator(false);
+                        view.scrollToTop();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if (isViewAttached()) {
-                            view.setLoadingIndicator(false);
-                        }
+                        view.setLoadingIndicator(false);
                     }
                 })
         );

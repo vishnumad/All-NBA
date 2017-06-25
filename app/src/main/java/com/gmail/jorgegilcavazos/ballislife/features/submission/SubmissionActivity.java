@@ -171,7 +171,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     public void showComments(List<CommentNode> commentNodes, Submission submission) {
-        threadAdapter.swap(commentNodes);
+        threadAdapter.setData(commentNodes);
         threadAdapter.setSubmission(submission);
     }
 

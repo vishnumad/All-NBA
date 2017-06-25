@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,26 +45,21 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 
 public class GameThreadFragment extends Fragment implements GameThreadView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, CompoundButton.OnCheckedChangeListener {
-    private static final String TAG = "GameThreadFragment";
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
-
+    private static final String TAG = "GameThreadFragment";
+    public boolean isPremium = false;
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
     @BindView(R.id.text_message) TextView tvMessage;
-
     private RecyclerView.LayoutManager lmComments;
     private ThreadAdapter threadAdapter;
     private Unbinder unbinder;
-
     private String homeTeam, awayTeam, threadType;
     private long gameDate;
     private boolean stream = false;
     private Switch streamSwitch;
-
     private GameThreadPresenter presenter;
-
-    public boolean isPremium = false;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -167,7 +161,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     @Override
     public void showComments(List<CommentNode> comments) {
-        threadAdapter.swap(comments);
+        threadAdapter.setData(comments);
         rvComments.setVisibility(View.VISIBLE);
     }
 

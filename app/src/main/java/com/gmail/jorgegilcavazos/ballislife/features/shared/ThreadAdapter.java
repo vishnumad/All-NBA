@@ -131,7 +131,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public void swap(List<CommentNode> data) {
+    public void setData(List<CommentNode> data) {
         commentsList.clear();
         commentsList.addAll(data);
         notifyDataSetChanged();
