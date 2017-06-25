@@ -38,7 +38,7 @@ public class PostsRepositoryImpl implements PostsRepository {
         SubredditPaginator paginator = new SubredditPaginator(
                 RedditAuthentication.getInstance().getRedditClient(),
                 subreddit);
-        paginator.setLimit(10);
+        paginator.setLimit(20);
         paginator.setSorting(sorting);
         paginator.setTimePeriod(timePeriod);
         if (sorting == Sorting.TOP) {
