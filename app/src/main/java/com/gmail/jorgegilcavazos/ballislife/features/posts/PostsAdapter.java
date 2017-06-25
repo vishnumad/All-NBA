@@ -16,6 +16,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickLis
 import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postsList = new ArrayList<>();
         }
         postsList.addAll(submissions);
+        preFetchImages(submissions);
         notifyDataSetChanged();
     }
 
@@ -127,6 +130,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postsList = new ArrayList<>();
         }
         postsList.addAll(submissions);
+        preFetchImages(submissions);
         notifyDataSetChanged();
     }
 
@@ -138,6 +142,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void setContentViewType(int viewType) {
         contentViewType = viewType;
         notifyDataSetChanged();
+    }
+
+    private void preFetchImages(List<CustomSubmission> submissions) {
+        for (CustomSubmission submission : submissions) {
+            Picasso.with(context)
+                    .load(Utilities.getThumbnailToShowFromCustomSubmission(submission))
+                    .fetch();
+        }
     }
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {

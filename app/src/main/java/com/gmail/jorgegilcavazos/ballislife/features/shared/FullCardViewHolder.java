@@ -16,10 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Submission;
@@ -73,13 +74,11 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             score = String.valueOf(customSubmission.getScore());
             selfTextHtml = customSubmission.getSelfTextHtml();
             domain = customSubmission.getDomain();
-            thumbnail = customSubmission.getThumbnail();
             url = customSubmission.getUrl();
             isSelf = customSubmission.isSelfPost();
             isStickied = customSubmission.isStickied();
             isSaved = customSubmission.isSaved();
             vote = customSubmission.getVoteDirection();
-            highResThumbnail = customSubmission.getHighResThumbnail();
         } else {
             Submission submission = customSubmission.getSubmission();
             title = submission.getTitle();
@@ -89,25 +88,14 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             score = String.valueOf(submission.getScore());
             selfTextHtml = submission.data("selftext_html");
             domain = submission.getDomain();
-            thumbnail = submission.getThumbnail();
             url = submission.getUrl();
             isSelf = submission.isSelfPost();
             isStickied = submission.isStickied();
             isSaved = submission.isSaved();
             vote = submission.getVote();
-            try {
-                highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
-            } catch (NullPointerException e) {
-                highResThumbnail = null;
-            }
         }
 
-        // Show HD thumbnail over lower res version.
-        if (highResThumbnail != null) {
-            thumbnailToShow = highResThumbnail;
-        } else {
-            thumbnailToShow = thumbnail;
-        }
+        thumbnailToShow = Utilities.getThumbnailToShowFromCustomSubmission(customSubmission);
 
         // Bind data to views.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

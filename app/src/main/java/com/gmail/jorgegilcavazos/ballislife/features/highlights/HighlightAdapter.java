@@ -75,17 +75,25 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     public void setData(List<Highlight> highlights) {
         this.highlights.clear();
         this.highlights.addAll(highlights);
+        preFetchImages(highlights);
         notifyDataSetChanged();
     }
 
     public void addData(List<Highlight> highlights) {
         this.highlights.addAll(highlights);
+        preFetchImages(highlights);
         notifyDataSetChanged();
     }
 
     public void setContentViewType(int viewType) {
         contentViewType = viewType;
         notifyDataSetChanged();
+    }
+
+    private void preFetchImages(List<Highlight> highlights) {
+        for (Highlight highlight : highlights) {
+            Picasso.with(context).load(highlight.getHdThumbnail()).fetch();
+        }
     }
 
     public Observable<Highlight> getViewClickObservable() {
