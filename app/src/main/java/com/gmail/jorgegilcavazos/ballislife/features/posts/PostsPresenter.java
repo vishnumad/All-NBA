@@ -23,6 +23,7 @@ import net.dean.jraw.paginators.TimePeriod;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -33,32 +34,33 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     private static final String TAG = "PostsPresenter";
 
     @Inject
+    LocalRepository localRepository;
+
+    @Inject
+    @Named("redditSharedPreferences")
+    SharedPreferences redditPrefs;
+
+    @Inject
+    PostsRepository postsRepository;
+
+    @Inject
     RedditService service;
 
-    private LocalRepository localRepository;
-    private PostsRepository postsRepository;
-    private SharedPreferences preferences;
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     private CompositeDisposable disposables;
-    private BaseSchedulerProvider schedulerProvider;
     private String subreddit;
 
-    public PostsPresenter(String subreddit,
-                          LocalRepository localRepository,
-                          PostsRepository postsRepository,
-                          SharedPreferences preferences,
-                          BaseSchedulerProvider schedulerProvider) {
+    public PostsPresenter(String subreddit) {
         BallIsLifeApplication.getAppComponent().inject(this);
         this.subreddit = subreddit;
-        this.localRepository = localRepository;
-        this.postsRepository = postsRepository;
-        this.preferences = preferences;
-        this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
     }
 
     public void loadSubscriberCount() {
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
                 .andThen(service.getSubscriberCount(subreddit))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -103,7 +105,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         view.dismissSnackbar();
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
                 .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -144,7 +146,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
                 .andThen(service.voteSubmission(submission, direction))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -168,7 +170,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
                 .andThen(service.saveSubmission(submission, saved))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())

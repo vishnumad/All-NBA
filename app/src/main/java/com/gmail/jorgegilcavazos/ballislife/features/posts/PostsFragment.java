@@ -36,7 +36,6 @@ import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivi
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
@@ -162,12 +161,7 @@ public class PostsFragment extends Fragment implements PostsView,
 
         recyclerViewPosts.addOnScrollListener(scrollListener);
 
-        presenter = new PostsPresenter(
-                subreddit,
-                localRepository,
-                postsRepository,
-                redditSharedPreferences,
-                SchedulerProvider.getInstance());
+        presenter = new PostsPresenter(subreddit);
         presenter.attachView(this);
         presenter.loadSubscriberCount();
 
