@@ -53,11 +53,9 @@ public class PostsFragment extends Fragment implements PostsView,
         SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener,
         PostsAdapter.OnLoadMoreListener {
 
-    private static final String TAG = "PostsFragment";
-
     public static final int TYPE_FIRST_LOAD = 0;
     public static final int TYPE_LOAD_MORE = 1;
-
+    private static final String TAG = "PostsFragment";
     private static final String VIEW_TYPE = "viewType";
     private static final String SUBREDDIT = "subreddit";
 
@@ -244,6 +242,7 @@ public class PostsFragment extends Fragment implements PostsView,
     public void showPosts(List<CustomSubmission> submissions) {
         postsAdapter.setData(submissions);
         recyclerViewPosts.setVisibility(View.VISIBLE);
+        recyclerViewPosts.smoothScrollToPosition(0);
     }
 
     @Override
