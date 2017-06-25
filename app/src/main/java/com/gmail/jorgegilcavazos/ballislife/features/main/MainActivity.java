@@ -16,7 +16,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +25,7 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Inject
     LocalRepository localRepository;
+
+    @Inject
+    PostsRepository postsRepository;
 
     Toolbar toolbar;
     ActionBar actionBar;
@@ -442,6 +445,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (postsFragment == null || !this.subreddit.equals(subreddit)) {
+            postsRepository.clearCache();
             postsFragment = PostsFragment.newInstance(subreddit);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     postsFragment, R.id.fragment);
@@ -462,7 +466,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (highlightsFragment == null) {
-            Log.d(TAG, "creating new instance");
             highlightsFragment = HighlightsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     highlightsFragment, R.id.fragment);

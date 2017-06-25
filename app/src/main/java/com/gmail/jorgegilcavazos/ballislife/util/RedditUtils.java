@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
-import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
@@ -15,10 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class RedditUtils {
-    private final static String TAG = "RedditUtils";
-
     public final static String LIVE_GT_TYPE = "LIVE_GAME_THREAD";
     public final static String POST_GT_TYPE = "POST_GAME_THREAD";
+    private final static String TAG = "RedditUtils";
 
     /**
      * Parses a given /r/NBA flair into a readable friendly string.
@@ -640,9 +638,7 @@ public final class RedditUtils {
     }
 
     public static String formatScoreToDigits(int score) {
-        Log.d(TAG, score + "");
         if (score < 1000) {
-            Log.d(TAG, score + " < 1000");
             return String.valueOf(score);
         } else {
             double res = ((double) score) / 1000.0;

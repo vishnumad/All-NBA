@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
-import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
 

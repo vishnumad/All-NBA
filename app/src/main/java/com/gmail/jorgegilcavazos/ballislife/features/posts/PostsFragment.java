@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -23,11 +25,12 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
@@ -50,14 +53,11 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class PostsFragment extends Fragment implements PostsView,
-        SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener,
-        PostsAdapter.OnLoadMoreListener {
+        SwipeRefreshLayout.OnRefreshListener, OnSubmissionClickListener {
 
-    public static final int TYPE_FIRST_LOAD = 0;
-    public static final int TYPE_LOAD_MORE = 1;
     private static final String TAG = "PostsFragment";
-    private static final String VIEW_TYPE = "viewType";
     private static final String SUBREDDIT = "subreddit";
+    private static final String LIST_STATE = "listState";
 
     @Inject
     LocalRepository localRepository;
@@ -66,24 +66,26 @@ public class PostsFragment extends Fragment implements PostsView,
     @Named("redditSharedPreferences")
     SharedPreferences redditSharedPreferences;
 
+    @Inject
+    PostsRepository postsRepository;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
-
+    Parcelable listState;
     private int viewType;
     private String subreddit;
     private Snackbar snackbar;
     private PostsAdapter postsAdapter;
-
+    private LinearLayoutManager linearLayoutManager;
+    private EndlessRecyclerViewScrollListener scrollListener;
     private PostsPresenter presenter;
     private Unbinder unbinder;
-
     private Sorting sorting = Sorting.HOT;
     private TimePeriod timePeriod = TimePeriod.ALL;
-
     private Menu menu;
 
     public PostsFragment() {
-
+        BallIsLifeApplication.getAppComponent().inject(this);
     }
 
     public static PostsFragment newInstance(String subreddit) {
@@ -96,9 +98,24 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save layout manager state to restore scroll position after config changes.
+        listState = linearLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LIST_STATE, listState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(LIST_STATE);
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BallIsLifeApplication.getAppComponent().inject(this);
 
         if (getArguments() != null) {
             subreddit = getArguments().getString(SUBREDDIT);
@@ -110,7 +127,17 @@ public class PostsFragment extends Fragment implements PostsView,
             viewType = Constants.VIEW_CARD;
         }
 
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this, subreddit);
+
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Load cached data if available, or from network if not.
+        presenter.loadFirstAvailable(sorting, timePeriod);
     }
 
     @Override
@@ -121,20 +148,28 @@ public class PostsFragment extends Fragment implements PostsView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this, subreddit);
-        postsAdapter.setLoadMoreListener(this);
-        recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerViewPosts.setLayoutManager(linearLayoutManager);
         recyclerViewPosts.setAdapter(postsAdapter);
+
+        // Pass 1 as staticItemCount because of the posts header.
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager,
+                1 /* staticItemCount */) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                presenter.loadPosts(false /* reset */);
+            }
+        };
+
+        recyclerViewPosts.addOnScrollListener(scrollListener);
 
         presenter = new PostsPresenter(
                 subreddit,
                 localRepository,
-                new RedditService(),
+                postsRepository,
                 redditSharedPreferences,
                 SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadSubscriberCount();
-        presenter.loadPosts(sorting, timePeriod);
 
         return view;
     }
@@ -162,65 +197,76 @@ public class PostsFragment extends Fragment implements PostsView,
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadSubscriberCount();
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 return true;
             case R.id.action_change_view:
                 openViewPickerDialog();
                 return true;
             case R.id.action_sort_hot:
                 sorting = Sorting.HOT;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("HOT");
                 return true;
             case R.id.action_sort_new:
                 sorting = Sorting.NEW;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("NEW");
                 return true;
             case R.id.action_sort_rising:
                 sorting = Sorting.RISING;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("RISING");
                 return true;
             case R.id.action_sort_controversial:
                 sorting = Sorting.CONTROVERSIAL;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("CONTROVERSIAL");
                 return true;
             case R.id.action_sort_top_hour:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.HOUR;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: HOUR");
                 return true;
             case R.id.action_sort_top_day:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.DAY;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: DAY");
                 return true;
             case R.id.action_sort_top_week:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.WEEK;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: WEEK");
                 return true;
             case R.id.action_sort_top_month:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.MONTH;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: MONTH");
                 return true;
             case R.id.action_sort_top_year:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.YEAR;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: YEAR");
                 return true;
             case R.id.action_sort_top_all:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.ALL;
-                presenter.loadPosts(sorting, timePeriod);
+                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                presenter.loadPosts(true /* reset */);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: ALL");
                 return true;
         }
@@ -230,7 +276,8 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onRefresh() {
         presenter.loadSubscriberCount();
-        presenter.loadPosts(sorting, timePeriod);
+        presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+        presenter.loadPosts(true /* reset */);
     }
 
     @Override
@@ -239,29 +286,29 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void showPosts(List<CustomSubmission> submissions) {
-        postsAdapter.setData(submissions);
+    public void showPosts(List<CustomSubmission> submissions, boolean clear) {
+        if (clear) {
+            postsAdapter.setData(submissions);
+            recyclerViewPosts.smoothScrollToPosition(0);
+        } else {
+            postsAdapter.addData(submissions);
+        }
         recyclerViewPosts.setVisibility(View.VISIBLE);
-        recyclerViewPosts.smoothScrollToPosition(0);
     }
 
     @Override
-    public void addPosts(List<CustomSubmission> submissions) {
-        postsAdapter.addData(submissions);
-    }
-
-    @Override
-    public void showPostsLoadingFailedSnackbar(final int loadType) {
+    public void showPostsLoadingFailedSnackbar(final boolean reset) {
         if (getView() != null) {
             snackbar = Snackbar.make(getView(), R.string.posts_loading_failed,
                     Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(R.string.retry, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (loadType == TYPE_FIRST_LOAD) {
-                        presenter.loadPosts(sorting, timePeriod);
+                    if (reset) {
+                        presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
+                        presenter.loadPosts(true /* reset */);
                     } else {
-                        presenter.loadMorePosts();
+                        presenter.loadPosts(false);
                     }
                 }
             });
@@ -300,11 +347,6 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void setLoadingFailed(boolean failed) {
-        postsAdapter.setLoadingFailed(failed);
-    }
-
-    @Override
     public void showNothingToShowToast() {
         Toast.makeText(getActivity(), R.string.nothing_to_show, Toast.LENGTH_SHORT).show();
     }
@@ -325,6 +367,11 @@ public class PostsFragment extends Fragment implements PostsView,
     public void changeViewType(int viewType) {
         postsAdapter.setContentViewType(viewType);
         setViewIcon(viewType);
+    }
+
+    @Override
+    public void resetScrollState() {
+        scrollListener.resetState();
     }
 
     @Override
@@ -378,11 +425,6 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onContentClick(String url) {
         presenter.onContentClick(url);
-    }
-
-    @Override
-    public void onLoadMore() {
-        presenter.loadMorePosts();
     }
 
     private void openViewPickerDialog() {

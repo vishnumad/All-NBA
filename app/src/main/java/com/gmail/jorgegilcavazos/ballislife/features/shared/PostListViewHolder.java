@@ -5,7 +5,6 @@ import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -78,7 +77,6 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             author = submission.getAuthor();
             timestamp = DateFormatUtil.formatRedditDate(submission.getCreated());
             commentCount = String.valueOf(submission.getCommentCount());
-            Log.d("Holder", submission.getScore() + "");
             score = RedditUtils.formatScoreToDigits(submission.getScore());
             selfTextHtml = submission.data("selftext_html");
             domain = submission.getDomain();

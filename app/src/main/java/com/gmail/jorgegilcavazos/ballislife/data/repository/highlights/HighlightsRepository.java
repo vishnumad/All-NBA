@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.data;
+package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 

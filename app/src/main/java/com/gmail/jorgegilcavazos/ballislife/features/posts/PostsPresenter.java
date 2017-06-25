@@ -3,26 +3,26 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
-import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
-import net.dean.jraw.RedditClient;
-import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
-import net.dean.jraw.paginators.SubredditPaginator;
 import net.dean.jraw.paginators.TimePeriod;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -30,19 +30,27 @@ import io.reactivex.observers.DisposableSingleObserver;
 
 public class PostsPresenter extends BasePresenter<PostsView> {
 
+    private static final String TAG = "PostsPresenter";
+
+    @Inject
+    RedditService service;
+
     private LocalRepository localRepository;
-    private RedditService service;
+    private PostsRepository postsRepository;
     private SharedPreferences preferences;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
-    private SubredditPaginator paginator;
     private String subreddit;
 
-    public PostsPresenter(String subreddit, LocalRepository localRepository, RedditService service, SharedPreferences preferences,
+    public PostsPresenter(String subreddit,
+                          LocalRepository localRepository,
+                          PostsRepository postsRepository,
+                          SharedPreferences preferences,
                           BaseSchedulerProvider schedulerProvider) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         this.subreddit = subreddit;
         this.localRepository = localRepository;
-        this.service = service;
+        this.postsRepository = postsRepository;
         this.preferences = preferences;
         this.schedulerProvider = schedulerProvider;
 
@@ -70,78 +78,48 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         );
     }
 
-    public void loadPosts(Sorting sorting, TimePeriod timePeriod) {
-        view.setLoadingIndicator(true);
-        view.dismissSnackbar();
-
-        RedditClient redditClient = RedditAuthentication.getInstance()
-                .getRedditClient();
-        paginator = new SubredditPaginator(redditClient, subreddit);
-        paginator.setLimit(25);
-        paginator.setSorting(sorting);
-
-        if (sorting == Sorting.TOP) {
-            paginator.setTimePeriod(timePeriod);
+    public void loadFirstAvailable(Sorting sorting, TimePeriod timePeriod) {
+        List<CustomSubmission> submissions = postsRepository.getCachedSubmissions();
+        if (submissions.isEmpty()) {
+            resetLoaderFromStartWithParams(sorting, timePeriod);
+            loadPosts(true /* reset */);
+        } else {
+            view.showPosts(submissions, false /* clear */);
         }
-
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(service.getSubmissionListing(paginator))
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
-                    @Override
-                    public void onSuccess(Listing<Submission> submissions) {
-                        if (submissions.isEmpty()) {
-                            view.showNothingToShowToast();
-                            return;
-                        }
-
-                        List<CustomSubmission> customSubmissions = new ArrayList<>();
-                        for (Submission submission : submissions) {
-                            customSubmissions.add(new CustomSubmission(submission,
-                                    submission.getVote(), submission.isSaved()));
-                        }
-
-                        view.showPosts(customSubmissions);
-                        view.setLoadingIndicator(false);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof NotAuthenticatedException) {
-                            view.showNotAuthenticatedToast();
-                        } else {
-                            view.showPostsLoadingFailedSnackbar(PostsFragment.TYPE_FIRST_LOAD);
-                        }
-                        view.setLoadingIndicator(false);
-                    }
-                })
-        );
     }
 
-    public void loadMorePosts() {
-        if (paginator == null) {
-            return;
+    /**
+     * Must be called before loadPosts(reset = true).
+     */
+    public void resetLoaderFromStartWithParams(Sorting sorting, TimePeriod timePeriod) {
+        postsRepository.reset(sorting, timePeriod, subreddit);
+    }
+
+    public void loadPosts(final boolean reset) {
+        if (reset) {
+            view.resetScrollState();
+            view.setLoadingIndicator(true);
         }
 
+        view.dismissSnackbar();
+
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
-                .andThen(service.getSubmissionListing(paginator))
+                .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<Listing<Submission>>() {
+                .subscribeWith(new DisposableSingleObserver<List<CustomSubmission>>() {
                     @Override
-                    public void onSuccess(Listing<Submission> submissions) {
+                    public void onSuccess(List<CustomSubmission> submissions) {
                         if (submissions.isEmpty()) {
                             view.showNothingToShowToast();
                             return;
                         }
 
-                        List<CustomSubmission> customSubmissions = new ArrayList<>();
-                        for (Submission submission : submissions) {
-                            customSubmissions.add(new CustomSubmission(submission,
-                                    submission.getVote(), submission.isSaved()));
+                        view.showPosts(submissions, reset);
+
+                        if (reset) {
+                            view.setLoadingIndicator(false);
                         }
-                        view.addPosts(customSubmissions);
                     }
 
                     @Override
@@ -149,9 +127,12 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                         if (e instanceof NotAuthenticatedException) {
                             view.showNotAuthenticatedToast();
                         } else {
-                            view.showPostsLoadingFailedSnackbar(PostsFragment.TYPE_LOAD_MORE);
+                            view.showPostsLoadingFailedSnackbar(reset);
                         }
-                        view.setLoadingFailed(true);
+
+                        if (reset) {
+                            view.setLoadingIndicator(false);
+                        }
                     }
                 })
         );

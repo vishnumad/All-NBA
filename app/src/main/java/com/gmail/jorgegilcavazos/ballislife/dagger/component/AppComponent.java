@@ -2,12 +2,14 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.component;
 
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
-import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsPresenter;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 
 import javax.inject.Singleton;
@@ -24,4 +26,8 @@ public interface AppComponent {
     void inject(HighlightsRepositoryImpl highlightsRepository);
     void inject(StandingsFragment fragment);
     void inject(RedditAuthentication redditAuthentication);
+
+    void inject(PostsRepositoryImpl postsRepository);
+
+    void inject(PostsPresenter postsPresenter);
 }

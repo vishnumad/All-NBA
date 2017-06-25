@@ -10,7 +10,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,8 +20,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
@@ -45,7 +44,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private static final String TAG = "HighlightsFragment";
 
     private static final String LIST_STATE = "listState";
-    private static final String ITEMS_LOADES = "itemsLoaded";
 
     @Inject
     LocalRepository localRepository;
@@ -58,7 +56,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
-
+    Parcelable listState;
     private int viewType;
     private Unbinder unbinder;
     private HighlightAdapter highlightAdapter;
@@ -67,10 +65,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
 
-    Parcelable listState;
-
     public HighlightsFragment() {
-        // Required empty public constructor
+        // Required empty public constructor.
     }
 
     public static HighlightsFragment newInstance() {
@@ -132,7 +128,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                presenter.loadHighlights(false);
+                presenter.loadHighlights(false /* reset */);
             }
         };
 

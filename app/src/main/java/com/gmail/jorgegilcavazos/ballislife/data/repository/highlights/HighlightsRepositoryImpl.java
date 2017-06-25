@@ -1,9 +1,8 @@
-package com.gmail.jorgegilcavazos.ballislife.data;
+package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.data.API.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +15,6 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HighlightsRepositoryImpl implements HighlightsRepository {
 

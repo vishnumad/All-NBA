@@ -9,11 +9,9 @@ public interface PostsView {
 
     void setLoadingIndicator(boolean active);
 
-    void showPosts(List<CustomSubmission> submissions);
+    void showPosts(List<CustomSubmission> submissions, boolean reset);
 
-    void addPosts(List<CustomSubmission> submissions);
-
-    void showPostsLoadingFailedSnackbar(int loadType);
+    void showPostsLoadingFailedSnackbar(boolean reset);
 
     void dismissSnackbar();
 
@@ -25,8 +23,6 @@ public interface PostsView {
 
     void openContentTab(String url);
 
-    void setLoadingFailed(boolean failed);
-
     void showNothingToShowToast();
 
     void openStreamable(String shortcode);
@@ -35,4 +31,5 @@ public interface PostsView {
 
     void changeViewType(int viewType);
 
+    void resetScrollState();
 }

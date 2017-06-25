@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -36,10 +35,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
-    private OnLoadMoreListener loadMoreListener;
     private String subreddit;
-    private boolean isLoading = false;
-    private boolean loadingFailed = false;
 
     public PostsAdapter(Context context,
                         List<CustomSubmission> postsList,
@@ -57,8 +53,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public int getItemViewType(int position) {
         if (position == 0) {
             return TYPE_HEADER;
-        } else if (position == getItemCount() - 1) {
-            return TYPE_LOADING;
         }
 
         switch (contentViewType) {
@@ -76,13 +70,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view;
-
         if (viewType == TYPE_HEADER) {
             view = inflater.inflate(R.layout.rnba_header_layout, parent, false);
             return new HeaderViewHolder(view);
-        } else if (viewType == TYPE_LOADING) {
-            view = inflater.inflate(R.layout.row_load_more, parent, false);
-            return new LoadHolder(view);
         }
 
         switch (contentViewType) {
@@ -93,8 +83,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 view = inflater.inflate(R.layout.post_layout_list, parent, false);
                 return new PostListViewHolder(view);
             default:
-                view = inflater.inflate(R.layout.post_layout_card, parent, false);
-                return new FullCardViewHolder(view);
+                throw new IllegalStateException("Posts view is neither CARD nor LIST");
         }
     }
 
@@ -102,20 +91,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).bindData(context, subscriberCount, subreddit);
-        } else if (holder instanceof LoadHolder) {
-            LoadHolder loadHolder = (LoadHolder) holder;
-            // Load more items if scroll position is last and is not already loading.
-            if (position >= getItemCount() - 1 && !isLoading && !loadingFailed && loadMoreListener != null
-                    && postsList != null && !postsList.isEmpty()) {
-                isLoading = true;
-                loadMoreListener.onLoadMore();
-            }
-
-            if (isLoading) {
-                loadHolder.progressBar.setVisibility(View.VISIBLE);
-            } else {
-                loadHolder.progressBar.setVisibility(View.GONE);
-            }
         } else {
             CustomSubmission customSubmission = postsList.get(position - 1);
             switch (contentViewType) {
@@ -133,57 +108,37 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return null != postsList ? postsList.size() + 2 : 2;
-    }
-
-    public void notifyDataChanged() {
-        isLoading = false;
-        notifyDataSetChanged();
+        // Add 1 for header.
+        return null != postsList ? postsList.size() + 1 : 1;
     }
 
     public void setData(List<CustomSubmission> submissions) {
-        loadingFailed = false;
         if (postsList != null) {
             postsList.clear();
         } else {
             postsList = new ArrayList<>();
         }
         postsList.addAll(submissions);
-        notifyDataChanged();
+        notifyDataSetChanged();
     }
 
     public void addData(List<CustomSubmission> submissions) {
-        if (postsList != null) {
-            loadingFailed = false;
-            postsList.addAll(submissions);
-            notifyDataChanged();
+        if (postsList == null) {
+            postsList = new ArrayList<>();
         }
+        postsList.addAll(submissions);
+        notifyDataSetChanged();
     }
 
     public void setSubscriberCount(SubscriberCount subscriberCount) {
         this.subscriberCount = subscriberCount;
-        notifyDataChanged();
-    }
-
-    public void setLoadMoreListener(OnLoadMoreListener loadMoreListener) {
-        this.loadMoreListener = loadMoreListener;
-    }
-
-    public void setLoadingFailed(boolean failed) {
-        loadingFailed = failed;
-        notifyDataChanged();
-    }
-
-    interface OnLoadMoreListener {
-        void onLoadMore();
+        notifyDataSetChanged();
     }
 
     public void setContentViewType(int viewType) {
         contentViewType = viewType;
-        notifyDataChanged();
+        notifyDataSetChanged();
     }
-
-    /* View Holders **/
 
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
 
@@ -214,15 +169,4 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         }
     }
-
-    static class LoadHolder extends  RecyclerView.ViewHolder {
-
-        @BindView(R.id.progressBar) ProgressBar progressBar;
-
-        public LoadHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
-
 }
