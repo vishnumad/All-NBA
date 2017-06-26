@@ -31,5 +31,7 @@ public interface PostsView {
 
     void changeViewType(int viewType);
 
+    void scrollToTop();
+
     void resetScrollState();
 }

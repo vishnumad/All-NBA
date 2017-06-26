@@ -283,11 +283,15 @@ public class PostsFragment extends Fragment implements PostsView,
     public void showPosts(List<CustomSubmission> submissions, boolean clear) {
         if (clear) {
             postsAdapter.setData(submissions);
-            recyclerViewPosts.smoothScrollToPosition(0);
         } else {
             postsAdapter.addData(submissions);
         }
-        recyclerViewPosts.setVisibility(View.VISIBLE);
+
+        // We're coming from a config change, so the state needs to be restored.
+        if (listState != null) {
+            linearLayoutManager.onRestoreInstanceState(listState);
+            listState = null;
+        }
     }
 
     @Override
@@ -361,6 +365,11 @@ public class PostsFragment extends Fragment implements PostsView,
     public void changeViewType(int viewType) {
         postsAdapter.setContentViewType(viewType);
         setViewIcon(viewType);
+    }
+
+    @Override
+    public void scrollToTop() {
+        recyclerViewPosts.smoothScrollToPosition(0);
     }
 
     @Override

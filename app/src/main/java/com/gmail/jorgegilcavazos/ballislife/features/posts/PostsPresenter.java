@@ -86,7 +86,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             resetLoaderFromStartWithParams(sorting, timePeriod);
             loadPosts(true /* reset */);
         } else {
-            view.showPosts(submissions, false /* clear */);
+            view.showPosts(submissions, true /* clear */);
         }
     }
 
@@ -118,6 +118,9 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                         }
 
                         view.showPosts(submissions, reset);
+                        if (reset) {
+                            view.scrollToTop();
+                        }
 
                         if (reset) {
                             view.setLoadingIndicator(false);
