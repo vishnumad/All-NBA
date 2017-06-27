@@ -324,6 +324,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     public void scrollToTop() {
-        submissionRecyclerView.smoothScrollToPosition(0);
+        submissionRecyclerView.scrollToPosition(0);
     }
 }

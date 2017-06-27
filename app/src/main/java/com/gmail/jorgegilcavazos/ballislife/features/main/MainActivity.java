@@ -158,8 +158,8 @@ public class MainActivity extends AppCompatActivity {
                 } else if (shortcut.equals(SHORTCUT_TEAM_SUB)) {
                     String teamSub = getTeamSubFromFavoritePref();
                     if (teamSub != null) {
-                        subreddit = teamSub;
-                        selectedFragment = POSTS_FRAGMENT_ID;
+                        setPostsFragment(teamSub);
+                        return;
                     }
                 }
             }
