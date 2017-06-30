@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         loadRedditUsername();
         setupDynamicShortcut();
 
+        // TODO: Move this out of here, either to application start or a presenter.
         SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
         disposables = new CompositeDisposable();
@@ -141,25 +142,30 @@ public class MainActivity extends AppCompatActivity {
         selectedFragment = GAMES_FRAGMENT_ID;
         // Default posts fragment subreddit is r/nba
         subreddit = "nba";
+
         if (savedInstanceState != null) {
+            // Restore fragment and selected subreddit if in posts fragment.
             selectedFragment = savedInstanceState.getInt(SELECTED_FRAGMENT_KEY);
             subreddit = savedInstanceState.getString(SELECTED_SUBREDDIT_KEY);
-        }
-
-        // Setup opening fragment if app opened from shorcut.
-        if (getIntent().getExtras() != null) {
-            String shortcut = getIntent().getStringExtra(SHORTCUT_KEY);
-            if (shortcut != null) {
-                if (shortcut.equals(SHORTCUT_RNBA)) {
-                    subreddit = "nba";
-                    selectedFragment = POSTS_FRAGMENT_ID;
-                } else if (shortcut.equals(SHORTCUT_HIGHLIGHTS)) {
-                    selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
-                } else if (shortcut.equals(SHORTCUT_TEAM_SUB)) {
-                    String teamSub = getTeamSubFromFavoritePref();
-                    if (teamSub != null) {
-                        setPostsFragment(teamSub);
-                        return;
+        } else {
+            // No saved instance, we are either starting up the Activity from the launcher of from
+            // a shortcut.
+            if (getIntent().getExtras() != null) {
+                String shortcut = getIntent().getStringExtra(SHORTCUT_KEY);
+                if (shortcut != null) {
+                    // Setup opening fragment if app opened from shortcut.
+                    if (shortcut.equals(SHORTCUT_RNBA)) {
+                        subreddit = "nba";
+                        selectedFragment = POSTS_FRAGMENT_ID;
+                    } else if (shortcut.equals(SHORTCUT_HIGHLIGHTS)) {
+                        selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
+                    } else if (shortcut.equals(SHORTCUT_TEAM_SUB)) {
+                        // Team shortcut opened, find favorite sub and set sub and fragment to open.
+                        String teamSub = getTeamSubFromFavoritePref();
+                        if (teamSub != null) {
+                            subreddit = teamSub;
+                            selectedFragment = POSTS_FRAGMENT_ID;
+                        }
                     }
                 }
             }
