@@ -1,14 +1,14 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
-        android:shortcutId="highlights"
         android:enabled="true"
         android:icon="@drawable/ic_shortcut_star"
-        android:shortcutShortLabel="@string/highlights_shortcut_short_label"
-        android:shortcutLongLabel="@string/highlights_shortcut_long_label">
+        android:shortcutId="highlights"
+        android:shortcutLongLabel="@string/highlights_shortcut_long_label"
+        android:shortcutShortLabel="@string/highlights_shortcut_short_label">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.gmail.jorgegilcavazos.ballislife.debug"
-            android:targetClass="com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity">
+            android:targetClass="com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity"
+            android:targetPackage="com.gmail.jorgegilcavazos.ballislife">
             <extra
                 android:name="shortcut"
                 android:value="shortcut_highlights"/>
@@ -16,15 +16,15 @@
     </shortcut>
 
     <shortcut
-        android:shortcutId="rnba"
         android:enabled="true"
         android:icon="@drawable/ic_shortcut_r"
-        android:shortcutShortLabel="@string/rnba_shortcut_short_label"
-        android:shortcutLongLabel="@string/rnba_shortcut_long_label">
+        android:shortcutId="rnba"
+        android:shortcutLongLabel="@string/rnba_shortcut_long_label"
+        android:shortcutShortLabel="@string/rnba_shortcut_short_label">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.gmail.jorgegilcavazos.ballislife.debug"
-            android:targetClass="com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity">
+            android:targetClass="com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity"
+            android:targetPackage="com.gmail.jorgegilcavazos.ballislife">
             <extra
                 android:name="shortcut"
                 android:value="shortcut_rnba"/>
