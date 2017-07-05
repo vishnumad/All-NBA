@@ -4,8 +4,10 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
@@ -26,8 +28,10 @@ public interface AppComponent {
     void inject(HighlightsRepositoryImpl highlightsRepository);
     void inject(StandingsFragment fragment);
     void inject(RedditAuthentication redditAuthentication);
-
     void inject(PostsRepositoryImpl postsRepository);
-
     void inject(PostsPresenter postsPresenter);
+
+    void inject(GamesFragment gamesFragment);
+
+    void inject(GamesRepositoryImpl gamesRepository);
 }

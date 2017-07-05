@@ -129,23 +129,6 @@ public final class DateFormatUtil {
                 && calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR);
     }
 
-    public static Date getDateFromString(String dateString, String pattern) {
-        try {
-            SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.US);
-            return format.parse(dateString);
-        } catch (ParseException e) {
-            if (MyDebug.LOG) {
-                Log.e(TAG, "Error parsing date: " + e.toString());
-            }
-        }
-        return null;
-    }
-
-    public static String getDashedDateString(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        return format.format(date);
-    }
-
     public static String getNoDashDateString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.US);
         return format.format(date);

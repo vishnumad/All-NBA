@@ -1,61 +1,69 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
-import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.GameUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.Calendar;
+import java.util.List;
 
-import io.reactivex.Single;
+import javax.inject.Inject;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class GamesPresenter extends BasePresenter<GamesView> {
 
-    private NbaGamesService nbaGamesService;
-    private BaseSchedulerProvider schedulerProvider;
-    private Calendar selectedDate;
+    GamesRepository gamesRepository;
+    BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
 
-    public GamesPresenter(NbaGamesService nbaGamesService, BaseSchedulerProvider schedulerProvider) {
-        this.nbaGamesService = nbaGamesService;
+    @Inject
+    public GamesPresenter(GamesRepository gamesRepository,
+                          BaseSchedulerProvider schedulerProvider) {
+        this.gamesRepository = gamesRepository;
         this.schedulerProvider = schedulerProvider;
-
         disposables = new CompositeDisposable();
-        selectedDate = Calendar.getInstance();
     }
 
-    public void loadGames() {
-        loadDateNavigatorText();
-        view.setLoadingIndicator(true);
-        view.dismissSnackbar();
-        view.hideGames();
-        view.setNoGamesIndicator(false);
+    public void loadFirstAvailable(Calendar selectedDate) {
+        List<NbaGame> nbaGames = gamesRepository
+                .getCachedGames(DateFormatUtil.getNoDashDateString(selectedDate.getTime()));
+        if (nbaGames == null || nbaGames.isEmpty()) {
+            loadGames(selectedDate);
+        } else {
+            loadDateNavigatorText(selectedDate);
+            view.setNoGamesIndicator(false);
+            view.showGames(nbaGames);
+            view.dismissSnackbar();
+        }
+    }
 
-        Single<DayGames> dayGamesSingle = nbaGamesService.getDayGames(
-                DateFormatUtil.getNoDashDateString(selectedDate.getTime()));
+    public void loadGames(Calendar selectedDate) {
+        view.dismissSnackbar();
+        view.setNoGamesIndicator(false);
+        view.setLoadingIndicator(true);
+        view.hideGames();
+
+        loadDateNavigatorText(selectedDate);
 
         disposables.clear();
-        disposables.add(dayGamesSingle
+        disposables.add(gamesRepository.getGames(DateFormatUtil
+                .getNoDashDateString(selectedDate.getTime()))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<DayGames>() {
+                .subscribeWith(new DisposableSingleObserver<List<NbaGame>>() {
                     @Override
-                    public void onSuccess(DayGames dayGames) {
-                        view.setLoadingIndicator(false);
-                        if (dayGames.getNum_games() == 0) {
+                    public void onSuccess(List<NbaGame> games) {
+                        if (games.isEmpty()) {
                             view.setNoGamesIndicator(true);
                         } else {
-                            if (dayGames.getGames() != null && dayGames.getGames().size() > 0) {
-                                view.showGames(dayGames.getGames());
-                            } else {
-                                view.showSnackbar(true);
-                            }
+                            view.showGames(games);
                         }
+                        view.setLoadingIndicator(false);
                     }
 
                     @Override
@@ -67,29 +75,19 @@ public class GamesPresenter extends BasePresenter<GamesView> {
         );
     }
 
-    public void addOrSubstractDay(int delta) {
-        selectedDate.add(Calendar.DAY_OF_YEAR, delta);
-        loadDateNavigatorText();
-        loadGames();
-    }
-
-    public void loadDateNavigatorText() {
+    public void loadDateNavigatorText(Calendar selectedDate) {
         String dateText = DateFormatUtil.formatNavigatorDate(selectedDate.getTime());
         view.setDateNavigatorText(dateText);
     }
 
-    public void openGameDetails(NbaGame requestedGame) {
+    public void openGameDetails(NbaGame requestedGame, Calendar selectedDate) {
         view.showGameDetails(requestedGame, selectedDate);
     }
 
-    public void updateGames(String gameData) {
+    public void updateGames(String gameData, Calendar selectedDate) {
         if (DateFormatUtil.isDateToday(selectedDate.getTime())) {
             view.updateScores(GameUtils.getGamesListFromJson(gameData));
         }
-    }
-
-    public void dismissSnackbar() {
-        view.dismissSnackbar();
     }
 
     public void stop() {

@@ -53,7 +53,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     @Override
     public void onBindViewHolder(final GameViewHolderWithBars holder, int position) {
-        NbaGame nbaGame = nbaGameList.get(position);
+        final NbaGame nbaGame = nbaGameList.get(position);
 
         int resKeyHome = context.getResources().getIdentifier(nbaGame.getHomeTeamAbbr()
                 .toLowerCase(), "color", context.getPackageName());
@@ -128,7 +128,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                gameItemListener.onGameClick(nbaGameList.get(holder.getAdapterPosition()));
+                gameItemListener.onGameClick(nbaGame);
             }
         });
     }
@@ -141,6 +141,11 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     public void swap(List<NbaGame> data) {
         nbaGameList.clear();
         nbaGameList.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void clearData() {
+        nbaGameList.clear();
         notifyDataSetChanged();
     }
 

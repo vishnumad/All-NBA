@@ -7,6 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
@@ -96,5 +98,11 @@ public class DataModule {
     @Singleton
     PostsRepository providePostsRepository() {
         return new PostsRepositoryImpl();
+    }
+
+    @Provides
+    @Singleton
+    GamesRepository provideGamesRepository() {
+        return new GamesRepositoryImpl();
     }
 }
