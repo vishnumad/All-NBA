@@ -7,8 +7,8 @@ import net.dean.jraw.models.Submission;
 public final class Utilities {
 
     public static String getPeriodString(String periodValue, String periodName) {
-        if (periodValue.equals("")) {
-            return "";
+        if (periodValue.isEmpty()) {
+            return periodValue;
         }
         int period = Integer.parseInt(periodValue);
         int overtimePeriod = period - 4;
@@ -35,7 +35,6 @@ public final class Utilities {
     public static String getThumbnailToShowFromCustomSubmission(CustomSubmission customSubmission) {
         String thumbnail;
         String highResThumbnail;
-        String thumbnailToShow;
         if (customSubmission.getSubmission() == null) {
             thumbnail = customSubmission.getThumbnail();
             highResThumbnail = customSubmission.getHighResThumbnail();

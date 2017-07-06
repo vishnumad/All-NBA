@@ -23,6 +23,9 @@ public class CustomSubmission implements Serializable {
     private String selfTextHtml;
     private String url;
 
+    public CustomSubmission() {
+    }
+
     public CustomSubmission(Submission submission, VoteDirection voteDirection, boolean saved) {
         this.submission = submission;
         this.voteDirection = voteDirection;

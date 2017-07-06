@@ -1,7 +1,10 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import static org.junit.Assert.*;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class UtilitiesTest {
 
@@ -21,6 +24,11 @@ public class UtilitiesTest {
     }
 
     @Test
+    public void testGetPeriodString_empty() {
+        assertEquals(Utilities.getPeriodString("", "Qtr"), "");
+    }
+
+    @Test
     public void testGetStreamableShortcodeFromUrl() {
         String url1 = "http://streamable.com/12345";
         String url2 = "streamable.com/ft67e";
@@ -31,5 +39,19 @@ public class UtilitiesTest {
         assertEquals("ft67e", Utilities.getStreamableShortcodeFromUrl(url2));
         assertEquals("a23r", Utilities.getStreamableShortcodeFromUrl(url3));
         assertEquals(null, Utilities.getStreamableShortcodeFromUrl(url4));
+    }
+
+    @Test
+    public void testGetThumbnailToShowFromCustomSubmission() {
+        CustomSubmission customSubmission = new CustomSubmission();
+        customSubmission.setThumbnail("sdThumbnail");
+        customSubmission.setHighResThumbnail("hdThumbnail");
+        CustomSubmission customSubmission1 = new CustomSubmission();
+        customSubmission1.setThumbnail("sdThumbnail");
+
+        assertEquals("hdThumbnail",
+                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission));
+        assertEquals("sdThumbnail",
+                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission1));
     }
 }
