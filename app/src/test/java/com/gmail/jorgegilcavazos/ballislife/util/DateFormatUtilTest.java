@@ -59,6 +59,11 @@ public class DateFormatUtilTest {
         assertEquals(expected, actual);
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testFormatToolbarDate_crashIfStringInvalid() {
+        DateFormatUtil.formatToolbarDate("2002/03/01");
+    }
+
     @Test
     public void testFormatToolbarDate_Today() {
         Calendar now = Calendar.getInstance();
@@ -90,23 +95,43 @@ public class DateFormatUtilTest {
     }
 
     @Test
+    public void testGetNoDashDateString() {
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.YEAR, 2010);
+        date.set(Calendar.MONTH, 6); // Starts from 0 so 6 is month 7 (July).
+        date.set(Calendar.DAY_OF_MONTH, 16);
+
+        String formattedDate = DateFormatUtil.getNoDashDateString(date.getTime());
+
+        assertEquals("20100716", formattedDate);
+    }
+
+    @Test
     public void testLocalizeGameTime() {
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
         String date1 = "9:00 pm";
         String date2 = "10:30 pm ET";
         String date3 = "8:15 am";
         String date4 = "11:59 am ET";
         String date5 = "12:00 pm ET";
 
+        String actual0 = DateFormatUtil.localizeGameTime(date1);
         String actual1 = DateFormatUtil.localizeGameTime(date1, TimeZone.getTimeZone("America/Mexico_City"));
         String actual2 = DateFormatUtil.localizeGameTime(date2, TimeZone.getTimeZone("America/Los_Angeles"));
         String actual3 = DateFormatUtil.localizeGameTime(date3, TimeZone.getTimeZone("America/New_York"));
         String actual4 = DateFormatUtil.localizeGameTime(date4, TimeZone.getTimeZone("America/Europe/London"));
         String actual5 = DateFormatUtil.localizeGameTime(date5, TimeZone.getTimeZone("America/Los_Angeles"));
 
+        assertEquals("8:00 PM", actual0);
         assertEquals("8:00 PM", actual1);
         assertEquals("7:30 PM", actual2);
         assertEquals("8:15 AM", actual3);
         assertEquals("4:59 PM", actual4);
         assertEquals("9:00 AM", actual5);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testLocalizeGameTime_crashIfInvalidDate() {
+        DateFormatUtil.localizeGameTime("5AM ET");
     }
 }

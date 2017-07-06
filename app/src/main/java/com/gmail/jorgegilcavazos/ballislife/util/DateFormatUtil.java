@@ -1,9 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import android.util.Log;
-
-import com.google.firebase.crash.FirebaseCrash;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -70,16 +66,13 @@ public final class DateFormatUtil {
      */
     public static String formatToolbarDate(String dateString) {
         try {
-            Date now = new Date();
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.US);
             Date date = format.parse(dateString);
             if (isDateToday(date)) {
                 return "Today";
             }
         } catch (ParseException e) {
-            if (MyDebug.LOG) {
-                Log.e(TAG, "Error parsing date: " + e.toString());
-            }
+            throw new RuntimeException("Un-parsable string " + dateString);
         }
         return dateString.substring(4, 6) + "/" + dateString.substring(6, 8);
     }
@@ -150,9 +143,8 @@ public final class DateFormatUtil {
             sdf.setTimeZone(timeZone);
             return sdf.format(date);
         } catch (ParseException e) {
-            Log.e(TAG, "Error parsing game time date. " + e);
-            FirebaseCrash.report(e);
+            throw new RuntimeException("Unlocalizable date string: " + dateETString +
+                    " to timezone: " + timeZone);
         }
-        return null;
     }
 }
