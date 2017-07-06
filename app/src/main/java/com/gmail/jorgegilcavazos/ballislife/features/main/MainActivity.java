@@ -418,6 +418,7 @@ public class MainActivity extends AppCompatActivity {
                     gamesFragment, R.id.fragment);
         }
 
+        expandToolbar();
         selectedFragment = GAMES_FRAGMENT_ID;
     }
 
@@ -437,6 +438,7 @@ public class MainActivity extends AppCompatActivity {
                     standingsFragment, R.id.fragment);
         }
 
+        expandToolbar();
         selectedFragment = STANDINGS_FRAGMENT_ID;
     }
 
@@ -457,6 +459,7 @@ public class MainActivity extends AppCompatActivity {
                     postsFragment, R.id.fragment);
         }
 
+        expandToolbar();
         selectedFragment = POSTS_FRAGMENT_ID;
         this.subreddit = subreddit;
     }
@@ -477,6 +480,7 @@ public class MainActivity extends AppCompatActivity {
                     highlightsFragment, R.id.fragment);
         }
 
+        expandToolbar();
         selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
     }
 
@@ -533,6 +537,12 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    private void expandToolbar() {
+        if (toolbar.getParent() instanceof AppBarLayout) {
+            ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -560,11 +570,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 // Return to games fragment.
                 setGamesFragment();
-                // Expand toolbar in case it's collapsed and empty games recycler doesn't allow
-                // scrolling.
-                if (toolbar.getParent() instanceof AppBarLayout) {
-                    ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
-                }
                 navigationView.getMenu().getItem(0).setChecked(true);
                 break;
         }
