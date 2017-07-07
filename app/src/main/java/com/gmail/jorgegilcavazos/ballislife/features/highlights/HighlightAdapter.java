@@ -21,11 +21,11 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
+import static android.view.View.GONE;
+import static android.view.View.OnClickListener;
+import static android.view.View.VISIBLE;
+
 public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
-
-    private static final int TYPE_SMALL = 0;
-    private static final int TYPE_LARGE = 1;
-
     private Context context;
     private List<Highlight> highlights;
     private int contentViewType;
@@ -64,7 +64,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     @Override
     public void onBindViewHolder(HighlightHolder holder, int position) {
-        holder.bindData(context, highlights.get(position), viewClickSubject, shareClickSubject);
+        holder.bindData(context, contentViewType, highlights.get(position), viewClickSubject,
+                shareClickSubject);
     }
 
     @Override
@@ -106,38 +107,44 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     static class HighlightHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.container) View container;
-        @BindView(R.id.image_thumbnail) ImageView ivThumbnail;
-        @BindView(R.id.text_title) TextView tvTitle;
-        @BindView(R.id.button_share) ImageButton ibShare;
+        @BindView(R.id.container)
+        View container;
+        @BindView(R.id.image_thumbnail)
+        ImageView ivThumbnail;
+        @BindView(R.id.image_thumbnail_unavailable)
+        ImageView ivThumbnailUnavailable;
+        @BindView(R.id.text_title)
+        TextView tvTitle;
+        @BindView(R.id.button_share)
+        ImageButton ibShare;
 
         public HighlightHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void bindData(Context context, final Highlight highlight,
+        void bindData(Context context,
+                      int contentViewType,
+                      final Highlight highlight,
                       final PublishSubject<Highlight> viewClickSubject,
                       final PublishSubject<Highlight> shareClickSubject) {
             tvTitle.setText(highlight.getTitle());
+            Picasso.with(context)
+                    .load(highlight.getHdThumbnail())
+                    .into(ivThumbnail);
 
-            if (highlight.getHdThumbnail() != null) {
-                ivThumbnail.setVisibility(View.VISIBLE);
-                Picasso.with(context)
-                        .load(highlight.getHdThumbnail())
-                        .into(ivThumbnail);
-            } else {
-                ivThumbnail.setVisibility(View.GONE);
-            }
+            // Set bball background visibility only for list type view.
+            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.VIEW_SMALL &&
+                    highlight.getHdThumbnail() == null ? VISIBLE : GONE);
 
-            container.setOnClickListener(new View.OnClickListener() {
+            container.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     viewClickSubject.onNext(highlight);
                 }
             });
 
-            ibShare.setOnClickListener(new View.OnClickListener() {
+            ibShare.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     shareClickSubject.onNext(highlight);
