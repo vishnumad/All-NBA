@@ -33,6 +33,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
@@ -45,12 +46,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.Arrays;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
-
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -80,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Inject
     LocalRepository localRepository;
+
+    @Inject
+    @Named("redditSharedPreferences")
+    SharedPreferences redditSharedPrefs;
 
     @Inject
     PostsRepository postsRepository;
@@ -119,10 +123,9 @@ public class MainActivity extends AppCompatActivity {
         setupDynamicShortcut();
 
         // TODO: Move this out of here, either to application start or a presenter.
-        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
         disposables = new CompositeDisposable();
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthentication.getInstance().authenticate(redditSharedPrefs)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -138,8 +141,22 @@ public class MainActivity extends AppCompatActivity {
                 })
         );
 
-        // Set default to GamesFragment.
-        selectedFragment = GAMES_FRAGMENT_ID;
+        // Set default fragment to selected startup page from preferences.
+        switch (localRepository.getStartupFragment()) {
+            case SettingsFragment.STARTUP_FRAGMENT_GAMES:
+                selectedFragment = GAMES_FRAGMENT_ID;
+                break;
+            case SettingsFragment.STARTUP_FRAGMENT_RNBA:
+                selectedFragment = POSTS_FRAGMENT_ID;
+                break;
+            case SettingsFragment.STARTUP_FRAGMENT_HIGHLIGHTS:
+                selectedFragment = HIGHLIGHTS_FRAGMENT_ID;
+                break;
+            default:
+                throw new IllegalStateException("Invalid startup fragment: " + localRepository
+                        .getStartupFragment());
+        }
+
         // Default posts fragment subreddit is r/nba
         subreddit = "nba";
 

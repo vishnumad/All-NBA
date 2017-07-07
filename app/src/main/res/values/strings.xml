@@ -131,6 +131,19 @@
     <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
+    <string name="pref_startup_fragment_title">Startup page</string>
+    <string-array name="pref_startup_fragment_entries">
+        <item>Games</item>
+        <item>r/NBA</item>
+        <item>Highlights</item>
+    </string-array>
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_startup_fragment_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string name="pref_startup_fragment_def_value">0</string>
 
     <!-- SUBREDDITS. DO NOT TRANSLATE -->
     <string name="r_atl">AtlantaHawks</string>

@@ -8,11 +8,11 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
-import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
+import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
-import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -26,12 +26,15 @@ import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.RED
 
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
-    private static final String TAG = "SettingsFragment";
-
     // Should match string values in strings.xml
     public static final String KEY_PREF_CGA_TOPICS = "pref_cga_topics";
     public static final String KEY_PREF_START_TOPICS = "pref_start_topics";
     public static final String KEY_ENABLE_ALERTS = "pref_enable_alerts";
+    public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
+    public static final String STARTUP_FRAGMENT_GAMES = "0";
+    public static final String STARTUP_FRAGMENT_RNBA = "1";
+    public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
+    private static final String TAG = "SettingsFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,10 @@ public class SettingsFragment extends PreferenceFragment
             case "teams_list":
                 String abbrev = sharedPreferences.getString(key, null);
                 preference.setSummary(getTeamName(abbrev));
+                break;
+            case KEY_STARTUP_FRAGMENT:
+                String selectedStartup = sharedPreferences.getString(key, null);
+                preference.setSummary(getStartupFragmentTextRes(selectedStartup));
                 break;
             case "log_out_pref":
                 preference.setTitle("Log in");
@@ -133,10 +140,27 @@ public class SettingsFragment extends PreferenceFragment
         return "No team selected";
     }
 
+    private int getStartupFragmentTextRes(String selectedValue) {
+        switch (selectedValue) {
+            case STARTUP_FRAGMENT_GAMES:
+                return R.string.games_fragment_title;
+            case STARTUP_FRAGMENT_RNBA:
+                return R.string.reddit_nba_fragment_title;
+            case STARTUP_FRAGMENT_HIGHLIGHTS:
+                return R.string.highlights_fragment_title;
+            default:
+                throw new IllegalStateException("Invalid fragment startup value: " + selectedValue);
+        }
+    }
+
     private void initSummary(Preference preference) {
         if (preference instanceof ListPreference) {
             ListPreference listPreference = (ListPreference) preference;
-            preference.setSummary(getTeamName(listPreference.getValue()));
+            if (listPreference.getKey().equals("teams_list")) {
+                preference.setSummary(getTeamName(listPreference.getValue()));
+            } else if (listPreference.getKey().equals(KEY_STARTUP_FRAGMENT)) {
+                preference.setSummary(getStartupFragmentTextRes(listPreference.getValue()));
+            }
         }
     }
 

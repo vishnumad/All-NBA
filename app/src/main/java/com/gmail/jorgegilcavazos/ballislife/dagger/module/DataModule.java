@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.module;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
@@ -74,6 +75,13 @@ public class DataModule {
     @Named("redditSharedPreferences")
     SharedPreferences provideRedditSharedPreferences(Application app) {
         return app.getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
+    }
+
+    @Provides
+    @Singleton
+    @Named("defaultSharedPreferences")
+    SharedPreferences provideDefaultSharedPreferences(Application app) {
+        return PreferenceManager.getDefaultSharedPreferences(app);
     }
 
     @Provides

@@ -13,4 +13,6 @@ public interface LocalRepository {
     void saveUsername(String username);
 
     String getUsername();
+
+    String getStartupFragment();
 }
