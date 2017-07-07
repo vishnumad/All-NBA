@@ -1,5 +1,5 @@
 # NBA Android App
-[![Release status](https://img.shields.io/badge/release-v0.6.8--beta-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
+[![Release status](https://img.shields.io/badge/release-v0.6.17--beta-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
 
 Android app for NBA fans. Features live scores, highlights, alerts and Reddit integration for discussions.
 
@@ -23,7 +23,7 @@ Android app for NBA fans. Features live scores, highlights, alerts and Reddit in
 Fix a bug, add a new feature or make the code prettier!
 
 ### Steps to contribute:
-1. Fork the localRepository
+1. Fork the repository
 2. Look at the list of [open issues](https://github.com/jorgegil96/All-NBA/issues), pick one or create a new one (this can be for a bug or wanted feature)
 3. Write code and document it, look at the code around you and try to follow the style and conventions used. The MVP design pattern is used throughout the app.
 4. Write unit tests (if possible)
