@@ -73,6 +73,8 @@ public class StandingsFragment extends Fragment implements StandingsView,
         View view = inflater.inflate(R.layout.fragment_standings, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         NbaStandingsService service = retrofit.create(NbaStandingsService.class);
 
         disposables = new CompositeDisposable();
