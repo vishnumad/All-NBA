@@ -8,14 +8,13 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:layout_marginTop="8dp"
-    android:background="?android:selectableItemBackground"
-    android:clickable="true"
     card_view:cardBackgroundColor="@android:color/white"
     card_view:cardElevation="2dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackgroundBorderless">
 
         <FrameLayout
             android:id="@+id/gradient"
@@ -68,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
-                android:background="?android:selectableItemBackground"
+                android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_share_black_24dp"/>
