@@ -5,12 +5,16 @@ import net.dean.jraw.models.VoteDirection;
 
 import java.io.Serializable;
 
+/**
+ * Wraps a {@link Submission} to allow mutation.
+ */
 public class CustomSubmission implements Serializable {
 
+    private String id;
     private Submission submission;
     private String title;
     private String author;
-    private String timestamp;
+    private long created;
     private String domain;
     private boolean selfPost;
     private boolean stickied;
@@ -26,30 +30,36 @@ public class CustomSubmission implements Serializable {
     public CustomSubmission() {
     }
 
-    public CustomSubmission(Submission submission, VoteDirection voteDirection, boolean saved) {
+    public CustomSubmission(Submission submission) {
         this.submission = submission;
-        this.voteDirection = voteDirection;
-        this.saved = saved;
+        id = submission.getId();
+        title = submission.getTitle();
+        author = submission.getAuthor();
+        created = submission.getCreated().getTime();
+        domain = submission.getDomain();
+        selfPost = submission.isSelfPost();
+        stickied = submission.isStickied();
+        score = submission.getScore();
+        commentCount = submission.getCommentCount();
+        thumbnail = submission.getThumbnail();
+        voteDirection = submission.getVote();
+        saved = submission.isSaved();
+        selfTextHtml = submission.data("selftext_html");
+        url = submission.getUrl();
+
+        try {
+            highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
+        } catch (NullPointerException e) {
+            highResThumbnail = null;
+        }
     }
 
-    public CustomSubmission(String title, String author, String timestamp, String domain,
-                            boolean selfPost, boolean stickied, int score, int commentCount,
-                            String thumbnail, String highResThumbnail, VoteDirection voteDirection,
-                            boolean saved, String selfTextHtml, String url) {
-        this.title = title;
-        this.author = author;
-        this.timestamp = timestamp;
-        this.domain = domain;
-        this.selfPost = selfPost;
-        this.stickied = stickied;
-        this.score = score;
-        this.commentCount = commentCount;
-        this.thumbnail = thumbnail;
-        this.highResThumbnail = highResThumbnail;
-        this.voteDirection = voteDirection;
-        this.saved = saved;
-        this.selfTextHtml = selfTextHtml;
-        this.url = url;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Submission getSubmission() {
@@ -76,12 +86,12 @@ public class CustomSubmission implements Serializable {
         this.author = author;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public long getCreated() {
+        return created;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setCreated(long created) {
+        this.created = created;
     }
 
     public String getDomain() {

@@ -35,9 +35,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickLis
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 
-import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.TimePeriod;
@@ -123,7 +121,7 @@ public class PostsFragment extends Fragment implements PostsView,
         if (localRepository.getFavoritePostsViewType() != -1) {
             viewType = localRepository.getFavoritePostsViewType();
         } else {
-            viewType = Constants.VIEW_CARD;
+            viewType = Constants.POSTS_VIEW_WIDE_CARD;
         }
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -164,6 +162,7 @@ public class PostsFragment extends Fragment implements PostsView,
         presenter = new PostsPresenter(subreddit);
         presenter.attachView(this);
         presenter.loadSubscriberCount();
+        presenter.subscribeToSubmissionShare(postsAdapter.getShareObservable());
 
         return view;
     }
@@ -378,51 +377,37 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void onSubmissionClick(Submission submission) {
+    public void share(String url) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+        startActivity(Intent.createChooser(shareIntent,
+                getResources().getString(R.string.share_this_link)));
+    }
+
+    @Override
+    public void showUnknownErrorToast() {
+        Toast.makeText(getActivity(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSubmissionClick(CustomSubmission customSubmission) {
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
-
         Bundle bundle = new Bundle();
-
-        String highResThumbnailUrl;
-        try {
-            highResThumbnailUrl = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
-        } catch (NullPointerException e) {
-            highResThumbnailUrl = null;
-        }
-
-        CustomSubmission customSubmission = new CustomSubmission(
-                submission.getTitle(),
-                submission.getAuthor(),
-                DateFormatUtil.formatRedditDate(submission.getCreated()),
-                submission.getDomain(),
-                submission.isSelfPost(),
-                submission.isStickied(),
-                submission.getScore(),
-                submission.getCommentCount(),
-                submission.getThumbnail(),
-                highResThumbnailUrl,
-                submission.getVote(),
-                submission.isSaved(),
-                submission.data("selftext_html"),
-                submission.getUrl()
-        );
-
-        bundle.putSerializable(Constants.THREAD_SUBMISSION, customSubmission);
-        bundle.putString(Constants.THREAD_ID, submission.getId());
+        bundle.putString(Constants.THREAD_ID, customSubmission.getId());
         bundle.putString(SubmissionActivity.KEY_SUBREDDIT, subreddit);
-
         intent.putExtras(bundle);
         startActivity(intent);
     }
 
     @Override
-    public void onVoteSubmission(Submission submission, VoteDirection voteDirection) {
-        presenter.onVote(submission, voteDirection);
+    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
+        presenter.onVote(customSubmission.getSubmission(), voteDirection);
     }
 
     @Override
-    public void onSaveSubmission(Submission submission, boolean saved) {
-        presenter.onSave(submission, saved);
+    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
+        presenter.onSave(customSubmission.getSubmission(), saved);
     }
 
     @Override
@@ -445,7 +430,7 @@ public class PostsFragment extends Fragment implements PostsView,
         viewTypeCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.VIEW_CARD);
+                presenter.onViewTypeSelected(Constants.POSTS_VIEW_WIDE_CARD);
                 materialDialog.dismiss();
             }
         });
@@ -453,7 +438,7 @@ public class PostsFragment extends Fragment implements PostsView,
         viewTypeList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.VIEW_LIST);
+                presenter.onViewTypeSelected(Constants.POSTS_VIEW_LIST);
                 materialDialog.dismiss();
             }
         });
@@ -464,10 +449,10 @@ public class PostsFragment extends Fragment implements PostsView,
     private void setViewIcon(int viewType) {
         Drawable drawable;
         switch (viewType) {
-            case Constants.VIEW_CARD:
+            case Constants.POSTS_VIEW_WIDE_CARD:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
                 break;
-            case Constants.VIEW_LIST:
+            case Constants.POSTS_VIEW_LIST:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
                 break;
             default:

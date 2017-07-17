@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
@@ -46,6 +47,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void loadComments(String threadId, CommentSort sorting) {
+        view.hideFab();
         view.setLoadingIndicator(true);
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.getSubmission(threadId, sorting))
@@ -60,9 +62,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                             commentNodes.add(node);
                         }
 
+                        view.setCustomSubmission(new CustomSubmission(submission));
                         view.showComments(commentNodes, submission);
                         view.setLoadingIndicator(false);
                         view.scrollToTop();
+                        view.showFab();
                     }
 
                     @Override
@@ -103,7 +107,6 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        view.showSavingToast();
         disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
                 .andThen(redditService.saveSubmission(submission, saved))
                 .subscribeOn(schedulerProvider.io())

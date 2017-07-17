@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.google.common.base.Optional;
 
 import net.dean.jraw.models.Submission;
 
@@ -32,7 +33,8 @@ public final class Utilities {
     }
 
     // Get data from real submission if available, otherwise used data from fake one.
-    public static String getThumbnailToShowFromCustomSubmission(CustomSubmission customSubmission) {
+    public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission(
+            CustomSubmission customSubmission) {
         String thumbnail;
         String highResThumbnail;
         if (customSubmission.getSubmission() == null) {
@@ -48,7 +50,20 @@ public final class Utilities {
             }
         }
 
+        if (thumbnail == null && highResThumbnail == null) {
+            return Optional.absent();
+        }
+
         // Show HD thumbnail over lower res version.
-        return highResThumbnail != null ? highResThumbnail : thumbnail;
+        if (highResThumbnail == null) {
+            return Optional.of(new Pair<>(ThumbnailType.LOW_RES, thumbnail));
+        } else {
+            return Optional.of(new Pair<>(ThumbnailType.HIGH_RES, highResThumbnail));
+        }
+    }
+
+    public enum ThumbnailType {
+        LOW_RES,
+        HIGH_RES
     }
 }

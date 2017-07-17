@@ -1,15 +1,16 @@
 package com.gmail.jorgegilcavazos.ballislife.features.shared;
 
-import net.dean.jraw.models.Submission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+
 import net.dean.jraw.models.VoteDirection;
 
 public interface OnSubmissionClickListener {
 
-    void onSubmissionClick(Submission submission);
+    void onSubmissionClick(CustomSubmission customSubmission);
 
-    void onVoteSubmission(Submission submission, VoteDirection voteDirection);
+    void onVoteSubmission(CustomSubmission submission, VoteDirection voteDirection);
 
-    void onSaveSubmission(Submission submission, boolean saved);
+    void onSaveSubmission(CustomSubmission submission, boolean saved);
 
     void onContentClick(String url);
 }

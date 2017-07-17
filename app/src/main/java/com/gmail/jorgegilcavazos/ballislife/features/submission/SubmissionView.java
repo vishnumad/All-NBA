@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
@@ -13,6 +15,8 @@ public interface SubmissionView {
     void showComments(List<CommentNode> commentNodes, Submission submission);
 
     void addComment(CommentNode comment, int position);
+
+    void setCustomSubmission(CustomSubmission customSubmission);
 
     void showErrorAddingComment();
 
@@ -35,4 +39,8 @@ public interface SubmissionView {
     void showContentUnavailableToast();
 
     void scrollToTop();
+
+    void hideFab();
+
+    void showFab();
 }

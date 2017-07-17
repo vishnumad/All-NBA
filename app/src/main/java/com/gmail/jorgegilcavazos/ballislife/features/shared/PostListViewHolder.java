@@ -18,8 +18,9 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.squareup.picasso.Picasso;
 
-import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
+
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,53 +49,23 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
                          final CustomSubmission customSubmission,
                          boolean isDisplayedInList,
                          final OnSubmissionClickListener submissionClickListener) {
-
-        String title, author, timestamp, commentCount, score, selfTextHtml, domain, thumbnail,
-                highResThumbnail, thumbnailToShow;
-        final String url;
-        boolean isSelf, isStickied, isSaved;
-        VoteDirection vote;
-
-        // Get data from real submission if available, otherwise used data from fake one.
-        if (customSubmission.getSubmission() == null) {
-            title = customSubmission.getTitle();
-            author = customSubmission.getAuthor();
-            timestamp = customSubmission.getTimestamp();
-            commentCount = String.valueOf(customSubmission.getCommentCount());
-            score = String.valueOf(customSubmission.getScore());
-            selfTextHtml = customSubmission.getSelfTextHtml();
-            domain = customSubmission.getDomain();
-            thumbnail = customSubmission.getThumbnail();
-            url = customSubmission.getUrl();
-            isSelf = customSubmission.isSelfPost();
-            isStickied = customSubmission.isStickied();
-            isSaved = customSubmission.isSaved();
-            vote = customSubmission.getVoteDirection();
-            highResThumbnail = customSubmission.getHighResThumbnail();
-        } else {
-            Submission submission = customSubmission.getSubmission();
-            title = submission.getTitle();
-            author = submission.getAuthor();
-            timestamp = DateFormatUtil.formatRedditDate(submission.getCreated());
-            commentCount = String.valueOf(submission.getCommentCount());
-            score = RedditUtils.formatScoreToDigits(submission.getScore());
-            selfTextHtml = submission.data("selftext_html");
-            domain = submission.getDomain();
-            thumbnail = submission.getThumbnail();
-            url = submission.getUrl();
-            isSelf = submission.isSelfPost();
-            isStickied = submission.isStickied();
-            isSaved = submission.isSaved();
-            vote = submission.getVote();
-            try {
-                highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
-            } catch (NullPointerException e) {
-                highResThumbnail = null;
-            }
-        }
+        String title = customSubmission.getTitle();
+        String author = customSubmission.getAuthor();
+        long timestamp = customSubmission.getCreated();
+        int commentCount = customSubmission.getCommentCount();
+        String score = String.valueOf(customSubmission.getScore());
+        String selfTextHtml = customSubmission.getSelfTextHtml();
+        String domain = customSubmission.getDomain();
+        String thumbnail = customSubmission.getThumbnail();
+        final String url = customSubmission.getUrl();
+        boolean isSelf = customSubmission.isSelfPost();
+        boolean isStickied = customSubmission.isStickied();
+        boolean isSaved = customSubmission.isSaved();
+        VoteDirection vote = customSubmission.getVoteDirection();
+        String highResThumbnail = customSubmission.getHighResThumbnail();
 
         // Show low res thumbnail over lower res version.
-        thumbnailToShow = thumbnail;
+        String thumbnailToShow = thumbnail;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             tvTitle.setText(Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY));
@@ -103,7 +74,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
         }
 
         tvAuthor.setText(author);
-        tvTimestamp.setText(timestamp);
+        tvTimestamp.setText(DateFormatUtil.formatRedditDate(new Date(timestamp)));
         tvComments.setText(context.getString(R.string.num_comments, commentCount));
         tvPoints.setText(score);
 
@@ -153,21 +124,21 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.NO_VOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.UPVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.UPVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
@@ -181,21 +152,21 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.NO_VOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.DOWNVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission.getSubmission(),
+                    submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.DOWNVOTE);
                     if (RedditAuthentication.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
@@ -217,7 +188,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             contentContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    submissionClickListener.onSubmissionClick(customSubmission.getSubmission());
+                    submissionClickListener.onSubmissionClick(customSubmission);
                 }
             });
         }

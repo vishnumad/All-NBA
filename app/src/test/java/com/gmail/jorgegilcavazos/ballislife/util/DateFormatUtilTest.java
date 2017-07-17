@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
+import com.google.common.base.Optional;
+
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -8,6 +10,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Class to test {@link DateFormatUtil}.
@@ -33,6 +37,37 @@ public class DateFormatUtilTest {
         assertEquals("50m", fiftyMinAgoString);
         assertEquals("4hr", fourHoursAgoString);
         assertEquals("2 days", twoDaysAgoString);
+    }
+
+    @Test
+    public void testFormatRedditDateLong() {
+        Calendar now = Calendar.getInstance();
+        Calendar fiftyMinAgo = Calendar.getInstance();
+        fiftyMinAgo.add(Calendar.MINUTE, -50);
+        Calendar fourHoursAgo = Calendar.getInstance();
+        fourHoursAgo.add(Calendar.HOUR, -4);
+        Calendar twoDaysAgo = Calendar.getInstance();
+        twoDaysAgo.add(Calendar.HOUR, -60);
+
+        Pair<Integer, Optional<Long>> nowPair = DateFormatUtil.formatRedditDateLong(now.getTime());
+        Pair<Integer, Optional<Long>> minutesPair = DateFormatUtil
+                .formatRedditDateLong(fiftyMinAgo.getTime());
+        Pair<Integer, Optional<Long>> hoursPair = DateFormatUtil
+                .formatRedditDateLong(fourHoursAgo.getTime());
+        Pair<Integer, Optional<Long>> daysPair = DateFormatUtil
+                .formatRedditDateLong(twoDaysAgo.getTime());
+
+        assertEquals(DateFormatUtil.TIME_UNIT_JUST_NOW, nowPair.first.intValue());
+        assertFalse(nowPair.second.isPresent());
+        assertEquals(DateFormatUtil.TIME_UNIT_MINUTES, minutesPair.first.intValue());
+        assertTrue(minutesPair.second.isPresent());
+        assertEquals(50, minutesPair.second.get().longValue());
+        assertEquals(DateFormatUtil.TIME_UNIT_HOURS, hoursPair.first.intValue());
+        assertTrue(hoursPair.second.isPresent());
+        assertEquals(4, hoursPair.second.get().longValue());
+        assertEquals(DateFormatUtil.TIME_UNIT_DAYS, daysPair.first.intValue());
+        assertTrue(daysPair.second.isPresent());
+        assertEquals(2, daysPair.second.get().longValue());
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
+import com.google.common.base.Optional;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,10 +14,14 @@ import java.util.concurrent.TimeUnit;
  * Utility methods used in various points of the application.
  */
 public final class DateFormatUtil {
+    public static final int TIME_UNIT_JUST_NOW = 0;
+    public static final int TIME_UNIT_MINUTES = 1;
+    public static final int TIME_UNIT_HOURS = 2;
+    public static final int TIME_UNIT_DAYS = 3;
     private static final String TAG = "DateFormatUtil";
 
     /**
-     * Receives a Date object and returns a human-readable string, e.g. "5 minutes ago".
+     * Receives a Date object and returns a human-readable string, e.g. "5m ago".
      */
     public static String formatRedditDate(Date date) {
         String postedOn;
@@ -37,6 +43,28 @@ public final class DateFormatUtil {
         }
 
         return postedOn;
+    }
+
+    /**
+     * Receives a Date object and returns a human-readable string, e.g. "5 minutes ago".
+     */
+    public static Pair<Integer, Optional<Long>> formatRedditDateLong(Date date) {
+        Date now = new Date();
+        long minutesAgo = (TimeUnit.MILLISECONDS.toMinutes(now.getTime() - date.getTime()));
+        long hoursAgo = (TimeUnit.MILLISECONDS.toHours(now.getTime() - date.getTime()));
+        long daysAgo = (TimeUnit.MILLISECONDS.toDays(now.getTime() - date.getTime()));
+
+        if (minutesAgo == 0) {
+            return new Pair<>(TIME_UNIT_JUST_NOW, Optional.<Long>absent());
+        } else if (minutesAgo < 60) {
+            return new Pair<>(TIME_UNIT_MINUTES, Optional.of(minutesAgo));
+        } else {
+            if (hoursAgo < 49) {
+                return new Pair<>(TIME_UNIT_HOURS, Optional.of(hoursAgo));
+            } else {
+                return new Pair<>(TIME_UNIT_DAYS, Optional.of(daysAgo));
+            }
+        }
     }
 
     /**

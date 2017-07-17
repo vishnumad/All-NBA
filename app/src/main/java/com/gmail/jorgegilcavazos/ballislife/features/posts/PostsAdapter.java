@@ -11,33 +11,37 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
-import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
+import com.google.common.base.Optional;
 import com.squareup.picasso.Picasso;
+
+import net.dean.jraw.models.Submission;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+
+import static com.gmail.jorgegilcavazos.ballislife.util.Constants.POSTS_VIEW_LIST;
+import static com.gmail.jorgegilcavazos.ballislife.util.Constants.POSTS_VIEW_WIDE_CARD;
+import static com.gmail.jorgegilcavazos.ballislife.util.Constants.VIEW_HEADER;
 
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private static final int TYPE_HEADER = 0;
-    private static final int TYPE_CONTENT_CARD = 1;
-    private static final int TYPE_CONTENT_LIST = 3;
-    private static final int TYPE_LOADING = 2;
-
     private Context context;
     private List<CustomSubmission> postsList;
     private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
     private String subreddit;
+
+    private PublishSubject<Submission> sharePublishSubject = PublishSubject.create();
 
     public PostsAdapter(Context context,
                         List<CustomSubmission> postsList,
@@ -54,17 +58,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {
-            return TYPE_HEADER;
+            return VIEW_HEADER;
         }
-
-        switch (contentViewType) {
-            case Constants.VIEW_CARD:
-                return TYPE_CONTENT_CARD;
-            case Constants.VIEW_LIST:
-                return TYPE_CONTENT_LIST;
-        }
-
-        return TYPE_CONTENT_CARD;
+        return contentViewType;
     }
 
     @Override
@@ -72,20 +68,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view;
-        if (viewType == TYPE_HEADER) {
+        if (viewType == VIEW_HEADER) {
             view = inflater.inflate(R.layout.rnba_header_layout, parent, false);
             return new HeaderViewHolder(view);
         }
 
         switch (contentViewType) {
-            case Constants.VIEW_CARD:
-                view = inflater.inflate(R.layout.post_layout_card, parent, false);
-                return new FullCardViewHolder(view);
-            case Constants.VIEW_LIST:
+            case POSTS_VIEW_LIST:
                 view = inflater.inflate(R.layout.post_layout_list, parent, false);
                 return new PostListViewHolder(view);
+            case POSTS_VIEW_WIDE_CARD:
+                view = inflater.inflate(R.layout.post_layout_card_wide, parent, false);
+                return new WideCardViewHolder(view);
             default:
-                throw new IllegalStateException("Posts view is neither CARD nor LIST");
+                throw new IllegalStateException("Posts view type is not valid: " + contentViewType);
         }
     }
 
@@ -96,14 +92,20 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else {
             CustomSubmission customSubmission = postsList.get(position - 1);
             switch (contentViewType) {
-                case Constants.VIEW_CARD:
-                    ((FullCardViewHolder) holder).bindData(context, customSubmission, true,
-                            submissionClickListener);
-                    break;
-                case Constants.VIEW_LIST:
+                case POSTS_VIEW_LIST:
                     ((PostListViewHolder) holder).bindData(context, customSubmission, true,
                             submissionClickListener);
                     break;
+                case POSTS_VIEW_WIDE_CARD:
+                    ((WideCardViewHolder) holder).bindData(
+                            context,
+                            customSubmission,
+                            submissionClickListener,
+                            sharePublishSubject);
+                    break;
+                default:
+                    throw new IllegalStateException("Invalid view type in bind view holder: "
+                            + contentViewType);
             }
         }
     }
@@ -144,11 +146,19 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public Observable<Submission> getShareObservable() {
+        return sharePublishSubject;
+    }
+
     private void preFetchImages(List<CustomSubmission> submissions) {
         for (CustomSubmission submission : submissions) {
-            Picasso.with(context)
-                    .load(Utilities.getThumbnailToShowFromCustomSubmission(submission))
-                    .fetch();
+            Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl =
+                    Utilities.getThumbnailToShowFromCustomSubmission(submission);
+            if (thumbnailTypeUrl.isPresent()) {
+                Picasso.with(context)
+                        .load(thumbnailTypeUrl.get().second)
+                        .fetch();
+            }
         }
     }
 

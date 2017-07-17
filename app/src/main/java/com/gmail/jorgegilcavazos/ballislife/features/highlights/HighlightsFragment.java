@@ -98,7 +98,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         if (localRepository.getFavoriteHighlightViewType() != -1) {
             viewType = localRepository.getFavoriteHighlightViewType();
         } else {
-            viewType = Constants.VIEW_SMALL;
+            viewType = Constants.HIGHLIGHTS_VIEW_SMALL;
         }
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -254,7 +254,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         viewTypeCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.VIEW_LARGE);
+                presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_LARGE);
                 materialDialog.dismiss();
             }
         });
@@ -262,7 +262,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         viewTypeList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.VIEW_SMALL);
+                presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_SMALL);
                 materialDialog.dismiss();
             }
         });
@@ -273,10 +273,10 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private void setViewIcon(int viewType) {
         Drawable drawable;
         switch (viewType) {
-            case Constants.VIEW_LARGE:
+            case Constants.HIGHLIGHTS_VIEW_LARGE:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
                 break;
-            case Constants.VIEW_SMALL:
+            case Constants.HIGHLIGHTS_VIEW_SMALL:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
                 break;
             default:

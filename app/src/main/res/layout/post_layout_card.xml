@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView android:layout_height="wrap_content"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,13 +14,13 @@
             android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
             android:orientation="vertical"
             android:paddingBottom="5dp"
-            android:paddingTop="10dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:clickable="true"
-            android:background="?android:selectableItemBackground">
+            android:paddingTop="10dp">
 
             <TextView
                 android:id="@+id/text_title"
@@ -41,33 +39,33 @@
                     android:id="@+id/text_author"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/text_title"
                     android:text="jorgegil96"
                     android:textColor="@color/blue"
-                    android:textStyle="bold"
                     android:textSize="10sp"
-                    android:layout_below="@+id/text_title" />
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/text_timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/text_title"
+                    android:layout_marginStart="5dp"
+                    android:layout_toRightOf="@+id/text_author"
                     android:text="• 4 hrs ago"
                     android:textColor="@color/secondaryText"
-                    android:textSize="10sp"
-                    android:layout_marginStart="5dp"
-                    android:layout_below="@+id/text_title"
-                    android:layout_toRightOf="@+id/text_author" />
+                    android:textSize="10sp"/>
 
                 <TextView
                     android:id="@+id/text_domain"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/text_title"
+                    android:layout_marginStart="5dp"
+                    android:layout_toRightOf="@id/text_timestamp"
                     android:text="• self"
                     android:textColor="@color/secondaryText"
-                    android:textSize="10sp"
-                    android:layout_marginStart="5dp"
-                    android:layout_below="@+id/text_title"
-                    android:layout_toRightOf="@id/text_timestamp" />
+                    android:textSize="10sp"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -81,29 +79,29 @@
                 android:id="@+id/image_thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
                 android:scaleType="centerCrop"
                 android:src="@mipmap/ic_launcher"
-                android:visibility="visible"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"/>
+                android:visibility="visible"/>
 
             <TextView
                 android:id="@+id/text_body"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                style="@style/Base.TextAppearance.AppCompat.Body1"/>
+                android:layout_marginStart="10dp"/>
 
             <LinearLayout
                 android:id="@+id/content_link"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true">
+                android:clickable="true"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="40dp"
@@ -116,8 +114,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:orientation="vertical"
-                    android:layout_margin="5dp">
+                    android:layout_margin="5dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/text_domain_link"
@@ -152,71 +150,40 @@
                     android:id="@+id/button_upvote"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_arrow_upward_black_18dp"
-                    android:background="?android:selectableItemBackground"
-                    android:tint="@color/commentNeutral"/>
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_arrow_upward_black_18dp"/>
 
                 <TextView
                     android:id="@+id/text_points"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="5dp"
+                    android:gravity="center"
                     android:text="3240"
                     android:textColor="@color/secondaryText"
-                    android:textSize="13sp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:gravity="center"/>
+                    android:textSize="13sp"/>
 
                 <ImageButton
                     android:id="@+id/button_downvote"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_arrow_downward_black_18dp"
-                    android:background="?android:selectableItemBackground"
-                    android:tint="@color/commentNeutral"/>
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_arrow_downward_black_18dp"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:orientation="horizontal"
-                android:layout_alignParentEnd="true">
-
-                <LinearLayout
-                    android:id="@+id/comments_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:clickable="true"
-                    android:background="?android:selectableItemBackground">
-
-                    <ImageButton
-                        android:id="@+id/button_comments"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_forum_black_18dp"
-                        android:background="@android:color/transparent"
-                        android:tint="@color/commentNeutral"
-                        android:clickable="false"/>
-
-                    <TextView
-                        android:id="@+id/text_comments"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="511"
-                        android:textColor="@color/secondaryText"
-                        android:textSize="13sp"
-                        android:layout_marginEnd="10dp"
-                        android:gravity="center"/>
-                </LinearLayout>
+                android:layout_alignParentEnd="true"
+                android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/button_save"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_bookmark_black_18dp"
-                    android:background="?android:selectableItemBackground"
-                    android:padding="3dp"
-                    android:tint="@color/commentNeutral"/>
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_bookmark_border_black_18dp"/>
 
             </LinearLayout>
 

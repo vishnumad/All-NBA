@@ -49,10 +49,10 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
         View view;
         switch (contentViewType) {
-            case Constants.VIEW_SMALL:
+            case Constants.HIGHLIGHTS_VIEW_SMALL:
                 view = inflater.inflate(R.layout.row_highlight_small, parent, false);
                 break;
-            case Constants.VIEW_LARGE:
+            case Constants.HIGHLIGHTS_VIEW_LARGE:
                 view = inflater.inflate(R.layout.row_highlight, parent, false);
                 break;
             default:
@@ -134,7 +134,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
                     .into(ivThumbnail);
 
             // Set bball background visibility only for list type view.
-            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.VIEW_SMALL &&
+            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.HIGHLIGHTS_VIEW_SMALL &&
                     highlight.getHdThumbnail() == null ? VISIBLE : GONE);
 
             container.setOnClickListener(new OnClickListener() {

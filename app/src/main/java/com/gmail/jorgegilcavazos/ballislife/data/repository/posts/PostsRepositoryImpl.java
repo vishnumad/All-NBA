@@ -59,8 +59,7 @@ public class PostsRepositoryImpl implements PostsRepository {
                         // Convert immutable listing to mutable list of custom submissions.
                         List<CustomSubmission> customSubmissions = new ArrayList<>();
                         for (Submission submission : submissions) {
-                            customSubmissions.add(new CustomSubmission(submission,
-                                    submission.getVote(), submission.isSaved()));
+                            customSubmissions.add(new CustomSubmission(submission));
                         }
 
                         cachedCustomSubmissions.addAll(customSubmissions);

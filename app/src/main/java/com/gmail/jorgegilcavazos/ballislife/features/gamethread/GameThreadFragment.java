@@ -125,7 +125,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (threadType.equals(RedditUtils.LIVE_GT_TYPE)) {
             inflater.inflate(R.menu.menu_game_thread, menu);
-            streamSwitch = (Switch) menu.findItem(R.id.action_stream).getActionView().findViewById(R.id.switch_stream);
+            streamSwitch = (Switch) menu.findItem(R.id.action_stream).getActionView()
+                    .findViewById(R.id.switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
             streamSwitch.setChecked(stream);
         }
@@ -300,7 +301,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             if (!isPremium) {
-                ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(), "premium");
+                ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(),
+                        "premium");
                 streamSwitch.setChecked(false);
             } else {
                 stream = true;

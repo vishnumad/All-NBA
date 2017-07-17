@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 /**
  * Adapter used to hold all of the comments from a thread. It also supports loading a header view
  * as the first element of the recycler view.
- * The (optional) header is leaded based on the hasHeader field of the constructor and when true
+ * The (optional) header is loaded based on the hasHeader field of the constructor and when true
  * loads a {@link FullCardViewHolder} with information about the submission.
  *
  * Currently used to display comments only in the
@@ -73,12 +73,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void setSubmission(Submission submission) {
-        customSubmission.setSubmission(submission);
+        customSubmission = new CustomSubmission(submission);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (!hasHeader) {
+        // Return comment type if we don't have a header of it the submission isn't loaded yet.
+        if (!hasHeader || customSubmission == null) {
             return TYPE_COMMENT;
         } else {
             if (position == 0) {
@@ -113,7 +114,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
             final CommentNode commentNode;
-            if (hasHeader) {
+            if (hasHeader && customSubmission != null) {
                 commentNode = commentsList.get(position - 1);
             } else {
                 commentNode = commentsList.get(position);
@@ -124,7 +125,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        if (hasHeader) {
+        if (hasHeader && customSubmission != null) {
             return null != commentsList ? commentsList.size() + 1 : 1;
         } else {
             return null != commentsList ? commentsList.size() : 0;
@@ -176,7 +177,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(final Context context, final CommentNode commentNode,
+        public void bindData(final Context context,
+                             final CommentNode commentNode,
                              final OnCommentClickListener commentClickListener) {
 
             final Comment comment = commentNode.getComment();

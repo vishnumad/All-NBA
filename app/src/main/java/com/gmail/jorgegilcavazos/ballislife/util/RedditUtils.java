@@ -161,6 +161,7 @@ public final class RedditUtils {
         return capsTitle.contains(capsName);
     }
 
+    // TODO: make generic holder and make FullCard, PostList and WideCard extend from it.
     public static void setUpvotedColors(Context context, final FullCardViewHolder holder) {
         DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
                 ContextCompat.getColor(context, R.color.commentUpvoted));

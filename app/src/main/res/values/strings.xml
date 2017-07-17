@@ -32,8 +32,8 @@
     <string name="no_highlights_to_show">No highlights to show</string>
     <string name="error_loading_highlights">Error loading highlights</string>
     <string name="error_loading_streamable">Error loading streamable</string>
-    <string name="num_comments">%1$s comments</string>
     <string name="purchase_complete">Premium features are now available!</string>
+    <string name="unknown_error">An unexpected error occurred</string>
 
     <!-- Strings for MainActivity -->
     <string name="action_refresh">Refresh</string>
@@ -100,7 +100,16 @@
     <string name="card_view_description">Larger HD images, uses more data</string>
     <string name="list_view">List View</string>
     <string name="list_view_description">Smaller thumbnails, uses less data</string>
-    
+    <string name="num_points">%1$d points</string>
+    <string name="num_comments">%1$d comments</string>
+    <string name="posted_details">Posted %1$s by %2$s via %3$s</string>
+    <string name="just_now">just now</string>
+    <string name="minutes_ago">%1$d minutes ago</string>
+    <string name="hours_ago">%1$d hours ago</string>
+    <string name="days_ago">%1$d days ago</string>
+    <string name="share_this_link">Share this link</string>
+
+
     <!-- App shortcuts -->
     <string name="rnba_shortcut_short_label">NBA</string>
     <string name="rnba_shortcut_long_label">NBA</string>

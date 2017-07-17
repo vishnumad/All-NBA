@@ -34,4 +34,8 @@ public interface PostsView {
     void scrollToTop();
 
     void resetScrollState();
+
+    void share(String url);
+
+    void showUnknownErrorToast();
 }

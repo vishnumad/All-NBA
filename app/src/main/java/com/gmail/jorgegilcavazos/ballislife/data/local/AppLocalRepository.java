@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +32,8 @@ public class AppLocalRepository implements LocalRepository {
 
     @Override
     public int getFavoritePostsViewType() {
-        return localSharedPreferences.getInt(LocalSharedPreferences.POSTS_VIEW_TYPE, -1);
+        return localSharedPreferences.getInt(LocalSharedPreferences.POSTS_VIEW_TYPE,
+                Constants.POSTS_VIEW_WIDE_CARD);
     }
 
     @Override
@@ -43,7 +45,8 @@ public class AppLocalRepository implements LocalRepository {
 
     @Override
     public int getFavoriteHighlightViewType() {
-        return localSharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, -1);
+        return localSharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE,
+                Constants.HIGHLIGHTS_VIEW_SMALL);
     }
 
     @Override
@@ -60,6 +63,7 @@ public class AppLocalRepository implements LocalRepository {
 
     @Override
     public String getStartupFragment() {
-        return defaultSharedPreferences.getString(SettingsFragment.KEY_STARTUP_FRAGMENT, null);
+        return defaultSharedPreferences.getString(SettingsFragment.KEY_STARTUP_FRAGMENT,
+                SettingsFragment.STARTUP_FRAGMENT_GAMES);
     }
 }

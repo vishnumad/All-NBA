@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    android:id="@+id/cardview_header"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="5dp">
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardview_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -12,38 +13,38 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:src="@drawable/rnbabg"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/rnbabg"/>
 
         <ImageView
             android:id="@+id/image_logo"
-            android:layout_marginTop="35dp"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            android:src="@drawable/rnbasnoo"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"
+            android:src="@drawable/rnbasnoo"/>
 
         <TextView
             android:id="@+id/text_subreddit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/image_logo"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp"
             android:text="r/NBA"
             android:textColor="@color/primaryText"
-            android:textSize="18sp"
-            android:layout_margin="5dp"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/image_logo"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/text_subscribers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="554843 subscribers • 8133 fans online"
-            android:textSize="13sp"
-            android:textColor="@color/secondaryText"
-            android:layout_marginBottom="5dp"
+            android:layout_below="@id/text_subreddit"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/text_subreddit"/>
+            android:layout_marginBottom="5dp"
+            android:text="554843 subscribers • 8133 fans online"
+            android:textColor="@color/secondaryText"
+            android:textSize="13sp"/>
 
     </RelativeLayout>
 

@@ -1,26 +1,16 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 public class Constants {
+    public static final String HTTPS = "https://";
+
     public static final String YOUTUBE_DOMAIN = "youtube.com";
     public static final String INSTAGRAM_DOMAIN = "instagram.com";
     public static final String STREAMABLE_DOMAIN = "streamable.com";
     public static final String IMGUR_DOMAIN = "imgur.com";
     public static final String GIPHY_DOMAIN = "giphy.com";
-
-    public static final String STREAMABLE_API_URL = "https://api.streamable.com/videos/";
+    public static final String REDDIT_DOMAIN = "reddit.com";
 
     public static final String THREAD_ID = "THREAD_ID";
-    public static final String THREAD_TITLE = "THREAD_TITLE";
-    public static final String THREAD_DESCRIPTION = "THREAD_DESCRIPTION";
-    public static final String THREAD_AUTHOR = "THREAD_AUTHOR";
-    public static final String THREAD_NUM_COMMENTS = "THREAD_NUM_COMMENTS";
-    public static final String THREAD_TIMESTAMP = "THREAD_TIMESTAMP";
-    public static final String THREAD_SCORE = "THREAD_SCORE";
-    public static final String THREAD_DOMAIN = "THREAD_DOMAIN";
-    public static final String THREAD_URL = "THREAD_URL";
-    public static final String THREAD_IMAGE = "THREAD_IMAGE";
-    public static final String THREAD_SELF = "THREAD_SELF";
-    public static final String THREAD_SUBMISSION = "THREAD_SUBMISSION";
 
     public static final boolean NBA_MATERIAL_ENABLED = false;
 
@@ -55,11 +45,14 @@ public class Constants {
     public static final String SUB_UTA = "UtahJazz";
     public static final String SUB_WAS = "WashingtonWizards";
 
+    // Generic view types
+    public static final int VIEW_HEADER = 0;
+
     // Reddit posts view types
-    public static final int VIEW_CARD = 0;
-    public static final int VIEW_LIST = 1;
+    public static final int POSTS_VIEW_WIDE_CARD = 1;
+    public static final int POSTS_VIEW_LIST = 2;
 
     // Highlights view types
-    public static final int VIEW_SMALL = 0;
-    public static final int VIEW_LARGE = 1;
+    public static final int HIGHLIGHTS_VIEW_SMALL = 1;
+    public static final int HIGHLIGHTS_VIEW_LARGE = 2;
 }

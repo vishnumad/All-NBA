@@ -1,10 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.google.common.base.Optional;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UtilitiesTest {
 
@@ -48,10 +51,19 @@ public class UtilitiesTest {
         customSubmission.setHighResThumbnail("hdThumbnail");
         CustomSubmission customSubmission1 = new CustomSubmission();
         customSubmission1.setThumbnail("sdThumbnail");
+        CustomSubmission customSubmission2 = new CustomSubmission();
 
-        assertEquals("hdThumbnail",
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission));
-        assertEquals("sdThumbnail",
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission1));
+        Optional<Pair<Utilities.ThumbnailType, String>> optional =
+                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission);
+        Optional<Pair<Utilities.ThumbnailType, String>> optional1 =
+                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission1);
+        Optional<Pair<Utilities.ThumbnailType, String>> optional2 =
+                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission2);
+
+        assertTrue(optional.isPresent());
+        assertEquals("hdThumbnail", optional.get().second);
+        assertTrue(optional1.isPresent());
+        assertEquals("sdThumbnail", optional1.get().second);
+        assertFalse(optional2.isPresent());
     }
 }

@@ -9,12 +9,15 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorPrimaryLight">#303030</color>
     <color name="colorAccent">#3F51B5</color>-->
-    <color name="primaryText">#212121</color>
-    <color name="secondaryText">#757575</color>
+    <color name="primaryText">#DE000000</color>
+    <color name="secondaryText">#8A000000</color>
+    <color name="hintText">#42000000</color>
     <color name="accentText">#BABABA</color>
     <color name="colorDivider">#1A000000</color>
     <color name="background">#F9F9F9</color>
     <color name="icon">#8D8D8D</color>
+    <color name="active_icon">#8A000000</color>
+    <color name="inactive_icon">#61000000</color>
 
     <color name="blackLight">#212121</color>
     <color name="white">#FFFFFF</color>
@@ -37,6 +40,7 @@
     <color name="gray">#DDDDDD</color>
     <color name="bgWhite">#f5f5f5</color>
     <color name="lightGray">#E5E5E5</color>
+    <color name="light_text_bg">#F9F9F9</color>
 
     <color name="stickiedColor">#228822</color>
     <color name="flairColor">#009688</color>
@@ -47,7 +51,7 @@
     <color name="commentBgDark">#E5E5E5</color>
     <color name="commentUpvoted">#FF9800</color>
     <color name="commentDownvoted">#3F51B5</color>
-    <color name="commentNeutral">#757575</color>
+    <color name="commentNeutral">#000000</color>
     <color name="commentSaved">#FFC107</color>
 
     <!-- Team colors -->

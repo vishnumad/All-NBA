@@ -25,8 +25,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class PostsPresenter extends BasePresenter<PostsView> {
@@ -211,6 +213,34 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public void onViewTypeSelected(int viewType) {
         localRepository.saveFavoritePostsViewType(viewType);
         view.changeViewType(viewType);
+    }
+
+    public void subscribeToSubmissionShare(Observable<Submission> shareObservable) {
+        disposables.add(shareObservable
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableObserver<Submission>() {
+                    @Override
+                    public void onNext(Submission submission) {
+                        if (submission.isSelfPost()) {
+                            view.share(Constants.HTTPS + Constants.REDDIT_DOMAIN +
+                                    submission.getPermalink());
+                        } else {
+                            view.share(submission.getUrl());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showUnknownErrorToast();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        );
     }
 
     public void stop() {

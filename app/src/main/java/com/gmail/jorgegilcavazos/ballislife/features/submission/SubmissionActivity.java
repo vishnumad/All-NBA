@@ -57,8 +57,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     private String threadId;
     private String subreddit;
-
     private CustomSubmission customSubmission;
+
     private ThreadAdapter threadAdapter;
     private SubmissionPresenter presenter;
 
@@ -79,8 +79,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         Bundle extras = getIntent().getExtras();
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
-            customSubmission = (CustomSubmission) extras
-                    .getSerializable(Constants.THREAD_SUBMISSION);
             subreddit = extras.getString(KEY_SUBREDDIT);
         }
 
@@ -92,7 +90,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         threadAdapter = new ThreadAdapter(this, new ArrayList<CommentNode>(), true);
         threadAdapter.setCommentClickListener(this);
         threadAdapter.setSubmissionClickListener(this);
-        threadAdapter.setCustomSubmission(customSubmission);
 
         submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         submissionRecyclerView.setAdapter(threadAdapter);
@@ -181,6 +178,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
+    public void setCustomSubmission(CustomSubmission customSubmission) {
+        this.customSubmission = customSubmission;
+    }
+
+    @Override
     public void showErrorAddingComment() {
         Toast.makeText(this, R.string.saving_failed, Toast.LENGTH_SHORT).show();
     }
@@ -248,21 +250,21 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void onSubmissionClick(Submission submission) {
+    public void onSubmissionClick(CustomSubmission customSubmission) {
         // No action on submission click.
     }
 
     @Override
-    public void onVoteSubmission(Submission submission, VoteDirection voteDirection) {
-        if (submission != null) {
-            presenter.onVoteSubmission(submission, voteDirection);
+    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
+        if (customSubmission != null) {
+            presenter.onVoteSubmission(customSubmission.getSubmission(), voteDirection);
         }
     }
 
     @Override
-    public void onSaveSubmission(Submission submission, boolean saved) {
-        if (submission != null) {
-            presenter.onSaveSubmission(submission, saved);
+    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
+        if (customSubmission != null) {
+            presenter.onSaveSubmission(customSubmission.getSubmission(), saved);
         }
     }
 
@@ -292,8 +294,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                 .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        if (customSubmission.getSubmission() != null) {
-                            presenter.onReplyToThread(input.toString(), customSubmission.getSubmission());
+                        if (customSubmission != null) {
+                            presenter.onReplyToThread(input.toString(),
+                                    customSubmission.getSubmission());
                         }
                     }
                 })
@@ -325,5 +328,15 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void scrollToTop() {
         submissionRecyclerView.scrollToPosition(0);
+    }
+
+    @Override
+    public void hideFab() {
+        fab.hide();
+    }
+
+    @Override
+    public void showFab() {
+        fab.show();
     }
 }
