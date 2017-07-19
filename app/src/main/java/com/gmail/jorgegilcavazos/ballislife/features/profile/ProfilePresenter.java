@@ -68,10 +68,10 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
                         if (contributions.isEmpty()) {
                             view.showNothingToShowSnackbar();
                             view.hideContent();
-                            return;
+                        } else {
+                            view.showContent(contributions, reset);
                         }
 
-                        view.showContent(contributions, reset);
                         if (reset) {
                             view.scrollToTop();
                             view.setLoadingIndicator(false);

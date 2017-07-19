@@ -125,6 +125,8 @@ public class ProfilePresenterTest {
         verify(mockRepository).next();
         verify(mockView).showNothingToShowSnackbar();
         verify(mockView).hideContent();
+        verify(mockView).scrollToTop();
+        verify(mockView).setLoadingIndicator(false);
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockRepository);
         verifyNoMoreInteractions(mockRedditAuthentication);
