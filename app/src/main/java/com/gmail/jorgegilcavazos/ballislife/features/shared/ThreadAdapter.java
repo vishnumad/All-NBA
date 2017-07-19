@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -287,12 +287,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 @Override
                 public void onClick(View v) {
                     if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorNeutral);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
                     } else {
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorUpvoted);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.UPVOTE);
@@ -304,12 +304,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 @Override
                 public void onClick(View v) {
                     if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorNeutral);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
                     } else {
-                        if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorDownvoted);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.DOWNVOTE);

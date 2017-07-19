@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
@@ -43,7 +43,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
 
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
@@ -106,7 +106,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
         SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
-        presenter = new SubmissionPresenter(new RedditService(), preferences,
+        presenter = new SubmissionPresenter(new RedditServiceImpl(), preferences,
                 SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadComments(threadId, sorting);

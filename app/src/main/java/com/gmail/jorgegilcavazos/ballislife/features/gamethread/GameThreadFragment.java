@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
 
@@ -114,7 +114,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
 
-        presenter = new GameThreadPresenter(this, new RedditService(), gameDate, preferences);
+        presenter = new GameThreadPresenter(this, new RedditServiceImpl(), gameDate, preferences);
         presenter.start();
         presenter.loadComments(threadType, homeTeam, awayTeam, stream);
 

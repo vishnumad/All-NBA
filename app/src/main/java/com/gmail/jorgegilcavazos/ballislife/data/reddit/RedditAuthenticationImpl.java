@@ -1,10 +1,10 @@
-package com.gmail.jorgegilcavazos.ballislife.data;
+package com.gmail.jorgegilcavazos.ballislife.data.reddit;
 
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 
 import net.dean.jraw.RedditClient;
@@ -33,37 +33,34 @@ import io.reactivex.functions.Action;
  * Whenever UserAuth is used, a refresh token must be saved in shared preferences so that future
  * authentications attempts can use that instead of asking to the user to login again.
  */
-public class RedditAuthentication {
-    private static final String TAG = "RedditAuthentication";
-
+public class RedditAuthenticationImpl implements RedditAuthentication {
     public static final String REDDIT_AUTH_PREFS = "RedditAuthPrefs";
     public static final String CLIENT_ID = "XDtA2eYVKp1wWA";
     public static final String REDIRECT_URL = "http://localhost/authorize_callback";
     public static final String REDDIT_TOKEN_KEY = "REDDIT_TOKEN";
     public static final String TOKEN_EXPIRATION_KEY = "TOKEN_EXPIRATION";
-
-    private static RedditAuthentication mInstance = null;
-
-    private RedditClient mRedditClient;
-    private RedditService redditService;
-
+    private static final String TAG = "RedditAuthImpl";
+    private static RedditAuthenticationImpl mInstance = null;
     @Inject
     LocalRepository localRepository;
+    private RedditClient mRedditClient;
+    private RedditServiceImpl redditService;
 
-    private RedditAuthentication() {
+    private RedditAuthenticationImpl() {
         BallIsLifeApplication.getAppComponent().inject(this);
         mRedditClient = new RedditClient(UserAgent.of("android",
                 "com.gmail.jorgegilcavazos.ballislife", "v0.5.3", "Obi-Wan_Ginobili"));
-        redditService = new RedditService();
+        redditService = new RedditServiceImpl();
     }
 
-    public static RedditAuthentication getInstance() {
+    public static RedditAuthenticationImpl getInstance() {
         if (mInstance == null) {
-            mInstance = new RedditAuthentication();
+            mInstance = new RedditAuthenticationImpl();
         }
         return mInstance;
     }
 
+    @Override
     public RedditClient getRedditClient() {
         return mRedditClient;
     }
@@ -78,6 +75,7 @@ public class RedditAuthentication {
      * Authenticates with user context if a refresh token is saved in shared preferences. Otherwise
      * authenticates without a user context.
      */
+    @Override
     public Completable authenticate(final SharedPreferences sharedPreferences) {
         if (mRedditClient.isAuthenticated() && isTokenValid(sharedPreferences)) {
             Log.d(TAG, "Is authenticated and token is valid");
@@ -118,6 +116,7 @@ public class RedditAuthentication {
      * Authenticates with a user context. On success, saves the refresh token to a shared
      * preferences file.
      */
+    @Override
     public Completable authenticateUser(String url, final SharedPreferences sharedPreferences) {
         Log.d(TAG, "Starting user auth");
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);
@@ -137,6 +136,7 @@ public class RedditAuthentication {
     /**
      * De-authenticates the user if one is logged in.
      */
+    @Override
     public Completable deAuthenticateUser(final SharedPreferences sharedPreferences) {
         if (!isUserLoggedIn()) {
             return Completable.complete();

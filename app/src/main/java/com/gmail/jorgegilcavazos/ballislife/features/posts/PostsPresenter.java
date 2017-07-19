@@ -3,10 +3,10 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
@@ -62,7 +62,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void loadSubscriberCount() {
-        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
                 .andThen(service.getSubscriberCount(subreddit))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -107,7 +107,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         view.dismissSnackbar();
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
                 .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -146,12 +146,12 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void onVote(Submission submission, VoteDirection direction) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
                 .andThen(service.voteSubmission(submission, direction))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -170,12 +170,12 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void onSave(Submission submission, boolean saved) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(redditPrefs)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
                 .andThen(service.saveSubmission(submission, saved))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())

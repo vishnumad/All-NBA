@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.data.API;
+package com.gmail.jorgegilcavazos.ballislife.data.service;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;

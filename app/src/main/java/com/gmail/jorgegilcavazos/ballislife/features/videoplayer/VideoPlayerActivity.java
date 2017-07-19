@@ -8,7 +8,7 @@ import android.widget.Toast;
 import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.API.StreamableService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.StreamableService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -19,10 +19,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class VideoPlayerActivity extends AppCompatActivity implements VideoPlayerView ,
         EasyVideoCallback {
-    private static final String TAG = "VideoPlayerActivity";
-
     public static final String SHORTCODE = "videoUrl";
-
+    private static final String TAG = "VideoPlayerActivity";
     @BindView(R.id.player) EasyVideoPlayer videoPlayer;
 
     private VideoPlayerPresenter presenter;

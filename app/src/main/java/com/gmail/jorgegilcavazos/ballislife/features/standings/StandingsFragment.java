@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;

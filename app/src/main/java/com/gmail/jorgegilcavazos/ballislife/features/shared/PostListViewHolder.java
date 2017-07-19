@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
@@ -126,21 +126,21 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
                 if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.NO_VOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.UPVOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
                     }
                 } else {
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.UPVOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
                     }
@@ -154,21 +154,21 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
                 if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.NO_VOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
                 } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.DOWNVOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
                     }
                 } else {
                     submissionClickListener.onVoteSubmission(customSubmission,
                             VoteDirection.DOWNVOTE);
-                    if (RedditAuthentication.getInstance().isUserLoggedIn()) {
+                    if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                         customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
                     }

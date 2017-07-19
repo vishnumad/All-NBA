@@ -17,10 +17,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -40,11 +40,9 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 
 public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
-    private static final String TAG = "BoxScoreFragment";
-
     public static final int LOAD_AWAY = 0;
     public static final int LOAD_HOME = 2;
-
+    private static final String TAG = "BoxScoreFragment";
     @BindView(R.id.button_home) Button btnHome;
     @BindView(R.id.button_away) Button btnAway;
     @BindView(R.id.rv_players) RecyclerView recyclerViewPlayers;

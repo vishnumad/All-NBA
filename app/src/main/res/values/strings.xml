@@ -14,7 +14,7 @@
     <string name="retry">Retry</string>
     <string name="failed_game_data">Could not load game data</string>
     <string name="failed_standings_data">Could not load standings</string>
-    <string name="failed_profile_data">Could not load user info</string>
+    <string name="failed_profile_data">Could not load your contributions</string>
     <string name="failed_comments_data">Could not load comments</string>
     <string name="mute_game">Mute this game</string>
     <string name="no_comments_found">No comments found</string>
@@ -109,6 +109,8 @@
     <string name="days_ago">%1$d days ago</string>
     <string name="share_this_link">Share this link</string>
 
+    <!-- Profile -->
+    <string name="profile">Profile</string>
 
     <!-- App shortcuts -->
     <string name="rnba_shortcut_short_label">NBA</string>

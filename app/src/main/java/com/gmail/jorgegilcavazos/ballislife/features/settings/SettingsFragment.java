@@ -9,7 +9,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
@@ -22,7 +22,7 @@ import java.util.Set;
 import io.reactivex.observers.DisposableCompletableObserver;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
 
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
@@ -166,7 +166,7 @@ public class SettingsFragment extends PreferenceFragment
 
     private void initLogInStatusText() {
         Preference logInStatusPref = findPreference("log_in_status_pref");
-        RedditAuthentication reddit = RedditAuthentication.getInstance();
+        RedditAuthenticationImpl reddit = RedditAuthenticationImpl.getInstance();
         if (reddit.isUserLoggedIn()) {
             logInStatusPref.setTitle(R.string.log_out);
             logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user),
@@ -186,7 +186,7 @@ public class SettingsFragment extends PreferenceFragment
         logInStatusPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                RedditAuthentication reddit = RedditAuthentication.getInstance();
+                RedditAuthenticationImpl reddit = RedditAuthenticationImpl.getInstance();
                 if (reddit.isUserLoggedIn()) {
                     reddit.deAuthenticateUser(redditPrefs)
                             .andThen(reddit.authenticate(redditPrefs))

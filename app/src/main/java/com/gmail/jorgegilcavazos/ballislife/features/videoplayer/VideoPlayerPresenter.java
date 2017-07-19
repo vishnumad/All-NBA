@@ -1,8 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.videoplayer;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
+import com.gmail.jorgegilcavazos.ballislife.data.service.StreamableService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Streamable;
-import com.gmail.jorgegilcavazos.ballislife.data.API.StreamableService;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.crash.FirebaseCrash;
 

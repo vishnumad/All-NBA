@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.standings;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaStandingsService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 

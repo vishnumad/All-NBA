@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
@@ -18,7 +18,7 @@ import java.net.URL;
 import butterknife.BindView;
 import io.reactivex.observers.DisposableCompletableObserver;
 
-import static com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
         final SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
-        URL authURL = RedditAuthentication.getInstance().getAuthorizationUrl();
+        URL authURL = RedditAuthenticationImpl.getInstance().getAuthorizationUrl();
         webView = (WebView) findViewById(R.id.login_webview);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 if (url.contains("code=")) {
                     webView.stopLoading();
-                    RedditAuthentication.getInstance().authenticateUser(url, preferences)
+                    RedditAuthenticationImpl.getInstance().authenticateUser(url, preferences)
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.ui())
                             .subscribeWith(new DisposableCompletableObserver() {

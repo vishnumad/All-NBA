@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights;
 
-import com.gmail.jorgegilcavazos.ballislife.data.API.HighlightsService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 

@@ -1,12 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.gmail.jorgegilcavazos.ballislife.data.API.GameThreadFinderService;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditGameThreadsService;
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
@@ -46,12 +45,12 @@ public class GameThreadPresenter {
     private long gameDate;
 
     private GameThreadView view;
-    private RedditService redditService;
+    private RedditServiceImpl redditService;
     private RedditGameThreadsService gameThreadsService;
     private SharedPreferences preferences;
     private CompositeDisposable disposables;
 
-    public GameThreadPresenter(GameThreadView view, RedditService redditService, long gameDate,
+    public GameThreadPresenter(GameThreadView view, RedditServiceImpl redditService, long gameDate,
                                SharedPreferences preferences) {
         this.view = view;
         this.redditService = redditService;
@@ -60,7 +59,7 @@ public class GameThreadPresenter {
     }
 
     public void start() {
-        redditService = new RedditService();
+        redditService = new RedditServiceImpl();
         disposables = new CompositeDisposable();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -79,7 +78,7 @@ public class GameThreadPresenter {
         view.hideComments();
         view.hideText();
 
-        Observable<List<CommentNode>> observable = RedditAuthentication.getInstance().authenticate(preferences)
+        Observable<List<CommentNode>> observable = RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(gameThreadsService.fetchGameThreads(
                         DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
@@ -146,12 +145,12 @@ public class GameThreadPresenter {
     }
 
     public void vote(Comment comment, VoteDirection voteDirection) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(redditService.voteComment(comment, voteDirection))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -170,12 +169,12 @@ public class GameThreadPresenter {
     }
 
     public void save(Comment comment) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(redditService.saveComment(comment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -192,12 +191,12 @@ public class GameThreadPresenter {
     }
 
     public void unsave(Comment comment) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(redditService.unsaveComment(comment))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -214,13 +213,13 @@ public class GameThreadPresenter {
     }
 
     public void reply(final int position, final Comment parentComment, final String text) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
         view.showSavingToast();
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(redditService.replyToComment(parentComment, text))
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
@@ -257,13 +256,13 @@ public class GameThreadPresenter {
 
     public void replyToThread(final String text, final String type, final String homeTeamAbbr,
                               final String awayTeamAbbr) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
         view.showSavingToast();
-        disposables.add(RedditAuthentication.getInstance().authenticate(preferences)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
                 .andThen(gameThreadsService.fetchGameThreads(
                 DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
@@ -326,7 +325,7 @@ public class GameThreadPresenter {
     }
 
     public void replyToCommentBtnClick(int position, Comment parentComment) {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
@@ -335,7 +334,7 @@ public class GameThreadPresenter {
     }
 
     public void replyToThreadBtnClick() {
-        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }

@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games;
 
-import com.gmail.jorgegilcavazos.ballislife.data.API.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;

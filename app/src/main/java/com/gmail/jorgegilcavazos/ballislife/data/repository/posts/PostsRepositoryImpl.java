@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.posts;
 
-import com.gmail.jorgegilcavazos.ballislife.data.API.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 
@@ -36,7 +36,7 @@ public class PostsRepositoryImpl implements PostsRepository {
     @Override
     public void reset(Sorting sorting, TimePeriod timePeriod, String subreddit) {
         SubredditPaginator paginator = new SubredditPaginator(
-                RedditAuthentication.getInstance().getRedditClient(),
+                RedditAuthenticationImpl.getInstance().getRedditClient(),
                 subreddit);
         paginator.setLimit(20);
         paginator.setSorting(sorting);

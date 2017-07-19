@@ -2,7 +2,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
-import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 
 import java.util.List;
@@ -28,7 +26,6 @@ import butterknife.ButterKnife;
 /**
  * Lists "contributions" of a reddit user. Contributions can be comments or link posts.
  */
-
 public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int LINK_TYPE = 0;
@@ -46,10 +43,8 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     public int getItemViewType(int position) {
         Contribution contribution = contributions.get(position);
         if (contribution.getDataNode().get("name").toString().contains("t1")) {
-            // Is comment.
             return COMMENT_TYPE;
         } else {
-            // Is submission.
             return LINK_TYPE;
         }
     }
@@ -64,8 +59,7 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 return new CommentViewHolder(LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.contribution_comment_layout, parent, false));
             default:
-                return new CommentViewHolder(LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.contribution_comment_layout, parent, false));
+                throw new IllegalStateException("Contribution view type is invalid: " + viewType);
         }
     }
 
@@ -107,10 +101,9 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
             holder.linkView.setText("• " + domain);
             if (thumbnailUrl != null) {
                 Picasso.with(context).load(thumbnailUrl).into(holder.thumbnail);
-                if (domain.equals(Constants.YOUTUBE_DOMAIN)
-                        || domain.equals(Constants.INSTAGRAM_DOMAIN)
-                        || domain.equals(Constants.STREAMABLE_DOMAIN)) {
-                    holder.thumbnailType.setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
+                if (domain.equals(Constants.STREAMABLE_DOMAIN)) {
+                    holder.thumbnailType
+                            .setImageResource(R.drawable.ic_play_circle_outline_black_24dp);
                 } else if (domain.equals(Constants.IMGUR_DOMAIN )
                         || domain.equals(Constants.GIPHY_DOMAIN)) {
                     holder.thumbnailType.setImageResource(R.drawable.ic_gif_black_24dp);
@@ -134,9 +127,19 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 String.valueOf(comment.getScore())));
     }
 
-    public void addData(Listing<Contribution> data) {
+    public void setData(List<Contribution> data) {
         contributions.clear();
         contributions.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void addData(List<Contribution> data) {
+        contributions.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void clearData() {
+        contributions.clear();
         notifyDataSetChanged();
     }
 

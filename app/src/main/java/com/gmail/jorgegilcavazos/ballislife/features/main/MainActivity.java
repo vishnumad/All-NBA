@@ -23,8 +23,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Move this out of here, either to application start or a presenter.
         BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
         disposables = new CompositeDisposable();
-        disposables.add(RedditAuthentication.getInstance().authenticate(redditSharedPrefs)
+        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditSharedPrefs)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.navigation_item_7:
                         // Start LoginActivity if no user is already logged in.
-                        if (!RedditAuthentication.getInstance().isUserLoggedIn()) {
+                        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
                             Intent loginIntent = new Intent(getApplicationContext(),
                                     LoginActivity.class);
                             startActivity(loginIntent);
