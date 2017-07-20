@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
@@ -19,6 +20,9 @@ import android.widget.Toast;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.EndlessRecyclerViewScrollListener;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Contribution;
 
@@ -40,8 +44,10 @@ public class ProfileActivity extends AppCompatActivity
     @BindView(R.id.profile_toolbar) Toolbar toolbar;
     @BindView(R.id.profile_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.profile_recycler_view) RecyclerView recyclerView;
+
     @Inject
     ProfilePresenter presenter;
+
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
     private ContributionsAdapter contributionsAdapter;
@@ -93,6 +99,7 @@ public class ProfileActivity extends AppCompatActivity
         recyclerView.addOnScrollListener(scrollListener);
 
         presenter.attachView(this);
+        presenter.observeContributionsClicks(contributionsAdapter.getClickObservable());
     }
 
     @Override
@@ -161,6 +168,27 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     @Override
+    public void openSubmission(String submissionId) {
+        Intent intent = new Intent(ProfileActivity.this, SubmissionActivity.class);
+        Bundle extras = new Bundle();
+        extras.putString(SubmissionActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(Constants.THREAD_ID, submissionId);
+        intent.putExtras(extras);
+        startActivity(intent);
+    }
+
+    @Override
+    public void openSubmissionAndScrollToComment(String submissionId, String commentId) {
+        Intent intent = new Intent(ProfileActivity.this, SubmissionActivity.class);
+        Bundle extras = new Bundle();
+        extras.putString(SubmissionActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(Constants.THREAD_ID, submissionId);
+        extras.putString(SubmissionActivity.KEY_COMMENT_TO_SCROLL, commentId);
+        intent.putExtras(extras);
+        startActivity(intent);
+    }
+
+    @Override
     public void dismissSnackbar() {
         if (snackbar != null && snackbar.isShown()) {
             snackbar.dismiss();
@@ -200,5 +228,11 @@ public class ProfileActivity extends AppCompatActivity
             }
         });
         snackbar.show();
+    }
+
+    @Override
+    public void showUnknownErrorToast(Throwable e) {
+        FirebaseCrash.report(e);
+        Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
     }
 }

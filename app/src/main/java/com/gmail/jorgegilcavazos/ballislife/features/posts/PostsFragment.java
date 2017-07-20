@@ -395,7 +395,7 @@ public class PostsFragment extends Fragment implements PostsView,
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, customSubmission.getId());
-        bundle.putString(SubmissionActivity.KEY_SUBREDDIT, subreddit);
+        bundle.putString(SubmissionActivity.KEY_TITLE, subreddit);
         intent.putExtras(bundle);
         startActivity(intent);
     }

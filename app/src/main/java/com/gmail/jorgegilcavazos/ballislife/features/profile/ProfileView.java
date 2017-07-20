@@ -15,6 +15,10 @@ public interface ProfileView extends MvpView {
 
     void hideContent();
 
+    void openSubmission(String submissionId);
+
+    void openSubmissionAndScrollToComment(String submissionId, String commentId);
+
     void dismissSnackbar();
 
     void scrollToTop();
@@ -26,4 +30,6 @@ public interface ProfileView extends MvpView {
     void showNothingToShowSnackbar();
 
     void showContributionsLoadingFailedSnackbar(boolean reset);
+
+    void showUnknownErrorToast(Throwable e);
 }

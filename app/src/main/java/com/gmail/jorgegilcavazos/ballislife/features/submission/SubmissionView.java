@@ -38,7 +38,7 @@ public interface SubmissionView {
 
     void showContentUnavailableToast();
 
-    void scrollToTop();
+    void scrollToComment(int index);
 
     void hideFab();
 

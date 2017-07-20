@@ -48,7 +48,8 @@ import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticat
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
         View.OnClickListener {
-    public static final String KEY_SUBREDDIT = "subreddit";
+    public static final String KEY_TITLE = "Title";
+    public static final String KEY_COMMENT_TO_SCROLL = "CommentToScroll";
     private static final String TAG = "SubmissionActivity";
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -56,7 +57,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @BindView(R.id.recyclerView_submission) RecyclerView submissionRecyclerView;
 
     private String threadId;
-    private String subreddit;
+    private String title;
+    private String commentIdToScroll;
     private CustomSubmission customSubmission;
 
     private ThreadAdapter threadAdapter;
@@ -79,10 +81,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         Bundle extras = getIntent().getExtras();
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
-            subreddit = extras.getString(KEY_SUBREDDIT);
+            title = extras.getString(KEY_TITLE);
+            commentIdToScroll = extras.getString(KEY_COMMENT_TO_SCROLL);
         }
 
-        setTitle(subreddit);
+        setTitle(title);
 
         fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -109,7 +112,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         presenter = new SubmissionPresenter(new RedditServiceImpl(), preferences,
                 SchedulerProvider.getInstance());
         presenter.attachView(this);
-        presenter.loadComments(threadId, sorting);
+        presenter.loadComments(threadId, sorting, commentIdToScroll);
     }
 
     @Override
@@ -326,8 +329,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void scrollToTop() {
-        submissionRecyclerView.scrollToPosition(0);
+    public void scrollToComment(int index) {
+        // Comment i is actually at index i + 1 because of the post card view.
+        submissionRecyclerView.scrollToPosition(index + 1);
     }
 
     @Override

@@ -47,6 +47,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void loadComments(String threadId, CommentSort sorting) {
+        loadComments(threadId, sorting, null);
+    }
+
+    public void loadComments(String threadId, CommentSort sorting, final String commentIdToScroll) {
         view.hideFab();
         view.setLoadingIndicator(true);
         disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
@@ -56,17 +60,30 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .subscribeWith(new DisposableSingleObserver<Submission>() {
                     @Override
                     public void onSuccess(Submission submission) {
+                        int i = 0;
+                        int indexToScrollTo = 0;
+
                         Iterable<CommentNode> iterable = submission.getComments().walkTree();
                         List<CommentNode> commentNodes = new ArrayList<>();
                         for (CommentNode node : iterable) {
                             commentNodes.add(node);
+                            if (commentIdToScroll != null
+                                    && node.getComment().getId().equals(commentIdToScroll)) {
+                                indexToScrollTo = i;
+                            }
+                            i++;
                         }
 
                         view.setCustomSubmission(new CustomSubmission(submission));
                         view.showComments(commentNodes, submission);
                         view.setLoadingIndicator(false);
-                        view.scrollToTop();
                         view.showFab();
+
+                        if (commentIdToScroll != null) {
+                            view.scrollToComment(indexToScrollTo);
+                        } else {
+                            view.scrollToComment(0);
+                        }
                     }
 
                     @Override
@@ -268,7 +285,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                     @Override
                     public void onSuccess(CommentNode comment) {
                         view.addComment(comment, 0);
-                        view.scrollToTop();
+                        view.scrollToComment(0);
                     }
 
                     @Override

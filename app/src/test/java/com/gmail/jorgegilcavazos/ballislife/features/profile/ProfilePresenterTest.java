@@ -8,7 +8,10 @@ import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedExcep
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
 import com.google.common.collect.ImmutableList;
 
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
+import net.dean.jraw.models.PublicContribution;
+import net.dean.jraw.models.Submission;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,8 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -182,5 +187,36 @@ public class ProfilePresenterTest {
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockRepository);
         verifyNoMoreInteractions(mockRedditAuthentication);
+    }
+
+    @Test
+    public void testObserveContributionsClicks() {
+        Comment mockComment = mock(Comment.class);
+        when(mockComment.getSubmissionId()).thenReturn("t3_sub_id_1");
+        when(mockComment.getId()).thenReturn("t1_comment_id_1");
+        Comment mockComment2 = mock(Comment.class);
+        when(mockComment2.getSubmissionId()).thenReturn("t3_sub_id_2");
+        when(mockComment.getId()).thenReturn("t1_comment_id_2");
+        Submission mockSubmission = mock(Submission.class);
+        when(mockSubmission.getId()).thenReturn("t3_sub_id_3");
+
+
+        Observable<PublicContribution> contributionObservable
+                = Observable.just(mockComment, mockComment2, mockSubmission);
+
+        presenter.observeContributionsClicks(contributionObservable);
+
+        verify(mockView).openSubmissionAndScrollToComment("sub_id_1", mockComment.getId());
+        verify(mockView).openSubmissionAndScrollToComment("sub_id_2", mockComment2.getId());
+        verify(mockView).openSubmission("sub_id_3");
+    }
+
+    @Test
+    public void testObserveContributionsClicks_unexpectedError() {
+        Observable<PublicContribution> contributionObservable = Observable.error(new Exception());
+
+        presenter.observeContributionsClicks(contributionObservable);
+
+        verify(mockView).showUnknownErrorToast(any(Throwable.class));
     }
 }

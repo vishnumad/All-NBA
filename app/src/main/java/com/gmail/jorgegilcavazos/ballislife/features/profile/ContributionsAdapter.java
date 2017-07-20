@@ -16,12 +16,15 @@ import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
+import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Lists "contributions" of a reddit user. Contributions can be comments or link posts.
@@ -33,6 +36,7 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private Context context;
     private List<Contribution> contributions;
+    private PublishSubject<PublicContribution> clickSubject = PublishSubject.create();
 
     public ContributionsAdapter(Context context, List<Contribution> contributions) {
         this.context = context;
@@ -83,7 +87,7 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     private void setLinkViewHolderViews(LinkViewHolder holder, int position) {
-        Submission post = new Submission(contributions.get(position).getDataNode());
+        final Submission post = new Submission(contributions.get(position).getDataNode());
 
         holder.titleView.setText(post.getTitle());
         holder.scoreView.setText(String.valueOf(post.getScore()));
@@ -114,10 +118,16 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                 holder.thumbnailContainer.setVisibility(View.GONE);
             }
         }
+        holder.container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickSubject.onNext(post);
+            }
+        });
     }
 
     private void setCommentViewHolderViews(CommentViewHolder holder, int position) {
-        Comment comment = new Comment(contributions.get(position).getDataNode());
+        final Comment comment = new Comment(contributions.get(position).getDataNode());
 
         holder.postTitleTextView.setText(comment.getSubmissionTitle());
         holder.authorTextView.setText(comment.getAuthor());
@@ -125,6 +135,12 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
         holder.timestampTextView.setText(DateFormatUtil.formatRedditDate(comment.getCreated()));
         holder.scoreTextView.setText(context.getString(R.string.points,
                 String.valueOf(comment.getScore())));
+        holder.container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickSubject.onNext(comment);
+            }
+        });
     }
 
     public void setData(List<Contribution> data) {
@@ -141,6 +157,10 @@ public class ContributionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void clearData() {
         contributions.clear();
         notifyDataSetChanged();
+    }
+
+    public Observable<PublicContribution> getClickObservable() {
+        return clickSubject;
     }
 
     public static class LinkViewHolder extends RecyclerView.ViewHolder {

@@ -8,14 +8,18 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepos
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
+import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
+import net.dean.jraw.models.PublicContribution;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class ProfilePresenter extends BasePresenter<ProfileView> {
@@ -57,7 +61,6 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
 
         view.dismissSnackbar();
 
-        disposables.clear();
         disposables.add(redditAuthentication.authenticate(redditSharedPreferences)
                 .andThen(profileRepository.next())
                 .subscribeOn(schedulerProvider.io())
@@ -90,6 +93,35 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
                             view.setLoadingIndicator(false);
                             view.hideContent();
                         }
+                    }
+                })
+        );
+    }
+
+    public void observeContributionsClicks(Observable<PublicContribution> contributionObservable) {
+        disposables.add(contributionObservable
+                .subscribeOn(schedulerProvider.ui())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableObserver<Contribution>() {
+                    @Override
+                    public void onNext(Contribution contribution) {
+                        if (contribution instanceof Comment) {
+                            String submissionId = ((Comment) contribution).getSubmissionId()
+                                    .substring(3);
+                            view.openSubmissionAndScrollToComment(submissionId,
+                                    contribution.getId());
+                        } else {
+                            view.openSubmission(contribution.getId().substring(3));
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showUnknownErrorToast(e);
+                    }
+
+                    @Override
+                    public void onComplete() {
                     }
                 })
         );
