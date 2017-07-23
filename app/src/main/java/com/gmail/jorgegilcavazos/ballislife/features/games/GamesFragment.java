@@ -21,11 +21,9 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.firebase.MyMessagingService;
-import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,7 +51,7 @@ public class GamesFragment extends Fragment implements GamesView,
     private static final String LIST_STATE = "ListState";
 
     @Inject
-    GamesRepository gamesRepository;
+    GamesPresenter presenter;
 
     @BindView(R.id.navigator_button_left) ImageButton btnPrevDay;
     @BindView(R.id.navigator_button_right) ImageButton btnNextDay;
@@ -68,7 +66,6 @@ public class GamesFragment extends Fragment implements GamesView,
     private GameAdapter gameAdapter;
     private Snackbar snackbar;
     private Unbinder unbinder;
-    private GamesPresenter presenter;
     private GameItemListener gameItemListener = new GameItemListener() {
         @Override
         public void onGameClick(NbaGame clickedGame) {
@@ -92,22 +89,6 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        listState = layoutManager.onSaveInstanceState();
-        outState.putLong(SELECTED_TIME, selectedDate.getTime().getTime());
-        outState.putParcelable(LIST_STATE, listState);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(LIST_STATE);
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
@@ -115,15 +96,6 @@ public class GamesFragment extends Fragment implements GamesView,
 
         layoutManager = new LinearLayoutManager(getActivity());
         gameAdapter = new GameAdapter(new ArrayList<NbaGame>(0), gameItemListener);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Load from cache if available, or from network if not.
-        presenter.loadFirstAvailable(selectedDate);
-        getActivity().registerReceiver(scoresUpdateReceiver,
-                new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
     }
 
     @Override
@@ -152,7 +124,6 @@ public class GamesFragment extends Fragment implements GamesView,
             }
         });
 
-        presenter = new GamesPresenter(gamesRepository, SchedulerProvider.getInstance());
         presenter.attachView(this);
 
         if (savedInstanceState != null) {
@@ -163,13 +134,34 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                presenter.loadGames(selectedDate);
-                return true;
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(LIST_STATE);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Load from cache if available, or from network if not.
+        presenter.loadFirstAvailable(selectedDate);
+        getActivity().registerReceiver(scoresUpdateReceiver,
+                new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        listState = layoutManager.onSaveInstanceState();
+        outState.putLong(SELECTED_TIME, selectedDate.getTime().getTime());
+        outState.putParcelable(LIST_STATE, listState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(scoresUpdateReceiver);
     }
 
     @Override
@@ -181,9 +173,13 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(scoresUpdateReceiver);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                presenter.loadGames(selectedDate);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

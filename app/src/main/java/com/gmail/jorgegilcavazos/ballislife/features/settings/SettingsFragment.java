@@ -9,20 +9,23 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import io.reactivex.observers.DisposableCompletableObserver;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
+        .REDDIT_AUTH_PREFS;
 
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
@@ -36,8 +39,15 @@ public class SettingsFragment extends PreferenceFragment
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
     private static final String TAG = "SettingsFragment";
 
+    @Inject
+    RedditAuthentication redditAuthentication;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_general);
 
@@ -166,11 +176,10 @@ public class SettingsFragment extends PreferenceFragment
 
     private void initLogInStatusText() {
         Preference logInStatusPref = findPreference("log_in_status_pref");
-        RedditAuthenticationImpl reddit = RedditAuthenticationImpl.getInstance();
-        if (reddit.isUserLoggedIn()) {
+        if (redditAuthentication.isUserLoggedIn()) {
             logInStatusPref.setTitle(R.string.log_out);
             logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user),
-                    reddit.getRedditClient().getAuthenticatedUser()));
+                    redditAuthentication.getRedditClient().getAuthenticatedUser()));
 
         } else {
             logInStatusPref.setTitle(R.string.log_in);
@@ -179,17 +188,16 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     private void initListeners() {
-        final SharedPreferences redditPrefs = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
-        final BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
+        final SharedPreferences redditPrefs = getActivity()
+                .getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
         Preference logInStatusPref = findPreference("log_in_status_pref");
         logInStatusPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                RedditAuthenticationImpl reddit = RedditAuthenticationImpl.getInstance();
-                if (reddit.isUserLoggedIn()) {
-                    reddit.deAuthenticateUser(redditPrefs)
-                            .andThen(reddit.authenticate(redditPrefs))
+                if (redditAuthentication.isUserLoggedIn()) {
+                    redditAuthentication.deAuthenticateUser(redditPrefs)
+                            .andThen(redditAuthentication.authenticate(redditPrefs))
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.ui())
                             .subscribeWith(new DisposableCompletableObserver() {

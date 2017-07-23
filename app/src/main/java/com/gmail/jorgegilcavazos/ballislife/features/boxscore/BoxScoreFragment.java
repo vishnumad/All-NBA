@@ -21,11 +21,13 @@ import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,15 +36,19 @@ import butterknife.Unbinder;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
-import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
+        .AWAY_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
+        .HOME_TEAM_KEY;
 
 
 public class BoxScoreFragment extends Fragment implements BoxScoreView {
-
     public static final int LOAD_AWAY = 0;
     public static final int LOAD_HOME = 2;
     private static final String TAG = "BoxScoreFragment";
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     @BindView(R.id.button_home) Button btnHome;
     @BindView(R.id.button_away) Button btnAway;
     @BindView(R.id.rv_players) RecyclerView recyclerViewPlayers;
@@ -101,7 +107,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         recyclerViewStats.setLayoutManager(new CustomLayoutMaganer(getActivity()));
         recyclerViewStats.setAdapter(statLineAdapter);
 
-        presenter = new BoxScorePresenter(this, gamesService, SchedulerProvider.getInstance());
+        presenter = new BoxScorePresenter(this, gamesService, schedulerProvider);
         presenter.start();
         presenter.loadBoxScore(gameId, teamSelected);
 

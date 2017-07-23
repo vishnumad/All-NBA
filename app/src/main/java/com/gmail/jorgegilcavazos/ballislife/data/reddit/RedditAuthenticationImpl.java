@@ -4,8 +4,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.UserAgent;
@@ -17,8 +16,10 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
 import io.reactivex.functions.Action;
 
 /**
@@ -33,6 +34,7 @@ import io.reactivex.functions.Action;
  * Whenever UserAuth is used, a refresh token must be saved in shared preferences so that future
  * authentications attempts can use that instead of asking to the user to login again.
  */
+@Singleton
 public class RedditAuthenticationImpl implements RedditAuthentication {
     public static final String REDDIT_AUTH_PREFS = "RedditAuthPrefs";
     public static final String CLIENT_ID = "XDtA2eYVKp1wWA";
@@ -40,35 +42,34 @@ public class RedditAuthenticationImpl implements RedditAuthentication {
     public static final String REDDIT_TOKEN_KEY = "REDDIT_TOKEN";
     public static final String TOKEN_EXPIRATION_KEY = "TOKEN_EXPIRATION";
     private static final String TAG = "RedditAuthImpl";
-    private static RedditAuthenticationImpl mInstance = null;
-    @Inject
-    LocalRepository localRepository;
+    private LocalRepository localRepository;
     private RedditClient mRedditClient;
-    private RedditServiceImpl redditService;
+    private RedditService redditService;
 
-    private RedditAuthenticationImpl() {
-        BallIsLifeApplication.getAppComponent().inject(this);
+    @Inject
+    public RedditAuthenticationImpl(LocalRepository localRepository, RedditService redditService) {
+        this.localRepository = localRepository;
+        this.redditService = redditService;
+
         mRedditClient = new RedditClient(UserAgent.of("android",
                 "com.gmail.jorgegilcavazos.ballislife", "v0.5.3", "Obi-Wan_Ginobili"));
-        redditService = new RedditServiceImpl();
     }
 
-    public static RedditAuthenticationImpl getInstance() {
-        if (mInstance == null) {
-            mInstance = new RedditAuthenticationImpl();
-        }
-        return mInstance;
+    @Override
+    public boolean isUserLoggedIn() {
+        return mRedditClient != null && mRedditClient.isAuthenticated()
+                && mRedditClient.getOAuthData().getExpirationDate().after(new Date())
+                && mRedditClient.hasActiveUserContext();
+    }
+
+    @Override
+    public Single<Boolean> checkUserLoggedIn() {
+        return Single.just(isUserLoggedIn());
     }
 
     @Override
     public RedditClient getRedditClient() {
         return mRedditClient;
-    }
-
-    public boolean isUserLoggedIn() {
-        return mRedditClient != null && mRedditClient.isAuthenticated()
-                && mRedditClient.getOAuthData().getExpirationDate().after(new Date())
-                && mRedditClient.hasActiveUserContext();
     }
 
     /**
@@ -149,6 +150,7 @@ public class RedditAuthenticationImpl implements RedditAuthentication {
         return redditService.deAuthenticate(mRedditClient, credentials);
     }
 
+    @Override
     public URL getAuthorizationUrl() {
         OAuthHelper oAuthHelper = mRedditClient.getOAuthHelper();
         Credentials credentials = Credentials.installedApp(CLIENT_ID, REDIRECT_URL);

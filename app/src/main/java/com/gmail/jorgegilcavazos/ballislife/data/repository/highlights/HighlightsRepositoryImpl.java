@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 
 import java.util.ArrayList;
@@ -10,19 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 import retrofit2.Retrofit;
 
+@Singleton
 public class HighlightsRepositoryImpl implements HighlightsRepository {
 
     public static final String ORDER_KEY = "\"$key\"";
     private static final String START_AT_ALL = "";
-
-    @Inject
-    Retrofit retrofit;
 
     private HighlightsService highlightsService;
     private String lastHighlighKey = "";
@@ -32,11 +30,15 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
 
     private List<Highlight> cachedHighlights;
 
-    public HighlightsRepositoryImpl(int itemsToLoad) {
-        BallIsLifeApplication.getAppComponent().inject(this);
-        this.itemsToLoad = itemsToLoad;
+    @Inject
+    public HighlightsRepositoryImpl(Retrofit retrofit) {
         highlightsService = retrofit.create(HighlightsService.class);
         cachedHighlights = new ArrayList<>();
+    }
+
+    @Override
+    public void setItemsToLoad(int itemsToLoad) {
+        this.itemsToLoad = itemsToLoad;
     }
 
     @Override

@@ -9,8 +9,10 @@ import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.service.StreamableService;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,6 +23,9 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
         EasyVideoCallback {
     public static final String SHORTCODE = "videoUrl";
     private static final String TAG = "VideoPlayerActivity";
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     @BindView(R.id.player) EasyVideoPlayer videoPlayer;
 
     private VideoPlayerPresenter presenter;
@@ -43,7 +48,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
 
         StreamableService streamableService = retrofit.create(StreamableService.class);
 
-        presenter = new VideoPlayerPresenter(streamableService, SchedulerProvider.getInstance());
+        presenter = new VideoPlayerPresenter(streamableService, schedulerProvider);
         presenter.attachView(this);
 
         String shortcode = getIntent().getStringExtra(SHORTCODE);

@@ -2,12 +2,13 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.SharedPreferences;
 
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
-import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -45,21 +47,26 @@ public class GameThreadPresenter {
     private long gameDate;
 
     private GameThreadView view;
-    private RedditServiceImpl redditService;
+    private RedditService redditService;
     private RedditGameThreadsService gameThreadsService;
     private SharedPreferences preferences;
+    private RedditAuthentication redditAuthentication;
     private CompositeDisposable disposables;
 
-    public GameThreadPresenter(GameThreadView view, RedditServiceImpl redditService, long gameDate,
-                               SharedPreferences preferences) {
+    public GameThreadPresenter(
+            GameThreadView view,
+            RedditService redditService,
+            long gameDate,
+            SharedPreferences preferences,
+            RedditAuthentication redditAuthentication) {
         this.view = view;
         this.redditService = redditService;
         this.gameDate = gameDate;
         this.preferences = preferences;
+        this.redditAuthentication = redditAuthentication;
     }
 
     public void start() {
-        redditService = new RedditServiceImpl();
         disposables = new CompositeDisposable();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -78,7 +85,7 @@ public class GameThreadPresenter {
         view.hideComments();
         view.hideText();
 
-        Observable<List<CommentNode>> observable = RedditAuthenticationImpl.getInstance().authenticate(preferences)
+        Observable<List<CommentNode>> observable = redditAuthentication.authenticate(preferences)
                 .andThen(gameThreadsService.fetchGameThreads(
                         DateFormatUtil.getNoDashDateString(new Date(gameDate))))
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
@@ -98,7 +105,8 @@ public class GameThreadPresenter {
                         if (threadId.equals("")) {
                             return Single.error(new ThreadNotFoundException());
                         }
-                        return redditService.getComments(threadId, type);
+                        return redditService.getComments(redditAuthentication.getRedditClient(),
+                                threadId, type);
                     }
                 })
                 .toObservable();
@@ -144,14 +152,27 @@ public class GameThreadPresenter {
         );
     }
 
-    public void vote(Comment comment, VoteDirection voteDirection) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+    public void vote(final Comment comment, final VoteDirection voteDirection) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
-                .andThen(redditService.voteComment(comment, voteDirection))
+        disposables.add(redditAuthentication.authenticate(preferences)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return redditService.voteComment(
+                                    redditAuthentication.getRedditClient(),
+                                    comment,
+                                    voteDirection);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -168,14 +189,26 @@ public class GameThreadPresenter {
         );
     }
 
-    public void save(Comment comment) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+    public void save(final Comment comment) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
-                .andThen(redditService.saveComment(comment))
+        disposables.add(redditAuthentication.authenticate(preferences)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return redditService.saveComment(
+                                    redditAuthentication.getRedditClient(),
+                                    comment);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -190,14 +223,26 @@ public class GameThreadPresenter {
         );
     }
 
-    public void unsave(Comment comment) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+    public void unsave(final Comment comment) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
-                .andThen(redditService.unsaveComment(comment))
+        disposables.add(redditAuthentication.authenticate(preferences)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return redditService.unsaveComment(
+                                    redditAuthentication.getRedditClient(),
+                                    comment);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -213,18 +258,30 @@ public class GameThreadPresenter {
     }
 
     public void reply(final int position, final Comment parentComment, final String text) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
         view.showSavingToast();
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
-                .andThen(redditService.replyToComment(parentComment, text))
+        disposables.add(redditAuthentication.authenticate(preferences)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMap(new Function<Boolean, SingleSource<String>>() {
+                    @Override
+                    public SingleSource<String> apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return redditService.replyToComment(
+                                    redditAuthentication.getRedditClient(), parentComment, text);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String s) throws Exception {
-                        return redditService.getComment(parentComment.getSubmissionId().substring(3), s);
+                        return redditService.getComment(redditAuthentication.getRedditClient(),
+                                parentComment.getSubmissionId().substring(3), s);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -256,15 +313,26 @@ public class GameThreadPresenter {
 
     public void replyToThread(final String text, final String type, final String homeTeamAbbr,
                               final String awayTeamAbbr) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
         view.showSavingToast();
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(preferences)
-                .andThen(gameThreadsService.fetchGameThreads(
-                DateFormatUtil.getNoDashDateString(new Date(gameDate))))
+        disposables.add(redditAuthentication.authenticate(preferences)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMap(new Function<Boolean, SingleSource<Map<String, GameThreadSummary>>>() {
+                    @Override
+                    public SingleSource<Map<String, GameThreadSummary>> apply(Boolean loggedIn)
+                            throws Exception {
+                        if (loggedIn) {
+                            return gameThreadsService.fetchGameThreads(
+                                    DateFormatUtil.getNoDashDateString(new Date(gameDate)));
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
                     @Override
                     public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
@@ -282,17 +350,24 @@ public class GameThreadPresenter {
                         if (threadId.equals("")) {
                             return Single.error(new ThreadNotFoundException());
                         }
-                        return redditService.getSubmission(threadId, null);
+                        return redditService.getSubmission(redditAuthentication.getRedditClient(),
+                                threadId, null);
                     }
                 })
                 .flatMap(new Function<Submission, SingleSource<CommentNode>>() {
                     @Override
-                    public SingleSource<CommentNode> apply(final Submission submission) throws Exception {
-                        return redditService.replyToThread(submission, text)
+                    public SingleSource<CommentNode> apply(final Submission submission) throws
+                            Exception {
+                        return redditService.replyToThread(redditAuthentication.getRedditClient(),
+                                submission, text)
                                     .flatMap(new Function<String, SingleSource<CommentNode>>() {
                                         @Override
-                                        public SingleSource<CommentNode> apply(String commentId) throws Exception {
-                                            return redditService.getComment(submission.getId(), commentId);
+                                        public SingleSource<CommentNode> apply(String commentId)
+                                                throws Exception {
+                                            return redditService.getComment(
+                                                    redditAuthentication.getRedditClient(),
+                                                    submission.getId(),
+                                                    commentId);
                                         }
                                     });
                     }
@@ -325,7 +400,7 @@ public class GameThreadPresenter {
     }
 
     public void replyToCommentBtnClick(int position, Comment parentComment) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
@@ -334,7 +409,7 @@ public class GameThreadPresenter {
     }
 
     public void replyToThreadBtnClick() {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }

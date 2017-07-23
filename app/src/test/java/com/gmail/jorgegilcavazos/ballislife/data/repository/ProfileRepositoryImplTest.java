@@ -61,11 +61,10 @@ public class ProfileRepositoryImplTest {
         when(mockRedditAuthentication.getRedditClient()).thenReturn(redditClient);
         profileRepository = new ProfileRepositoryImpl(
                 mockRedditService,
-                mockRedditAuthentication,
-                ProfileRepositoryImpl.OVERVIEW,
-                5,
-                Sorting.NEW,
-                TimePeriod.ALL);
+                mockRedditAuthentication);
+        profileRepository.setLimit(5);
+        profileRepository.setSorting(Sorting.NEW);
+        profileRepository.setTimePeriod(TimePeriod.ALL);
     }
 
     @Test

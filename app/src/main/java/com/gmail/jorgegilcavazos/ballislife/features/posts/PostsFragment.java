@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
@@ -66,6 +67,12 @@ public class PostsFragment extends Fragment implements PostsView,
     @Inject
     PostsRepository postsRepository;
 
+    @Inject
+    PostsPresenter presenter;
+
+    @Inject
+    RedditAuthentication redditAuthentication;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
     Parcelable listState;
@@ -75,7 +82,6 @@ public class PostsFragment extends Fragment implements PostsView,
     private PostsAdapter postsAdapter;
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private PostsPresenter presenter;
     private Unbinder unbinder;
     private Sorting sorting = Sorting.HOT;
     private TimePeriod timePeriod = TimePeriod.ALL;
@@ -95,22 +101,6 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // Save layout manager state to restore scroll position after config changes.
-        listState = linearLayoutManager.onSaveInstanceState();
-        outState.putParcelable(LIST_STATE, listState);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(LIST_STATE);
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -125,16 +115,10 @@ public class PostsFragment extends Fragment implements PostsView,
         }
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        postsAdapter = new PostsAdapter(getActivity(), null, viewType, this, subreddit);
+        postsAdapter = new PostsAdapter(getActivity(), redditAuthentication,
+                null, viewType, this, subreddit);
 
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Load cached data if available, or from network if not.
-        presenter.loadFirstAvailable(sorting, timePeriod);
     }
 
     @Override
@@ -159,12 +143,35 @@ public class PostsFragment extends Fragment implements PostsView,
 
         recyclerViewPosts.addOnScrollListener(scrollListener);
 
-        presenter = new PostsPresenter(subreddit);
+        presenter.setSubreddit(subreddit);
         presenter.attachView(this);
         presenter.loadSubscriberCount();
         presenter.subscribeToSubmissionShare(postsAdapter.getShareObservable());
 
         return view;
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(LIST_STATE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Load cached data if available, or from network if not.
+        presenter.loadFirstAvailable(sorting, timePeriod);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save layout manager state to restore scroll position after config changes.
+        listState = linearLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LIST_STATE, listState);
     }
 
     @Override

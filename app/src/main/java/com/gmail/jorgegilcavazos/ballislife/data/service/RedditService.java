@@ -36,13 +36,13 @@ public interface RedditService {
      * @param threadId the id of the submission to fetch comments of
      * @param type     either RedditUtils.LIVE_GT_TYPE or RedditUtils.POST_GT_TYPE
      */
-    Single<List<CommentNode>> getComments(String threadId, String type);
+    Single<List<CommentNode>> getComments(RedditClient redditClient, String threadId, String type);
 
     /**
      * Returns an Rx Single that emits the data of a full comment given its id and the id of the
      * submission it belongs to.
      */
-    Single<CommentNode> getComment(String threadId, String commentId);
+    Single<CommentNode> getComment(RedditClient redditClient, String threadId, String commentId);
 
     /**
      * Returns an Rx Single that posts a reply to a given comment.
@@ -51,22 +51,22 @@ public interface RedditService {
      * @param text   contents of the reply
      * @return the id of the posted comment
      */
-    Single<String> replyToComment(Comment parent, String text);
+    Single<String> replyToComment(RedditClient redditClient, Comment parent, String text);
 
     /**
      * Returns an Rx Completable that performs a vote on a comment.
      */
-    Completable voteComment(Comment comment, VoteDirection direction);
+    Completable voteComment(RedditClient redditClient, Comment comment, VoteDirection direction);
 
     /**
      * Returns an Rx Completable that saves the given comment for the currently logged-in user.
      */
-    Completable saveComment(Comment comment);
+    Completable saveComment(RedditClient redditClient, Comment comment);
 
     /**
      * Returns an Rx Completable that un-saves the given comment for the currently logged-in user.
      */
-    Completable unsaveComment(Comment comment);
+    Completable unsaveComment(RedditClient redditClient, Comment comment);
 
     /**
      * Returns an Rx Single that posts a reply to a given submission.
@@ -75,7 +75,7 @@ public interface RedditService {
      * @param text       contents of the reply
      * @return the id of the posted comment
      */
-    Single<String> replyToThread(Submission submission, String text);
+    Single<String> replyToThread(RedditClient redditClient, Submission submission, String text);
 
     /**
      * Returns an Rx Single that emits a full reddit submittion.
@@ -83,7 +83,7 @@ public interface RedditService {
      * @param threadId of the submission to fetch
      * @param sort     that the comments should be retrieved with
      */
-    Single<Submission> getSubmission(String threadId, CommentSort sort);
+    Single<Submission> getSubmission(RedditClient redditClient, String threadId, CommentSort sort);
 
     /**
      * Returns an Rx Single that emits a listing of the next page of Submission given a paginator.
@@ -93,18 +93,19 @@ public interface RedditService {
     /**
      * Returns an Rx Completable that performs a vote on a fiven submission.
      */
-    Completable voteSubmission(Submission submission, VoteDirection vote);
+    Completable voteSubmission(RedditClient redditClient, Submission submission,
+                               VoteDirection vote);
 
     /**
      * Returns an Rx Completable that saves or un-saves the given submission for the currently
      * logged-in user.
      */
-    Completable saveSubmission(Submission submission, boolean saved);
+    Completable saveSubmission(RedditClient redditClient, Submission submission, boolean saved);
 
     /**
      * Returns an Rx Single that emits the subscriber count of the given subreddit.
      */
-    Single<SubscriberCount> getSubscriberCount(String subreddit);
+    Single<SubscriberCount> getSubscriberCount(RedditClient redditClient, String subreddit);
 
     /**
      * Returns an Rx Completable that authenticates to reddit without a user context.

@@ -22,7 +22,9 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -34,21 +36,33 @@ import net.dean.jraw.models.VoteDirection;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
-import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.AWAY_TEAM_KEY;
-import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity.HOME_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
+        .REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
+        .AWAY_TEAM_KEY;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
+        .HOME_TEAM_KEY;
 
-public class GameThreadFragment extends Fragment implements GameThreadView,
-        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, CompoundButton.OnCheckedChangeListener {
+public class GameThreadFragment extends Fragment
+        implements GameThreadView,
+        SwipeRefreshLayout.OnRefreshListener,
+        OnCommentClickListener,
+        CompoundButton.OnCheckedChangeListener {
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
     private static final String TAG = "GameThreadFragment";
     public boolean isPremium = false;
+    @Inject
+    RedditService redditService;
+    @Inject
+    RedditAuthentication redditAuthentication;
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
     @BindView(R.id.text_message) TextView tvMessage;
@@ -71,6 +85,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -94,7 +109,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(getActivity(), new ArrayList<CommentNode>(), false);
+        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication,
+                new ArrayList<CommentNode>(), false);
         threadAdapter.setCommentClickListener(this);
         
         lmComments = new LinearLayoutManager(getActivity());
@@ -114,11 +130,19 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
 
-        presenter = new GameThreadPresenter(this, new RedditServiceImpl(), gameDate, preferences);
+        presenter = new GameThreadPresenter(this, redditService, gameDate, preferences,
+                redditAuthentication);
         presenter.start();
         presenter.loadComments(threadType, homeTeam, awayTeam, stream);
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+        presenter.stop();
     }
 
     @Override
@@ -131,13 +155,6 @@ public class GameThreadFragment extends Fragment implements GameThreadView,
             streamSwitch.setChecked(stream);
         }
         super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-        presenter.stop();
     }
 
     @Override

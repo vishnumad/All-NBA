@@ -9,20 +9,29 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import java.net.URL;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import io.reactivex.observers.DisposableCompletableObserver;
 
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
+import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
+        .REDDIT_AUTH_PREFS;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
+
+    @Inject
+    RedditAuthentication redditAuthentication;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
 
     @BindView(R.id.login_webview) WebView webView;
 
@@ -30,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -38,11 +48,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         setTitle("Log in to Reddit");
 
-        final BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
-
         final SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
 
-        URL authURL = RedditAuthenticationImpl.getInstance().getAuthorizationUrl();
+        URL authURL = redditAuthentication.getAuthorizationUrl();
         webView = (WebView) findViewById(R.id.login_webview);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -54,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 if (url.contains("code=")) {
                     webView.stopLoading();
-                    RedditAuthenticationImpl.getInstance().authenticateUser(url, preferences)
+                    redditAuthentication.authenticateUser(url, preferences)
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.ui())
                             .subscribeWith(new DisposableCompletableObserver() {
@@ -76,6 +84,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        webView.destroy();
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -83,11 +97,5 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        webView.destroy();
-        super.onDestroy();
     }
 }

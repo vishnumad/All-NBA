@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games;
 
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -20,18 +20,13 @@ import retrofit2.Retrofit;
 /**
  * Implemntation of the {@link GamesRepository} interface.
  */
+@Singleton
 public class GamesRepositoryImpl implements GamesRepository {
-
-    @Inject
-    Retrofit retrofit;
-
     private NbaGamesService nbaGamesService;
-
     private Map<String, List<NbaGame>> cachedDayGamesMap;
 
     @Inject
-    public GamesRepositoryImpl() {
-        BallIsLifeApplication.getAppComponent().inject(this);
+    public GamesRepositoryImpl(Retrofit retrofit) {
         nbaGamesService = retrofit.create(NbaGamesService.class);
         cachedDayGamesMap = new HashMap<>();
     }

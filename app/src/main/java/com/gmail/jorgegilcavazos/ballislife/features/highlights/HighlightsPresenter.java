@@ -9,6 +9,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
@@ -23,6 +25,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
 
+    @Inject
     public HighlightsPresenter(HighlightsRepository highlightsRepository,
                                LocalRepository localRepository,
                                BaseSchedulerProvider schedulerProvider) {
@@ -31,6 +34,10 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
+    }
+
+    public void setItemsToLoad(int itemsToLoad) {
+        highlightsRepository.setItemsToLoad(itemsToLoad);
     }
 
     public void loadFirstAvailable() {

@@ -54,13 +54,16 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
+    @Inject
+    HighlightsPresenter presenter;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
+
     Parcelable listState;
     private int viewType;
     private Unbinder unbinder;
     private HighlightAdapter highlightAdapter;
-    private HighlightsPresenter presenter;
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
@@ -72,22 +75,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public static HighlightsFragment newInstance() {
         HighlightsFragment fragment = new HighlightsFragment();
         return fragment;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // Save layout manager state to restore scroll position after config changes.
-        listState = linearLayoutManager.onSaveInstanceState();
-        outState.putParcelable(LIST_STATE, listState);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            listState = savedInstanceState.getParcelable(LIST_STATE);
-        }
     }
 
     @Override
@@ -105,13 +92,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25), viewType);
 
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Load cached data if available, or from network if not.
-        presenter.loadFirstAvailable();
     }
 
     @Override
@@ -134,13 +114,35 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         rvHighlights.addOnScrollListener(scrollListener);
 
-        presenter = new HighlightsPresenter(highlightsRepository, localRepository,
-                schedulerProvider);
+        presenter.setItemsToLoad(10);
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
 
         return view;
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(LIST_STATE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Load cached data if available, or from network if not.
+        presenter.loadFirstAvailable();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save layout manager state to restore scroll position after config changes.
+        listState = linearLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LIST_STATE, listState);
     }
 
     @Override

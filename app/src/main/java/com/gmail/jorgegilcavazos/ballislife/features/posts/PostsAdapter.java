@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
@@ -35,6 +36,7 @@ import static com.gmail.jorgegilcavazos.ballislife.util.Constants.VIEW_HEADER;
 
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
+    private RedditAuthentication redditAuthentication;
     private List<CustomSubmission> postsList;
     private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
@@ -44,23 +46,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private PublishSubject<Submission> sharePublishSubject = PublishSubject.create();
 
     public PostsAdapter(Context context,
+                        RedditAuthentication redditAuthentication,
                         List<CustomSubmission> postsList,
                         int contentViewType,
                         OnSubmissionClickListener submissionClickListener,
                         String subreddit) {
         this.context = context;
+        this.redditAuthentication = redditAuthentication;
         this.postsList = postsList;
         this.contentViewType = contentViewType;
         this.submissionClickListener = submissionClickListener;
         this.subreddit = subreddit;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return VIEW_HEADER;
-        }
-        return contentViewType;
     }
 
     @Override
@@ -93,12 +89,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             CustomSubmission customSubmission = postsList.get(position - 1);
             switch (contentViewType) {
                 case POSTS_VIEW_LIST:
-                    ((PostListViewHolder) holder).bindData(context, customSubmission, true,
+                    ((PostListViewHolder) holder).bindData(
+                            context,
+                            redditAuthentication,
+                            customSubmission,
+                            true,
                             submissionClickListener);
                     break;
                 case POSTS_VIEW_WIDE_CARD:
                     ((WideCardViewHolder) holder).bindData(
                             context,
+                            redditAuthentication,
                             customSubmission,
                             submissionClickListener,
                             sharePublishSubject);
@@ -108,6 +109,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             + contentViewType);
             }
         }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return VIEW_HEADER;
+        }
+        return contentViewType;
     }
 
     @Override

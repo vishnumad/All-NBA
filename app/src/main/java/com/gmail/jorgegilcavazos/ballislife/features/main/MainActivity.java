@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
@@ -40,7 +40,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Arrays;
@@ -88,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     PostsRepository postsRepository;
 
+    @Inject
+    RedditAuthentication redditAuthentication;
+
+    @Inject
+    BaseSchedulerProvider schedulerProvider;
+
     Toolbar toolbar;
     ActionBar actionBar;
     DrawerLayout drawerLayout;
@@ -123,9 +128,8 @@ public class MainActivity extends AppCompatActivity {
         setupDynamicShortcut();
 
         // TODO: Move this out of here, either to application start or a presenter.
-        BaseSchedulerProvider schedulerProvider = SchedulerProvider.getInstance();
         disposables = new CompositeDisposable();
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditSharedPrefs)
+        disposables.add(redditAuthentication.authenticate(redditSharedPrefs)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -204,23 +208,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposables.clear();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(SELECTED_FRAGMENT_KEY, selectedFragment);
         outState.putString(SELECTED_SUBREDDIT_KEY, subreddit);
 
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadRedditUsername();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposables.clear();
     }
 
     private void setUpToolbar() {
@@ -274,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     case R.id.navigation_item_7:
                         // Start LoginActivity if no user is already logged in.
-                        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+                        if (!redditAuthentication.isUserLoggedIn()) {
                             Intent loginIntent = new Intent(getApplicationContext(),
                                     LoginActivity.class);
                             startActivity(loginIntent);
@@ -590,5 +588,11 @@ public class MainActivity extends AppCompatActivity {
                 navigationView.getMenu().getItem(0).setChecked(true);
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadRedditUsername();
     }
 }

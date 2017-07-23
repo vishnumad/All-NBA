@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -47,6 +47,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int TYPE_SUBMISSION_HEADER = 0;
     private static final int TYPE_COMMENT = 1;
 
+    private RedditAuthentication redditAuthentication;
     private Context context;
     private List<CommentNode> commentsList;
     private boolean hasHeader;
@@ -54,10 +55,14 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private OnSubmissionClickListener submissionClickListener;
     private CustomSubmission customSubmission;
 
-    public ThreadAdapter(Context context, List<CommentNode> commentsList, boolean hasHeader) {
+    public ThreadAdapter(Context context,
+                         RedditAuthentication redditAuthentication,
+                         List<CommentNode> commentsList,
+                         boolean hasHeader) {
         this.context = context;
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
+        this.redditAuthentication = redditAuthentication;
     }
 
     public void setCommentClickListener(OnCommentClickListener commentClickListener) {
@@ -74,20 +79,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void setSubmission(Submission submission) {
         customSubmission = new CustomSubmission(submission);
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        // Return comment type if we don't have a header of it the submission isn't loaded yet.
-        if (!hasHeader || customSubmission == null) {
-            return TYPE_COMMENT;
-        } else {
-            if (position == 0) {
-                return TYPE_SUBMISSION_HEADER;
-            } else {
-                return TYPE_COMMENT;
-            }
-        }
     }
 
     @Override
@@ -108,7 +99,11 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FullCardViewHolder) {
-            ((FullCardViewHolder) holder).bindData(context, customSubmission, false,
+            ((FullCardViewHolder) holder).bindData(
+                    context,
+                    redditAuthentication,
+                    customSubmission,
+                    false,
                     submissionClickListener);
         } else {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
@@ -119,7 +114,22 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             } else {
                 commentNode = commentsList.get(position);
             }
-            commentHolder.bindData(context, commentNode, commentClickListener);
+            commentHolder.bindData(context, commentNode, commentClickListener,
+                    redditAuthentication);
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // Return comment type if we don't have a header of it the submission isn't loaded yet.
+        if (!hasHeader || customSubmission == null) {
+            return TYPE_COMMENT;
+        } else {
+            if (position == 0) {
+                return TYPE_SUBMISSION_HEADER;
+            } else {
+                return TYPE_COMMENT;
+            }
         }
     }
 
@@ -179,7 +189,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void bindData(final Context context,
                              final CommentNode commentNode,
-                             final OnCommentClickListener commentClickListener) {
+                             final OnCommentClickListener commentClickListener,
+                             final RedditAuthentication redditAuthentication) {
 
             final Comment comment = commentNode.getComment();
             String author = comment.getAuthor();
@@ -287,12 +298,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 @Override
                 public void onClick(View v) {
                     if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
-                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+                        if (redditAuthentication.isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorNeutral);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
                     } else {
-                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+                        if (redditAuthentication.isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorUpvoted);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.UPVOTE);
@@ -304,12 +315,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 @Override
                 public void onClick(View v) {
                     if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
-                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+                        if (redditAuthentication.isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorNeutral);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
                     } else {
-                        if (RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+                        if (redditAuthentication.isUserLoggedIn()) {
                             scoreTextView.setTextColor(colorDownvoted);
                         }
                         commentClickListener.onVoteComment(comment, VoteDirection.DOWNVOTE);

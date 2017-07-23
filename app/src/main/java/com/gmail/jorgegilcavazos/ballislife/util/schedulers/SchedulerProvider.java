@@ -1,7 +1,9 @@
 package com.gmail.jorgegilcavazos.ballislife.util.schedulers;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -10,20 +12,11 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Provides different types of schedulers.
  */
+@Singleton
 public class SchedulerProvider implements BaseSchedulerProvider {
 
-    @Nullable
-    private static SchedulerProvider INSTANCE;
-
-    // Prevent direct instantiation.
-    private SchedulerProvider() {
-    }
-
-    public static synchronized SchedulerProvider getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new SchedulerProvider();
-        }
-        return INSTANCE;
+    @Inject
+    public SchedulerProvider() {
     }
 
     @Override

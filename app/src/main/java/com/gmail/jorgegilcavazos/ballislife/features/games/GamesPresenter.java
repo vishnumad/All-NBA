@@ -17,8 +17,8 @@ import io.reactivex.observers.DisposableSingleObserver;
 
 public class GamesPresenter extends BasePresenter<GamesView> {
 
-    GamesRepository gamesRepository;
-    BaseSchedulerProvider schedulerProvider;
+    private GamesRepository gamesRepository;
+    private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
 
     @Inject

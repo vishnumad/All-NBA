@@ -2,25 +2,24 @@ package com.gmail.jorgegilcavazos.ballislife.data.local;
 
 import android.content.SharedPreferences;
 
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+@Singleton
 public class AppLocalRepository implements LocalRepository {
-
-    @Inject
-    @Named("localSharedPreferences")
     SharedPreferences localSharedPreferences;
-
-    @Inject
-    @Named("defaultSharedPreferences")
     SharedPreferences defaultSharedPreferences;
 
-    public AppLocalRepository() {
-        BallIsLifeApplication.getAppComponent().inject(this);
+    @Inject
+    public AppLocalRepository(
+            @Named("localSharedPreferences") SharedPreferences localSharedPreferences,
+            @Named("defaultSharedPreferences") SharedPreferences defaultSharedPreferences) {
+        this.localSharedPreferences = localSharedPreferences;
+        this.defaultSharedPreferences = defaultSharedPreferences;
     }
 
     @Override

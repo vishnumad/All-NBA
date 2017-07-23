@@ -8,6 +8,8 @@ import io.reactivex.Single;
 
 public interface HighlightsRepository {
 
+    void setItemsToLoad(int itemsToLoad);
+
     void reset();
 
     Single<List<Highlight>> next();

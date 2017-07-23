@@ -1,26 +1,25 @@
 package com.gmail.jorgegilcavazos.ballislife.dagger.component;
 
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
+import com.gmail.jorgegilcavazos.ballislife.dagger.module.BindModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
-import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
-import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
-import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
-import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
-import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsPresenter;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
 
 @Singleton
-@Component(modules = {AppModule.class, DataModule.class})
+@Component(modules = {AppModule.class, DataModule.class, BindModule.class})
 public interface AppComponent {
     void inject(MainActivity activity);
 
@@ -28,21 +27,17 @@ public interface AppComponent {
 
     void inject(PostsFragment fragment);
 
-    void inject(AppLocalRepository localRepository);
-
-    void inject(HighlightsRepositoryImpl highlightsRepository);
-
     void inject(StandingsFragment fragment);
-
-    void inject(RedditAuthenticationImpl redditAuthenticationImpl);
-
-    void inject(PostsRepositoryImpl postsRepository);
-
-    void inject(PostsPresenter postsPresenter);
 
     void inject(GamesFragment gamesFragment);
 
-    void inject(GamesRepositoryImpl gamesRepository);
-
     void inject(ProfileActivity profileActivity);
+
+    void inject(GameThreadFragment gameThreadFragment);
+
+    void inject(LoginActivity loginActivity);
+
+    void inject(SettingsFragment settingsFragment);
+
+    void inject(SubmissionActivity submissionActivity);
 }

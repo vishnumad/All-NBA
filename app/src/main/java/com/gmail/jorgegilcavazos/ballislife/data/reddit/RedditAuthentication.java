@@ -4,12 +4,19 @@ import android.content.SharedPreferences;
 
 import net.dean.jraw.RedditClient;
 
+import java.net.URL;
+
 import io.reactivex.Completable;
+import io.reactivex.Single;
 
 /**
  * Manages a reddit user's authentication session.
  */
 public interface RedditAuthentication {
+
+    boolean isUserLoggedIn();
+
+    Single<Boolean> checkUserLoggedIn();
 
     /**
      * Returns the reddit client used in this authenticator.
@@ -32,4 +39,6 @@ public interface RedditAuthentication {
      * De-authenticates the user if one is logged in.
      */
     Completable deAuthenticateUser(SharedPreferences sharedPreferences);
+
+    URL getAuthorizationUrl();
 }

@@ -1,6 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.profile;
 
 import net.dean.jraw.models.Contribution;
+import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.List;
 
@@ -11,6 +13,12 @@ import io.reactivex.Single;
  * them in memory for fast reuse.
  */
 public interface ProfileRepository {
+
+    void setLimit(int limit);
+
+    void setSorting(Sorting sorting);
+
+    void setTimePeriod(TimePeriod timePeriod);
 
     /**
      * Resets the state of the repository, restarting pagination and clearing any cached

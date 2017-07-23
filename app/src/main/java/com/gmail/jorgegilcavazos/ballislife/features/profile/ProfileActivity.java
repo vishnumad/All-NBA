@@ -25,6 +25,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Contribution;
+import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,12 @@ public class ProfileActivity extends AppCompatActivity
     private Parcelable listState;
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        listState = savedInstanceState.getParcelable(LIST_STATE);
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         listState = linearLayoutManager.onSaveInstanceState();
@@ -62,9 +70,23 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        listState = savedInstanceState.getParcelable(LIST_STATE);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.profile_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_refresh:
+                presenter.loadContributions(true /* reset */);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -98,15 +120,11 @@ public class ProfileActivity extends AppCompatActivity
 
         recyclerView.addOnScrollListener(scrollListener);
 
+        presenter.setLimit(20);
+        presenter.setSorting(Sorting.NEW);
+        presenter.setTimePeriod(TimePeriod.ALL);
         presenter.attachView(this);
         presenter.observeContributionsClicks(contributionsAdapter.getClickObservable());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Load cached data if available, from network if not.
-        presenter.loadFirstAvailable();
     }
 
     @Override
@@ -118,23 +136,10 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.profile_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            case R.id.action_refresh:
-                presenter.loadContributions(true /* reset */);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    protected void onResume() {
+        super.onResume();
+        // Load cached data if available, from network if not.
+        presenter.loadFirstAvailable();
     }
 
     @Override

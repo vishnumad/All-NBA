@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
@@ -22,6 +23,7 @@ import io.reactivex.functions.Function;
  * Implementation of the {@link ProfileRepository}. Provides the reddit {@link Contribution}s of a
  * user from memory if available or from a network request if not.
  */
+@Singleton
 public class ProfileRepositoryImpl implements ProfileRepository {
     public static final String OVERVIEW = "overview";
 
@@ -33,21 +35,29 @@ public class ProfileRepositoryImpl implements ProfileRepository {
     @Inject
     public ProfileRepositoryImpl(
             RedditService redditService,
-            RedditAuthentication redditAuthentication,
-            String where,
-            int limit,
-            Sorting sorting,
-            TimePeriod timePeriod) {
+            RedditAuthentication redditAuthentication) {
         this.redditService = redditService;
 
         cachedContributions = new ArrayList<>();
         RedditClient redditClient = redditAuthentication.getRedditClient();
         contributionPaginator = new UserContributionPaginator(
                 redditClient,
-                where,
+                OVERVIEW,
                 redditClient.getAuthenticatedUser());
+    }
+
+    @Override
+    public void setLimit(int limit) {
         contributionPaginator.setLimit(limit);
+    }
+
+    @Override
+    public void setSorting(Sorting sorting) {
         contributionPaginator.setSorting(sorting);
+    }
+
+    @Override
+    public void setTimePeriod(TimePeriod timePeriod) {
         contributionPaginator.setTimePeriod(timePeriod);
     }
 

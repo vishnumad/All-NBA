@@ -4,15 +4,15 @@ import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
+import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import net.dean.jraw.models.Submission;
@@ -25,8 +25,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -35,35 +37,42 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
     private static final String TAG = "PostsPresenter";
 
-    @Inject
-    LocalRepository localRepository;
-
-    @Inject
-    @Named("redditSharedPreferences")
-    SharedPreferences redditPrefs;
-
-    @Inject
-    PostsRepository postsRepository;
-
-    @Inject
-    RedditService service;
-
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    private RedditAuthentication redditAuthentication;
+    private LocalRepository localRepository;
+    private SharedPreferences redditPrefs;
+    private PostsRepository postsRepository;
+    private RedditService service;
+    private BaseSchedulerProvider schedulerProvider;
 
     private CompositeDisposable disposables;
     private String subreddit;
 
-    public PostsPresenter(String subreddit) {
-        BallIsLifeApplication.getAppComponent().inject(this);
-        this.subreddit = subreddit;
+    @Inject
+    public PostsPresenter(
+            RedditAuthentication redditAuthentication,
+            LocalRepository localRepository,
+            @Named("redditSharedPreferences") SharedPreferences redditPrefs,
+            PostsRepository postsRepository,
+            RedditService redditService,
+            BaseSchedulerProvider schedulerProvider) {
+        this.redditAuthentication = redditAuthentication;
+        this.localRepository = localRepository;
+        this.redditPrefs = redditPrefs;
+        this.postsRepository = postsRepository;
+        this.service = redditService;
+        this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
     }
 
+    public void setSubreddit(String subreddit) {
+        this.subreddit = subreddit;
+    }
+
     public void loadSubscriberCount() {
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
-                .andThen(service.getSubscriberCount(subreddit))
+        disposables.add(redditAuthentication.authenticate(redditPrefs)
+                .andThen(service.getSubscriberCount(redditAuthentication.getRedditClient(),
+                        subreddit))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<SubscriberCount>() {
@@ -107,7 +116,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         view.dismissSnackbar();
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate(redditPrefs)
                 .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -145,14 +154,27 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         );
     }
 
-    public void onVote(Submission submission, VoteDirection direction) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+    public void onVote(final Submission submission, final VoteDirection direction) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
-                .andThen(service.voteSubmission(submission, direction))
+        disposables.add(redditAuthentication.authenticate(redditPrefs)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return service.voteSubmission(
+                                    redditAuthentication.getRedditClient(),
+                                    submission,
+                                    direction);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -169,14 +191,27 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         );
     }
 
-    public void onSave(Submission submission, boolean saved) {
-        if (!RedditAuthenticationImpl.getInstance().isUserLoggedIn()) {
+    public void onSave(final Submission submission, final boolean saved) {
+        if (!redditAuthentication.isUserLoggedIn()) {
             view.showNotLoggedInToast();
             return;
         }
 
-        disposables.add(RedditAuthenticationImpl.getInstance().authenticate(redditPrefs)
-                .andThen(service.saveSubmission(submission, saved))
+        disposables.add(redditAuthentication.authenticate(redditPrefs)
+                .andThen(redditAuthentication.checkUserLoggedIn())
+                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Boolean loggedIn) throws Exception {
+                        if (loggedIn) {
+                            return service.saveSubmission(
+                                    redditAuthentication.getRedditClient(),
+                                    submission,
+                                    saved);
+                        } else {
+                            throw new NotLoggedInException();
+                        }
+                    }
+                })
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {

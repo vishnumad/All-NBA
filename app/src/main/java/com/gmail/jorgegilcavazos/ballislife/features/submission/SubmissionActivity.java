@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,14 +21,14 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -40,10 +39,10 @@ import net.dean.jraw.models.VoteDirection;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl.REDDIT_AUTH_PREFS;
 
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
@@ -51,6 +50,12 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL = "CommentToScroll";
     private static final String TAG = "SubmissionActivity";
+    @Inject
+    RedditAuthentication redditAuthentication;
+
+    @Inject
+    SubmissionPresenter presenter;
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
@@ -62,12 +67,12 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private CustomSubmission customSubmission;
 
     private ThreadAdapter threadAdapter;
-    private SubmissionPresenter presenter;
 
     private CommentSort sorting = CommentSort.TOP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submission);
         ButterKnife.bind(this);
@@ -90,7 +95,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(this, new ArrayList<CommentNode>(), true);
+        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<CommentNode>(),
+                true);
         threadAdapter.setCommentClickListener(this);
         threadAdapter.setSubmissionClickListener(this);
 
@@ -107,12 +113,15 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
             }
         });
 
-        SharedPreferences preferences = getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
-
-        presenter = new SubmissionPresenter(new RedditServiceImpl(), preferences,
-                SchedulerProvider.getInstance());
         presenter.attachView(this);
         presenter.loadComments(threadId, sorting, commentIdToScroll);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
+        presenter.stop();
     }
 
     @Override
@@ -155,13 +164,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.detachView();
-        presenter.stop();
     }
 
     @Override
@@ -211,32 +213,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void onRefresh() {
-        presenter.loadComments(threadId, sorting);
-    }
-
-    @Override
-    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
-        presenter.onVoteComment(comment, voteDirection);
-    }
-
-    @Override
-    public void onSaveComment(Comment comment) {
-        presenter.onSaveComment(comment);
-    }
-
-    @Override
-    public void onUnsaveComment(Comment comment) {
-        presenter.onUnsaveComment(comment);
-    }
-
-
-    @Override
-    public void onReplyToComment(int position, Comment parentComment) {
-        presenter.onReplyToCommentBtnClick(position, parentComment);
-    }
-
-    @Override
     public void openReplyToCommentDialog(final int position, final Comment parentComment) {
         new MaterialDialog.Builder(this)
                 .title(R.string.add_comment)
@@ -250,43 +226,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                 .positiveText(R.string.reply)
                 .negativeText(R.string.cancel)
                 .show();
-    }
-
-    @Override
-    public void onSubmissionClick(CustomSubmission customSubmission) {
-        // No action on submission click.
-    }
-
-    @Override
-    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
-        if (customSubmission != null) {
-            presenter.onVoteSubmission(customSubmission.getSubmission(), voteDirection);
-        }
-    }
-
-    @Override
-    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
-        if (customSubmission != null) {
-            presenter.onSaveSubmission(customSubmission.getSubmission(), saved);
-        }
-    }
-
-    @Override
-    public void onContentClick(String url) {
-        presenter.onContentClick(url);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fab:
-                onReplyToThread();
-                break;
-        }
-    }
-
-    public void onReplyToThread() {
-        presenter.onReplyToThreadBtnClick();
     }
 
     @Override
@@ -342,5 +281,67 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void showFab() {
         fab.show();
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.loadComments(threadId, sorting);
+    }
+
+    @Override
+    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
+        presenter.onVoteComment(comment, voteDirection);
+    }
+
+    @Override
+    public void onSaveComment(Comment comment) {
+        presenter.onSaveComment(comment);
+    }
+
+    @Override
+    public void onUnsaveComment(Comment comment) {
+        presenter.onUnsaveComment(comment);
+    }
+
+    @Override
+    public void onReplyToComment(int position, Comment parentComment) {
+        presenter.onReplyToCommentBtnClick(position, parentComment);
+    }
+
+    @Override
+    public void onSubmissionClick(CustomSubmission customSubmission) {
+        // No action on submission click.
+    }
+
+    @Override
+    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
+        if (customSubmission != null) {
+            presenter.onVoteSubmission(customSubmission.getSubmission(), voteDirection);
+        }
+    }
+
+    @Override
+    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
+        if (customSubmission != null) {
+            presenter.onSaveSubmission(customSubmission.getSubmission(), saved);
+        }
+    }
+
+    @Override
+    public void onContentClick(String url) {
+        presenter.onContentClick(url);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fab:
+                onReplyToThread();
+                break;
+        }
+    }
+
+    public void onReplyToThread() {
+        presenter.onReplyToThreadBtnClick();
     }
 }

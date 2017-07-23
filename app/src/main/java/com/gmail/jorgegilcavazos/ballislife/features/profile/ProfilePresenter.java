@@ -11,6 +11,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.PublicContribution;
+import net.dean.jraw.paginators.Sorting;
+import net.dean.jraw.paginators.TimePeriod;
 
 import java.util.List;
 
@@ -41,6 +43,18 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
+    }
+
+    public void setLimit(int limit) {
+        profileRepository.setLimit(limit);
+    }
+
+    public void setSorting(Sorting sorting) {
+        profileRepository.setSorting(sorting);
+    }
+
+    public void setTimePeriod(TimePeriod timePeriod) {
+        profileRepository.setTimePeriod(timePeriod);
     }
 
     public void loadFirstAvailable() {

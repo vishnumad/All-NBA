@@ -1,8 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.posts;
 
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 
 import net.dean.jraw.models.Listing;
@@ -15,28 +14,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
 
+@Singleton
 public class PostsRepositoryImpl implements PostsRepository {
 
-    @Inject
-    RedditService redditService;
+    private RedditAuthentication redditAuthentication;
+    private RedditService redditService;
 
     private SubredditPaginator paginator;
     private List<CustomSubmission> cachedCustomSubmissions;
 
-    public PostsRepositoryImpl() {
-        BallIsLifeApplication.getAppComponent().inject(this);
+
+    @Inject
+    public PostsRepositoryImpl(
+            RedditAuthentication redditAuthentication,
+            RedditService redditService) {
+        this.redditAuthentication = redditAuthentication;
+        this.redditService = redditService;
         cachedCustomSubmissions = new ArrayList<>();
     }
 
     @Override
     public void reset(Sorting sorting, TimePeriod timePeriod, String subreddit) {
         SubredditPaginator paginator = new SubredditPaginator(
-                RedditAuthenticationImpl.getInstance().getRedditClient(),
+                redditAuthentication.getRedditClient(),
                 subreddit);
         paginator.setLimit(20);
         paginator.setSorting(sorting);
