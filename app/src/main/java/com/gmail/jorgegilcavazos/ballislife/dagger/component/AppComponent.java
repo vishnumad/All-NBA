@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.component;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.BindModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
+import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
@@ -13,6 +14,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 
 import javax.inject.Singleton;
 
@@ -40,4 +42,8 @@ public interface AppComponent {
     void inject(SettingsFragment settingsFragment);
 
     void inject(SubmissionActivity submissionActivity);
+
+    void inject(BoxScoreFragment boxScoreFragment);
+
+    void inject(VideoPlayerActivity videoPlayerActivity);
 }

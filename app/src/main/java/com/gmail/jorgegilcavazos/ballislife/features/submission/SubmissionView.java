@@ -28,9 +28,9 @@ public interface SubmissionView {
 
     void showErrorSavingToast();
 
-    void openReplyToCommentDialog(int position, Comment parentComment);
+    void openReplyToCommentActivity(int position, Comment parentComment);
 
-    void openReplyToSubmissionDialog();
+    void openReplyToSubmissionActivity();
 
     void openContentTab(String url);
 

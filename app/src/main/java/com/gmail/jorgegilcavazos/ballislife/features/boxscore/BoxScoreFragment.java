@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
@@ -46,6 +47,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     public static final int LOAD_AWAY = 0;
     public static final int LOAD_HOME = 2;
     private static final String TAG = "BoxScoreFragment";
+
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
@@ -71,6 +73,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        BallIsLifeApplication.getAppComponent().inject(this);
 
         if (getArguments() != null) {
             homeTeam = getArguments().getString(HOME_TEAM_KEY);

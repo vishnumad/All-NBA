@@ -267,7 +267,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        view.openReplyToCommentDialog(position, parent);
+        view.openReplyToCommentActivity(position, parent);
     }
 
     public void onReplyToComment(final int position, final Comment parent, final String text) {
@@ -327,7 +327,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             return;
         }
 
-        view.openReplyToSubmissionDialog();
+        view.openReplyToSubmissionActivity();
     }
 
     public void onReplyToThread(final String text, final Submission submission) {
@@ -348,7 +348,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(3, TimeUnit.SECONDS)
+                .delay(4, TimeUnit.SECONDS)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String commentId) throws Exception {

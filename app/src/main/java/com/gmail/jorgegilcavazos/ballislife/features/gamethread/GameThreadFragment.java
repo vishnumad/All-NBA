@@ -1,14 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +19,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -42,6 +42,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
         .REDDIT_AUTH_PREFS;
@@ -59,13 +60,16 @@ public class GameThreadFragment extends Fragment
     public static final String GAME_DATE_KEY = "GAME_DATE";
     private static final String TAG = "GameThreadFragment";
     public boolean isPremium = false;
+
     @Inject
     RedditService redditService;
     @Inject
     RedditAuthentication redditAuthentication;
+
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
     @BindView(R.id.text_message) TextView tvMessage;
+
     private RecyclerView.LayoutManager lmComments;
     private ThreadAdapter threadAdapter;
     private Unbinder unbinder;
@@ -74,6 +78,9 @@ public class GameThreadFragment extends Fragment
     private boolean stream = false;
     private Switch streamSwitch;
     private GameThreadPresenter presenter;
+
+    private int commentToReplyToPos = -1;
+    private Comment commentToReplyTo;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -168,6 +175,30 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
+            if (commentToReplyToPos == -1 || commentToReplyTo == null) {
+                Toast.makeText(getActivity(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                FirebaseCrash.log("Comment pos: " + commentToReplyToPos);
+                FirebaseCrash.log("Comment: " + commentToReplyTo.toString());
+                FirebaseCrash.report(new Exception(
+                        "Received result for comment reply but pos or comment was empty."));
+            }
+            presenter.reply(
+                    commentToReplyToPos,
+                    commentToReplyTo,
+                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
+        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST
+                && resultCode == RESULT_OK) {
+            presenter.replyToThread(
+                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
+                    threadType,
+                    homeTeam,
+                    awayTeam);
+        }
+    }
+
+    @Override
     public void onRefresh() {
         presenter.loadComments(threadType, homeTeam, awayTeam, stream);
     }
@@ -232,18 +263,8 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void showFailedToSaveToast() {
-        Toast.makeText(getActivity(), R.string.failed_to_save_comment, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void showNotLoggedInToast() {
         Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showReplyToSubmissionSavedToast() {
-        Toast.makeText(getActivity(), R.string.reply_to_sub_saved, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -257,35 +278,22 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void openReplyToCommentDialog(final int position, final Comment parentComment) {
-        new MaterialDialog.Builder(getContext())
-                .title(R.string.add_comment)
-                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
-                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        presenter.reply(position, parentComment, input.toString());
-                    }
-                })
-                .positiveText(R.string.reply)
-                .negativeText(R.string.cancel)
-                .show();
+    public void openReplyToCommentActivity(final int position, final Comment parentComment) {
+        commentToReplyTo = parentComment;
+        commentToReplyToPos = position;
+
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
+        Bundle extras = new Bundle();
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
+                RedditUtils.bindSnuDown(parentComment.data("body_html")));
+        intent.putExtras(extras);
+        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }
 
     @Override
-    public void openReplyToThreadDialog() {
-        new MaterialDialog.Builder(getContext())
-                .title(R.string.add_comment)
-                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
-                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        presenter.replyToThread(input.toString(), threadType, homeTeam, awayTeam);
-                    }
-                })
-                .positiveText(R.string.reply)
-                .negativeText(R.string.cancel)
-                .show();
+    public void openReplyToSubmissionActivity() {
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
+        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
     @Override

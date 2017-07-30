@@ -31,17 +31,13 @@ public interface GameThreadView extends MvpView {
 
     void showSavedToast();
 
-    void showFailedToSaveToast();
-
     void showNotLoggedInToast();
-
-    void showReplyToSubmissionSavedToast();
 
     void showReplyToSubmissionFailedToast();
 
     void showSavingToast();
 
-    void openReplyToCommentDialog(int position, Comment parentComment);
+    void openReplyToCommentActivity(int position, Comment parentComment);
 
-    void openReplyToThreadDialog();
+    void openReplyToSubmissionActivity();
 }

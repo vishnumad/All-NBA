@@ -9,6 +9,7 @@ import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.service.StreamableService;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -23,6 +24,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
         EasyVideoCallback {
     public static final String SHORTCODE = "videoUrl";
     private static final String TAG = "VideoPlayerActivity";
+
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
@@ -33,6 +35,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BallIsLifeApplication.getAppComponent().inject(this);
         setContentView(R.layout.activity_video_player);
         ButterKnife.bind(this);
 

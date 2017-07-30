@@ -48,7 +48,7 @@
     <string name="saving">Saving</string>
 
     <!-- GameThread -->
-    <string name="add_comment">Add a comment</string>
+    <string name="add_a_comment">Add a comment</string>
     <string name="type_comment">Type a coment</string>
     <string name="empty"></string>
     <string name="reply_saved">Reply saved</string>
@@ -117,6 +117,12 @@
     <string name="rnba_shortcut_long_label">NBA</string>
     <string name="highlights_shortcut_short_label">Highlights</string>
     <string name="highlights_shortcut_long_label">Highlights</string>
+
+    <!-- Reply -->
+    <string name="your_comment">Your comment</string>
+    <string name="add_comment">Add comment</string>
+    <string name="post">Post</string>
+    <string name="reply_is_empty">Reply is empty</string>
 
     <!-- Settings -->
     <string name="title_activity_submission">Settings</string>

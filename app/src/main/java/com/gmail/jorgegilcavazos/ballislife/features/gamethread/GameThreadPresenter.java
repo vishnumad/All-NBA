@@ -277,6 +277,10 @@ public class GameThreadPresenter {
                         }
                     }
                 })
+                // Comment is not immediately available after being posted in the next call
+                // (probably a small delay from reddit's servers) so we need to wait for a bit
+                // before fetching the posted comment.
+                .delay(4, TimeUnit.SECONDS)
                 .flatMap(new Function<String, SingleSource<CommentNode>>() {
                     @Override
                     public SingleSource<CommentNode> apply(String s) throws Exception {
@@ -360,6 +364,10 @@ public class GameThreadPresenter {
                             Exception {
                         return redditService.replyToThread(redditAuthentication.getRedditClient(),
                                 submission, text)
+                                    // Comment is not immediately available after being posted in the next call
+                                    // (probably a small delay from reddit's servers) so we need to wait for a bit
+                                    // before fetching the posted comment.
+                                    .delay(4, TimeUnit.SECONDS)
                                     .flatMap(new Function<String, SingleSource<CommentNode>>() {
                                         @Override
                                         public SingleSource<CommentNode> apply(String commentId)
@@ -405,7 +413,7 @@ public class GameThreadPresenter {
             return;
         }
 
-        view.openReplyToCommentDialog(position, parentComment);
+        view.openReplyToCommentActivity(position, parentComment);
     }
 
     public void replyToThreadBtnClick() {
@@ -414,7 +422,7 @@ public class GameThreadPresenter {
             return;
         }
 
-        view.openReplyToThreadDialog();
+        view.openReplyToSubmissionActivity();
     }
 
     public void stop() {

@@ -3,7 +3,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.submission;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -12,23 +11,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -47,9 +47,11 @@ import butterknife.ButterKnife;
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
         View.OnClickListener {
+    private static final String TAG = "SubmissionActivity";
+
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL = "CommentToScroll";
-    private static final String TAG = "SubmissionActivity";
+
     @Inject
     RedditAuthentication redditAuthentication;
 
@@ -65,6 +67,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private String title;
     private String commentIdToScroll;
     private CustomSubmission customSubmission;
+
+    private int commentToReplyToPos = -1;
+    private Comment commentToReplyTo;
 
     private ThreadAdapter threadAdapter;
 
@@ -167,6 +172,28 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
+            if (commentToReplyToPos == -1 || commentToReplyTo == null) {
+                Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
+                FirebaseCrash.log("Comment pos: " + commentToReplyToPos);
+                FirebaseCrash.log("Comment: " + commentToReplyTo.toString());
+                FirebaseCrash.report(new Exception(
+                        "Received result for comment reply but pos or comment was empty."));
+            }
+            presenter.onReplyToComment(
+                    commentToReplyToPos,
+                    commentToReplyTo,
+                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
+        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST
+                && resultCode == RESULT_OK) {
+            presenter.onReplyToThread(
+                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
+                    customSubmission.getSubmission());
+        }
+    }
+
+    @Override
     public void setLoadingIndicator(boolean active) {
         swipeRefreshLayout.setRefreshing(active);
     }
@@ -213,38 +240,22 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void openReplyToCommentDialog(final int position, final Comment parentComment) {
-        new MaterialDialog.Builder(this)
-                .title(R.string.add_comment)
-                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
-                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        presenter.onReplyToComment(position, parentComment, input.toString());
-                    }
-                })
-                .positiveText(R.string.reply)
-                .negativeText(R.string.cancel)
-                .show();
+    public void openReplyToCommentActivity(final int position, final Comment parentComment) {
+        commentToReplyTo = parentComment;
+        commentToReplyToPos = position;
+
+        Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
+        Bundle extras = new Bundle();
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
+                RedditUtils.bindSnuDown(parentComment.data("body_html")));
+        intent.putExtras(extras);
+        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }
 
     @Override
-    public void openReplyToSubmissionDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.add_comment)
-                .inputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)
-                .input(R.string.type_comment, R.string.empty, new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        if (customSubmission != null) {
-                            presenter.onReplyToThread(input.toString(),
-                                    customSubmission.getSubmission());
-                        }
-                    }
-                })
-                .positiveText(R.string.reply)
-                .negativeText(R.string.cancel)
-                .show();
+    public void openReplyToSubmissionActivity() {
+        Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
+        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
     @Override
@@ -336,12 +347,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
-                onReplyToThread();
+                presenter.onReplyToThreadBtnClick();
                 break;
         }
-    }
-
-    public void onReplyToThread() {
-        presenter.onReplyToThreadBtnClick();
     }
 }
