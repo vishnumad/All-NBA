@@ -91,8 +91,6 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
                         if (commentIdToScroll != null) {
                             view.scrollToComment(indexToScrollTo);
-                        } else {
-                            view.scrollToComment(0);
                         }
                     }
 
