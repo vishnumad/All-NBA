@@ -1,5 +1,6 @@
 # NBA Android App
 [![Release status](https://img.shields.io/badge/release-v0.6.17--beta-red.svg)](https://github.com/jorgegil96/All-NBA/releases)
+[![Build Status](https://travis-ci.org/jorgegil96/All-NBA.png?branch=master)](https://travis-ci.org/jorgegil96/All-NBA)
 
 Android app for NBA fans. Features live scores, highlights, alerts and Reddit integration for discussions.
 
