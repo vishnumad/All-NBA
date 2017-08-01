@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.getkeepsafe.dexcount'
+apply plugin: 'jacoco-android'
 
 android {
     compileSdkVersion 26
@@ -35,6 +36,12 @@ android {
 
     lintOptions {
         abortOnError false
+    }
+
+    jacocoAndroidUnitTestReport {
+        csv.enabled false
+        html.enabled true
+        xml.enabled false
     }
 }
 
