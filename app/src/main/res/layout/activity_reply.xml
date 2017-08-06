@@ -6,47 +6,134 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity"
-    tools:layout_editor_absoluteY="81dp"
-    tools:layout_editor_absoluteX="0dp">
-
-    <EditText
-        android:id="@+id/edit_response"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:hint="@string/your_comment"
-        android:inputType="textMultiLine"
-        android:background="@android:color/transparent"
-        android:textSize="14sp"
-        android:gravity="top"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/view_separator"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="81dp">
 
     <View
         android:id="@+id/view_separator"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@drawable/divider_light"
-        app:layout_constraintTop_toBottomOf="@+id/text_comment"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/text_comment"/>
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_response"/>
+
+    <ImageButton
+        android:id="@+id/button_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_remove_red_eye_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_format_bold_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_preview"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_italic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_format_italic_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_bold"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_strikethrough"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_format_strikethrough_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_italic"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_superscript"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_expand_less_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_strikethrough"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_quotes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_format_quote_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_superscript"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <ImageButton
+        android:id="@+id/button_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:padding="10dp"
+        android:src="@drawable/ic_insert_link_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/button_quotes"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <EditText
+        android:id="@+id/edit_response"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="@string/your_comment"
+        android:inputType="textMultiLine"
+        android:paddingBottom="10dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="10dp"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/button_preview"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_separator"
+        app:layout_constraintVertical_bias="0.0"/>
 
     <TextView
         android:id="@+id/text_comment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:textSize="14sp"
-        android:textColor="@color/primaryText"
+        android:paddingBottom="10dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:textColor="@color/primaryText"
+        android:textSize="14sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
 </android.support.constraint.ConstraintLayout>

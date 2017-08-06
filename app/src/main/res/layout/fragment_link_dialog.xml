@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="16dp"
+              tools:context="com.gmail.jorgegilcavazos.ballislife.features.reply.AddLinkDialogFragment">
+
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/text"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/edit_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/link"
+        android:textSize="14sp"/>
+</LinearLayout>

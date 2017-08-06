@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'jacoco-android'
 
 android {
@@ -13,7 +12,9 @@ android {
         versionCode 38
         versionName "0.6.18"
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
@@ -44,6 +45,11 @@ android {
         html.enabled true
         xml.enabled true
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 def ANDROID_SUPPORT_VERSION = "25.3.1"
@@ -67,6 +73,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.android.support:support-v4:26.0.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:support-v4:26.0.1'
@@ -103,6 +110,9 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     testCompile 'org.robolectric:robolectric:3.4'
     testCompile "org.robolectric:shadows-multidex:3.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'

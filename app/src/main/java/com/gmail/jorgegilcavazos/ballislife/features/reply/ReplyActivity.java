@@ -1,22 +1,29 @@
 package com.gmail.jorgegilcavazos.ballislife.features.reply;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class ReplyActivity extends AppCompatActivity {
+/** Activity used for adding a comment with formatting tools */
+public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFragment
+        .OnFragmentInteractionListener {
     public static final int POST_COMMENT_REPLY_REQUEST = 1;
     public static final int POST_SUBMISSION_REPLY_REQUEST = 2;
     public static final String KEY_COMMENT = "Comment";
@@ -31,6 +38,8 @@ public class ReplyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reply);
         ButterKnife.bind(this);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         setTitle(R.string.add_comment);
         if (getSupportActionBar() != null) {
@@ -69,6 +78,85 @@ public class ReplyActivity extends AppCompatActivity {
                 postComment();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.button_bold)
+    public void onClickBold() {
+        int start = etResponse.getSelectionStart();
+        int end = etResponse.getSelectionEnd();
+        String text = etResponse.getText().toString();
+        String prevText = text.substring(0, start);
+        String actualText = text.substring(start, end);
+        String afterText = text.substring(end);
+        etResponse.setText(prevText + "**" + actualText + "**" + afterText);
+        // Set cursor before the closing '**'.
+        etResponse.setSelection(end + 2);
+    }
+
+    @OnClick(R.id.button_italic)
+    public void onClickItalics() {
+        int start = etResponse.getSelectionStart();
+        int end = etResponse.getSelectionEnd();
+        String text = etResponse.getText().toString();
+        String prevText = text.substring(0, start);
+        String actualText = text.substring(start, end);
+        String afterText = text.substring(end);
+        etResponse.setText(prevText + "*" + actualText + "*" + afterText);
+        // Set cursor before the closing '*'.
+        etResponse.setSelection(end + 1);
+    }
+
+    @OnClick(R.id.button_strikethrough)
+    public void onClickStrikethrough() {
+        int start = etResponse.getSelectionStart();
+        int end = etResponse.getSelectionEnd();
+        String text = etResponse.getText().toString();
+        String prevText = text.substring(0, start);
+        String actualText = text.substring(start, end);
+        String afterText = text.substring(end);
+        etResponse.setText(prevText + "~~" + actualText + "~~" + afterText);
+        // Set cursor before the closing '~'.
+        etResponse.setSelection(end + 2);
+    }
+
+    @OnClick(R.id.button_quotes)
+    public void onClickQuote() {
+        int start = etResponse.getSelectionStart();
+        String text = etResponse.getText().toString();
+        String prevText = text.substring(0, start);
+        String afterText = text.substring(start);
+        etResponse.setText(prevText + "> " + afterText);
+        etResponse.setSelection(prevText.length() + 2);
+    }
+
+    @OnClick(R.id.button_superscript)
+    public void onSuperScript() {
+        int start = etResponse.getSelectionStart();
+        String text = etResponse.getText().toString();
+        String prevText = text.substring(0, start);
+        String afterText = text.substring(start);
+        etResponse.setText(prevText + "^" + afterText);
+        etResponse.setSelection(prevText.length() + 1);
+    }
+
+    @OnClick(R.id.button_link)
+    public void onClickLink() {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+
+        AddLinkDialogFragment dialogFragment = AddLinkDialogFragment.Companion.newInstance("");
+        dialogFragment.show(fragmentTransaction, "TAG");
+    }
+
+    @Override
+    public void onLinkAdded(@NotNull String text, @NotNull String link) {
+        int start = etResponse.getSelectionStart();
+        int end = etResponse.getSelectionEnd();
+        String responseText = etResponse.getText().toString();
+        String prevText = responseText.substring(0, start);
+        String afterText = responseText.substring(end);
+        etResponse.setText(prevText + "[" + text + "](" + link + ")" + afterText);
+        etResponse.setSelection(prevText.length() + text.length() + link.length() + 4);
     }
 
     private void postComment() {
