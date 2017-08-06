@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 23,
+@Config(constants = BuildConfig.class, sdk = 25,
         packageName = "com.gmail.jorgegilcavazos.ballislife")
 /** Tests for the {@link ReplyActivity} */
 public class ReplyActivityTest {
