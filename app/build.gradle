@@ -40,6 +40,14 @@ android {
         abortOnError false
     }
 
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
+
     jacocoAndroidUnitTestReport {
         csv.enabled false
         html.enabled true
