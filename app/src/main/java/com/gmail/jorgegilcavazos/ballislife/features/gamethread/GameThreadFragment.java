@@ -24,8 +24,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.OnCommentClickListener;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.google.firebase.crash.FirebaseCrash;
 

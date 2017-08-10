@@ -7,8 +7,8 @@ import android.text.Html;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.FullCardViewHolder;
-import com.gmail.jorgegilcavazos.ballislife.features.shared.PostListViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.common.FullCardViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.common.PostListViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

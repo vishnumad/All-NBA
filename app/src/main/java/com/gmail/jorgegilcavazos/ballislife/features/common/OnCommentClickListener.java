@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.shared;
+package com.gmail.jorgegilcavazos.ballislife.features.common;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.VoteDirection;

@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.shared;
+package com.gmail.jorgegilcavazos.ballislife.features.common;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 

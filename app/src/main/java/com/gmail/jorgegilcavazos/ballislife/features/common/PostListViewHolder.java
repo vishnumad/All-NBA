@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.shared;
+package com.gmail.jorgegilcavazos.ballislife.features.common;
 
 import android.content.Context;
 import android.graphics.Typeface;
