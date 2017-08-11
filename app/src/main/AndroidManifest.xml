@@ -58,7 +58,7 @@
             android:label="@string/title_activity_settings"/>
         <activity android:name=".features.login.LoginActivity"/>
         <activity
-            android:name=".features.submissionWrapper.SubmissionActivity"
+            android:name=".features.submission.SubmissionActivity"
             android:label="@string/title_activity_submission"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
