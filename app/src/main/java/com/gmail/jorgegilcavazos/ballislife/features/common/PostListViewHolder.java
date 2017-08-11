@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -46,24 +46,24 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final Context context,
-                         final RedditAuthentication redditAuthentication,
-                         final CustomSubmission customSubmission,
+                         final RedditAuthentication redditAuthentication, final SubmissionWrapper
+                                 submissionWrapper,
                          boolean isDisplayedInList,
                          final OnSubmissionClickListener submissionClickListener) {
-        String title = customSubmission.getTitle();
-        String author = customSubmission.getAuthor();
-        long timestamp = customSubmission.getCreated();
-        int commentCount = customSubmission.getCommentCount();
-        String score = String.valueOf(customSubmission.getScore());
-        String selfTextHtml = customSubmission.getSelfTextHtml();
-        String domain = customSubmission.getDomain();
-        String thumbnail = customSubmission.getThumbnail();
-        final String url = customSubmission.getUrl();
-        boolean isSelf = customSubmission.isSelfPost();
-        boolean isStickied = customSubmission.isStickied();
-        boolean isSaved = customSubmission.isSaved();
-        VoteDirection vote = customSubmission.getVoteDirection();
-        String highResThumbnail = customSubmission.getHighResThumbnail();
+        String title = submissionWrapper.getTitle();
+        String author = submissionWrapper.getAuthor();
+        long timestamp = submissionWrapper.getCreated();
+        int commentCount = submissionWrapper.getCommentCount();
+        String score = String.valueOf(submissionWrapper.getScore());
+        String selfTextHtml = submissionWrapper.getSelfTextHtml();
+        String domain = submissionWrapper.getDomain();
+        String thumbnail = submissionWrapper.getThumbnail();
+        final String url = submissionWrapper.getUrl();
+        boolean isSelf = submissionWrapper.isSelfPost();
+        boolean isStickied = submissionWrapper.isStickied();
+        boolean isSaved = submissionWrapper.isSaved();
+        VoteDirection vote = submissionWrapper.getVoteDirection();
+        String highResThumbnail = submissionWrapper.getHighResThumbnail();
 
         // Show low res thumbnail over lower res version.
         String thumbnailToShow = thumbnail;
@@ -124,25 +124,25 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
         btnUpvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         RedditUtils.setUpvotedColors(context, holder);
                     }
                 }
@@ -152,25 +152,25 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
         btnDownvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         RedditUtils.setNoVoteColors(context, holder);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         RedditUtils.setDownvotedColors(context, holder);
                     }
                 }
@@ -189,7 +189,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             contentContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    submissionClickListener.onSubmissionClick(customSubmission);
+                    submissionClickListener.onSubmissionClick(submissionWrapper);
                 }
             });
         }

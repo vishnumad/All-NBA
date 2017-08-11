@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.google.common.base.Optional;
 
 import net.dean.jraw.models.Submission;
@@ -33,15 +33,14 @@ public final class Utilities {
     }
 
     // Get data from real submission if available, otherwise used data from fake one.
-    public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission(
-            CustomSubmission customSubmission) {
+    public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission(SubmissionWrapper submissionWrapper) {
         String thumbnail;
         String highResThumbnail;
-        if (customSubmission.getSubmission() == null) {
-            thumbnail = customSubmission.getThumbnail();
-            highResThumbnail = customSubmission.getHighResThumbnail();
+        if (submissionWrapper.getSubmission() == null) {
+            thumbnail = submissionWrapper.getThumbnail();
+            highResThumbnail = submissionWrapper.getHighResThumbnail();
         } else {
-            Submission submission = customSubmission.getSubmission();
+            Submission submission = submissionWrapper.getSubmission();
             thumbnail = submission.getThumbnail();
             try {
                 highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl().toString();

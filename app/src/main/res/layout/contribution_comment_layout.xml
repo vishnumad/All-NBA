@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:paddingEnd="10dp"
             android:paddingStart="10dp"
-            android:text="submission title"
+            android:text="submissionWrapper title"
             android:textColor="@color/primaryText"
             android:textSize="14sp"
             android:textStyle="bold"/>

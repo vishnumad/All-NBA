@@ -40,4 +40,6 @@ public interface GameThreadView extends MvpView {
     void openReplyToCommentActivity(int position, Comment parentComment);
 
     void openReplyToSubmissionActivity();
+
+    void setSubmissionId(String submissionId);
 }

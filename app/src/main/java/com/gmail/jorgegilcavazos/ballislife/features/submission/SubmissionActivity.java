@@ -20,15 +20,14 @@ import android.widget.Toast;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
-import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
-import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -48,10 +47,10 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
         View.OnClickListener {
     private static final String TAG = "SubmissionActivity";
-
+    private static final String KEY_COMMENT_TO_REPLY_POS = "CommentToReplyPos";
+    private static final String KEY_COMMENT_TO_REPLY_FULL_NAME = "CommentToReplyFullName";
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL = "CommentToScroll";
-
     @Inject
     RedditAuthentication redditAuthentication;
 
@@ -66,10 +65,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private String threadId;
     private String title;
     private String commentIdToScroll;
-    private CustomSubmission customSubmission;
 
     private int commentToReplyToPos = -1;
-    private Comment commentToReplyTo;
+    private String commentToReplyToFullName;
 
     private ThreadAdapter threadAdapter;
 
@@ -100,14 +98,13 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<CommentNode>(),
-                true);
+        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true);
         threadAdapter.setCommentClickListener(this);
         threadAdapter.setSubmissionClickListener(this);
 
         submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         submissionRecyclerView.setAdapter(threadAdapter);
-        submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (dy > 0) {
@@ -120,6 +117,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
         presenter.attachView(this);
         presenter.loadComments(threadId, sorting, commentIdToScroll);
+
+        if (savedInstanceState != null) {
+            commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
+            commentToReplyToFullName = savedInstanceState.getString(KEY_COMMENT_TO_REPLY_FULL_NAME);
+        }
     }
 
     @Override
@@ -127,6 +129,13 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         super.onDestroy();
         presenter.detachView();
         presenter.stop();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_COMMENT_TO_REPLY_POS, commentToReplyToPos);
+        outState.putString(KEY_COMMENT_TO_REPLY_FULL_NAME, commentToReplyToFullName);
     }
 
     @Override
@@ -174,22 +183,16 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            if (commentToReplyToPos == -1 || commentToReplyTo == null) {
-                Toast.makeText(this, R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                FirebaseCrash.log("Comment pos: " + commentToReplyToPos);
-                FirebaseCrash.log("Comment: " + commentToReplyTo.toString());
-                FirebaseCrash.report(new Exception(
-                        "Received result for comment reply but pos or comment was empty."));
+            if (commentToReplyToPos == -1 || commentToReplyToFullName == null) {
+                throw new IllegalStateException("Invalid reply pos or fullname");
             }
             presenter.onReplyToComment(
-                    commentToReplyToPos,
-                    commentToReplyTo,
+                    commentToReplyToPos, threadId, commentToReplyToFullName,
                     data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
         } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST
                 && resultCode == RESULT_OK) {
-            presenter.onReplyToThread(
-                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
-                    customSubmission.getSubmission());
+            presenter.onReplyToThread(data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
+                    threadId);
         }
     }
 
@@ -207,11 +210,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void addComment(CommentNode comment, int position) {
         threadAdapter.addComment(position, comment);
-    }
-
-    @Override
-    public void setCustomSubmission(CustomSubmission customSubmission) {
-        this.customSubmission = customSubmission;
     }
 
     @Override
@@ -241,7 +239,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     public void openReplyToCommentActivity(final int position, final Comment parentComment) {
-        commentToReplyTo = parentComment;
+        commentToReplyToFullName = parentComment.getFullName();
         commentToReplyToPos = position;
 
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
@@ -320,21 +318,21 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void onSubmissionClick(CustomSubmission customSubmission) {
+    public void onSubmissionClick(SubmissionWrapper submissionWrapper) {
         // No action on submission click.
     }
 
     @Override
-    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
-        if (customSubmission != null) {
-            presenter.onVoteSubmission(customSubmission.getSubmission(), voteDirection);
+    public void onVoteSubmission(SubmissionWrapper submissionWrapper, VoteDirection voteDirection) {
+        if (submissionWrapper != null) {
+            presenter.onVoteSubmission(submissionWrapper.getSubmission(), voteDirection);
         }
     }
 
     @Override
-    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
-        if (customSubmission != null) {
-            presenter.onSaveSubmission(customSubmission.getSubmission(), saved);
+    public void onSaveSubmission(SubmissionWrapper submissionWrapper, boolean saved) {
+        if (submissionWrapper != null) {
+            presenter.onSaveSubmission(submissionWrapper.getSubmission(), saved);
         }
     }
 

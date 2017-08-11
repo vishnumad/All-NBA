@@ -21,13 +21,13 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
-import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -56,15 +56,17 @@ public class GameThreadFragment extends Fragment
         SwipeRefreshLayout.OnRefreshListener,
         OnCommentClickListener,
         CompoundButton.OnCheckedChangeListener {
+    private static final String TAG = "GameThreadFragment";
+    private static final String KEY_COMMENT_TO_REPLY_POS = "CommentToReplyPos";
+    private static final String KEY_COMMENT_TO_REPLY_FULL_NAME = "CommentToReplyFullName";
+    private static final String KEY_SUBMISSION_ID = "SubmissionId";
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
-    private static final String TAG = "GameThreadFragment";
     public boolean isPremium = false;
 
-    @Inject
-    RedditService redditService;
-    @Inject
-    RedditAuthentication redditAuthentication;
+    @Inject RedditService redditService;
+    @Inject RedditAuthentication redditAuthentication;
+    @Inject SubmissionRepository submissionRepository;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
@@ -80,7 +82,8 @@ public class GameThreadFragment extends Fragment
     private GameThreadPresenter presenter;
 
     private int commentToReplyToPos = -1;
-    private Comment commentToReplyTo;
+    private String commentToReplyToFullName;
+    private String submissionId;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -88,6 +91,21 @@ public class GameThreadFragment extends Fragment
 
     public static GameThreadFragment newInstance() {
         return new GameThreadFragment();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
+            if (commentToReplyToPos == -1 || commentToReplyToFullName == null) {
+                throw new IllegalStateException("Invalid reply pos or fullname");
+            }
+            presenter.reply(commentToReplyToPos, submissionId, commentToReplyToFullName, data
+                    .getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
+        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
+                RESULT_OK) {
+            presenter.replyToThread(data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
+                    submissionId);
+        }
     }
 
     @Override
@@ -137,12 +155,26 @@ public class GameThreadFragment extends Fragment
         SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
                 MODE_PRIVATE);
 
-        presenter = new GameThreadPresenter(this, redditService, gameDate, preferences,
-                redditAuthentication);
+        presenter = new GameThreadPresenter(this, redditService, submissionRepository, gameDate,
+                preferences, redditAuthentication);
         presenter.start();
         presenter.loadComments(threadType, homeTeam, awayTeam, stream);
 
+        if (savedInstanceState != null) {
+            commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
+            commentToReplyToFullName = savedInstanceState.getString(KEY_COMMENT_TO_REPLY_FULL_NAME);
+            submissionId = savedInstanceState.getString(KEY_SUBMISSION_ID);
+        }
+
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_COMMENT_TO_REPLY_POS, commentToReplyToPos);
+        outState.putString(KEY_COMMENT_TO_REPLY_FULL_NAME, commentToReplyToFullName);
+        outState.putString(KEY_SUBMISSION_ID, submissionId);
     }
 
     @Override
@@ -156,7 +188,7 @@ public class GameThreadFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (threadType.equals(RedditUtils.LIVE_GT_TYPE)) {
             inflater.inflate(R.menu.menu_game_thread, menu);
-            streamSwitch = (Switch) menu.findItem(R.id.action_stream).getActionView()
+            streamSwitch = menu.findItem(R.id.action_stream).getActionView()
                     .findViewById(R.id.switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
             streamSwitch.setChecked(stream);
@@ -172,30 +204,6 @@ public class GameThreadFragment extends Fragment
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            if (commentToReplyToPos == -1 || commentToReplyTo == null) {
-                Toast.makeText(getActivity(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                FirebaseCrash.log("Comment pos: " + commentToReplyToPos);
-                FirebaseCrash.log("Comment: " + commentToReplyTo.toString());
-                FirebaseCrash.report(new Exception(
-                        "Received result for comment reply but pos or comment was empty."));
-            }
-            presenter.reply(
-                    commentToReplyToPos,
-                    commentToReplyTo,
-                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
-        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST
-                && resultCode == RESULT_OK) {
-            presenter.replyToThread(
-                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
-                    threadType,
-                    homeTeam,
-                    awayTeam);
-        }
     }
 
     @Override
@@ -279,7 +287,7 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void openReplyToCommentActivity(final int position, final Comment parentComment) {
-        commentToReplyTo = parentComment;
+        commentToReplyToFullName = parentComment.getFullName();
         commentToReplyToPos = position;
 
         Intent intent = new Intent(getActivity(), ReplyActivity.class);
@@ -294,6 +302,11 @@ public class GameThreadFragment extends Fragment
     public void openReplyToSubmissionActivity() {
         Intent intent = new Intent(getActivity(), ReplyActivity.class);
         startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
+    }
+
+    @Override
+    public void setSubmissionId(String submissionId) {
+        this.submissionId = submissionId;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.google.common.base.Optional;
 
 import org.junit.Test;
@@ -46,19 +46,19 @@ public class UtilitiesTest {
 
     @Test
     public void testGetThumbnailToShowFromCustomSubmission() {
-        CustomSubmission customSubmission = new CustomSubmission();
-        customSubmission.setThumbnail("sdThumbnail");
-        customSubmission.setHighResThumbnail("hdThumbnail");
-        CustomSubmission customSubmission1 = new CustomSubmission();
-        customSubmission1.setThumbnail("sdThumbnail");
-        CustomSubmission customSubmission2 = new CustomSubmission();
+        SubmissionWrapper submissionWrapper = new SubmissionWrapper();
+        submissionWrapper.setThumbnail("sdThumbnail");
+        submissionWrapper.setHighResThumbnail("hdThumbnail");
+        SubmissionWrapper submissionWrapper1 = new SubmissionWrapper();
+        submissionWrapper1.setThumbnail("sdThumbnail");
+        SubmissionWrapper submissionWrapper2 = new SubmissionWrapper();
 
-        Optional<Pair<Utilities.ThumbnailType, String>> optional =
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission);
-        Optional<Pair<Utilities.ThumbnailType, String>> optional1 =
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission1);
-        Optional<Pair<Utilities.ThumbnailType, String>> optional2 =
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission2);
+        Optional<Pair<Utilities.ThumbnailType, String>> optional = Utilities
+                .getThumbnailToShowFromCustomSubmission(submissionWrapper);
+        Optional<Pair<Utilities.ThumbnailType, String>> optional1 = Utilities
+                .getThumbnailToShowFromCustomSubmission(submissionWrapper1);
+        Optional<Pair<Utilities.ThumbnailType, String>> optional2 = Utilities
+                .getThumbnailToShowFromCustomSubmission(submissionWrapper2);
 
         assertTrue(optional.isPresent());
         assertEquals("hdThumbnail", optional.get().second);

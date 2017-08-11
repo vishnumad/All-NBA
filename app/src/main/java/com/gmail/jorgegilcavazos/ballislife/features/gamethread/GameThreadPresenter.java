@@ -3,20 +3,24 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ThreadNotFoundException;
+import com.google.common.base.Optional;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
-import net.dean.jraw.models.Submission;
+import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.VoteDirection;
 
 import java.util.ArrayList;
@@ -25,14 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.CompletableSource;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -41,26 +42,25 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GameThreadPresenter {
-
-    private static final String TAG = "GameThreadPresenter";
-
     private long gameDate;
 
     private GameThreadView view;
     private RedditService redditService;
     private RedditGameThreadsService gameThreadsService;
+    private SubmissionRepository submissionRepository;
     private SharedPreferences preferences;
     private RedditAuthentication redditAuthentication;
     private CompositeDisposable disposables;
 
     public GameThreadPresenter(
             GameThreadView view,
-            RedditService redditService,
+            RedditService redditService, SubmissionRepository submissionRepository,
             long gameDate,
             SharedPreferences preferences,
             RedditAuthentication redditAuthentication) {
         this.view = view;
         this.redditService = redditService;
+        this.submissionRepository = submissionRepository;
         this.gameDate = gameDate;
         this.preferences = preferences;
         this.redditAuthentication = redditAuthentication;
@@ -87,37 +87,45 @@ public class GameThreadPresenter {
 
         Observable<List<CommentNode>> observable = redditAuthentication.authenticate(preferences)
                 .andThen(gameThreadsService.fetchGameThreads(
-                        DateFormatUtil.getNoDashDateString(new Date(gameDate))))
-                .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
-                    @Override
-                    public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
-                        List<GameThreadSummary> threadList = new ArrayList<>();
-                        for (Map.Entry<String, GameThreadSummary> entry : threads.entrySet()) {
-                            threadList.add(entry.getValue());
-                        }
-                        return GameThreadFinderService.findGameThreadInList(threadList, type,
-                                homeTeamAbbr, awayTeamAbbr);
+                        DateFormatUtil.getNoDashDateString(new Date(gameDate)))).flatMap(threads
+                        -> {
+                    List<GameThreadSummary> threadList = new ArrayList<>();
+                    for (Map.Entry<String, GameThreadSummary> entry : threads.entrySet()) {
+                        threadList.add(entry.getValue());
                     }
-                })
-                .flatMap(new Function<String, SingleSource<List<CommentNode>>>() {
-                    @Override
-                    public SingleSource<List<CommentNode>> apply(String threadId) throws Exception {
-                        if (threadId.equals("")) {
-                            return Single.error(new ThreadNotFoundException());
-                        }
-                        return redditService.getComments(redditAuthentication.getRedditClient(),
-                                threadId, type);
+                    return GameThreadFinderService.findGameThreadInList(threadList, type,
+                            homeTeamAbbr, awayTeamAbbr);
+                }).flatMap(threadId -> {
+                    if (threadId.equals("")) {
+                        return Single.error(new ThreadNotFoundException());
                     }
+                    CommentSort sort;
+                    switch (type) {
+                        case RedditUtils.LIVE_GT_TYPE:
+                            sort = CommentSort.NEW;
+                            break;
+                        case RedditUtils.POST_GT_TYPE:
+                            sort = CommentSort.TOP;
+                            break;
+                        default:
+                            throw new IllegalStateException("Thread type should be new or top");
+                    }
+                    return redditService.getSubmission(redditAuthentication.getRedditClient(),
+                            threadId, sort);
+                }).flatMap((submission) -> {
+                    submissionRepository.saveSubmission(new SubmissionWrapper(submission));
+                    view.setSubmissionId(submission.getId());
+                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                    List<CommentNode> commentNodes = new ArrayList<>();
+                    for (CommentNode node : iterable) {
+                        commentNodes.add(node);
+                    }
+                    return Single.just(commentNodes);
                 })
                 .toObservable();
 
         if (stream) {
-            observable = observable.repeatWhen(new Function<Observable<Object>, ObservableSource<?>>() {
-                @Override
-                public ObservableSource<?> apply(Observable<Object> objectObservable) throws Exception {
-                    return objectObservable.delay(10, TimeUnit.SECONDS);
-                }
-            });
+            observable = observable.repeatWhen(object -> object.delay(10, TimeUnit.SECONDS));
         }
 
         disposables.clear();
@@ -153,26 +161,15 @@ public class GameThreadPresenter {
     }
 
     public void vote(final Comment comment, final VoteDirection voteDirection) {
-        if (!redditAuthentication.isUserLoggedIn()) {
-            view.showNotLoggedInToast();
-            return;
-        }
-
         disposables.add(redditAuthentication.authenticate(preferences)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.voteComment(
-                                    redditAuthentication.getRedditClient(),
-                                    comment,
-                                    voteDirection);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn -> {
+                    if (loggedIn) {
+                        return redditService.voteComment(redditAuthentication.getRedditClient(),
+                                comment, voteDirection);
+                    } else {
+                        throw new NotLoggedInException();
                     }
-                })
+                }))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableCompletableObserver() {
@@ -183,111 +180,77 @@ public class GameThreadPresenter {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        if (e instanceof NotLoggedInException) {
+                            view.showNotLoggedInToast();
+                        }
                     }
-                })
-        );
+                }));
     }
 
     public void save(final Comment comment) {
-        if (!redditAuthentication.isUserLoggedIn()) {
-            view.showNotLoggedInToast();
-            return;
-        }
+        disposables.add(redditAuthentication.authenticate(preferences).andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn -> {
+            if (loggedIn) {
+                return redditService.saveComment(redditAuthentication.getRedditClient(), comment);
+            } else {
+                throw new NotLoggedInException();
+            }
+        })).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith
+                (new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+            }
 
-        disposables.add(redditAuthentication.authenticate(preferences)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.saveComment(
-                                    redditAuthentication.getRedditClient(),
-                                    comment);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableCompletableObserver() {
-                    @Override
-                    public void onComplete() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-                })
-        );
+            @Override
+            public void onError(Throwable e) {
+                if (e instanceof NotLoggedInException) {
+                    view.showNotLoggedInToast();
+                }
+            }
+        }));
     }
 
     public void unsave(final Comment comment) {
-        if (!redditAuthentication.isUserLoggedIn()) {
-            view.showNotLoggedInToast();
-            return;
-        }
+        disposables.add(redditAuthentication.authenticate(preferences).andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn -> {
+            if (loggedIn) {
+                return redditService.unsaveComment(redditAuthentication.getRedditClient(), comment);
+            } else {
+                throw new NotLoggedInException();
+            }
+        })).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(new DisposableCompletableObserver() {
+            @Override
+            public void onComplete() {
+            }
 
-        disposables.add(redditAuthentication.authenticate(preferences)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.unsaveComment(
-                                    redditAuthentication.getRedditClient(),
-                                    comment);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableCompletableObserver() {
-                    @Override
-                    public void onComplete() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-                })
-        );
+            @Override
+            public void onError(Throwable e) {
+                if (e instanceof NotLoggedInException) {
+                    view.showNotLoggedInToast();
+                }
+            }
+        }));
     }
 
-    public void reply(final int position, final Comment parentComment, final String text) {
-        if (!redditAuthentication.isUserLoggedIn()) {
-            view.showNotLoggedInToast();
-            return;
+    public void reply(final int position, final String submissionId, final String commentFullName, final String text) {
+        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
+        Optional<CommentNode> parent = submissionWrapper.getSubmission().getComments().walkTree().firstMatch(node -> node.getComment().getFullName().equals(commentFullName));
+        if (!parent.isPresent()) {
+            throw new IllegalStateException("Could not find comment to reply to.");
         }
 
         view.showSavingToast();
         disposables.add(redditAuthentication.authenticate(preferences)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMap(new Function<Boolean, SingleSource<String>>() {
-                    @Override
-                    public SingleSource<String> apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.replyToComment(
-                                    redditAuthentication.getRedditClient(), parentComment, text);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn -> {
+                    if (loggedIn) {
+                        return redditService.replyToComment(redditAuthentication.getRedditClient
+                                (), parent.get().getComment(), text);
+                    } else {
+                        throw new NotLoggedInException();
                     }
-                })
+                }))
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS)
-                .flatMap(new Function<String, SingleSource<CommentNode>>() {
-                    @Override
-                    public SingleSource<CommentNode> apply(String s) throws Exception {
-                        return redditService.getComment(redditAuthentication.getRedditClient(),
-                                parentComment.getSubmissionId().substring(3), s);
-                    }
-                })
+                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment(redditAuthentication.getRedditClient(), submissionId, commentId))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
@@ -306,6 +269,8 @@ public class GameThreadPresenter {
                         if (isViewAttached()) {
                             if (e instanceof ReplyNotAvailableException) {
                                 view.showReplySavedToast();
+                            } else if (e instanceof NotLoggedInException) {
+                                view.showNotLoggedInToast();
                             } else {
                                 view.showReplyErrorToast();
                             }
@@ -315,71 +280,25 @@ public class GameThreadPresenter {
         );
     }
 
-    public void replyToThread(final String text, final String type, final String homeTeamAbbr,
-                              final String awayTeamAbbr) {
-        if (!redditAuthentication.isUserLoggedIn()) {
-            view.showNotLoggedInToast();
-            return;
+    public void replyToThread(final String text, final String submissionId) {
+        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
+        if (submissionWrapper == null) {
+            throw new IllegalStateException("Could not get submission from repository");
         }
 
         view.showSavingToast();
         disposables.add(redditAuthentication.authenticate(preferences)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMap(new Function<Boolean, SingleSource<Map<String, GameThreadSummary>>>() {
-                    @Override
-                    public SingleSource<Map<String, GameThreadSummary>> apply(Boolean loggedIn)
-                            throws Exception {
-                        if (loggedIn) {
-                            return gameThreadsService.fetchGameThreads(
-                                    DateFormatUtil.getNoDashDateString(new Date(gameDate)));
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn) -> {
+                    if (!loggedIn) {
+                        throw new NotLoggedInException();
                     }
-                })
-                .flatMap(new Function<Map<String, GameThreadSummary>, SingleSource<String>>() {
-                    @Override
-                    public SingleSource<String> apply(Map<String, GameThreadSummary> threads) throws Exception {
-                        List<GameThreadSummary> threadList = new ArrayList<>();
-                        for (Map.Entry<String, GameThreadSummary> entry : threads.entrySet()) {
-                            threadList.add(entry.getValue());
-                        }
-                        return GameThreadFinderService.findGameThreadInList(threadList, type,
-                                homeTeamAbbr, awayTeamAbbr);
-                    }
-                })
-                .flatMap(new Function<String, SingleSource<Submission>>() {
-                    @Override
-                    public SingleSource<Submission> apply(String threadId) throws Exception {
-                        if (threadId.equals("")) {
-                            return Single.error(new ThreadNotFoundException());
-                        }
-                        return redditService.getSubmission(redditAuthentication.getRedditClient(),
-                                threadId, null);
-                    }
-                })
-                .flatMap(new Function<Submission, SingleSource<CommentNode>>() {
-                    @Override
-                    public SingleSource<CommentNode> apply(final Submission submission) throws
-                            Exception {
-                        return redditService.replyToThread(redditAuthentication.getRedditClient(),
-                                submission, text)
-                                    // Comment is not immediately available after being posted in the next call
-                                    // (probably a small delay from reddit's servers) so we need to wait for a bit
-                                    // before fetching the posted comment.
-                                    .delay(4, TimeUnit.SECONDS)
-                                    .flatMap(new Function<String, SingleSource<CommentNode>>() {
-                                        @Override
-                                        public SingleSource<CommentNode> apply(String commentId)
-                                                throws Exception {
-                                            return redditService.getComment(
-                                                    redditAuthentication.getRedditClient(),
-                                                    submission.getId(),
-                                                    commentId);
-                                        }
-                                    });
-                    }
-                })
+                    return Completable.complete();
+                }).andThen(redditService.replyToThread(redditAuthentication.getRedditClient(), submissionWrapper.getSubmission(), text))
+                // Comment is not immediately available after being posted in the next call
+                // (probably a small delay from reddit's servers) so we need to wait for a bit
+                // before fetching the posted comment.º
+                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment
+                        (redditAuthentication.getRedditClient(), submissionId, commentId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
@@ -400,6 +319,8 @@ public class GameThreadPresenter {
                                 view.showReplyToSubmissionFailedToast();
                             } else if (e instanceof ReplyNotAvailableException) {
                                 view.showSavedToast();
+                            } else if (e instanceof NotLoggedInException) {
+                                view.showNotLoggedInToast();
                             }
                         }
                     }

@@ -29,10 +29,10 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -286,7 +286,7 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void showPosts(List<CustomSubmission> submissions, boolean clear) {
+    public void showPosts(List<SubmissionWrapper> submissions, boolean clear) {
         if (clear) {
             postsAdapter.setData(submissions);
         } else {
@@ -398,23 +398,23 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void onSubmissionClick(CustomSubmission customSubmission) {
+    public void onSubmissionClick(SubmissionWrapper submissionWrapper) {
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.THREAD_ID, customSubmission.getId());
+        bundle.putString(Constants.THREAD_ID, submissionWrapper.getId());
         bundle.putString(SubmissionActivity.KEY_TITLE, subreddit);
         intent.putExtras(bundle);
         startActivity(intent);
     }
 
     @Override
-    public void onVoteSubmission(CustomSubmission customSubmission, VoteDirection voteDirection) {
-        presenter.onVote(customSubmission.getSubmission(), voteDirection);
+    public void onVoteSubmission(SubmissionWrapper submissionWrapper, VoteDirection voteDirection) {
+        presenter.onVote(submissionWrapper.getSubmission(), voteDirection);
     }
 
     @Override
-    public void onSaveSubmission(CustomSubmission customSubmission, boolean saved) {
-        presenter.onSave(customSubmission.getSubmission(), saved);
+    public void onSaveSubmission(SubmissionWrapper submissionWrapper, boolean saved) {
+        presenter.onSave(submissionWrapper.getSubmission(), saved);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.posts;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.TimePeriod;
@@ -12,9 +12,9 @@ import io.reactivex.Single;
 public interface PostsRepository {
     void reset(Sorting sorting, TimePeriod timePeriod, String subreddit);
 
-    Single<List<CustomSubmission>> next();
+    Single<List<SubmissionWrapper>> next();
 
-    List<CustomSubmission> getCachedSubmissions();
+    List<SubmissionWrapper> getCachedSubmissions();
 
     void clearCache();
 }

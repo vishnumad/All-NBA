@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
@@ -53,7 +53,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private boolean hasHeader;
     private OnCommentClickListener commentClickListener;
     private OnSubmissionClickListener submissionClickListener;
-    private CustomSubmission customSubmission;
+    private SubmissionWrapper submissionWrapper;
 
     public ThreadAdapter(Context context,
                          RedditAuthentication redditAuthentication,
@@ -73,12 +73,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.submissionClickListener = submissionClickListener;
     }
 
-    public void setCustomSubmission(CustomSubmission customSubmission) {
-        this.customSubmission = customSubmission;
+    public void setSubmissionWrapper(SubmissionWrapper submissionWrapper) {
+        this.submissionWrapper = submissionWrapper;
     }
 
     public void setSubmission(Submission submission) {
-        customSubmission = new CustomSubmission(submission);
+        submissionWrapper = new SubmissionWrapper(submission);
     }
 
     @Override
@@ -100,16 +100,14 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FullCardViewHolder) {
             ((FullCardViewHolder) holder).bindData(
-                    context,
-                    redditAuthentication,
-                    customSubmission,
+                    context, redditAuthentication, submissionWrapper,
                     false,
                     submissionClickListener);
         } else {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
             final CommentNode commentNode;
-            if (hasHeader && customSubmission != null) {
+            if (hasHeader && submissionWrapper != null) {
                 commentNode = commentsList.get(position - 1);
             } else {
                 commentNode = commentsList.get(position);
@@ -122,7 +120,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemViewType(int position) {
         // Return comment type if we don't have a header of it the submission isn't loaded yet.
-        if (!hasHeader || customSubmission == null) {
+        if (!hasHeader || submissionWrapper == null) {
             return TYPE_COMMENT;
         } else {
             if (position == 0) {
@@ -135,7 +133,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @Override
     public int getItemCount() {
-        if (hasHeader && customSubmission != null) {
+        if (hasHeader && submissionWrapper != null) {
             return null != commentsList ? commentsList.size() + 1 : 1;
         } else {
             return null != commentsList ? commentsList.size() : 0;

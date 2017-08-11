@@ -10,10 +10,10 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.PostListViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
@@ -37,7 +37,7 @@ import static com.gmail.jorgegilcavazos.ballislife.util.Constants.VIEW_HEADER;
 public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private RedditAuthentication redditAuthentication;
-    private List<CustomSubmission> postsList;
+    private List<SubmissionWrapper> postsList;
     private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
@@ -46,8 +46,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private PublishSubject<Submission> sharePublishSubject = PublishSubject.create();
 
     public PostsAdapter(Context context,
-                        RedditAuthentication redditAuthentication,
-                        List<CustomSubmission> postsList,
+                        RedditAuthentication redditAuthentication, List<SubmissionWrapper>
+                                postsList,
                         int contentViewType,
                         OnSubmissionClickListener submissionClickListener,
                         String subreddit) {
@@ -86,21 +86,17 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).bindData(context, subscriberCount, subreddit);
         } else {
-            CustomSubmission customSubmission = postsList.get(position - 1);
+            SubmissionWrapper submissionWrapper = postsList.get(position - 1);
             switch (contentViewType) {
                 case POSTS_VIEW_LIST:
                     ((PostListViewHolder) holder).bindData(
-                            context,
-                            redditAuthentication,
-                            customSubmission,
+                            context, redditAuthentication, submissionWrapper,
                             true,
                             submissionClickListener);
                     break;
                 case POSTS_VIEW_WIDE_CARD:
                     ((WideCardViewHolder) holder).bindData(
-                            context,
-                            redditAuthentication,
-                            customSubmission,
+                            context, redditAuthentication, submissionWrapper,
                             submissionClickListener,
                             sharePublishSubject);
                     break;
@@ -125,7 +121,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return null != postsList ? postsList.size() + 1 : 1;
     }
 
-    public void setData(List<CustomSubmission> submissions) {
+    public void setData(List<SubmissionWrapper> submissions) {
         if (postsList != null) {
             postsList.clear();
         } else {
@@ -136,7 +132,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void addData(List<CustomSubmission> submissions) {
+    public void addData(List<SubmissionWrapper> submissions) {
         if (postsList == null) {
             postsList = new ArrayList<>();
         }
@@ -159,8 +155,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return sharePublishSubject;
     }
 
-    private void preFetchImages(List<CustomSubmission> submissions) {
-        for (CustomSubmission submission : submissions) {
+    private void preFetchImages(List<SubmissionWrapper> submissions) {
+        for (SubmissionWrapper submission : submissions) {
             Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl =
                     Utilities.getThumbnailToShowFromCustomSubmission(submission);
             if (thumbnailTypeUrl.isPresent()) {

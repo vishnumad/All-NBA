@@ -226,16 +226,13 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final Submission submission,
             final String text) {
-        return Single.create(new SingleOnSubscribe<String>() {
-            @Override
-            public void subscribe(SingleEmitter<String> e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    e.onSuccess(accountManager.reply(submission, text));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(new ReplyToThreadException());
-                    }
+        return Single.create((e) -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                e.onSuccess(accountManager.reply(submission, text));
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(new ReplyToThreadException());
                 }
             }
         });

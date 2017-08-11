@@ -2,7 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.repository.posts;
 
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
@@ -27,7 +27,7 @@ public class PostsRepositoryImpl implements PostsRepository {
     private RedditService redditService;
 
     private SubredditPaginator paginator;
-    private List<CustomSubmission> cachedCustomSubmissions;
+    private List<SubmissionWrapper> cachedSubmissionWrappers;
 
 
     @Inject
@@ -36,7 +36,7 @@ public class PostsRepositoryImpl implements PostsRepository {
             RedditService redditService) {
         this.redditAuthentication = redditAuthentication;
         this.redditService = redditService;
-        cachedCustomSubmissions = new ArrayList<>();
+        cachedSubmissionWrappers = new ArrayList<>();
     }
 
     @Override
@@ -55,32 +55,32 @@ public class PostsRepositoryImpl implements PostsRepository {
     }
 
     @Override
-    public Single<List<CustomSubmission>> next() {
+    public Single<List<SubmissionWrapper>> next() {
         return redditService.getSubmissionListing(paginator)
-                .flatMap(new Function<Listing<Submission>, SingleSource<? extends
-                        List<CustomSubmission>>>() {
+                .flatMap(new Function<Listing<Submission>, SingleSource<? extends List
+                        <SubmissionWrapper>>>() {
                     @Override
-                    public SingleSource<? extends List<CustomSubmission>>
+                    public SingleSource<? extends List<SubmissionWrapper>>
                     apply(Listing<Submission> submissions) throws Exception {
                         // Convert immutable listing to mutable list of custom submissions.
-                        List<CustomSubmission> customSubmissions = new ArrayList<>();
+                        List<SubmissionWrapper> submissionWrappers = new ArrayList<>();
                         for (Submission submission : submissions) {
-                            customSubmissions.add(new CustomSubmission(submission));
+                            submissionWrappers.add(new SubmissionWrapper(submission));
                         }
 
-                        cachedCustomSubmissions.addAll(customSubmissions);
-                        return Single.just(customSubmissions);
+                        cachedSubmissionWrappers.addAll(submissionWrappers);
+                        return Single.just(submissionWrappers);
                     }
                 });
     }
 
     @Override
-    public List<CustomSubmission> getCachedSubmissions() {
-        return cachedCustomSubmissions;
+    public List<SubmissionWrapper> getCachedSubmissions() {
+        return cachedSubmissionWrappers;
     }
 
     @Override
     public void clearCache() {
-        cachedCustomSubmissions.clear();
+        cachedSubmissionWrappers.clear();
     }
 }

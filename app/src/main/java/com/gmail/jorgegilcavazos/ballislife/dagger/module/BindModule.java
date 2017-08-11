@@ -12,6 +12,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositor
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -50,4 +52,8 @@ public abstract class BindModule {
     @Binds
     public abstract HighlightsRepository bindHighlightsRepository(
             HighlightsRepositoryImpl highlightsRepositoryImpl);
+
+    @Binds
+    public abstract SubmissionRepository bindSubmissionRepository(SubmissionRepositoryImpl
+                                                                              submissionRepositoryImpl);
 }

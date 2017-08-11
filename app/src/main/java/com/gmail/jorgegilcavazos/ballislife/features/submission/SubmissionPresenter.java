@@ -4,14 +4,16 @@ import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
@@ -26,10 +28,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.reactivex.CompletableSource;
-import io.reactivex.SingleSource;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
@@ -37,6 +36,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     private RedditAuthentication redditAuthentication;
     private RedditService redditService;
+    private SubmissionRepository submissionRepository;
     private SharedPreferences redditPrefs;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
@@ -44,11 +44,12 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     @Inject
     public SubmissionPresenter(
             RedditAuthentication redditAuthentication,
-            RedditService redditService,
+            RedditService redditService, SubmissionRepository submissionRepository,
             @Named("redditSharedPreferences") SharedPreferences redditPrefs,
             BaseSchedulerProvider schedulerProvider) {
         this.redditAuthentication = redditAuthentication;
         this.redditService = redditService;
+        this.submissionRepository = submissionRepository;
         this.redditPrefs = redditPrefs;
         this.schedulerProvider = schedulerProvider;
 
@@ -84,7 +85,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                             i++;
                         }
 
-                        view.setCustomSubmission(new CustomSubmission(submission));
+                        SubmissionWrapper submissionWrapper = new SubmissionWrapper(submission);
+                        submissionRepository.saveSubmission(submissionWrapper);
                         view.showComments(commentNodes, submission);
                         view.setLoadingIndicator(false);
                         view.showFab();
@@ -104,16 +106,13 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onVoteSubmission(final Submission submission, final VoteDirection vote) {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.voteSubmission(
-                                    redditAuthentication.getRedditClient(), submission, vote);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
+                        -> {
+                    if (loggedIn) {
+                        return redditService.voteSubmission(redditAuthentication.getRedditClient
+                                (), submission, vote);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -136,16 +135,13 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onSaveSubmission(final Submission submission, final boolean saved) {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.saveSubmission(
-                                    redditAuthentication.getRedditClient(), submission, saved);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
+                        -> {
+                    if (loggedIn) {
+                        return redditService.saveSubmission(redditAuthentication.getRedditClient
+                                (), submission, saved);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -167,16 +163,13 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onVoteComment(final Comment comment, final VoteDirection vote) {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.voteComment(redditAuthentication.getRedditClient(),
-                                    comment, vote);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
+                        -> {
+                    if (loggedIn) {
+                        return redditService.voteComment(redditAuthentication.getRedditClient(),
+                                comment, vote);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -199,16 +192,13 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onSaveComment(final Comment comment) {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.saveComment(redditAuthentication.getRedditClient(),
-                                    comment);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
+                        -> {
+                    if (loggedIn) {
+                        return redditService.saveComment(redditAuthentication.getRedditClient(),
+                                comment);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -230,16 +220,13 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onUnsaveComment(final Comment comment) {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.unsaveComment(
-                                    redditAuthentication.getRedditClient(), comment);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
+                        -> {
+                    if (loggedIn) {
+                        return redditService.unsaveComment(redditAuthentication.getRedditClient()
+                                , comment);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -268,32 +255,29 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         view.openReplyToCommentActivity(position, parent);
     }
 
-    public void onReplyToComment(final int position, final Comment parent, final String text) {
+    public void onReplyToComment(final int position, final String submissionId, final String
+            commentFullName, final String text) {
+        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
+        Optional<CommentNode> parent = submissionWrapper.getSubmission().getComments().walkTree()
+                .firstMatch(node -> node.getComment().getFullName().equals(commentFullName));
+        if (!parent.isPresent()) {
+            throw new IllegalStateException("Could not find comment to reply to.");
+        }
+
         view.showSavingToast();
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMap(new Function<Boolean, SingleSource<String>>() {
-                    @Override
-                    public SingleSource<String> apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.replyToComment(
-                                    redditAuthentication.getRedditClient(), parent, text);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn) -> {
+                    if (loggedIn) {
+                        return redditService.replyToComment(redditAuthentication.getRedditClient
+                                (), parent.get().getComment(), text);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS)
-                .flatMap(new Function<String, SingleSource<CommentNode>>() {
-                    @Override
-                    public SingleSource<CommentNode> apply(String s) throws Exception {
-                        return redditService.getComment(redditAuthentication.getRedditClient(),
-                                parent.getSubmissionId().substring(3), s);
-                    }
-                })
+                .delay(4, TimeUnit.SECONDS).flatMap(s -> redditService.getComment(redditAuthentication.getRedditClient(), submissionId, s))
                 .observeOn(schedulerProvider.ui())
                 .subscribeOn(schedulerProvider.io())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
@@ -328,32 +312,26 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         view.openReplyToSubmissionActivity();
     }
 
-    public void onReplyToThread(final String text, final Submission submission) {
+    public void onReplyToThread(final String text, final String submissionId) {
+        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
+        if (submissionWrapper == null) {
+            throw new IllegalStateException("Could not get submission from repository");
+        }
+
         view.showSavingToast();
         disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMap(new Function<Boolean, SingleSource<String>>() {
-                    @Override
-                    public SingleSource<String> apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return redditService.replyToThread(
-                                    redditAuthentication.getRedditClient(), submission, text);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn) -> {
+                    if (loggedIn) {
+                        return redditService.replyToThread(redditAuthentication.getRedditClient()
+                                , submissionRepository.getSubmission(submissionWrapper.getId()).getSubmission(), text);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS)
-                .flatMap(new Function<String, SingleSource<CommentNode>>() {
-                    @Override
-                    public SingleSource<CommentNode> apply(String commentId) throws Exception {
-                        return redditService.getComment(redditAuthentication.getRedditClient(),
-                                submission.getId(), commentId);
-                    }
-                })
+                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment(redditAuthentication.getRedditClient(), submissionWrapper.getId(), commentId))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {

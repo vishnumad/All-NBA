@@ -8,7 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
@@ -92,7 +92,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void loadFirstAvailable(Sorting sorting, TimePeriod timePeriod) {
-        List<CustomSubmission> submissions = postsRepository.getCachedSubmissions();
+        List<SubmissionWrapper> submissions = postsRepository.getCachedSubmissions();
         if (submissions.isEmpty()) {
             resetLoaderFromStartWithParams(sorting, timePeriod);
             loadPosts(true /* reset */);
@@ -119,10 +119,9 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         disposables.add(redditAuthentication.authenticate(redditPrefs)
                 .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<List<CustomSubmission>>() {
+                .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<SubmissionWrapper>>() {
                     @Override
-                    public void onSuccess(List<CustomSubmission> submissions) {
+                    public void onSuccess(List<SubmissionWrapper> submissions) {
                         if (submissions.isEmpty()) {
                             view.showNothingToShowToast();
                             return;

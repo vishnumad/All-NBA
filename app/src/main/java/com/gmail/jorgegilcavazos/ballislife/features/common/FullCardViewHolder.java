@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -56,8 +56,8 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(
             final Context context,
-            final RedditAuthentication redditAuthentication,
-            final CustomSubmission customSubmission,
+            final RedditAuthentication redditAuthentication, final SubmissionWrapper
+                    submissionWrapper,
             boolean isDisplayedInList,
             final OnSubmissionClickListener submissionClickListener) {
 
@@ -69,21 +69,21 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         long timestamp;
 
         // Get data from real submission if available, otherwise used data from fake one.
-        title = customSubmission.getTitle();
-        author = customSubmission.getAuthor();
-        timestamp = customSubmission.getCreated();
-        commentCount = String.valueOf(customSubmission.getCommentCount());
-        score = String.valueOf(customSubmission.getScore());
-        selfTextHtml = customSubmission.getSelfTextHtml();
-        domain = customSubmission.getDomain();
-        url = customSubmission.getUrl();
-        isSelf = customSubmission.isSelfPost();
-        isStickied = customSubmission.isStickied();
-        isSaved = customSubmission.isSaved();
-        vote = customSubmission.getVoteDirection();
+        title = submissionWrapper.getTitle();
+        author = submissionWrapper.getAuthor();
+        timestamp = submissionWrapper.getCreated();
+        commentCount = String.valueOf(submissionWrapper.getCommentCount());
+        score = String.valueOf(submissionWrapper.getScore());
+        selfTextHtml = submissionWrapper.getSelfTextHtml();
+        domain = submissionWrapper.getDomain();
+        url = submissionWrapper.getUrl();
+        isSelf = submissionWrapper.isSelfPost();
+        isStickied = submissionWrapper.isStickied();
+        isSaved = submissionWrapper.isSaved();
+        vote = submissionWrapper.getVoteDirection();
 
-        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl =
-                Utilities.getThumbnailToShowFromCustomSubmission(customSubmission);
+        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl = Utilities
+                .getThumbnailToShowFromCustomSubmission(submissionWrapper);
         thumbnailToShow = thumbnailTypeUrl.isPresent() ? thumbnailTypeUrl.get().second : null;
 
         // Bind data to views.
@@ -191,25 +191,25 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         btnUpvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         setNoVoteColors(context);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         setUpvotedColors(context);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         setUpvotedColors(context);
                     }
                 }
@@ -219,25 +219,25 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         btnDownvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         setNoVoteColors(context);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE){
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         setDownvotedColors(context);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         setDownvotedColors(context);
                     }
                 }
@@ -247,19 +247,19 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.isSaved()) {
-                    submissionClickListener.onSaveSubmission(customSubmission,
+                if (submissionWrapper.isSaved()) {
+                    submissionClickListener.onSaveSubmission(submissionWrapper,
                             false);
                     if (redditAuthentication.isUserLoggedIn()) {
                         setUnsavedIcon();
-                        customSubmission.setSaved(false);
+                        submissionWrapper.setSaved(false);
                     }
                 } else {
-                    submissionClickListener.onSaveSubmission(customSubmission,
+                    submissionClickListener.onSaveSubmission(submissionWrapper,
                             true);
                     if (redditAuthentication.isUserLoggedIn()) {
                         setSavedIcon();
-                        customSubmission.setSaved(true);
+                        submissionWrapper.setSaved(true);
                     }
                 }
             }
@@ -284,7 +284,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             headerLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    submissionClickListener.onSubmissionClick(customSubmission);
+                    submissionClickListener.onSubmissionClick(submissionWrapper);
                 }
             });
         }

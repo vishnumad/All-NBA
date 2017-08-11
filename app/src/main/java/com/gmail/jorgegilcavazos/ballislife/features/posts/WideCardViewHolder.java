@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.CustomSubmission;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
 import io.reactivex.subjects.PublishSubject;
 
 /**
- * Holder that binds Reddit {@link CustomSubmission} data to it's view.
+ * Holder that binds Reddit {@link SubmissionWrapper} data to it's view.
  * TODO: Refactor to user PublishSubject instead of listeners for all click actions.
  */
 public class WideCardViewHolder extends RecyclerView.ViewHolder {
@@ -75,25 +75,25 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindData(final Context context,
-                         RedditAuthentication redditAuthentication,
-                         final CustomSubmission customSubmission,
+                         RedditAuthentication redditAuthentication, final SubmissionWrapper
+                                 submissionWrapper,
                          final OnSubmissionClickListener submissionClickListener,
                          final PublishSubject<Submission> shareSubject) {
-        String title = customSubmission.getTitle();
-        String author = customSubmission.getAuthor();
-        long timestamp = customSubmission.getCreated();
-        int commentCount = customSubmission.getCommentCount();
-        int score = customSubmission.getScore();
-        String selfTextHtml = customSubmission.getSelfTextHtml();
-        String domain = customSubmission.getDomain();
-        String url = customSubmission.getUrl();
-        boolean isSelf = customSubmission.isSelfPost();
-        boolean isStickied = customSubmission.isStickied();
-        boolean isSaved = customSubmission.isSaved();
-        VoteDirection vote = customSubmission.getVoteDirection();
+        String title = submissionWrapper.getTitle();
+        String author = submissionWrapper.getAuthor();
+        long timestamp = submissionWrapper.getCreated();
+        int commentCount = submissionWrapper.getCommentCount();
+        int score = submissionWrapper.getScore();
+        String selfTextHtml = submissionWrapper.getSelfTextHtml();
+        String domain = submissionWrapper.getDomain();
+        String url = submissionWrapper.getUrl();
+        boolean isSelf = submissionWrapper.isSelfPost();
+        boolean isStickied = submissionWrapper.isStickied();
+        boolean isSaved = submissionWrapper.isSaved();
+        VoteDirection vote = submissionWrapper.getVoteDirection();
 
         Optional<Pair<ThumbnailType, String>> thumbnailTypeUrl = Utilities
-                .getThumbnailToShowFromCustomSubmission(customSubmission);
+                .getThumbnailToShowFromCustomSubmission(submissionWrapper);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             tvTitle.setText(Html.fromHtml(title, Html.FROM_HTML_MODE_LEGACY));
@@ -170,14 +170,14 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
             setUnsavedIcon();
         }
 
-        initSaveBtnListener(redditAuthentication, customSubmission, submissionClickListener);
-        initShareBtnListener(customSubmission.getSubmission(), shareSubject);
-        initUpvoteBtnListener(context, redditAuthentication, customSubmission,
+        initSaveBtnListener(redditAuthentication, submissionWrapper, submissionClickListener);
+        initShareBtnListener(submissionWrapper.getSubmission(), shareSubject);
+        initUpvoteBtnListener(context, redditAuthentication, submissionWrapper,
                 submissionClickListener);
-        initDownvoteBtnListener(context, redditAuthentication, customSubmission,
+        initDownvoteBtnListener(context, redditAuthentication, submissionWrapper,
                 submissionClickListener);
         initThumbnailListener(url, submissionClickListener);
-        initContainerListener(customSubmission, submissionClickListener);
+        initContainerListener(submissionWrapper, submissionClickListener);
     }
 
     private void setUpvotedColors(Context context) {
@@ -222,23 +222,23 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
         btnSave.setImageResource(R.drawable.ic_bookmark_border_black_18dp);
     }
 
-    private void initSaveBtnListener(final RedditAuthentication redditAuthentication,
-                                     final CustomSubmission customSubmission,
+    private void initSaveBtnListener(final RedditAuthentication redditAuthentication, final
+    SubmissionWrapper submissionWrapper,
                                      final OnSubmissionClickListener submissionClickListener) {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.isSaved()) {
-                    submissionClickListener.onSaveSubmission(customSubmission, false);
+                if (submissionWrapper.isSaved()) {
+                    submissionClickListener.onSaveSubmission(submissionWrapper, false);
                     if (redditAuthentication.isUserLoggedIn()) {
                         setUnsavedIcon();
-                        customSubmission.setSaved(false);
+                        submissionWrapper.setSaved(false);
                     }
                 } else {
-                    submissionClickListener.onSaveSubmission(customSubmission, true);
+                    submissionClickListener.onSaveSubmission(submissionWrapper, true);
                     if (redditAuthentication.isUserLoggedIn()) {
                         setSavedIcon();
-                        customSubmission.setSaved(true);
+                        submissionWrapper.setSaved(true);
                     }
                 }
             }
@@ -246,31 +246,30 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void initUpvoteBtnListener(final Context context,
-                                       final RedditAuthentication redditAuthentication,
-                                       final CustomSubmission customSubmission,
+                                       final RedditAuthentication redditAuthentication, final SubmissionWrapper submissionWrapper,
                                        final OnSubmissionClickListener submissionClickListener) {
         btnUpvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         setNoVoteColors(context);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         setUpvotedColors(context);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.UPVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.UPVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                         setUpvotedColors(context);
                     }
                 }
@@ -279,31 +278,30 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void initDownvoteBtnListener(final Context context,
-                                         final RedditAuthentication redditAuthentication,
-                                         final CustomSubmission customSubmission,
+                                         final RedditAuthentication redditAuthentication, final SubmissionWrapper submissionWrapper,
                                          final OnSubmissionClickListener submissionClickListener) {
         btnDownvote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (customSubmission.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.NO_VOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.NO_VOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                         setNoVoteColors(context);
                     }
-                } else if (customSubmission.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         setDownvotedColors(context);
                     }
                 } else {
-                    submissionClickListener.onVoteSubmission(customSubmission,
+                    submissionClickListener.onVoteSubmission(submissionWrapper,
                             VoteDirection.DOWNVOTE);
                     if (redditAuthentication.isUserLoggedIn()) {
-                        customSubmission.setVoteDirection(VoteDirection.DOWNVOTE);
+                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                         setDownvotedColors(context);
                     }
                 }
@@ -337,12 +335,12 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    private void initContainerListener(final CustomSubmission customSubmission,
+    private void initContainerListener(final SubmissionWrapper submissionWrapper,
                                        final OnSubmissionClickListener submissionClickListener) {
         layoutContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submissionClickListener.onSubmissionClick(customSubmission);
+                submissionClickListener.onSubmissionClick(submissionWrapper);
             }
         });
     }

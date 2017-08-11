@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Wraps a {@link Submission} to allow mutation.
  */
-public class CustomSubmission implements Serializable {
+public class SubmissionWrapper implements Serializable {
 
     private String id;
     private Submission submission;
@@ -27,10 +27,10 @@ public class CustomSubmission implements Serializable {
     private String selfTextHtml;
     private String url;
 
-    public CustomSubmission() {
+    public SubmissionWrapper() {
     }
 
-    public CustomSubmission(Submission submission) {
+    public SubmissionWrapper(Submission submission) {
         this.submission = submission;
         id = submission.getId();
         title = submission.getTitle();
