@@ -2,7 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.repository.posts;
 
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 
 import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;

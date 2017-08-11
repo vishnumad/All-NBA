@@ -23,7 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;

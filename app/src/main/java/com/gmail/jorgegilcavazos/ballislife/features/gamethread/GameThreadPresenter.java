@@ -8,7 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;

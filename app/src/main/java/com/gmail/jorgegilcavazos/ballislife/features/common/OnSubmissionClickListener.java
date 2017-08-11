@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.common;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 
 import net.dean.jraw.models.VoteDirection;
 

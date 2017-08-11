@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.submissions
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper
 import javax.inject.Inject
 import javax.inject.Singleton
 

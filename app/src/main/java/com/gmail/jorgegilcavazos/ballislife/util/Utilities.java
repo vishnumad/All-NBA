@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.google.common.base.Optional;
 
 import net.dean.jraw.models.Submission;

@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.model.wrapper;
+package com.gmail.jorgegilcavazos.ballislife.features.model;
 
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;

@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.wrapper.SubmissionWrapper;
 
 import java.util.List;
 
