@@ -56,25 +56,24 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         disposables = new CompositeDisposable();
     }
 
-    public void loadComments(String threadId, CommentSort sorting) {
-        loadComments(threadId, sorting, null);
+    public void loadComments(String threadId, CommentSort sorting, boolean forceReload) {
+        loadComments(threadId, sorting, null, forceReload);
     }
 
-    public void loadComments(String threadId, CommentSort sorting, final String commentIdToScroll) {
+    public void loadComments(String threadId, CommentSort sorting, final String
+            commentIdToScroll, boolean forceReload) {
         view.hideFab();
         view.setLoadingIndicator(true);
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditService.getSubmission(redditAuthentication.getRedditClient(),
-                        threadId, sorting))
+        disposables.add(redditAuthentication.authenticate(redditPrefs).andThen(submissionRepository.getSubmission(threadId, sorting, forceReload))
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<Submission>() {
+                .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<SubmissionWrapper>() {
                     @Override
-                    public void onSuccess(Submission submission) {
+                    public void onSuccess(SubmissionWrapper submissionWrapper) {
                         int i = 0;
                         int indexToScrollTo = 0;
 
-                        Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                        Iterable<CommentNode> iterable = submissionWrapper.submission.getComments
+                                ().walkTree();
                         List<CommentNode> commentNodes = new ArrayList<>();
                         for (CommentNode node : iterable) {
                             commentNodes.add(node);
@@ -85,9 +84,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                             i++;
                         }
 
-                        SubmissionWrapper submissionWrapper = new SubmissionWrapper(submission);
-                        submissionRepository.saveSubmission(submissionWrapper);
-                        view.showComments(commentNodes, submission);
+                        view.showComments(commentNodes, submissionWrapper.submission);
                         view.setLoadingIndicator(false);
                         view.showFab();
 
@@ -257,8 +254,11 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
 
     public void onReplyToComment(final int position, final String submissionId, final String
             commentFullName, final String text) {
-        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
-        Optional<CommentNode> parent = submissionWrapper.getSubmission().getComments().walkTree()
+        Optional<Submission> submission = submissionRepository.getCachedSubmission(submissionId);
+        if (!submission.isPresent()) {
+            throw new IllegalStateException("A cached submission should've been available.");
+        }
+        Optional<CommentNode> parent = submission.get().getComments().walkTree()
                 .firstMatch(node -> node.getComment().getFullName().equals(commentFullName));
         if (!parent.isPresent()) {
             throw new IllegalStateException("Could not find comment to reply to.");
@@ -313,9 +313,9 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onReplyToThread(final String text, final String submissionId) {
-        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
-        if (submissionWrapper == null) {
-            throw new IllegalStateException("Could not get submission from repository");
+        Optional<Submission> submission = submissionRepository.getCachedSubmission(submissionId);
+        if (!submission.isPresent()) {
+            throw new IllegalStateException("A cached submission should've been available.");
         }
 
         view.showSavingToast();
@@ -323,7 +323,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn) -> {
                     if (loggedIn) {
                         return redditService.replyToThread(redditAuthentication.getRedditClient()
-                                , submissionRepository.getSubmission(submissionWrapper.getId()).getSubmission(), text);
+                                , submission.get(), text);
                     } else {
                         throw new NotLoggedInException();
                     }
@@ -331,7 +331,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment(redditAuthentication.getRedditClient(), submissionWrapper.getId(), commentId))
+                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment
+                        (redditAuthentication.getRedditClient(), submissionId, commentId))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {

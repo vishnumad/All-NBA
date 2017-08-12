@@ -158,7 +158,7 @@ public class GameThreadFragment extends Fragment
         presenter = new GameThreadPresenter(this, redditService, submissionRepository, gameDate,
                 preferences, redditAuthentication);
         presenter.start();
-        presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+        presenter.loadComments(threadType, homeTeam, awayTeam, stream, false /* forceReload */);
 
         if (savedInstanceState != null) {
             commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
@@ -200,7 +200,8 @@ public class GameThreadFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+                presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
+                forceReload */);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -208,7 +209,7 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+        presenter.loadComments(threadType, homeTeam, awayTeam, stream, true  /* forceReload */);
     }
 
     @Override
@@ -344,11 +345,12 @@ public class GameThreadFragment extends Fragment
                 streamSwitch.setChecked(false);
             } else {
                 stream = true;
-                presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+                presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
+                forceReload */);
             }
         } else {
             stream = false;
-            presenter.loadComments(threadType, homeTeam, awayTeam, stream);
+            presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /* forceReload */);
         }
     }
 }

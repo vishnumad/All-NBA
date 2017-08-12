@@ -8,7 +8,6 @@ import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
@@ -21,6 +20,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
+import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
 import java.util.ArrayList;
@@ -78,8 +78,8 @@ public class GameThreadPresenter {
         gameThreadsService = retrofit.create(RedditGameThreadsService.class);
     }
 
-    public void loadComments(final String type, final String homeTeamAbbr,
-                             final String awayTeamAbbr, boolean stream) {
+    public void loadComments(final String type, final String homeTeamAbbr, final String
+            awayTeamAbbr, boolean stream, boolean forceReload) {
 
         view.setLoadingIndicator(true);
         view.hideComments();
@@ -110,12 +110,11 @@ public class GameThreadPresenter {
                         default:
                             throw new IllegalStateException("Thread type should be new or top");
                     }
-                    return redditService.getSubmission(redditAuthentication.getRedditClient(),
-                            threadId, sort);
-                }).flatMap((submission) -> {
-                    submissionRepository.saveSubmission(new SubmissionWrapper(submission));
-                    view.setSubmissionId(submission.getId());
-                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                    return submissionRepository.getSubmission(threadId, sort, forceReload);
+                }).flatMap((submissionWrapper) -> {
+                    view.setSubmissionId(submissionWrapper.getId());
+                    Iterable<CommentNode> iterable = submissionWrapper.submission.getComments()
+                            .walkTree();
                     List<CommentNode> commentNodes = new ArrayList<>();
                     for (CommentNode node : iterable) {
                         commentNodes.add(node);
@@ -230,9 +229,14 @@ public class GameThreadPresenter {
         }));
     }
 
-    public void reply(final int position, final String submissionId, final String commentFullName, final String text) {
-        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
-        Optional<CommentNode> parent = submissionWrapper.getSubmission().getComments().walkTree().firstMatch(node -> node.getComment().getFullName().equals(commentFullName));
+    public void reply(final int position, final String submissionId, final String
+            commentFullName, final String text) {
+        Optional<Submission> submission = submissionRepository.getCachedSubmission(submissionId);
+        if (!submission.isPresent()) {
+            throw new IllegalStateException("A cached submission should've been available.");
+        }
+        Optional<CommentNode> parent = submission.get().getComments().walkTree().firstMatch(node
+                -> node.getComment().getFullName().equals(commentFullName));
         if (!parent.isPresent()) {
             throw new IllegalStateException("Could not find comment to reply to.");
         }
@@ -250,7 +254,8 @@ public class GameThreadPresenter {
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment(redditAuthentication.getRedditClient(), submissionId, commentId))
+                .delay(4, TimeUnit.SECONDS).flatMap(commentId -> redditService.getComment
+                        (redditAuthentication.getRedditClient(), submissionId, commentId))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
@@ -281,9 +286,9 @@ public class GameThreadPresenter {
     }
 
     public void replyToThread(final String text, final String submissionId) {
-        SubmissionWrapper submissionWrapper = submissionRepository.getSubmission(submissionId);
-        if (submissionWrapper == null) {
-            throw new IllegalStateException("Could not get submission from repository");
+        Optional<Submission> submission = submissionRepository.getCachedSubmission(submissionId);
+        if (!submission.isPresent()) {
+            throw new IllegalStateException("A cached submission should've been available.");
         }
 
         view.showSavingToast();
@@ -293,7 +298,8 @@ public class GameThreadPresenter {
                         throw new NotLoggedInException();
                     }
                     return Completable.complete();
-                }).andThen(redditService.replyToThread(redditAuthentication.getRedditClient(), submissionWrapper.getSubmission(), text))
+                }).andThen(redditService.replyToThread(redditAuthentication.getRedditClient(),
+                        submission.get(), text))
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.º

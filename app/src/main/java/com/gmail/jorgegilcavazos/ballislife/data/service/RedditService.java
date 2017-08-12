@@ -31,14 +31,6 @@ public interface RedditService {
     Single<List<Contribution>> getUserContributions(UserContributionPaginator paginator);
 
     /**
-     * Returns an Rx Single that emits a list all the comments in a submission.
-     *
-     * @param threadId the id of the submission to fetch comments of
-     * @param type     either RedditUtils.LIVE_GT_TYPE or RedditUtils.POST_GT_TYPE
-     */
-    Single<List<CommentNode>> getComments(RedditClient redditClient, String threadId, String type);
-
-    /**
      * Returns an Rx Single that emits the data of a full comment given its id and the id of the
      * submission it belongs to.
      */

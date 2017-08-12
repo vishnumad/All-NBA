@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.service;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
@@ -52,50 +51,6 @@ public class RedditServiceImpl implements RedditService {
             public void subscribe(SingleEmitter<List<Contribution>> e) throws Exception {
                 try {
                     e.onSuccess(new ArrayList<>(paginator.next()));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public Single<List<CommentNode>> getComments(
-            final RedditClient redditClient,
-            final String threadId,
-            final String type) {
-        return Single.create(new SingleOnSubscribe<List<CommentNode>>() {
-            @Override
-            public void subscribe(SingleEmitter<List<CommentNode>> e) throws Exception {
-                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
-                switch (type) {
-                    case RedditUtils.LIVE_GT_TYPE:
-                        builder.sort(CommentSort.NEW);
-                        break;
-                    case RedditUtils.POST_GT_TYPE:
-                        builder.sort(CommentSort.TOP);
-                        break;
-                    default:
-                        builder.sort(CommentSort.TOP);
-                        break;
-                }
-
-                SubmissionRequest submissionRequest = builder.build();
-                Submission submission = null;
-                try {
-                    submission = redditClient.getSubmission(submissionRequest);
-
-                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
-                    List<CommentNode> commentNodes = new ArrayList<>();
-                    for (CommentNode node : iterable) {
-                        commentNodes.add(node);
-                    }
-
-                    if (!e.isDisposed()) {
-                        e.onSuccess(commentNodes);
-                    }
                 } catch (Exception ex) {
                     if (!e.isDisposed()) {
                         e.onError(ex);
@@ -252,7 +207,6 @@ public class RedditServiceImpl implements RedditService {
                 }
 
                 SubmissionRequest submissionRequest = builder.build();
-
                 try {
                     e.onSuccess(redditClient.getSubmission(submissionRequest));
                 } catch (Exception ex) {

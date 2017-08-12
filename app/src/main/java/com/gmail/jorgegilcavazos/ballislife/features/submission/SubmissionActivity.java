@@ -116,7 +116,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         });
 
         presenter.attachView(this);
-        presenter.loadComments(threadId, sorting, commentIdToScroll);
+        presenter.loadComments(threadId, sorting, commentIdToScroll, false /* forceReload */);
 
         if (savedInstanceState != null) {
             commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
@@ -153,27 +153,27 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
                 return true;
             case R.id.action_sort_hot:
                 sorting = CommentSort.HOT;
-                presenter.loadComments(threadId, sorting);
+                presenter.loadComments(threadId, sorting, true /* forceReload */);
                 getSupportActionBar().setSubtitle("HOT");
                 return true;
             case R.id.action_sort_new:
                 sorting = CommentSort.NEW;
-                presenter.loadComments(threadId, sorting);
+                presenter.loadComments(threadId, sorting, true /* forceReload */);
                 getSupportActionBar().setSubtitle("NEW");
                 return true;
             case R.id.action_sort_old:
                 sorting = CommentSort.OLD;
-                presenter.loadComments(threadId, sorting);
+                presenter.loadComments(threadId, sorting, true /* forceReload */);
                 getSupportActionBar().setSubtitle("OLD");
                 return true;
             case R.id.action_sort_controversial:
                 sorting = CommentSort.CONTROVERSIAL;
-                presenter.loadComments(threadId, sorting);
+                presenter.loadComments(threadId, sorting, true /* forceReload */);
                 getSupportActionBar().setSubtitle("CONTROVERSIAL");
                 return true;
             case R.id.action_sort_top:
                 sorting = CommentSort.TOP;
-                presenter.loadComments(threadId, sorting);
+                presenter.loadComments(threadId, sorting, true /* forceReload */);
                 getSupportActionBar().setSubtitle("TOP");
                 return true;
         }
@@ -294,7 +294,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(threadId, sorting);
+        presenter.loadComments(threadId, sorting, true /* forceReload */);
     }
 
     @Override
