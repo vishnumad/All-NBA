@@ -135,7 +135,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         });
 
         if (isSelf) {
-            if (!isDisplayedInList) {
+            if (!isDisplayedInList && selfTextHtml != null) {
                 tvBody.setVisibility(View.VISIBLE);
                 tvBody.setText(RedditUtils.bindSnuDown(selfTextHtml));
             } else {
