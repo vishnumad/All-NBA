@@ -188,7 +188,7 @@ public class ProfileActivity extends AppCompatActivity
         Bundle extras = new Bundle();
         extras.putString(SubmissionActivity.KEY_TITLE, getString(R.string.profile));
         extras.putString(Constants.THREAD_ID, submissionId);
-        extras.putString(SubmissionActivity.KEY_COMMENT_TO_SCROLL, commentId);
+        extras.putString(SubmissionActivity.KEY_COMMENT_TO_SCROLL_ID, commentId);
         intent.putExtras(extras);
         startActivity(intent);
     }

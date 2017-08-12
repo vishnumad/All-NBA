@@ -50,7 +50,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private static final String KEY_COMMENT_TO_REPLY_POS = "CommentToReplyPos";
     private static final String KEY_COMMENT_TO_REPLY_FULL_NAME = "CommentToReplyFullName";
     public static final String KEY_TITLE = "Title";
-    public static final String KEY_COMMENT_TO_SCROLL = "CommentToScroll";
+    public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
+
     @Inject
     RedditAuthentication redditAuthentication;
 
@@ -64,11 +65,12 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     private String threadId;
     private String title;
-    private String commentIdToScroll;
+    private String commentIdToScrollTo;
 
     private int commentToReplyToPos = -1;
     private String commentToReplyToFullName;
 
+    private LinearLayoutManager linearLayoutManager;
     private ThreadAdapter threadAdapter;
 
     private CommentSort sorting = CommentSort.TOP;
@@ -90,7 +92,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
             title = extras.getString(KEY_TITLE);
-            commentIdToScroll = extras.getString(KEY_COMMENT_TO_SCROLL);
+            commentIdToScrollTo = extras.getString(KEY_COMMENT_TO_SCROLL_ID);
         }
 
         setTitle(title);
@@ -102,7 +104,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         threadAdapter.setCommentClickListener(this);
         threadAdapter.setSubmissionClickListener(this);
 
-        submissionRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        submissionRecyclerView.setLayoutManager(linearLayoutManager);
         submissionRecyclerView.setAdapter(threadAdapter);
         submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -115,13 +118,14 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
             }
         });
 
-        presenter.attachView(this);
-        presenter.loadComments(threadId, sorting, commentIdToScroll, false /* forceReload */);
-
         if (savedInstanceState != null) {
             commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
             commentToReplyToFullName = savedInstanceState.getString(KEY_COMMENT_TO_REPLY_FULL_NAME);
+            commentIdToScrollTo = savedInstanceState.getString(KEY_COMMENT_TO_SCROLL_ID);
         }
+
+        presenter.attachView(this);
+        presenter.loadComments(threadId, sorting, commentIdToScrollTo, false /* forceReload */);
     }
 
     @Override
@@ -136,6 +140,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_COMMENT_TO_REPLY_POS, commentToReplyToPos);
         outState.putString(KEY_COMMENT_TO_REPLY_FULL_NAME, commentToReplyToFullName);
+        outState.putString(KEY_COMMENT_TO_SCROLL_ID, commentIdToScrollTo);
     }
 
     @Override
@@ -241,6 +246,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     public void openReplyToCommentActivity(final int position, final Comment parentComment) {
         commentToReplyToFullName = parentComment.getFullName();
         commentToReplyToPos = position;
+        commentIdToScrollTo = parentComment.getId();
 
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
         Bundle extras = new Bundle();

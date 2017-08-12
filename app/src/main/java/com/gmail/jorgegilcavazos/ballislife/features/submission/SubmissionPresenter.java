@@ -64,7 +64,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             commentIdToScroll, boolean forceReload) {
         view.hideFab();
         view.setLoadingIndicator(true);
-        disposables.add(redditAuthentication.authenticate(redditPrefs).andThen(submissionRepository.getSubmission(threadId, sorting, forceReload))
+        disposables.add(redditAuthentication.authenticate(redditPrefs).andThen
+                (submissionRepository.getSubmission(threadId, sorting, forceReload))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<SubmissionWrapper>() {
                     @Override
