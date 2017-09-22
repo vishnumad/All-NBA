@@ -39,6 +39,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -47,6 +48,8 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
+    @BindView(R.id.mainAppBarLayout) AppBarLayout appBarLayout;
     Toolbar toolbar;
     ActionBar actionBar;
     DrawerLayout drawerLayout;
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         BallIsLifeApplication.getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {
@@ -416,6 +421,9 @@ public class MainActivity extends AppCompatActivity {
     public void setGamesFragment() {
         setTitle("Games");
         getSupportActionBar().setSubtitle(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setElevation(0);
+        }
 
         GamesFragment gamesFragment = null;
         if (selectedFragment == GAMES_FRAGMENT_ID) {
@@ -436,6 +444,9 @@ public class MainActivity extends AppCompatActivity {
     public void setStandingsFragment() {
         setTitle("Standings");
         getSupportActionBar().setSubtitle(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
+        }
 
         StandingsFragment standingsFragment = null;
         if (selectedFragment == STANDINGS_FRAGMENT_ID) {
@@ -456,6 +467,9 @@ public class MainActivity extends AppCompatActivity {
     public void setPostsFragment(String subreddit) {
         setTitle("r/" + subreddit);
         getSupportActionBar().setSubtitle(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
+        }
 
         PostsFragment postsFragment = null;
         if (selectedFragment == POSTS_FRAGMENT_ID) {
@@ -478,6 +492,9 @@ public class MainActivity extends AppCompatActivity {
     public void setHighlightsFragment() {
         setTitle("Highlights");
         getSupportActionBar().setSubtitle(null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
+        }
 
         HighlightsFragment highlightsFragment = null;
         if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
