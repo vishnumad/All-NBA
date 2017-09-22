@@ -18,6 +18,7 @@ import java.util.Collections;
 
 import io.reactivex.Single;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -114,6 +115,22 @@ public class GamesPresenterTest {
         verify(mockView).setLoadingIndicator(false);
         verify(mockView).showSnackbar(true);
         verifyNoMoreInteractions(mockRepository);
+    }
+
+    @Test
+    public void openGameDetailsOnClick() {
+        NbaGame nbaGame = new NbaGame();
+        Calendar calendar = Calendar.getInstance();
+        presenter.openGameDetails(nbaGame, calendar);
+
+        verify(mockView).showGameDetails(nbaGame, calendar);
+    }
+
+    @Test
+    public void updateScoresOnGameDataChanged() {
+        presenter.updateGames("[]", Calendar.getInstance());
+
+        verify(mockView).updateScores(anyList());
     }
 
     @Test
