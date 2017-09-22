@@ -248,171 +248,167 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUpDrawerContent() {
-        navigationView.setNavigationItemSelectedListener(new NavigationView
-                .OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                switch (menuItem.getItemId()) {
-                    case R.id.navigation_item_1:
-                        setGamesFragment();
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.navigation_item_2:
-                        setStandingsFragment();
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.navigation_item_3:
-                        setPostsFragment("NBA");
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.navigation_item_4:
-                        setHighlightsFragment();
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.navigation_item_7:
-                        // Start LoginActivity if no user is already logged in.
-                        if (!redditAuthentication.isUserLoggedIn()) {
-                            Intent loginIntent = new Intent(getApplicationContext(),
-                                    LoginActivity.class);
-                            startActivity(loginIntent);
-                        } else {
-                            Intent profileIntent = new Intent(getApplicationContext(),
-                                    ProfileActivity.class);
-                            startActivity(profileIntent);
-                        }
-                        return true;
-                    case R.id.navigation_item_9:
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        Intent settingsIntent = new Intent(getApplicationContext(),
-                                SettingsActivity.class);
-                        startActivity(settingsIntent);
-                        return true;
-                    case R.id.nav_atl:
-                        setPostsFragment(Constants.SUB_ATL);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_bkn:
-                        setPostsFragment(Constants.SUB_BKN);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_bos:
-                        setPostsFragment(Constants.SUB_BOS);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_cha:
-                        setPostsFragment(Constants.SUB_CHA);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_chi:
-                        setPostsFragment(Constants.SUB_CHI);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_cle:
-                        setPostsFragment(Constants.SUB_CLE);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_dal:
-                        setPostsFragment(Constants.SUB_DAL);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_den:
-                        setPostsFragment(Constants.SUB_DEN);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_det:
-                        setPostsFragment(Constants.SUB_DET);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_gsw:
-                        setPostsFragment(Constants.SUB_GSW);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_hou:
-                        setPostsFragment(Constants.SUB_HOU);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_ind:
-                        setPostsFragment(Constants.SUB_IND);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_lac:
-                        setPostsFragment(Constants.SUB_LAC);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_lal:
-                        setPostsFragment(Constants.SUB_LAL);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_mem:
-                        setPostsFragment(Constants.SUB_MEM);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_mia:
-                        setPostsFragment(Constants.SUB_MIA);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_mil:
-                        setPostsFragment(Constants.SUB_MIL);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_min:
-                        setPostsFragment(Constants.SUB_MIN);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_nop:
-                        setPostsFragment(Constants.SUB_NOP);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_nyk:
-                        setPostsFragment(Constants.SUB_NYK);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_okc:
-                        setPostsFragment(Constants.SUB_OKC);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_orl:
-                        setPostsFragment(Constants.SUB_ORL);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_phi:
-                        setPostsFragment(Constants.SUB_PHI);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_pho:
-                        setPostsFragment(Constants.SUB_PHO);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_por:
-                        setPostsFragment(Constants.SUB_POR);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_sac:
-                        setPostsFragment(Constants.SUB_SAC);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_sas:
-                        setPostsFragment(Constants.SUB_SAS);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_tor:
-                        setPostsFragment(Constants.SUB_TOR);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_uta:
-                        setPostsFragment(Constants.SUB_UTA);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    case R.id.nav_was:
-                        setPostsFragment(Constants.SUB_WAS);
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                    default:
-                        setGamesFragment();
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                        return true;
-                }
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            menuItem.setChecked(true);
+            switch (menuItem.getItemId()) {
+                case R.id.navigation_item_1:
+                    setGamesFragment();
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.navigation_item_2:
+                    setStandingsFragment();
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.navigation_item_3:
+                    setPostsFragment("NBA");
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.navigation_item_4:
+                    setHighlightsFragment();
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.navigation_item_7:
+                    // Start LoginActivity if no user is already logged in.
+                    if (!redditAuthentication.isUserLoggedIn()) {
+                        Intent loginIntent = new Intent(getApplicationContext(), LoginActivity
+                                .class);
+                        startActivity(loginIntent);
+                    } else {
+                        Intent profileIntent = new Intent(getApplicationContext(),
+                                ProfileActivity.class);
+                        startActivity(profileIntent);
+                    }
+                    return true;
+                case R.id.navigation_item_9:
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity
+                            .class);
+                    startActivity(settingsIntent);
+                    return true;
+                case R.id.nav_atl:
+                    setPostsFragment(Constants.SUB_ATL);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_bkn:
+                    setPostsFragment(Constants.SUB_BKN);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_bos:
+                    setPostsFragment(Constants.SUB_BOS);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_cha:
+                    setPostsFragment(Constants.SUB_CHA);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_chi:
+                    setPostsFragment(Constants.SUB_CHI);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_cle:
+                    setPostsFragment(Constants.SUB_CLE);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_dal:
+                    setPostsFragment(Constants.SUB_DAL);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_den:
+                    setPostsFragment(Constants.SUB_DEN);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_det:
+                    setPostsFragment(Constants.SUB_DET);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_gsw:
+                    setPostsFragment(Constants.SUB_GSW);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_hou:
+                    setPostsFragment(Constants.SUB_HOU);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_ind:
+                    setPostsFragment(Constants.SUB_IND);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_lac:
+                    setPostsFragment(Constants.SUB_LAC);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_lal:
+                    setPostsFragment(Constants.SUB_LAL);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_mem:
+                    setPostsFragment(Constants.SUB_MEM);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_mia:
+                    setPostsFragment(Constants.SUB_MIA);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_mil:
+                    setPostsFragment(Constants.SUB_MIL);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_min:
+                    setPostsFragment(Constants.SUB_MIN);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_nop:
+                    setPostsFragment(Constants.SUB_NOP);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_nyk:
+                    setPostsFragment(Constants.SUB_NYK);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_okc:
+                    setPostsFragment(Constants.SUB_OKC);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_orl:
+                    setPostsFragment(Constants.SUB_ORL);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_phi:
+                    setPostsFragment(Constants.SUB_PHI);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_pho:
+                    setPostsFragment(Constants.SUB_PHO);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_por:
+                    setPostsFragment(Constants.SUB_POR);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_sac:
+                    setPostsFragment(Constants.SUB_SAC);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_sas:
+                    setPostsFragment(Constants.SUB_SAS);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_tor:
+                    setPostsFragment(Constants.SUB_TOR);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_uta:
+                    setPostsFragment(Constants.SUB_UTA);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.nav_was:
+                    setPostsFragment(Constants.SUB_WAS);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                default:
+                    setGamesFragment();
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
             }
         });
     }
@@ -505,7 +501,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         View headerView = navigationView.getHeaderView(0);
-        TextView redditUsername = (TextView) headerView.findViewById(R.id.redditUsername);
+        TextView redditUsername = headerView.findViewById(R.id.redditUsername);
 
         String username = localRepository.getUsername();
         if (username != null) {

@@ -113,7 +113,7 @@ public class GameThreadPresenter {
                     return submissionRepository.getSubmission(threadId, sort, forceReload);
                 }).flatMap((submissionWrapper) -> {
                     view.setSubmissionId(submissionWrapper.getId());
-                    Iterable<CommentNode> iterable = submissionWrapper.submission.getComments()
+                    Iterable<CommentNode> iterable = submissionWrapper.getSubmission().getComments()
                             .walkTree();
                     List<CommentNode> commentNodes = new ArrayList<>();
                     for (CommentNode node : iterable) {

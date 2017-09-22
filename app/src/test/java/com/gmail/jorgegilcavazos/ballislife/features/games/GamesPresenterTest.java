@@ -88,8 +88,7 @@ public class GamesPresenterTest {
     @Test
     public void testLoadFirstAvailable_cacheEmptyWithNoGamesFromNetwork() {
         when(mockRepository.getCachedGames(anyString())).thenReturn(null);
-        when(mockRepository.getGames(anyString()))
-                .thenReturn(Single.just(Collections.<NbaGame>emptyList()));
+        when(mockRepository.getGames(anyString())).thenReturn(Single.just(Collections.emptyList()));
 
         presenter.loadFirstAvailable(Calendar.getInstance());
 
@@ -115,5 +114,12 @@ public class GamesPresenterTest {
         verify(mockView).setLoadingIndicator(false);
         verify(mockView).showSnackbar(true);
         verifyNoMoreInteractions(mockRepository);
+    }
+
+    @Test
+    public void onDestroy_hideSnackbar() {
+        presenter.stop();
+
+        verify(mockView).dismissSnackbar();
     }
 }

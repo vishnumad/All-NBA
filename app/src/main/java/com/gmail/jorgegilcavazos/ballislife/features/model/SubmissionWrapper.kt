@@ -9,11 +9,10 @@ import java.io.Serializable
 /**
  * Wraps a [Submission] to allow mutation.
  */
-class SubmissionWrapper : Serializable {
-  lateinit var id: String
-  lateinit var submission: Submission
-  lateinit var title: String
-  lateinit var author: String
+data class SubmissionWrapper(val id: String,
+                             val submission: Submission?,
+                             val title: String,
+                             val author: String) : Serializable {
   var created: Long = 0
   var domain: String? = null
   var isSelfPost: Boolean = false
@@ -28,24 +27,21 @@ class SubmissionWrapper : Serializable {
   var url: String? = null
   var sort: CommentSort? = null
 
-  constructor()
-
-  constructor(submission: Submission) {
-    this.submission = submission
-    id = submission.id
-    title = submission.title
-    author = submission.author
-    created = submission.created.time
-    domain = submission.domain
-    isSelfPost = submission.isSelfPost
-    isStickied = submission.isStickied
-    score = submission.score!!
-    commentCount = submission.commentCount!!
-    thumbnail = submission.thumbnail
-    highResThumbnail = submission.oEmbedMedia?.thumbnail?.url?.toString()
-    voteDirection = submission.vote
-    isSaved = submission.isSaved!!
-    selfTextHtml = submission.data("selftext_html")
-    url = submission.url
+  init {
+    created = submission?.created?.time ?: 0
+    domain = submission?.domain
+    isSelfPost = submission?.isSelfPost == true
+    isStickied = submission?.isStickied == true
+    score = submission?.score ?: 0
+    commentCount = submission?.commentCount ?: 0
+    thumbnail = submission?.thumbnail
+    highResThumbnail = submission?.oEmbedMedia?.thumbnail?.url?.toString()
+    voteDirection = submission?.vote
+    isSaved = submission?.isSaved == true
+    selfTextHtml = submission?.data("selftext_html")
+    url = submission?.url
   }
+
+  constructor(submission: Submission) :
+      this(submission.id, submission, submission.title, submission.author)
 }

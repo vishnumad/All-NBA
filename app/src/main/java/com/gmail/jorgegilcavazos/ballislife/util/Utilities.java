@@ -33,7 +33,8 @@ public final class Utilities {
     }
 
     // Get data from real submission if available, otherwise used data from fake one.
-    public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission(SubmissionWrapper submissionWrapper) {
+    public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission
+    (SubmissionWrapper submissionWrapper) {
         String thumbnail;
         String highResThumbnail;
         if (submissionWrapper.getSubmission() == null) {

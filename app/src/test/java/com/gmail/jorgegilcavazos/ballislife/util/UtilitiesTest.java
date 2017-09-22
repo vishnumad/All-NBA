@@ -46,12 +46,12 @@ public class UtilitiesTest {
 
     @Test
     public void testGetThumbnailToShowFromCustomSubmission() {
-        SubmissionWrapper submissionWrapper = new SubmissionWrapper();
+        SubmissionWrapper submissionWrapper = new SubmissionWrapper("", null, "", "");
         submissionWrapper.setThumbnail("sdThumbnail");
         submissionWrapper.setHighResThumbnail("hdThumbnail");
-        SubmissionWrapper submissionWrapper1 = new SubmissionWrapper();
+        SubmissionWrapper submissionWrapper1 = new SubmissionWrapper("", null, "", "");
         submissionWrapper1.setThumbnail("sdThumbnail");
-        SubmissionWrapper submissionWrapper2 = new SubmissionWrapper();
+        SubmissionWrapper submissionWrapper2 = new SubmissionWrapper("", null, "", "");
 
         Optional<Pair<Utilities.ThumbnailType, String>> optional = Utilities
                 .getThumbnailToShowFromCustomSubmission(submissionWrapper);

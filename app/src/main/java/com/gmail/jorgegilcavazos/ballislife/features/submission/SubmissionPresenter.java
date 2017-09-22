@@ -73,8 +73,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                         int i = 0;
                         int indexToScrollTo = 0;
 
-                        Iterable<CommentNode> iterable = submissionWrapper.submission.getComments
-                                ().walkTree();
+                        Iterable<CommentNode> iterable = submissionWrapper.getSubmission()
+                                .getComments().walkTree();
                         List<CommentNode> commentNodes = new ArrayList<>();
                         for (CommentNode node : iterable) {
                             commentNodes.add(node);
@@ -85,7 +85,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                             i++;
                         }
 
-                        view.showComments(commentNodes, submissionWrapper.submission);
+                        view.showComments(commentNodes, submissionWrapper.getSubmission());
                         view.setLoadingIndicator(false);
                         view.showFab();
 

@@ -94,6 +94,7 @@ public class GamesPresenter extends BasePresenter<GamesView> {
         if (disposables != null) {
             disposables.clear();
         }
+        view.dismissSnackbar();
     }
 
 }
