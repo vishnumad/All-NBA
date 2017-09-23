@@ -441,5 +441,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="would_you_like_to_sign_in">Would you like to sign in to your Reddit account? \n\n Signing in with reddit allows you to vote submissions and comments, reply to other users and save your favorite posts.</string>
+    <string name="log_in_caps">LOG IN</string>
+    <string name="skip">SKIP</string>
 
 </resources>
