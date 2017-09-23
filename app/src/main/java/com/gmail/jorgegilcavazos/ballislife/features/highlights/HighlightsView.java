@@ -23,4 +23,6 @@ public interface HighlightsView {
     void shareHighlight(Highlight highlight);
 
     void changeViewType(int viewType);
+
+    void hideSnackbar();
 }

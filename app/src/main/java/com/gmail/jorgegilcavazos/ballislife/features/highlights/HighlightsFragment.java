@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,8 +24,8 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -67,6 +68,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
+    private Snackbar snackbar;
 
     public HighlightsFragment() {
         // Required empty public constructor.
@@ -206,7 +208,9 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void showErrorLoadingHighlights() {
-        Toast.makeText(getActivity(), R.string.error_loading_highlights, Toast.LENGTH_SHORT).show();
+        snackbar = Snackbar.make(getView(), R.string.error_loading_highlights, Snackbar
+                .LENGTH_SHORT);
+        snackbar.show();
     }
 
     @Override
@@ -239,6 +243,13 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     public void changeViewType(int viewType) {
         highlightAdapter.setContentViewType(viewType);
         setViewIcon(viewType);
+    }
+
+    @Override
+    public void hideSnackbar() {
+        if (snackbar != null) {
+            snackbar.dismiss();
+        }
     }
 
     private void openViewPickerDialog() {

@@ -131,4 +131,10 @@ public class HighlightsPresenterTest {
         verifyNoMoreInteractions(mockView);
     }
 
+    @Test
+    public void onDestroyHideSnackbar() {
+        presenter.stop();
+
+        verify(mockView).hideSnackbar();
+    }
 }

@@ -15,7 +15,6 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
-import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.VoteDirection;
@@ -112,87 +111,96 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
 
         // Set vote buttons colors if there submission has been voted on.
         if (vote == VoteDirection.UPVOTE) {
-            RedditUtils.setUpvotedColors(context, this);
+            setUpvotedColors(itemView.getContext());
         } else if (vote == VoteDirection.DOWNVOTE) {
-            RedditUtils.setDownvotedColors(context, this);
+            setDownvotedColors(itemView.getContext());
         } else {
-            RedditUtils.setNoVoteColors(context, this);
+            setNoVoteColors(itemView.getContext());
         }
 
-        final PostListViewHolder holder = this;
-
-        btnUpvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        RedditUtils.setNoVoteColors(context, holder);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        RedditUtils.setUpvotedColors(context, holder);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        RedditUtils.setUpvotedColors(context, holder);
-                    }
+        btnUpvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(itemView.getContext());
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(itemView.getContext());
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(itemView.getContext());
                 }
             }
         });
 
-        btnDownvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        RedditUtils.setNoVoteColors(context, holder);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        RedditUtils.setDownvotedColors(context, holder);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        RedditUtils.setDownvotedColors(context, holder);
-                    }
+        btnDownvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(itemView.getContext());
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(itemView.getContext());
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(itemView.getContext());
                 }
             }
         });
 
-        thumbnailContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onContentClick(url);
-            }
-        });
+        thumbnailContainer.setOnClickListener(v -> submissionClickListener.onContentClick(url));
 
         if (isDisplayedInList) {
             // Enable buttons to navigate to SubmissionActivity.
-            contentContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onSubmissionClick(submissionWrapper);
-                }
-            });
+            contentContainer.setOnClickListener(v -> submissionClickListener.onSubmissionClick(submissionWrapper));
         }
+    }
 
+    private void setUpvotedColors(Context context) {
+        setUpvoteIcon(true);
+        setDownvoteIcon(false);
+        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
+    }
+
+    private void setDownvotedColors(Context context) {
+        setUpvoteIcon(false);
+        setDownvoteIcon(true);
+        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
+    }
+
+    private void setNoVoteColors(Context context) {
+        setUpvoteIcon(false);
+        setDownvoteIcon(false);
+        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+    }
+
+    private void setUpvoteIcon(boolean active) {
+        if (active) {
+            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_orange_18dp);
+        } else {
+            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_black_18dp);
+        }
+    }
+
+    private void setDownvoteIcon(boolean active) {
+        if (active) {
+            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_purple_18dp);
+        } else {
+            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_black_18dp);
+        }
     }
 }

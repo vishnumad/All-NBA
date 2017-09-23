@@ -143,6 +143,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         if (disposables != null) {
             disposables.clear();
         }
+        view.hideSnackbar();
     }
 
 }
