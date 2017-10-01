@@ -111,6 +111,8 @@ dependencies {
     implementation 'com.anjlab.android.iab.v3:library:1.0.39'
     implementation 'com.jonathanfinerty.once:once:1.2.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.squareup.okhttp3:logging-interceptor:3.4.1"
+    implementation "com.squareup.okhttp3:okhttp:3.4.1"
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.7.1'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'

@@ -4,7 +4,6 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 
-import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.SubredditPaginator;
@@ -17,8 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.functions.Function;
 
 @Singleton
 public class PostsRepositoryImpl implements PostsRepository {
@@ -56,21 +53,15 @@ public class PostsRepositoryImpl implements PostsRepository {
 
     @Override
     public Single<List<SubmissionWrapper>> next() {
-        return redditService.getSubmissionListing(paginator)
-                .flatMap(new Function<Listing<Submission>, SingleSource<? extends List
-                        <SubmissionWrapper>>>() {
-                    @Override
-                    public SingleSource<? extends List<SubmissionWrapper>>
-                    apply(Listing<Submission> submissions) throws Exception {
-                        // Convert immutable listing to mutable list of custom submissions.
-                        List<SubmissionWrapper> submissionWrappers = new ArrayList<>();
-                        for (Submission submission : submissions) {
-                            submissionWrappers.add(new SubmissionWrapper(submission));
-                        }
+        return redditService.getSubmissionListing(paginator).flatMap(submissions -> {
+            // Convert immutable listing to mutable list of custom submissions.
+            List<SubmissionWrapper> submissionWrappers = new ArrayList<>();
+            for (Submission submission : submissions) {
+                submissionWrappers.add(new SubmissionWrapper(submission));
+            }
 
-                        cachedSubmissionWrappers.addAll(submissionWrappers);
-                        return Single.just(submissionWrappers);
-                    }
+            cachedSubmissionWrappers.addAll(submissionWrappers);
+            return Single.just(submissionWrappers);
                 });
     }
 

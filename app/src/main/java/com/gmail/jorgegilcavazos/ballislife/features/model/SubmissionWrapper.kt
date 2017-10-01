@@ -35,7 +35,7 @@ data class SubmissionWrapper(val id: String,
     score = submission?.score ?: 0
     commentCount = submission?.commentCount ?: 0
     thumbnail = submission?.thumbnail
-    highResThumbnail = submission?.oEmbedMedia?.thumbnail?.url?.toString()
+    highResThumbnail = submission?.oEmbedMedia?.thumbnail?.url?.toString() ?: ""
     voteDirection = submission?.vote
     isSaved = submission?.isSaved == true
     selfTextHtml = submission?.data("selftext_html")

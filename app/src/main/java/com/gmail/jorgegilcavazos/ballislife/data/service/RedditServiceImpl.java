@@ -220,15 +220,13 @@ public class RedditServiceImpl implements RedditService {
 
     @Override
     public Single<Listing<Submission>> getSubmissionListing(final SubredditPaginator paginator) {
-        return Single.create(new SingleOnSubscribe<Listing<Submission>>() {
-            @Override
-            public void subscribe(SingleEmitter<Listing<Submission>> e) throws Exception {
-                try {
-                    e.onSuccess(paginator.next(false));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Single.create(e -> {
+            try {
+                Listing<Submission> listing = paginator.next(false);
+                e.onSuccess(listing);
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
