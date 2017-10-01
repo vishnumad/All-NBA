@@ -7,7 +7,9 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.Submissi
 import com.gmail.jorgegilcavazos.ballislife.data.service.GameThreadFinderService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
@@ -134,11 +136,16 @@ public class GameThreadPresenter {
                 .subscribeWith(new DisposableObserver<List<CommentNode>>() {
                     @Override
                     public void onNext(List<CommentNode> commentNodes) {
+                        List<ThreadItem> items = new ArrayList<>();
+                        for (CommentNode node : commentNodes) {
+                            items.add(new ThreadItem(ThreadAdapter.TYPE_COMMENT, node, node
+                                    .getDepth()));
+                        }
                         view.setLoadingIndicator(false);
                         if (commentNodes.size() == 0) {
                             view.showNoCommentsText();
                         } else {
-                            view.showComments(commentNodes);
+                            view.showComments(items);
                         }
                     }
 

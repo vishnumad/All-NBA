@@ -97,41 +97,37 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         tvTimestamp.setText(DateFormatUtil.formatRedditDate(new Date(timestamp)));
         tvPoints.setText(score);
 
-        tvBody.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                boolean ret = false;
-                CharSequence text = ((TextView) v).getText();
-                Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
-                TextView widget = (TextView) v;
-                int action = event.getAction();
+        tvBody.setOnTouchListener((v, event) -> {
+            boolean ret = false;
+            CharSequence text = ((TextView) v).getText();
+            Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
+            TextView widget = (TextView) v;
+            int action = event.getAction();
 
-                if (action == MotionEvent.ACTION_UP ||
-                        action == MotionEvent.ACTION_DOWN) {
-                    int x = (int) event.getX();
-                    int y = (int) event.getY();
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
 
-                    x -= widget.getTotalPaddingLeft();
-                    y -= widget.getTotalPaddingTop();
+                x -= widget.getTotalPaddingLeft();
+                y -= widget.getTotalPaddingTop();
 
-                    x += widget.getScrollX();
-                    y += widget.getScrollY();
+                x += widget.getScrollX();
+                y += widget.getScrollY();
 
-                    Layout layout = widget.getLayout();
-                    int line = layout.getLineForVertical(y);
-                    int off = layout.getOffsetForHorizontal(line, x);
+                Layout layout = widget.getLayout();
+                int line = layout.getLineForVertical(y);
+                int off = layout.getOffsetForHorizontal(line, x);
 
-                    ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
+                ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
 
-                    if (link.length != 0) {
-                        if (action == MotionEvent.ACTION_UP) {
-                            link[0].onClick(widget);
-                        }
-                        ret = true;
+                if (link.length != 0) {
+                    if (action == MotionEvent.ACTION_UP) {
+                        link[0].onClick(widget);
                     }
+                    ret = true;
                 }
-                return ret;
             }
+            return ret;
         });
 
         if (isSelf) {
@@ -188,105 +184,74 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
         final FullCardViewHolder holder = this;
 
-        btnUpvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        setNoVoteColors(context);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        setUpvotedColors(context);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        setUpvotedColors(context);
-                    }
+        btnUpvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(context);
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(context);
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(context);
                 }
             }
         });
 
-        btnDownvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        setNoVoteColors(context);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        setDownvotedColors(context);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        setDownvotedColors(context);
-                    }
+        btnDownvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(context);
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(context);
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(context);
                 }
             }
         });
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.isSaved()) {
-                    submissionClickListener.onSaveSubmission(submissionWrapper,
-                            false);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        setUnsavedIcon();
-                        submissionWrapper.setSaved(false);
-                    }
-                } else {
-                    submissionClickListener.onSaveSubmission(submissionWrapper,
-                            true);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        setSavedIcon();
-                        submissionWrapper.setSaved(true);
-                    }
+        btnSave.setOnClickListener(v -> {
+            if (submissionWrapper.isSaved()) {
+                submissionClickListener.onSaveSubmission(submissionWrapper, false);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    setUnsavedIcon();
+                    submissionWrapper.setSaved(false);
+                }
+            } else {
+                submissionClickListener.onSaveSubmission(submissionWrapper, true);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    setSavedIcon();
+                    submissionWrapper.setSaved(true);
                 }
             }
         });
 
-        ivThumbnail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onContentClick(url);
-            }
-        });
+        ivThumbnail.setOnClickListener(v -> submissionClickListener.onContentClick(url));
 
-        containerLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onContentClick(url);
-            }
-        });
+        containerLink.setOnClickListener(v -> submissionClickListener.onContentClick(url));
 
         if (isDisplayedInList) {
             // Enable buttons to navigate to SubmissionActivity.
-            headerLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    submissionClickListener.onSubmissionClick(submissionWrapper);
-                }
-            });
+            headerLayout.setOnClickListener(v -> submissionClickListener.onSubmissionClick
+                    (submissionWrapper));
         }
     }
 

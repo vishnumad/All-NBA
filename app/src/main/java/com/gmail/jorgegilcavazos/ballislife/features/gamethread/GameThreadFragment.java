@@ -26,6 +26,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
@@ -134,8 +135,8 @@ public class GameThreadFragment extends Fragment
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication,
-                new ArrayList<CommentNode>(), false);
+        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
+                false);
         threadAdapter.setCommentClickListener(this);
         
         lmComments = new LinearLayoutManager(getActivity());
@@ -218,7 +219,7 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void showComments(List<CommentNode> comments) {
+    public void showComments(List<ThreadItem> comments) {
         threadAdapter.setData(comments);
         rvComments.setVisibility(View.VISIBLE);
     }

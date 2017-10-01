@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
@@ -44,20 +45,20 @@ import butterknife.ButterKnife;
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int TYPE_SUBMISSION_HEADER = 0;
-    private static final int TYPE_COMMENT = 1;
+    public static final int TYPE_SUBMISSION_HEADER = 0;
+    public static final int TYPE_COMMENT = 1;
+    public static final int TYPE_LOAD_MORE = 2;
 
     private RedditAuthentication redditAuthentication;
     private Context context;
-    private List<CommentNode> commentsList;
+    private List<ThreadItem> commentsList;
     private boolean hasHeader;
     private OnCommentClickListener commentClickListener;
     private OnSubmissionClickListener submissionClickListener;
     private SubmissionWrapper submissionWrapper;
 
     public ThreadAdapter(Context context,
-                         RedditAuthentication redditAuthentication,
-                         List<CommentNode> commentsList,
+                         RedditAuthentication redditAuthentication, List<ThreadItem> commentsList,
                          boolean hasHeader) {
         this.context = context;
         this.commentsList = commentsList;
@@ -90,9 +91,14 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (viewType == TYPE_SUBMISSION_HEADER) {
             view = inflater.inflate(R.layout.post_layout_card, parent, false);
             return new FullCardViewHolder(view);
-        } else {
+        } else if (viewType == TYPE_COMMENT) {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
             return new CommentViewHolder(view);
+        } else if (viewType == TYPE_LOAD_MORE) {
+            view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
+            return new LoadMoreCommentsHolder(view);
+        } else {
+            throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
     }
 
@@ -103,44 +109,57 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     context, redditAuthentication, submissionWrapper,
                     false,
                     submissionClickListener);
-        } else {
+        } else if (holder instanceof CommentViewHolder) {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
             final CommentNode commentNode;
             if (hasHeader && submissionWrapper != null) {
-                commentNode = commentsList.get(position - 1);
+                commentNode = commentsList.get(position - 1).getCommentNode();
             } else {
-                commentNode = commentsList.get(position);
+                commentNode = commentsList.get(position).getCommentNode();
             }
-            commentHolder.bindData(context, commentNode, commentClickListener,
-                    redditAuthentication);
+            if (commentNode == null) {
+                throw new IllegalStateException("CommentNode should not be null");
+            }
+            commentHolder.bindData(context, commentNode, commentClickListener, redditAuthentication);
+        } else if (holder instanceof LoadMoreCommentsHolder) {
+            if (hasHeader) {
+                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position - 1)
+                        .getDepth());
+            } else {
+                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position).getDepth());
+            }
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        // Return comment type if we don't have a header of it the submission isn't loaded yet.
-        if (!hasHeader || submissionWrapper == null) {
-            return TYPE_COMMENT;
-        } else {
+        // Submission data guaranteed to be not null at this point.
+        if (hasHeader) {
             if (position == 0) {
                 return TYPE_SUBMISSION_HEADER;
             } else {
-                return TYPE_COMMENT;
+                return commentsList.get(position - 1).getType();
             }
         }
+        return commentsList.get(position).getType();
     }
 
     @Override
     public int getItemCount() {
-        if (hasHeader && submissionWrapper != null) {
-            return null != commentsList ? commentsList.size() + 1 : 1;
-        } else {
+        if (!hasHeader) {
             return null != commentsList ? commentsList.size() : 0;
+        } else {
+            if (submissionWrapper == null) {
+                // Don't show anything until we have a submission to show.
+                return 0;
+            } else {
+                return null != commentsList ? commentsList.size() + 1 : 1;
+            }
         }
     }
 
-    public void setData(List<CommentNode> data) {
+    public void setData(List<ThreadItem> data) {
         commentsList.clear();
         commentsList.addAll(data);
         notifyDataSetChanged();
@@ -149,18 +168,21 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void addComment(int position, CommentNode comment) {
         if (position == 0) {
             // Coming from a reply to thread. Show comment in first position.
-            commentsList.add(0, comment);
+            commentsList.add(0, new ThreadItem(ThreadAdapter.TYPE_COMMENT, comment, comment
+                    .getDepth()));
         } else {
             // Coming from a comment reply, position param is comment adapter position + 1, which
-            // means that if there is a header we need to subtract 1 to place in comment in desired
+            // means that if there is a header we need to subtract 1 to place comment in desired
             // position.
             if (hasHeader) {
-                commentsList.add(position - 1, comment);
+                commentsList.add(position - 1, new ThreadItem(ThreadAdapter.TYPE_COMMENT,
+                        comment, comment.getDepth()));
             } else {
-                commentsList.add(position, comment);
+                commentsList.add(position, new ThreadItem(ThreadAdapter.TYPE_COMMENT, comment,
+                        comment.getDepth()));
             }
         }
-        notifyDataSetChanged();
+        notifyItemInserted(position);
     }
 
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -189,7 +211,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                              final CommentNode commentNode,
                              final OnCommentClickListener commentClickListener,
                              final RedditAuthentication redditAuthentication) {
-
             final Comment comment = commentNode.getComment();
             String author = comment.getAuthor();
             CharSequence body = RedditUtils.bindSnuDown(comment.data("body_html"));
@@ -200,42 +221,42 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     .parseCssClassFromFlair(String.valueOf(comment.getAuthorFlair()));
             int flairRes = RedditUtils.getFlairFromCss(cssClass);
 
+            if (commentNode.hasMoreComments()) {
+                // This comment has children that are not currently loaded in the tree.
+            }
+
             authorTextView.setText(author);
-            bodyTextView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    boolean ret = false;
-                    CharSequence text = ((TextView) v).getText();
-                    Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
-                    TextView widget = (TextView) v;
-                    int action = event.getAction();
+            bodyTextView.setOnTouchListener((v, event) -> {
+                boolean ret = false;
+                CharSequence text = ((TextView) v).getText();
+                Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
+                TextView widget = (TextView) v;
+                int action = event.getAction();
 
-                    if (action == MotionEvent.ACTION_UP ||
-                            action == MotionEvent.ACTION_DOWN) {
-                        int x = (int) event.getX();
-                        int y = (int) event.getY();
+                if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+                    int x = (int) event.getX();
+                    int y = (int) event.getY();
 
-                        x -= widget.getTotalPaddingLeft();
-                        y -= widget.getTotalPaddingTop();
+                    x -= widget.getTotalPaddingLeft();
+                    y -= widget.getTotalPaddingTop();
 
-                        x += widget.getScrollX();
-                        y += widget.getScrollY();
+                    x += widget.getScrollX();
+                    y += widget.getScrollY();
 
-                        Layout layout = widget.getLayout();
-                        int line = layout.getLineForVertical(y);
-                        int off = layout.getOffsetForHorizontal(line, x);
+                    Layout layout = widget.getLayout();
+                    int line = layout.getLineForVertical(y);
+                    int off = layout.getOffsetForHorizontal(line, x);
 
-                        ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
+                    ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
 
-                        if (link.length != 0) {
-                            if (action == MotionEvent.ACTION_UP) {
-                                link[0].onClick(widget);
-                            }
-                            ret = true;
+                    if (link.length != 0) {
+                        if (action == MotionEvent.ACTION_UP) {
+                            link[0].onClick(widget);
                         }
+                        ret = true;
                     }
-                    return ret;
                 }
+                return ret;
             });
             bodyTextView.setText(body);
             timestampTextView.setText(timestamp);
@@ -256,14 +277,11 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             final CommentViewHolder commentHolder = this;
 
             // On comment click hide/show actions (upvote, downvote, save, etc...).
-            commentContentLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (rlCommentActions.getVisibility() == View.VISIBLE) {
-                        hideActions(context, commentHolder, commentNode);
-                    } else {
-                        showActions(context, commentHolder, commentNode);
-                    }
+            commentContentLayout.setOnClickListener(v -> {
+                if (rlCommentActions.getVisibility() == View.VISIBLE) {
+                    hideActions(context, commentHolder, commentNode);
+                } else {
+                    showActions(context, commentHolder, commentNode);
                 }
             });
 
@@ -292,70 +310,60 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 timestampTextView.setText(timestamp + "*");
             }
 
-            btnUpvote.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
-                        if (redditAuthentication.isUserLoggedIn()) {
-                            scoreTextView.setTextColor(colorNeutral);
-                        }
-                        commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
-                    } else {
-                        if (redditAuthentication.isUserLoggedIn()) {
-                            scoreTextView.setTextColor(colorUpvoted);
-                        }
-                        commentClickListener.onVoteComment(comment, VoteDirection.UPVOTE);
+            btnUpvote.setOnClickListener(v -> {
+                if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
+                    if (redditAuthentication.isUserLoggedIn()) {
+                        scoreTextView.setTextColor(colorNeutral);
                     }
-                    hideActions(context, commentHolder, commentNode);
-                }
-            });
-            btnDownvote.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
-                        if (redditAuthentication.isUserLoggedIn()) {
-                            scoreTextView.setTextColor(colorNeutral);
-                        }
-                        commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
-                    } else {
-                        if (redditAuthentication.isUserLoggedIn()) {
-                            scoreTextView.setTextColor(colorDownvoted);
-                        }
-                        commentClickListener.onVoteComment(comment, VoteDirection.DOWNVOTE);
+                    commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
+                } else {
+                    if (redditAuthentication.isUserLoggedIn()) {
+                        scoreTextView.setTextColor(colorUpvoted);
                     }
-                    hideActions(context, commentHolder, commentNode);
+                    commentClickListener.onVoteComment(comment, VoteDirection.UPVOTE);
                 }
+                hideActions(context, commentHolder, commentNode);
             });
-            btnSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (tvSaved.getVisibility() == View.VISIBLE) {
-                        commentClickListener.onUnsaveComment(comment);
-                        tvSaved.setVisibility(View.GONE);
-                    } else {
-                        commentClickListener.onSaveComment(comment);
-                        tvSaved.setVisibility(View.VISIBLE);
+            btnDownvote.setOnClickListener(v -> {
+                if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
+                    if (redditAuthentication.isUserLoggedIn()) {
+                        scoreTextView.setTextColor(colorNeutral);
                     }
-                    hideActions(context, commentHolder, commentNode);
+                    commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
+                } else {
+                    if (redditAuthentication.isUserLoggedIn()) {
+                        scoreTextView.setTextColor(colorDownvoted);
+                    }
+                    commentClickListener.onVoteComment(comment, VoteDirection.DOWNVOTE);
                 }
+                hideActions(context, commentHolder, commentNode);
             });
-            btnReply.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    commentClickListener.onReplyToComment(getAdapterPosition(), comment);
-                    hideActions(context, commentHolder, commentNode);
+            btnSave.setOnClickListener(v -> {
+                if (tvSaved.getVisibility() == View.VISIBLE) {
+                    commentClickListener.onUnsaveComment(comment);
+                    tvSaved.setVisibility(View.GONE);
+                } else {
+                    commentClickListener.onSaveComment(comment);
+                    tvSaved.setVisibility(View.VISIBLE);
                 }
+                hideActions(context, commentHolder, commentNode);
+            });
+            btnReply.setOnClickListener(v -> {
+                commentClickListener.onReplyToComment(getAdapterPosition(), comment);
+                hideActions(context, commentHolder, commentNode);
             });
         }
 
-        private void hideActions(Context context, CommentViewHolder holder, CommentNode commentNode) {
+        private void hideActions(Context context, CommentViewHolder holder, CommentNode
+                commentNode) {
             holder.commentInnerContentLayout.setBackgroundColor(
                     ContextCompat.getColor(context, R.color.white));
             holder.rlCommentActions.setVisibility(View.GONE);
             setBackgroundAndPadding(context, commentNode, holder, false /* dark */);
         }
 
-        private void showActions(Context context, CommentViewHolder holder, CommentNode commentNode) {
+        private void showActions(Context context, CommentViewHolder holder, CommentNode
+                commentNode) {
             holder.rlCommentActions.setVisibility(View.VISIBLE);
             holder.commentInnerContentLayout.setBackgroundColor(
                     ContextCompat.getColor(context, R.color.lightGray));
@@ -422,6 +430,53 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             // Add padding depending on level.
             holder.commentContentLayout.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
+        }
+    }
+
+    static class LoadMoreCommentsHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.innerLayout) View innerLayout;
+
+        public LoadMoreCommentsHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        public void bindData(int depth) {
+            setBackgroundAndPadding(depth);
+        }
+
+        private void setBackgroundAndPadding(int depth) {
+            int padding_in_dp = 5;
+            final float scale = itemView.getContext().getResources().getDisplayMetrics().density;
+            int padding_in_px = (int) (padding_in_dp * scale + 0.5F);
+
+            // Add color if it is not a top-level comment.
+            if (depth > 1) {
+                int depthFromZero = depth - 2;
+                int res = (depthFromZero) % 5;
+                switch (res) {
+                    case 0:
+                        innerLayout.setBackgroundResource(R.drawable.borderblue);
+                        break;
+                    case 1:
+                        innerLayout.setBackgroundResource(R.drawable.bordergreen);
+                        break;
+                    case 2:
+                        innerLayout.setBackgroundResource(R.drawable.borderbrown);
+                        break;
+                    case 3:
+                        innerLayout.setBackgroundResource(R.drawable.borderorange);
+                        break;
+                    case 4:
+                        innerLayout.setBackgroundResource(R.drawable.borderred);
+                }
+            } else {
+                innerLayout.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R
+                        .color.commentBgLight));
+            }
+            // Add padding depending on level.
+            itemView.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
         }
     }
 }

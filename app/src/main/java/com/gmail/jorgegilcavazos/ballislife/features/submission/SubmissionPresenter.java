@@ -7,6 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
+import com.gmail.jorgegilcavazos.ballislife.util.CommentsTraverser;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
@@ -21,7 +23,6 @@ import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -70,27 +71,17 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<SubmissionWrapper>() {
                     @Override
                     public void onSuccess(SubmissionWrapper submissionWrapper) {
-                        int i = 0;
-                        int indexToScrollTo = 0;
+                        List<ThreadItem> items = CommentsTraverser.Companion.flattenCommentTree
+                                (submissionWrapper.getSubmission().getComments().getChildren());
 
-                        Iterable<CommentNode> iterable = submissionWrapper.getSubmission()
-                                .getComments().walkTree();
-                        List<CommentNode> commentNodes = new ArrayList<>();
-                        for (CommentNode node : iterable) {
-                            commentNodes.add(node);
-                            if (commentIdToScroll != null
-                                    && node.getComment().getId().equals(commentIdToScroll)) {
-                                indexToScrollTo = i;
-                            }
-                            i++;
-                        }
+                        Optional<Integer> pos = findComment(items, commentIdToScroll);
 
-                        view.showComments(commentNodes, submissionWrapper.getSubmission());
+                        view.showComments(items, submissionWrapper.getSubmission());
                         view.setLoadingIndicator(false);
                         view.showFab();
 
-                        if (commentIdToScroll != null) {
-                            view.scrollToComment(indexToScrollTo);
+                        if (pos.isPresent()) {
+                            view.scrollToComment(pos.get());
                         }
                     }
 
@@ -278,7 +269,8 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
                 // Comment is not immediately available after being posted in the next call
                 // (probably a small delay from reddit's servers) so we need to wait for a bit
                 // before fetching the posted comment.
-                .delay(4, TimeUnit.SECONDS).flatMap(s -> redditService.getComment(redditAuthentication.getRedditClient(), submissionId, s))
+                .delay(4, TimeUnit.SECONDS).flatMap(s -> redditService.getComment
+                        (redditAuthentication.getRedditClient(), submissionId, s))
                 .observeOn(schedulerProvider.ui())
                 .subscribeOn(schedulerProvider.io())
                 .subscribeWith(new DisposableSingleObserver<CommentNode>() {
@@ -381,5 +373,18 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         if (disposables != null) {
             disposables.clear();
         }
+    }
+
+    private Optional<Integer> findComment(List<ThreadItem> items, String id) {
+        if (id == null) {
+            return Optional.absent();
+        }
+        for (int i = 0; i < items.size(); i++) {
+            CommentNode node = items.get(i).getCommentNode();
+            if (node != null && node.getComment().getId().equals(id)) {
+                return Optional.of(i);
+            }
+        }
+        return Optional.absent();
     }
 }

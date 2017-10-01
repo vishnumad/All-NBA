@@ -445,5 +445,6 @@
     <string name="log_in_caps">LOG IN</string>
     <string name="skip">SKIP</string>
     <string name="sign_in">Sign in</string>
+    <string name="load_more_comments">Load more comments</string>
 
 </resources>

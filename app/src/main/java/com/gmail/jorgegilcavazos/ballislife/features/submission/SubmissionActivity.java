@@ -24,6 +24,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListen
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -207,7 +208,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void showComments(List<CommentNode> commentNodes, Submission submission) {
+    public void showComments(List<ThreadItem> commentNodes, Submission submission) {
         threadAdapter.setData(commentNodes);
         threadAdapter.setSubmission(submission);
     }

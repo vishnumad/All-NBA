@@ -225,85 +225,69 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     private void initSaveBtnListener(final RedditAuthentication redditAuthentication, final
     SubmissionWrapper submissionWrapper,
                                      final OnSubmissionClickListener submissionClickListener) {
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.isSaved()) {
-                    submissionClickListener.onSaveSubmission(submissionWrapper, false);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        setUnsavedIcon();
-                        submissionWrapper.setSaved(false);
-                    }
-                } else {
-                    submissionClickListener.onSaveSubmission(submissionWrapper, true);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        setSavedIcon();
-                        submissionWrapper.setSaved(true);
-                    }
+        btnSave.setOnClickListener(v -> {
+            if (submissionWrapper.isSaved()) {
+                submissionClickListener.onSaveSubmission(submissionWrapper, false);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    setUnsavedIcon();
+                    submissionWrapper.setSaved(false);
+                }
+            } else {
+                submissionClickListener.onSaveSubmission(submissionWrapper, true);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    setSavedIcon();
+                    submissionWrapper.setSaved(true);
                 }
             }
         });
     }
 
-    private void initUpvoteBtnListener(final Context context,
-                                       final RedditAuthentication redditAuthentication, final SubmissionWrapper submissionWrapper,
+    private void initUpvoteBtnListener(final Context context, final RedditAuthentication redditAuthentication, final SubmissionWrapper submissionWrapper,
                                        final OnSubmissionClickListener submissionClickListener) {
-        btnUpvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        setNoVoteColors(context);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        setUpvotedColors(context);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.UPVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
-                        setUpvotedColors(context);
-                    }
+        btnUpvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(context);
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(context);
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
+                    setUpvotedColors(context);
                 }
             }
         });
     }
 
-    private void initDownvoteBtnListener(final Context context,
-                                         final RedditAuthentication redditAuthentication, final SubmissionWrapper submissionWrapper,
+    private void initDownvoteBtnListener(final Context context, final RedditAuthentication
+            redditAuthentication, final SubmissionWrapper submissionWrapper,
                                          final OnSubmissionClickListener submissionClickListener) {
-        btnDownvote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.NO_VOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                        setNoVoteColors(context);
-                    }
-                } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        setDownvotedColors(context);
-                    }
-                } else {
-                    submissionClickListener.onVoteSubmission(submissionWrapper,
-                            VoteDirection.DOWNVOTE);
-                    if (redditAuthentication.isUserLoggedIn()) {
-                        submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
-                        setDownvotedColors(context);
-                    }
+        btnDownvote.setOnClickListener(v -> {
+            if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
+                    setNoVoteColors(context);
+                }
+            } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(context);
+                }
+            } else {
+                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                if (redditAuthentication.isUserLoggedIn()) {
+                    submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
+                    setDownvotedColors(context);
                 }
             }
         });
@@ -311,37 +295,18 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
 
     private void initShareBtnListener(final Submission submission,
                                       final PublishSubject<Submission> shareSubject) {
-        btnShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareSubject.onNext(submission);
-            }
-        });
+        btnShare.setOnClickListener(v -> shareSubject.onNext(submission));
     }
 
     private void initThumbnailListener(final String url,
                                        final OnSubmissionClickListener submissionClickListener) {
-        ivThumbnail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onContentClick(url);
-            }
-        });
-        ivThumbnailSmall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onContentClick(url);
-            }
-        });
+        ivThumbnail.setOnClickListener(v -> submissionClickListener.onContentClick(url));
+        ivThumbnailSmall.setOnClickListener(v -> submissionClickListener.onContentClick(url));
     }
 
     private void initContainerListener(final SubmissionWrapper submissionWrapper,
                                        final OnSubmissionClickListener submissionClickListener) {
-        layoutContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submissionClickListener.onSubmissionClick(submissionWrapper);
-            }
-        });
+        layoutContainer.setOnClickListener(v -> submissionClickListener.onSubmissionClick
+                (submissionWrapper));
     }
 }

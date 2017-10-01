@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.hannesdorfmann.mosby.mvp.MvpView;
 
 import net.dean.jraw.models.Comment;
@@ -11,7 +12,7 @@ public interface GameThreadView extends MvpView {
 
     void setLoadingIndicator(boolean active);
 
-    void showComments(List<CommentNode> comments);
+    void showComments(List<ThreadItem> comments);
 
     void hideComments();
 
