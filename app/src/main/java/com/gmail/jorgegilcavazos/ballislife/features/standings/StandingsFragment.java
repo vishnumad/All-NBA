@@ -74,6 +74,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
+        layoutContent.setVisibility(View.GONE);
 
         NbaStandingsService service = retrofit.create(NbaStandingsService.class);
 
@@ -87,13 +88,9 @@ public class StandingsFragment extends Fragment implements StandingsView,
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                presenter.loadStandings();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onPause() {
+        presenter.dismissSnackbar();
+        super.onPause();
     }
 
     @Override
@@ -107,9 +104,13 @@ public class StandingsFragment extends Fragment implements StandingsView,
     }
 
     @Override
-    public void onPause() {
-        presenter.dismissSnackbar();
-        super.onPause();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                presenter.loadStandings();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -124,6 +125,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
 
     @Override
     public void showStandings(Standings standings) {
+        layoutContent.setVisibility(View.VISIBLE);
         layoutContent.removeAllViews();
 
         addConferenceHeader(EAST);
@@ -167,7 +169,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
     private void addConferenceHeader(int conference) {
         View eastHeader = LayoutInflater.from(getActivity())
                 .inflate(R.layout.standings_conference_header, layoutContent, false);
-        TextView tvEastConf = (TextView) eastHeader.findViewById(R.id.text_conference);
+        TextView tvEastConf = eastHeader.findViewById(R.id.text_conference);
 
         if (conference == EAST) {
             tvEastConf.setText(getResources().getString(R.string.eastern_conference));
@@ -184,12 +186,12 @@ public class StandingsFragment extends Fragment implements StandingsView,
         for (Standings.TeamStanding teamStanding : teamStandings) {
             View teamRow = LayoutInflater.from(getActivity())
                     .inflate(R.layout.standings_team_item, layoutContent, false);
-            TextView tvId = (TextView) teamRow.findViewById(R.id.text_seed);
-            TextView tvTeam = (TextView) teamRow.findViewById(R.id.text_team);
-            TextView tvWins = (TextView) teamRow.findViewById(R.id.text_wins);
-            TextView tvLosses = (TextView) teamRow.findViewById(R.id.text_losses);
-            TextView tvPct = (TextView) teamRow.findViewById(R.id.text_pct);
-            TextView tvGB = (TextView) teamRow.findViewById(R.id.text_gb);
+            TextView tvId = teamRow.findViewById(R.id.text_seed);
+            TextView tvTeam = teamRow.findViewById(R.id.text_team);
+            TextView tvWins = teamRow.findViewById(R.id.text_wins);
+            TextView tvLosses = teamRow.findViewById(R.id.text_losses);
+            TextView tvPct = teamRow.findViewById(R.id.text_pct);
+            TextView tvGB = teamRow.findViewById(R.id.text_gb);
 
             String wins = "", losses = "", pct = "", gb = "";
             for (Standings.StandingStat stat : teamStanding.getStats()) {
