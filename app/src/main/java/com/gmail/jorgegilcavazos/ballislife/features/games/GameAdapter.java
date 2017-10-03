@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
-import android.content.Context;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 
 import java.util.List;
@@ -26,8 +27,7 @@ import butterknife.ButterKnife;
 /**
  * RecyclerView Adapter used by the {@link GamesFragment} to display a list of games.
  */
-public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolderWithBars> {
-    private Context context;
+public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<NbaGame> nbaGameList;
     private GamesFragment.GameItemListener gameItemListener;
 
@@ -38,99 +38,27 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     }
 
     @Override
-    public GameViewHolderWithBars onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         if (Constants.NBA_MATERIAL_ENABLED) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_logos,
                     parent, false);
+            return new GameViewHolder(view);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_bars,
                     parent, false);
+            return new GameViewHolderWithBars(view);
         }
-        context = parent.getContext();
-        return new GameViewHolderWithBars(view);
     }
 
     @Override
-    public void onBindViewHolder(final GameViewHolderWithBars holder, int position) {
-        final NbaGame nbaGame = nbaGameList.get(position);
-
-        int resKeyHome = context.getResources().getIdentifier(nbaGame.getHomeTeamAbbr()
-                .toLowerCase(), "color", context.getPackageName());
-        int resKeyAway = context.getResources().getIdentifier(nbaGame.getAwayTeamAbbr()
-                .toLowerCase(), "color", context.getPackageName());
-
-        /*
-        ((GradientDrawable) holder.ivHomeLogo.getBackground()).setColor(
-                ContextCompat.getColor(context, resKeyHome));
-        ((GradientDrawable) holder.ivAwayLogo.getBackground()).setColor(
-                ContextCompat.getColor(context, resKeyAway));
-                */
-
-        ViewCompat.setBackgroundTintList(holder.barAway, context.getResources().getColorStateList(resKeyAway));
-        ViewCompat.setBackgroundTintList(holder.barHome, context.getResources().getColorStateList(resKeyHome));
-
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3,
-                context.getResources().getDisplayMetrics());
-        float awayPct;
-        float homePct;
-        try {
-            int awayScore = Integer.valueOf(nbaGame.getAwayTeamScore());
-            int homeScore = Integer.valueOf(nbaGame.getHomeTeamScore());
-            awayPct = (float) (awayScore) / (float) (awayScore + homeScore);
-            homePct = (float) (homeScore) / (float) (awayScore + homeScore);
-
-            if (awayScore == 0 && homeScore == 0) {
-                awayPct = 0.5f;
-                homePct = 0.5f;
-            }
-        } catch (NumberFormatException e) {
-            awayPct = 0.5f;
-            homePct = 0.5f;
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        if (Constants.NBA_MATERIAL_ENABLED) {
+            ((GameViewHolder) holder).bindData(nbaGameList.get(position), gameItemListener,
+                    nbaGameList.size() - 1 == position);
+        } else {
+            ((GameViewHolderWithBars) holder).bindData(nbaGameList.get(position), gameItemListener);
         }
-        holder.barHome.setLayoutParams(new TableLayout.LayoutParams(0, height, awayPct));
-        holder.barAway.setLayoutParams(new TableLayout.LayoutParams(0, height, homePct));
-
-        holder.tvHomeTeam.setText(nbaGame.getHomeTeamAbbr());
-        holder.tvAwayTeam.setText(nbaGame.getAwayTeamAbbr());
-        holder.tvHomeScore.setText(nbaGame.getHomeTeamScore());
-        holder.tvAwayScore.setText(nbaGame.getAwayTeamScore());
-        holder.tvClock.setText(nbaGame.getGameClock());
-        holder.tvPeriod.setText(Utilities.getPeriodString(nbaGame.getPeriodValue(),
-                nbaGame.getPeriodName()));
-
-        holder.tvHomeScore.setVisibility(View.GONE);
-        holder.tvAwayScore.setVisibility(View.GONE);
-        holder.tvClock.setVisibility(View.GONE);
-        holder.tvPeriod.setVisibility(View.GONE);
-        holder.tvFinal.setVisibility(View.GONE);
-        holder.tvTime.setVisibility(View.GONE);
-
-        switch (nbaGame.getGameStatus()) {
-            case NbaGame.PRE_GAME:
-                holder.tvTime.setVisibility(View.VISIBLE);
-                holder.tvTime.setText(DateFormatUtil.localizeGameTime(nbaGame.getPeriodStatus()));
-                break;
-            case NbaGame.IN_GAME:
-                holder.tvHomeScore.setVisibility(View.VISIBLE);
-                holder.tvAwayScore.setVisibility(View.VISIBLE);
-                holder.tvClock.setVisibility(View.VISIBLE);
-                holder.tvPeriod.setVisibility(View.VISIBLE);
-                break;
-            case NbaGame.POST_GAME:
-                holder.tvHomeScore.setVisibility(View.VISIBLE);
-                holder.tvAwayScore.setVisibility(View.VISIBLE);
-                holder.tvFinal.setVisibility(View.VISIBLE);
-                holder.tvFinal.setText("FINAL");
-                break;
-        }
-
-        holder.container.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gameItemListener.onGameClick(nbaGame);
-            }
-        });
     }
 
     @Override
@@ -175,6 +103,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     public static class GameViewHolder extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.gameCard) CardView gameCard;
         @BindView(R.id.layout_content) RelativeLayout container;
         @BindView(R.id.homelabel) TextView tvHomeTeam;
         @BindView(R.id.awaylabel) TextView tvAwayTeam;
@@ -190,6 +119,62 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         public GameViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+        }
+
+        public void bindData(NbaGame nbaGame, GamesFragment.GameItemListener gameItemListener,
+                             boolean isLastGame) {
+            int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
+                    .getHomeTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
+                    .getPackageName());
+            int resKeyAway = itemView.getContext().getResources().getIdentifier(nbaGame
+                    .getAwayTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
+                    .getPackageName());
+
+            ivHomeLogo.setImageResource(resKeyHome);
+            ivAwayLogo.setImageResource(resKeyAway);
+            tvHomeTeam.setText(nbaGame.getHomeTeamAbbr());
+            tvAwayTeam.setText(nbaGame.getAwayTeamAbbr());
+            tvHomeScore.setText(nbaGame.getHomeTeamScore());
+            tvAwayScore.setText(nbaGame.getAwayTeamScore());
+            tvClock.setText(nbaGame.getGameClock());
+            tvPeriod.setText(Utilities.getPeriodString(nbaGame.getPeriodValue(), nbaGame
+                    .getPeriodName()));
+
+            tvHomeScore.setVisibility(View.GONE);
+            tvAwayScore.setVisibility(View.GONE);
+            tvClock.setVisibility(View.GONE);
+            tvPeriod.setVisibility(View.GONE);
+            tvFinal.setVisibility(View.GONE);
+            tvTime.setVisibility(View.GONE);
+
+            switch (nbaGame.getGameStatus()) {
+                case NbaGame.PRE_GAME:
+                    tvTime.setVisibility(View.VISIBLE);
+                    tvTime.setText(DateFormatUtil.localizeGameTime(nbaGame.getPeriodStatus()));
+                    break;
+                case NbaGame.IN_GAME:
+                    tvHomeScore.setVisibility(View.VISIBLE);
+                    tvAwayScore.setVisibility(View.VISIBLE);
+                    tvClock.setVisibility(View.VISIBLE);
+                    tvPeriod.setVisibility(View.VISIBLE);
+                    break;
+                case NbaGame.POST_GAME:
+                    tvHomeScore.setVisibility(View.VISIBLE);
+                    tvAwayScore.setVisibility(View.VISIBLE);
+                    tvFinal.setVisibility(View.VISIBLE);
+                    tvFinal.setText("FINAL");
+                    break;
+            }
+
+            container.setOnClickListener(v -> gameItemListener.onGameClick(nbaGame));
+
+            if (isLastGame) {
+                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)
+                        gameCard.getLayoutParams();
+                int margin = (int) UnitUtils.convertDpToPixel(8, itemView.getContext());
+                layoutParams.setMargins(margin, margin, margin, margin);
+                gameCard.requestLayout();
+            }
         }
     }
 
@@ -210,6 +195,81 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         public GameViewHolderWithBars(View view) {
             super(view);
             ButterKnife.bind(this, view);
+        }
+
+        public void bindData(NbaGame nbaGame, GamesFragment.GameItemListener gameItemListener) {
+            int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
+                    .getHomeTeamAbbr().toLowerCase(), "color", itemView.getContext()
+                    .getPackageName());
+            int resKeyAway = itemView.getContext().getResources().getIdentifier(nbaGame
+                    .getAwayTeamAbbr().toLowerCase(), "color", itemView.getContext()
+                    .getPackageName());
+
+            if (resKeyAway != 0) {
+                ViewCompat.setBackgroundTintList(barAway, itemView.getContext().getResources()
+                        .getColorStateList(resKeyAway));
+            }
+            if (resKeyHome != 0) {
+                ViewCompat.setBackgroundTintList(barHome, itemView.getContext().getResources()
+                        .getColorStateList(resKeyHome));
+            }
+
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, itemView
+                    .getContext().getResources().getDisplayMetrics());
+            float awayPct;
+            float homePct;
+            try {
+                int awayScore = Integer.valueOf(nbaGame.getAwayTeamScore());
+                int homeScore = Integer.valueOf(nbaGame.getHomeTeamScore());
+                awayPct = (float) (awayScore) / (float) (awayScore + homeScore);
+                homePct = (float) (homeScore) / (float) (awayScore + homeScore);
+
+                if (awayScore == 0 && homeScore == 0) {
+                    awayPct = 0.5f;
+                    homePct = 0.5f;
+                }
+            } catch (NumberFormatException e) {
+                awayPct = 0.5f;
+                homePct = 0.5f;
+            }
+            barHome.setLayoutParams(new TableLayout.LayoutParams(0, height, awayPct));
+            barAway.setLayoutParams(new TableLayout.LayoutParams(0, height, homePct));
+
+            tvHomeTeam.setText(nbaGame.getHomeTeamAbbr());
+            tvAwayTeam.setText(nbaGame.getAwayTeamAbbr());
+            tvHomeScore.setText(nbaGame.getHomeTeamScore());
+            tvAwayScore.setText(nbaGame.getAwayTeamScore());
+            tvClock.setText(nbaGame.getGameClock());
+            tvPeriod.setText(Utilities.getPeriodString(nbaGame.getPeriodValue(), nbaGame
+                    .getPeriodName()));
+
+            tvHomeScore.setVisibility(View.GONE);
+            tvAwayScore.setVisibility(View.GONE);
+            tvClock.setVisibility(View.GONE);
+            tvPeriod.setVisibility(View.GONE);
+            tvFinal.setVisibility(View.GONE);
+            tvTime.setVisibility(View.GONE);
+
+            switch (nbaGame.getGameStatus()) {
+                case NbaGame.PRE_GAME:
+                    tvTime.setVisibility(View.VISIBLE);
+                    tvTime.setText(DateFormatUtil.localizeGameTime(nbaGame.getPeriodStatus()));
+                    break;
+                case NbaGame.IN_GAME:
+                    tvHomeScore.setVisibility(View.VISIBLE);
+                    tvAwayScore.setVisibility(View.VISIBLE);
+                    tvClock.setVisibility(View.VISIBLE);
+                    tvPeriod.setVisibility(View.VISIBLE);
+                    break;
+                case NbaGame.POST_GAME:
+                    tvHomeScore.setVisibility(View.VISIBLE);
+                    tvAwayScore.setVisibility(View.VISIBLE);
+                    tvFinal.setVisibility(View.VISIBLE);
+                    tvFinal.setText("FINAL");
+                    break;
+            }
+
+            container.setOnClickListener(v -> gameItemListener.onGameClick(nbaGame));
         }
     }
 }

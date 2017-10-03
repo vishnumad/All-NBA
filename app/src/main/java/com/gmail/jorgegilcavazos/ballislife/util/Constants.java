@@ -12,7 +12,7 @@ public class Constants {
 
     public static final String THREAD_ID = "THREAD_ID";
 
-    public static final boolean NBA_MATERIAL_ENABLED = false;
+    public static final boolean NBA_MATERIAL_ENABLED = true;
 
     public static final String SUB_ATL = "AtlantaHawks";
     public static final String SUB_BKN = "GoNets";

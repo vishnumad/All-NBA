@@ -40,16 +40,13 @@ import butterknife.Unbinder;
  */
 public class GamesFragment extends Fragment implements GamesView,
         SwipeRefreshLayout.OnRefreshListener {
+    private static final String SELECTED_TIME = "SelectedTime";
+    private static final String LIST_STATE = "ListState";
     public final static String TAG = "GamesFragment";
-
     public final static String GAME_THREAD_HOME = "GAME_THREAD_HOME";
     public final static String GAME_THREAD_AWAY = "GAME_THREAD_AWAY";
     public final static String GAME_ID = "GAME_ID";
     public final static String GAME_DATE = "GAME_DATE";
-
-    private static final String SELECTED_TIME = "SelectedTime";
-    private static final String LIST_STATE = "ListState";
-
     @Inject
     GamesPresenter presenter;
 
@@ -95,7 +92,7 @@ public class GamesFragment extends Fragment implements GamesView,
         setHasOptionsMenu(true);
 
         layoutManager = new LinearLayoutManager(getActivity());
-        gameAdapter = new GameAdapter(new ArrayList<NbaGame>(0), gameItemListener);
+        gameAdapter = new GameAdapter(new ArrayList<>(0), gameItemListener);
     }
 
     @Override
@@ -109,19 +106,13 @@ public class GamesFragment extends Fragment implements GamesView,
         rvGames.setLayoutManager(layoutManager);
         rvGames.setAdapter(gameAdapter);
 
-        btnPrevDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedDate.add(Calendar.DAY_OF_YEAR, -1);
-                presenter.loadFirstAvailable(selectedDate);
-            }
+        btnPrevDay.setOnClickListener(v -> {
+            selectedDate.add(Calendar.DAY_OF_YEAR, -1);
+            presenter.loadFirstAvailable(selectedDate);
         });
-        btnNextDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedDate.add(Calendar.DAY_OF_YEAR, 1);
-                presenter.loadFirstAvailable(selectedDate);
-            }
+        btnNextDay.setOnClickListener(v -> {
+            selectedDate.add(Calendar.DAY_OF_YEAR, 1);
+            presenter.loadFirstAvailable(selectedDate);
         });
 
         presenter.attachView(this);
