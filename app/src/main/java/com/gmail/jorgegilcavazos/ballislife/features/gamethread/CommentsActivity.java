@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -27,26 +28,28 @@ import butterknife.ButterKnife;
 public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         View.OnClickListener, BillingProcessor.IBillingHandler {
     private static final String TAG = "CommentsActivity";
-
+    private static final String LICENSE_KEY =
+            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJK4rNHNjwBh9Xc0a29VV" +
+                    "+V8UaEfAAoJuBKv9RfbGtCtwFhJI6UPbH" +
+                    "/gulND9bX43DRyw5zSrhCaz1eUSm3XbOVMcrnhv4gfNOeLLhzzN9vzcoiOjzI4z" +
+                    "+75j45MUWI3M6AmJGHCfl1c0zOCObwz71/BHte5peR" +
+                    "/O8nFisMAkdDSGV846xvBiviSTRBlI4HBy1TE+8mFQVYs4bxY6V9bIOqhALCwithQpgZF" +
+                    "/TMk1xy9sbz2Ab9NJVaYPqICrco5POEVAPMBTv0QI14M1ECuZQZaNNR9jc6V" +
+                    "+fQoVBD2xdetCEjh1fdxb5HBNboWxC5xdLlPpnoZ8dkFENOz1yzoLQIDAQAB"; // PUT YOUR
+    // MERCHANT KEY HERE;
     public static final String GAME_ID_KEY = "gameId";
     public static final String HOME_TEAM_KEY = "homeTeamKey";
     public static final String AWAY_TEAM_KEY = "awayTeamKey";
-
-    private static final String LICENSE_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJK4rNHNjwBh9Xc0a29VV+V8UaEfAAoJuBKv9RfbGtCtwFhJI6UPbH/gulND9bX43DRyw5zSrhCaz1eUSm3XbOVMcrnhv4gfNOeLLhzzN9vzcoiOjzI4z+75j45MUWI3M6AmJGHCfl1c0zOCObwz71/BHte5peR/O8nFisMAkdDSGV846xvBiviSTRBlI4HBy1TE+8mFQVYs4bxY6V9bIOqhALCwithQpgZF/TMk1xy9sbz2Ab9NJVaYPqICrco5POEVAPMBTv0QI14M1ECuZQZaNNR9jc6V+fQoVBD2xdetCEjh1fdxb5HBNboWxC5xdLlPpnoZ8dkFENOz1yzoLQIDAQAB"; // PUT YOUR MERCHANT KEY HERE;
-
-    private String homeTeam;
-    private String awayTeam;
-    private String gameId;
-    private long date;
-
+    public BillingProcessor billingProcessor;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tabLayout) TabLayout tabLayout;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
-
+    private String homeTeam;
+    private String awayTeam;
+    private String gameId;
+    private long date;
     private PagerAdapter pagerAdapter;
-
-    public BillingProcessor billingProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,7 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.box_score));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
+        fab.hide();
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
                 tabLayout.getTabCount(), bundle);
@@ -120,14 +124,9 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
     public void onTabSelected(TabLayout.Tab tab) {
         viewPager.setCurrentItem(tab.getPosition());
         switch (tab.getPosition()) {
-            case 0:
-                fab.show();
-                break;
             case 1:
                 fab.hide();
-                break;
-            case 2:
-                fab.show();
+                expandToolbar();
                 break;
         }
     }
@@ -192,5 +191,19 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
 
     @Override
     public void onBillingInitialized() {
+    }
+
+    private void expandToolbar() {
+        if (toolbar.getParent() instanceof AppBarLayout) {
+            ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
+        }
+    }
+
+    public void showFab() {
+        fab.show();
+    }
+
+    public void hideFab() {
+        fab.hide();
     }
 }

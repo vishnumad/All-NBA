@@ -1,19 +1,19 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -22,7 +22,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
+import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Optional;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
@@ -37,6 +39,8 @@ import butterknife.Unbinder;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
         .AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
@@ -44,24 +48,21 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 
 
 public class BoxScoreFragment extends Fragment implements BoxScoreView {
+    private static final String TAG = "BoxScoreFragment";
     public static final int LOAD_AWAY = 0;
     public static final int LOAD_HOME = 2;
-    private static final String TAG = "BoxScoreFragment";
-
     @Inject
     BaseSchedulerProvider schedulerProvider;
 
     @BindView(R.id.button_home) Button btnHome;
     @BindView(R.id.button_away) Button btnAway;
-    @BindView(R.id.rv_players) RecyclerView recyclerViewPlayers;
-    @BindView(R.id.rv_stats) RecyclerView recyclerViewStats;
     @BindView(R.id.progressBar) ProgressBar progressBar;
-    @BindView(R.id.layout_boxscore) LinearLayout layoutBoxScore;
     @BindView(R.id.text_load_message) TextView tvLoadMessage;
+    @BindView(R.id.playersTable) TableLayout playersTable;
+    @BindView(R.id.statsTable) TableLayout statsTable;
+    @BindView(R.id.scrollView) ScrollView scrollView;
 
     private BoxScorePresenter presenter;
-    private PlayerAdapter playerAdapter;
-    private StatLineAdapter statLineAdapter;
     private Unbinder unbinder;
 
     private String homeTeam;
@@ -79,6 +80,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             homeTeam = getArguments().getString(HOME_TEAM_KEY);
             awayTeam = getArguments().getString(AWAY_TEAM_KEY);
             gameId = getArguments().getString(CommentsActivity.GAME_ID_KEY);
+            gameId = "0041600405";
         }
     }
 
@@ -100,15 +102,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 .build();
 
         NbaGamesService gamesService = retrofit.create(NbaGamesService.class);
-
-        playerAdapter = new PlayerAdapter(new ArrayList<String>());
-        recyclerViewPlayers.setLayoutManager(new CustomLayoutMaganer(getActivity()));
-        recyclerViewPlayers.setAdapter(playerAdapter);
-        recyclerViewPlayers.setNestedScrollingEnabled(false);
-
-        statLineAdapter = new StatLineAdapter(getActivity(), new ArrayList<StatLine>());
-        recyclerViewStats.setLayoutManager(new CustomLayoutMaganer(getActivity()));
-        recyclerViewStats.setAdapter(statLineAdapter);
 
         presenter = new BoxScorePresenter(this, gamesService, schedulerProvider);
         presenter.start();
@@ -168,11 +161,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 players.add(statLine.getLn());
             }
         }
-
-        playerAdapter.setData(players);
-        statLineAdapter.setData(values.getVls().getPstsg());
-
-        layoutBoxScore.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -188,10 +176,17 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             }
         }
 
-        playerAdapter.setData(players);
-        statLineAdapter.setData(values.getHls().getPstsg());
+        addRowToPlayersTable("PLAYER");
+        for (String player : players) {
+            addRowToPlayersTable(player);
+        }
 
-        layoutBoxScore.setVisibility(View.VISIBLE);
+        addRowToStatsTable(Optional.absent());
+        for (StatLine statLine : values.getHls().getPstsg()) {
+            addRowToStatsTable(Optional.of(statLine));
+        }
+
+        scrollView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -205,7 +200,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Override
     public void hideBoxScore() {
-        layoutBoxScore.setVisibility(View.GONE);
+        scrollView.setVisibility(View.GONE);
     }
 
     @Override
@@ -225,17 +220,76 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         tvLoadMessage.setVisibility(View.GONE);
     }
 
-    public class CustomLayoutMaganer extends LinearLayoutManager {
+    public void addRowToPlayersTable(String content) {
+        TableRow row = new TableRow(getActivity());
+        row.setBackgroundColor(Color.WHITE);
+        row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
-        private boolean isScrollEnabled = false;
+        row.addView(createTextView(content, 200, false));
+        playersTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+    }
 
-        public CustomLayoutMaganer(Context context) {
-            super(context);
+    public void addRowToStatsTable(Optional<StatLine> statLineOptional) {
+        TableRow row = new TableRow(getActivity());
+        row.setBackgroundColor(Color.WHITE);
+        row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+
+        if (statLineOptional.isPresent()) {
+            StatLine statLine = statLineOptional.get();
+
+            row.addView(createTextView(String.valueOf(statLine.getMin())));
+            row.addView(createTextView(String.valueOf(statLine.getPts())));
+            row.addView(createTextView(String.valueOf(statLine.getReb())));
+            row.addView(createTextView(String.valueOf(statLine.getAst())));
+            row.addView(createTextView(String.valueOf(statLine.getStl())));
+            row.addView(createTextView(String.valueOf(statLine.getBlk())));
+            row.addView(createTextView(String.valueOf(statLine.getPf())));
+            row.addView(createTextView(String.valueOf(statLine.getTov())));
+            row.addView(createTextView(String.valueOf(statLine.getReb())));
+            row.addView(createTextView("DREB"));
+            row.addView(createTextView(String.valueOf(statLine.getFga() + "/" + statLine.getFgm()
+            )));
+            row.addView(createTextView("FG%"));
+            row.addView(createTextView("FT"));
+            row.addView(createTextView("FT%"));
+            row.addView(createTextView("3P"));
+            row.addView(createTextView("3P%"));
+        } else {
+            row.addView(createTextView("MIN"));
+            row.addView(createTextView("PTS"));
+            row.addView(createTextView("REB"));
+            row.addView(createTextView("AST"));
+            row.addView(createTextView("STL"));
+            row.addView(createTextView("BLK"));
+            row.addView(createTextView("PF"));
+            row.addView(createTextView("TO"));
+            row.addView(createTextView("OREB"));
+            row.addView(createTextView("DREB"));
+            row.addView(createTextView("FG"));
+            row.addView(createTextView("FG%"));
+            row.addView(createTextView("FT"));
+            row.addView(createTextView("FT%"));
+            row.addView(createTextView("3P"));
+            row.addView(createTextView("3P%"));
         }
 
-        @Override
-        public boolean canScrollVertically() {
-            return isScrollEnabled && super.canScrollVertically();
+        statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+    }
+
+    private TextView createTextView(String text) {
+        return createTextView(text, 60, true);
+    }
+
+    private TextView createTextView(String text, int width, boolean center) {
+        TextView textView = new TextView(getActivity());
+        textView.setText(text);
+        textView.setTextColor(ContextCompat.getColor(getActivity(), R.color.primaryText));
+        if (center) {
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
+        int padding = (int) UnitUtils.convertDpToPixel(8, getActivity());
+        textView.setPadding(padding, padding, padding, padding);
+        textView.setTextSize(18);
+        return textView;
     }
 }

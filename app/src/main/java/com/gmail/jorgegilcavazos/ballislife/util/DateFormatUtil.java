@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import com.google.common.base.Optional;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,11 +15,11 @@ import java.util.concurrent.TimeUnit;
  * Utility methods used in various points of the application.
  */
 public final class DateFormatUtil {
+    private static final String TAG = "DateFormatUtil";
     public static final int TIME_UNIT_JUST_NOW = 0;
     public static final int TIME_UNIT_MINUTES = 1;
     public static final int TIME_UNIT_HOURS = 2;
     public static final int TIME_UNIT_DAYS = 3;
-    private static final String TAG = "DateFormatUtil";
 
     /**
      * Receives a Date object and returns a human-readable string, e.g. "5m ago".
@@ -171,8 +172,9 @@ public final class DateFormatUtil {
             sdf.setTimeZone(timeZone);
             return sdf.format(date);
         } catch (ParseException e) {
-            throw new RuntimeException("Unlocalizable date string: " + dateETString +
-                    " to timezone: " + timeZone);
+            FirebaseCrash.report(new RuntimeException("Unlocalizable date string: " +
+                    dateETString + " to timezone: " + timeZone));
+            return dateETString;
         }
     }
 }

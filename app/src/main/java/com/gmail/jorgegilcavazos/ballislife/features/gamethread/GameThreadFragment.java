@@ -312,6 +312,16 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
+    public void showFab() {
+        ((CommentsActivity) getActivity()).showFab();
+    }
+
+    @Override
+    public void hideFab() {
+        ((CommentsActivity) getActivity()).hideFab();
+    }
+
+    @Override
     public void onVoteComment(Comment comment, VoteDirection voteDirection) {
         presenter.vote(comment, voteDirection);
     }

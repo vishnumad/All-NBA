@@ -446,5 +446,7 @@
     <string name="skip">SKIP</string>
     <string name="sign_in">Sign in</string>
     <string name="load_more_comments">Load more comments</string>
+    <string name="halftime">Halftime</string>
+    <string name="end_of_game">FINAL</string>
 
 </resources>

@@ -147,6 +147,7 @@ public class GameThreadPresenter {
                         } else {
                             view.showComments(items);
                         }
+                        view.showFab();
                     }
 
                     @Override
@@ -154,6 +155,7 @@ public class GameThreadPresenter {
                         view.setLoadingIndicator(false);
                         if (e instanceof ThreadNotFoundException) {
                             view.showNoThreadText();
+                            view.hideFab();
                         } else {
                             view.showFailedToLoadCommentsText();
                         }

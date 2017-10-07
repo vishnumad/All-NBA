@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,30 +12,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_margin="10dp">
+            android:visibility="gone">
 
             <Button
                 android:id="@+id/button_away"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="SAS"
                 android:layout_weight="1"
-                android:background="@drawable/square_white" />
+                android:background="@drawable/square_white"
+                android:text="SAS"/>
 
             <Button
                 android:id="@+id/button_home"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="ATL"
-                android:textColor="@color/white"
                 android:layout_weight="1"
-                android:background="@drawable/square_black"/>
+                android:background="@drawable/square_black"
+                android:text="ATL"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -49,76 +48,65 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/box_score_not_available"
+                android:textAlignment="center"
                 android:textColor="@color/colorPrimary"
                 android:textSize="16sp"
-                android:textAlignment="center"
                 android:visibility="gone"/>
 
-            <LinearLayout
-                android:id="@+id/layout_boxscore"
+            <ScrollView
+                android:id="@+id/scrollView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:layout_height="match_parent"
+                android:layout_marginBottom="56dp">
 
-                <LinearLayout
-                    android:id="@+id/layout_players"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="5dp">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                    <TextView
+                    <RelativeLayout
+                        android:id="@+id/playerContainer"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PLAYER"
-                        android:textColor="@color/primaryText"
-                        android:textSize="16sp"
-                        android:layout_margin="3dp"
-                        android:textStyle="bold"/>
+                        android:layout_height="wrap_content">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rv_players"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:listitem="@layout/player_name_item"/>
-
-                </LinearLayout>
-
-                <HorizontalScrollView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="5dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <include layout="@layout/box_score_row" />
-
-                        </LinearLayout>
-
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/rv_stats"
+                        <TableLayout
+                            android:id="@+id/playersTable"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            tools:listitem="@layout/box_score_row" />
-                    </LinearLayout>
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true">
+                        </TableLayout>
 
-                </HorizontalScrollView>
+                    </RelativeLayout>
 
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/playerContainer">
 
-            </LinearLayout>
+                        <HorizontalScrollView
+                            android:id="@+id/horizontalScrollView1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true">
+
+                            <TableLayout
+                                android:id="@+id/statsTable"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                            </TableLayout>
+
+                        </HorizontalScrollView>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+            </ScrollView>
 
         </RelativeLayout>
 
     </LinearLayout>
 
-</android.support.v4.widget.NestedScrollView>
+</FrameLayout>
 

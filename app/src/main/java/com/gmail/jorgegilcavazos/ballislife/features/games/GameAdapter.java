@@ -155,26 +155,34 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 case NbaGame.IN_GAME:
                     tvHomeScore.setVisibility(View.VISIBLE);
                     tvAwayScore.setVisibility(View.VISIBLE);
-                    tvClock.setVisibility(View.VISIBLE);
-                    tvPeriod.setVisibility(View.VISIBLE);
+                    if (nbaGame.getPeriodStatus().equals("Halftime")) {
+                        tvFinal.setVisibility(View.VISIBLE);
+                        tvFinal.setText(R.string.halftime);
+                        tvTime.setVisibility(View.VISIBLE);
+                    } else {
+                        tvClock.setVisibility(View.VISIBLE);
+                        tvPeriod.setVisibility(View.VISIBLE);
+                    }
                     break;
                 case NbaGame.POST_GAME:
                     tvHomeScore.setVisibility(View.VISIBLE);
                     tvAwayScore.setVisibility(View.VISIBLE);
                     tvFinal.setVisibility(View.VISIBLE);
-                    tvFinal.setText("FINAL");
+                    tvFinal.setText(R.string.end_of_game);
                     break;
             }
 
             container.setOnClickListener(v -> gameItemListener.onGameClick(nbaGame));
 
+            int margin = (int) UnitUtils.convertDpToPixel(8, itemView.getContext());
+            ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) gameCard
+                    .getLayoutParams();
             if (isLastGame) {
-                ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams)
-                        gameCard.getLayoutParams();
-                int margin = (int) UnitUtils.convertDpToPixel(8, itemView.getContext());
                 layoutParams.setMargins(margin, margin, margin, margin);
-                gameCard.requestLayout();
+            } else {
+                layoutParams.setMargins(margin, margin, margin, 0);
             }
+            gameCard.requestLayout();
         }
     }
 

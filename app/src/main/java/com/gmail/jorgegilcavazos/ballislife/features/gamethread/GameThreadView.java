@@ -43,4 +43,8 @@ public interface GameThreadView extends MvpView {
     void openReplyToSubmissionActivity();
 
     void setSubmissionId(String submissionId);
+
+    void showFab();
+
+    void hideFab();
 }

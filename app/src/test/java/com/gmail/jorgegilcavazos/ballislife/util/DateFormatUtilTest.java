@@ -164,9 +164,4 @@ public class DateFormatUtilTest {
         assertEquals("4:59 PM", actual4);
         assertEquals("9:00 AM", actual5);
     }
-
-    @Test(expected = RuntimeException.class)
-    public void testLocalizeGameTime_crashIfInvalidDate() {
-        DateFormatUtil.localizeGameTime("5AM ET");
-    }
 }
