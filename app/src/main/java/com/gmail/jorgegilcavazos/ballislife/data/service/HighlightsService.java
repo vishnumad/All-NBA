@@ -10,7 +10,7 @@ import retrofit2.http.Query;
 
 public interface HighlightsService {
 
-    @GET("streamables.json")
+    @GET("highlights/2017-18/.json")
     Single<Map<String, Highlight>> getHighlights(@Query("orderBy") String orderBy,
                                                  @Query("startAt") String startAt,
                                                  @Query("endAt") String endAt,

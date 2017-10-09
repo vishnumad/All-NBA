@@ -12,18 +12,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.functions.Function;
-import retrofit2.Retrofit;
 
 @Singleton
 public class HighlightsRepositoryImpl implements HighlightsRepository {
 
-    public static final String ORDER_KEY = "\"$key\"";
     private static final String START_AT_ALL = "";
+    public static final String ORDER_KEY = "\"$key\"";
+    private final HighlightsService highlightsService;
 
-    private HighlightsService highlightsService;
-    private String lastHighlighKey = "";
+    private String lastHighlightKey = "";
     private boolean firstLoad = true;
 
     private int itemsToLoad;
@@ -31,8 +28,8 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
     private List<Highlight> cachedHighlights;
 
     @Inject
-    public HighlightsRepositoryImpl(Retrofit retrofit) {
-        highlightsService = retrofit.create(HighlightsService.class);
+    public HighlightsRepositoryImpl(HighlightsService highlightsService) {
+        this.highlightsService = highlightsService;
         cachedHighlights = new ArrayList<>();
     }
 
@@ -44,7 +41,7 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
     @Override
     public void reset() {
         firstLoad = true;
-        lastHighlighKey = "";
+        lastHighlightKey = "";
         cachedHighlights.clear();
     }
 
@@ -57,39 +54,36 @@ public class HighlightsRepositoryImpl implements HighlightsRepository {
             itemsToLoad = String.valueOf(this.itemsToLoad);
         } else {
             startAt = null;
-            endAt = "\"" + lastHighlighKey + "\"";
+            endAt = "\"" + lastHighlightKey + "\"";
             itemsToLoad = String.valueOf(this.itemsToLoad + 1);
         }
 
-        return highlightsService.getHighlights(ORDER_KEY, startAt, endAt, itemsToLoad)
-                    .flatMap(new Function<Map<String, Highlight>, SingleSource<? extends List<Highlight>>>() {
-                        @Override
-                        public SingleSource<? extends List<Highlight>> apply(Map<String, Highlight> stringHighlightMap) throws Exception {
-                            List<Highlight> highlightList = new ArrayList<>();
-                            if (stringHighlightMap.isEmpty()) {
-                                cachedHighlights.addAll(highlightList);
-                                return Single.just(highlightList);
-                            } else {
-                                // Save the key of the 1st element (oldest on the map) for pagination.
-                                for (Map.Entry<String, Highlight> entry : stringHighlightMap.entrySet()) {
-                                    lastHighlighKey = entry.getKey();
-                                    break;
-                                }
+        return highlightsService.getHighlights(ORDER_KEY, startAt, endAt, itemsToLoad).flatMap
+                (stringHighlightMap -> {
+            List<Highlight> highlightList = new ArrayList<>();
+            if (stringHighlightMap.isEmpty()) {
+                cachedHighlights.addAll(highlightList);
+                return Single.just(highlightList);
+            } else {
+                // Save the key of the 1st element (oldest on the map) for pagination.
+                for (Map.Entry<String, Highlight> entry : stringHighlightMap.entrySet()) {
+                    lastHighlightKey = entry.getKey();
+                    break;
+                }
 
-                                highlightList.addAll(stringHighlightMap.values());
+                highlightList.addAll(stringHighlightMap.values());
 
-                                if (!firstLoad) {
-                                    // Last element was already emitted in the previous loadHighlights.
-                                    highlightList.remove(highlightList.size() - 1);
-                                }
+                if (!firstLoad) {
+                    // Last element was already emitted in the previous loadHighlights.
+                    highlightList.remove(highlightList.size() - 1);
+                }
 
-                                firstLoad = false;
+                firstLoad = false;
 
-                                // Reverse items so that they're sorted from most recent to oldest.
-                                Collections.reverse(highlightList);
-                                cachedHighlights.addAll(highlightList);
-                                return Single.just(highlightList);
-                            }
+                // Reverse items so that they're sorted from most recent to oldest.
+                Collections.reverse(highlightList);
+                cachedHighlights.addAll(highlightList);
+                return Single.just(highlightList);
                         }
                     });
     }

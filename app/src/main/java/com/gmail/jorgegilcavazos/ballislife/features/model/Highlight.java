@@ -1,17 +1,24 @@
 package com.gmail.jorgegilcavazos.ballislife.features.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Highlight {
 
     private String id;
     private String title;
+    private String thumbnail;
     private String hdThumbnail;
     private String url;
+    @SerializedName("created_utc") private long createdUtc;
 
-    public Highlight(String id, String title, String hdThumbnail, String url) {
+    public Highlight(String id, String title, String thumbnail, String hdThumbnail, String url,
+                     long createdUtc) {
         this.id = id;
         this.title = title;
+        this.thumbnail = thumbnail;
         this.hdThumbnail = hdThumbnail;
         this.url = url;
+        this.createdUtc = createdUtc;
     }
 
     public String getId() {
@@ -30,6 +37,14 @@ public class Highlight {
         this.title = title;
     }
 
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public String getHdThumbnail() {
         return hdThumbnail;
     }
@@ -44,5 +59,13 @@ public class Highlight {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public long getCreatedUtc() {
+        return createdUtc;
+    }
+
+    public void setCreatedUtc(long createdUtc) {
+        this.createdUtc = createdUtc;
     }
 }

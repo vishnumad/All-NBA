@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,7 +23,6 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 import static android.view.View.GONE;
-import static android.view.View.OnClickListener;
 import static android.view.View.VISIBLE;
 
 public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
@@ -36,11 +36,6 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         this.context = context;
         this.highlights = highlights;
         this.contentViewType = contentViewType;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return contentViewType;
     }
 
     @Override
@@ -69,6 +64,11 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return contentViewType;
+    }
+
+    @Override
     public int getItemCount() {
         return null != highlights ? highlights.size() : 0;
     }
@@ -93,7 +93,13 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     private void preFetchImages(List<Highlight> highlights) {
         for (Highlight highlight : highlights) {
-            Picasso.with(context).load(highlight.getHdThumbnail()).fetch();
+            if (StringUtils.Companion.isEmpty(highlight.getHdThumbnail())) {
+                if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
+                    Picasso.with(context).load(highlight.getThumbnail()).fetch();
+                }
+            } else {
+                Picasso.with(context).load(highlight.getHdThumbnail()).fetch();
+            }
         }
     }
 
@@ -129,27 +135,22 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
                       final PublishSubject<Highlight> viewClickSubject,
                       final PublishSubject<Highlight> shareClickSubject) {
             tvTitle.setText(highlight.getTitle());
-            Picasso.with(context)
-                    .load(highlight.getHdThumbnail())
-                    .into(ivThumbnail);
+
+            boolean thumbnailAvailable = true;
+            if (!StringUtils.Companion.isEmpty(highlight.getHdThumbnail())) {
+                Picasso.with(context).load(highlight.getHdThumbnail()).into(ivThumbnail);
+            } else if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
+                Picasso.with(context).load(highlight.getThumbnail()).into(ivThumbnail);
+            } else {
+                thumbnailAvailable = false;
+            }
 
             // Set bball background visibility only for list type view.
-            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.HIGHLIGHTS_VIEW_SMALL &&
-                    highlight.getHdThumbnail() == null ? VISIBLE : GONE);
+            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.HIGHLIGHTS_VIEW_SMALL && !thumbnailAvailable ? VISIBLE : GONE);
 
-            container.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewClickSubject.onNext(highlight);
-                }
-            });
+            container.setOnClickListener(v -> viewClickSubject.onNext(highlight));
 
-            ibShare.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareClickSubject.onNext(highlight);
-                }
-            });
+            ibShare.setOnClickListener(v -> shareClickSubject.onNext(highlight));
         }
     }
 }
