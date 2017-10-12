@@ -32,6 +32,16 @@ public final class Utilities {
         return url.substring(i + streamableUrl.length());
     }
 
+    public static String getYoutubeVideoIdFromUrl(String url) {
+        if (url.contains("youtu.be")) {
+            return url.substring(url.lastIndexOf("/") + 1);
+        } else if (url.contains("youtube.com")) {
+            return url.substring(url.lastIndexOf("=") + 1);
+        } else {
+            return null;
+        }
+    }
+
     // Get data from real submission if available, otherwise used data from fake one.
     public static Optional<Pair<ThumbnailType, String>> getThumbnailToShowFromCustomSubmission
     (SubmissionWrapper submissionWrapper) {

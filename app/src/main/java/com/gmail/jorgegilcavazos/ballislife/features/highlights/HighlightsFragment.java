@@ -29,6 +29,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         }
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<Highlight>(25), viewType);
+        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<>(25), viewType);
 
         setHasOptionsMenu(true);
     }
@@ -226,6 +227,25 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
+    public void openYoutubeVideo(String videoId) {
+        Intent intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
+                "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
+                videoId, 0, /* Start millisecond */
+                true /* Autoplay */, false /* Lightbox */);
+        startActivity(intent);
+    }
+
+    @Override
+    public void showErrorOpeningYoutube() {
+        Toast.makeText(getActivity(), R.string.error_loading_youtube, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showUnknownSourceError() {
+        Toast.makeText(getActivity(), R.string.unknown_source, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void resetScrollState() {
         scrollListener.resetState();
     }
@@ -264,20 +284,14 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         View viewTypeCard = view.findViewById(R.id.layout_type_card);
         View viewTypeList = view.findViewById(R.id.layout_type_list);
 
-        viewTypeCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_LARGE);
-                materialDialog.dismiss();
-            }
+        viewTypeCard.setOnClickListener(v -> {
+            presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_LARGE);
+            materialDialog.dismiss();
         });
 
-        viewTypeList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_SMALL);
-                materialDialog.dismiss();
-            }
+        viewTypeList.setOnClickListener(v -> {
+            presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_SMALL);
+            materialDialog.dismiss();
         });
 
         materialDialog.show();

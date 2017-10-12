@@ -448,5 +448,7 @@
     <string name="load_more_comments">Load more comments</string>
     <string name="halftime">Halftime</string>
     <string name="end_of_game">FINAL</string>
+    <string name="error_loading_youtube">Error loading youtube video</string>
+    <string name="unknown_source">Unknown source</string>
 
 </resources>

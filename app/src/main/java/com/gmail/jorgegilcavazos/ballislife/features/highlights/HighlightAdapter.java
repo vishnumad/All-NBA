@@ -142,11 +142,13 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             } else if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
                 Picasso.with(context).load(highlight.getThumbnail()).into(ivThumbnail);
             } else {
+                ivThumbnail.setImageDrawable(null);
                 thumbnailAvailable = false;
             }
 
             // Set bball background visibility only for list type view.
-            ivThumbnailUnavailable.setVisibility(contentViewType == Constants.HIGHLIGHTS_VIEW_SMALL && !thumbnailAvailable ? VISIBLE : GONE);
+            ivThumbnailUnavailable.setVisibility(contentViewType == Constants
+                    .HIGHLIGHTS_VIEW_SMALL && !thumbnailAvailable ? VISIBLE : GONE);
 
             container.setOnClickListener(v -> viewClickSubject.onNext(highlight));
 

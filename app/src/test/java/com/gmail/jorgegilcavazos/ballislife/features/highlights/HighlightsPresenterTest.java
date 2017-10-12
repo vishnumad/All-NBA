@@ -47,9 +47,9 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_hlsAvailable_shouldShowHighlights() {
         List<Highlight> highlightList = new ArrayList<>();
-        highlightList.add(new Highlight("1", "Title 1", "url1", "url1"));
-        highlightList.add(new Highlight("2", "Title 2", "url2", "url2"));
-        highlightList.add(new Highlight("3", "Title 3", "url3", "url3"));
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0));
         Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
 
         presenter.loadHighlights(true); // reset to get first batch.
@@ -102,9 +102,9 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_loadSecondPage_showShowHighlights() {
         List<Highlight> highlightList = new ArrayList<>();
-        highlightList.add(new Highlight("1", "Title 1", "url1", "url1"));
-        highlightList.add(new Highlight("2", "Title 2", "url2", "url2"));
-        highlightList.add(new Highlight("3", "Title 3", "url3", "url3"));
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0));
         Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
 
         presenter.loadHighlights(false);
@@ -117,17 +117,21 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testSubscribeToHighlightsClick() {
-        Highlight hl1 = new Highlight("1", "Title 1", "url1", "streamable.com/abcde");
-        Highlight hl2 = new Highlight("2", "Title 2", "url2", "twitter.com/rkeyr");
-        Highlight hl3 = new Highlight("3", "Title 3", "url3", "streamable.com/fghi");
+        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0);
+        Highlight hl2 = new Highlight("2", "Title 2", "", "", "twitter.com/rkeyr", 0);
+        Highlight hl3 = new Highlight("3", "Title 3", "", "", "streamable.com/fghi", 0);
+        Highlight hl4 = new Highlight("3", "Title 3", "", "", "youtube.com?v=poiuy", 0);
+        Highlight hl5 = new Highlight("3", "Title 3", "", "", "youtu.be/xyz", 0);
 
-        Observable<Highlight> highlightObservable = Observable.just(hl1, hl2, hl3);
+        Observable<Highlight> highlightObservable = Observable.just(hl1, hl2, hl3, hl4, hl5);
 
         presenter.subscribeToHighlightsClick(highlightObservable);
 
         verify(mockView).openStreamable("abcde");
-        verify(mockView).showErrorOpeningStreamable();
+        verify(mockView).showUnknownSourceError();
         verify(mockView).openStreamable("fghi");
+        verify(mockView).openYoutubeVideo("poiuy");
+        verify(mockView).openYoutubeVideo("xyz");
         verifyNoMoreInteractions(mockView);
     }
 

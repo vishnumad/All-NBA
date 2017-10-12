@@ -91,11 +91,23 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                 .subscribeWith(new DisposableObserver<Highlight>() {
                     @Override
                     public void onNext(Highlight hl) {
-                        String shortCode = Utilities.getStreamableShortcodeFromUrl(hl.getUrl());
-                        if (shortCode != null) {
-                            view.openStreamable(shortCode);
+                        if (hl.getUrl().contains("streamable")) {
+                            String shortCode = Utilities.getStreamableShortcodeFromUrl(hl.getUrl());
+                            if (shortCode != null) {
+                                view.openStreamable(shortCode);
+                            } else {
+                                view.showErrorOpeningStreamable();
+                            }
+                        } else if (hl.getUrl().contains("youtube") || hl.getUrl().contains("youtu" +
+                                ".be")) {
+                            String videoId = Utilities.getYoutubeVideoIdFromUrl(hl.getUrl());
+                            if (videoId == null) {
+                                view.showErrorOpeningYoutube();
+                            } else {
+                                view.openYoutubeVideo(videoId);
+                            }
                         } else {
-                            view.showErrorOpeningStreamable();
+                            view.showUnknownSourceError();
                         }
                     }
 

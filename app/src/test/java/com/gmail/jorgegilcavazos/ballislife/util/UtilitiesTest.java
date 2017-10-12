@@ -66,4 +66,15 @@ public class UtilitiesTest {
         assertEquals("sdThumbnail", optional1.get().second);
         assertFalse(optional2.isPresent());
     }
+
+    @Test
+    public void getYoutubeVideoIdFromUrl() {
+        String url1 = "https://youtu.be/LEOODbUCge";
+        String url2 = "https://streamable.com/jcb6p";
+        String url3 = "https://www.youtube.com/watch?v=cwlx4QyCTBU";
+
+        assertEquals("LEOODbUCge", Utilities.getYoutubeVideoIdFromUrl(url1));
+        assertEquals(null, Utilities.getYoutubeVideoIdFromUrl(url2));
+        assertEquals("cwlx4QyCTBU", Utilities.getYoutubeVideoIdFromUrl(url3));
+    }
 }

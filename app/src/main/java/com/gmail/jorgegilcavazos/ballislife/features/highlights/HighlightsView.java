@@ -18,6 +18,12 @@ public interface HighlightsView {
 
     void showErrorOpeningStreamable();
 
+    void openYoutubeVideo(String videoId);
+
+    void showErrorOpeningYoutube();
+
+    void showUnknownSourceError();
+
     void resetScrollState();
 
     void shareHighlight(Highlight highlight);
