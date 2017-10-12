@@ -21,7 +21,7 @@
 
         <ImageView
             android:id="@+id/awayicon"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
@@ -29,34 +29,33 @@
 
         <TextView
             android:id="@+id/awaylabel"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/awayicon"
             android:text="A"
             android:textAlignment="center"
             android:textColor="@color/secondaryText"
-            android:textSize="15dp"/>
+            android:textSize="15sp"/>
 
         <ImageView
             android:id="@+id/homeicon"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
-            android:src="@mipmap/ic_launcher"
-            />
+            android:src="@mipmap/ic_launcher"/>
 
         <TextView
             android:id="@+id/homelabel"
-            android:layout_width="70dp"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/homeicon"
             android:text="B"
             android:textAlignment="center"
             android:textColor="@color/secondaryText"
-            android:textSize="15dp"/>
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/text_time"
@@ -68,7 +67,7 @@
             android:layout_toStartOf="@id/homeicon"
             android:gravity="center"
             android:textColor="@color/primaryText"
-            android:textSize="20dp"/>
+            android:textSize="20sp"/>
 
         <TextView
             android:id="@+id/text_final"
@@ -79,7 +78,7 @@
             android:layout_toEndOf="@id/awayicon"
             android:layout_toStartOf="@id/homeicon"
             android:gravity="center"
-            android:textSize="15dp"/>
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/awayscore"
@@ -87,23 +86,25 @@
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/awayicon"
+            android:layout_toStartOf="@id/period"
             android:gravity="center"
             android:text="50"
             android:textAlignment="center"
             android:textColor="@color/primaryText"
-            android:textSize="25dp"/>
+            android:textSize="25sp"/>
 
         <TextView
             android:id="@+id/homescore"
             android:layout_width="80dp"
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/period"
             android:layout_toStartOf="@+id/homeicon"
             android:gravity="center"
             android:text="100"
             android:textAlignment="center"
             android:textColor="@color/primaryText"
-            android:textSize="25dp"/>
+            android:textSize="25sp"/>
 
         <TextView
             android:id="@+id/clock"
@@ -115,7 +116,7 @@
             android:text="12:00"
             android:textAlignment="center"
             android:textColor="@color/secondaryText"
-            android:textSize="15dp"/>
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/period"
@@ -127,7 +128,7 @@
             android:text="4th Qtr"
             android:textAlignment="center"
             android:textColor="@color/secondaryText"
-            android:textSize="15dp"/>
+            android:textSize="15sp"/>
 
     </RelativeLayout>
 

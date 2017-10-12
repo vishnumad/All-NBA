@@ -164,4 +164,22 @@ public class DateFormatUtilTest {
         assertEquals("4:59 PM", actual4);
         assertEquals("9:00 AM", actual5);
     }
+
+    @Test
+    public void getDateStartUtc() {
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+
+        long expected = date.getTimeInMillis() / 1000;
+
+        date.set(Calendar.HOUR_OF_DAY, 5);
+        date.set(Calendar.MINUTE, 32);
+        date.set(Calendar.SECOND, 11);
+        date.set(Calendar.MILLISECOND, 7);
+
+        assertEquals(expected, DateFormatUtil.getDateStartUtc(date));
+    }
 }

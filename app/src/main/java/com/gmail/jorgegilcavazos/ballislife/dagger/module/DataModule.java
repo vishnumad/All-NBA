@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.google.gson.Gson;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -86,5 +87,11 @@ public class DataModule {
     @Singleton
     HighlightsService provideHighlightsService(Retrofit retrofit) {
         return retrofit.create(HighlightsService.class);
+    }
+
+    @Provides
+    @Singleton
+    NbaGamesService provideNbaGamesService(Retrofit retrofit) {
+        return retrofit.create(NbaGamesService.class);
     }
 }

@@ -23,6 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.firebase.MyMessagingService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class GamesFragment extends Fragment implements GamesView,
     private Unbinder unbinder;
     private GameItemListener gameItemListener = new GameItemListener() {
         @Override
-        public void onGameClick(NbaGame clickedGame) {
+        public void onGameClick(GameV2 clickedGame) {
             presenter.openGameDetails(clickedGame, selectedDate);
         }
     };
@@ -194,12 +195,12 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void showGames(List<NbaGame> games) {
+    public void showGames(List<GameV2> games) {
         gameAdapter.swap(games);
     }
 
     @Override
-    public void showGameDetails(NbaGame game, Calendar selectedDate) {
+    public void showGameDetails(GameV2 game, Calendar selectedDate) {
         Intent intent = new Intent(getActivity(), CommentsActivity.class);
         intent.putExtra(GAME_THREAD_HOME, game.getHomeTeamAbbr());
         intent.putExtra(GAME_THREAD_AWAY, game.getAwayTeamAbbr());
@@ -209,7 +210,7 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void updateScores(List<NbaGame> games) {
+    public void updateScores(List<GameV2> games) {
         gameAdapter.updateScores(games);
         rvGames.setVisibility(View.VISIBLE);
     }
@@ -227,12 +228,7 @@ public class GamesFragment extends Fragment implements GamesView,
     public void showSnackbar(boolean canReload) {
         snackbar = Snackbar.make(getView(), R.string.failed_game_data, Snackbar.LENGTH_INDEFINITE);
         if (canReload) {
-            snackbar.setAction(R.string.retry, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    presenter.loadGames(selectedDate);
-                }
-            });
+            snackbar.setAction(R.string.retry, v -> presenter.loadGames(selectedDate));
         }
         snackbar.show();
     }
@@ -245,6 +241,6 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     public interface GameItemListener {
-        void onGameClick(NbaGame clickedGame);
+        void onGameClick(GameV2 clickedGame);
     }
 }

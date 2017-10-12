@@ -177,4 +177,25 @@ public final class DateFormatUtil {
             return dateETString;
         }
     }
+
+    public static long getDateStartUtc(Calendar date) {
+        Calendar dateStart = Calendar.getInstance();
+        dateStart.setTimeInMillis(date.getTimeInMillis());
+        dateStart.set(Calendar.HOUR_OF_DAY, 0);
+        dateStart.set(Calendar.MINUTE, 0);
+        dateStart.set(Calendar.SECOND, 0);
+        dateStart.set(Calendar.MILLISECOND, 0);
+        return dateStart.getTimeInMillis() / 1000;
+    }
+
+    public static long getDateEndUtc(Calendar date) {
+        Calendar dateEnd = Calendar.getInstance();
+        dateEnd.setTimeInMillis(date.getTimeInMillis());
+        dateEnd.set(Calendar.HOUR_OF_DAY, 0);
+        dateEnd.set(Calendar.MINUTE, 0);
+        dateEnd.set(Calendar.SECOND, 0);
+        dateEnd.set(Calendar.MILLISECOND, 0);
+        dateEnd.add(Calendar.DAY_OF_YEAR, 1);
+        return dateEnd.getTimeInMillis() / 1000;
+    }
 }

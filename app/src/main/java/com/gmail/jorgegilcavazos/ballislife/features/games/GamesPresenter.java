@@ -2,7 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.games;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
-import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.GameUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -30,8 +30,7 @@ public class GamesPresenter extends BasePresenter<GamesView> {
     }
 
     public void loadFirstAvailable(Calendar selectedDate) {
-        List<NbaGame> nbaGames = gamesRepository
-                .getCachedGames(DateFormatUtil.getNoDashDateString(selectedDate.getTime()));
+        List<GameV2> nbaGames = null;
         if (nbaGames == null || nbaGames.isEmpty()) {
             loadGames(selectedDate);
         } else {
@@ -51,13 +50,11 @@ public class GamesPresenter extends BasePresenter<GamesView> {
         loadDateNavigatorText(selectedDate);
 
         disposables.clear();
-        disposables.add(gamesRepository.getGames(DateFormatUtil
-                .getNoDashDateString(selectedDate.getTime()))
+        disposables.add(gamesRepository.getGames(selectedDate)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui())
-                .subscribeWith(new DisposableSingleObserver<List<NbaGame>>() {
+                .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<GameV2>>() {
                     @Override
-                    public void onSuccess(List<NbaGame> games) {
+                    public void onSuccess(List<GameV2> games) {
                         if (games.isEmpty()) {
                             view.setNoGamesIndicator(true);
                         } else {
@@ -80,7 +77,7 @@ public class GamesPresenter extends BasePresenter<GamesView> {
         view.setDateNavigatorText(dateText);
     }
 
-    public void openGameDetails(NbaGame requestedGame, Calendar selectedDate) {
+    public void openGameDetails(GameV2 requestedGame, Calendar selectedDate) {
         view.showGameDetails(requestedGame, selectedDate);
     }
 

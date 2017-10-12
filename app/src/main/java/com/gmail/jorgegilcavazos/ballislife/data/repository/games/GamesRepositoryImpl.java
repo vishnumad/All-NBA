@@ -1,61 +1,39 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games;
 
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
-import com.gmail.jorgegilcavazos.ballislife.features.model.DayGames;
-import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
+import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.functions.Function;
-import retrofit2.Retrofit;
 
 /**
- * Implemntation of the {@link GamesRepository} interface.
+ * Implementation of the {@link GamesRepository} interface.
  */
 @Singleton
 public class GamesRepositoryImpl implements GamesRepository {
-    private NbaGamesService nbaGamesService;
-    private Map<String, List<NbaGame>> cachedDayGamesMap;
+
+    private final NbaGamesService gamesService;
 
     @Inject
-    public GamesRepositoryImpl(Retrofit retrofit) {
-        nbaGamesService = retrofit.create(NbaGamesService.class);
-        cachedDayGamesMap = new HashMap<>();
+    public GamesRepositoryImpl(NbaGamesService gamesService) {
+        this.gamesService = gamesService;
     }
 
     @Override
-    public void reset() {
-        cachedDayGamesMap.clear();
-    }
-
-    @Override
-    public Single<List<NbaGame>> getGames(final String date) {
-        return nbaGamesService.getDayGames(date)
-                .flatMap(new Function<DayGames, SingleSource<? extends List<NbaGame>>>() {
-                    @Override
-                    public SingleSource<? extends List<NbaGame>> apply(DayGames dayGames) throws
-                            Exception {
-                        if (dayGames.getNum_games() == 0) {
-                            cachedDayGamesMap.remove(date);
-                            return Single.just(new ArrayList<NbaGame>());
-                        } else {
-                            cachedDayGamesMap.put(date, dayGames.getGames());
-                            return Single.just(dayGames.getGames());
-                        }
-                    }
+    public Single<List<GameV2>> getGames(Calendar date) {
+        return gamesService.getDayGames("\"timeUtc\"", DateFormatUtil.getDateStartUtc(date),
+                DateFormatUtil.getDateEndUtc(date)).map(idGameV2Map -> new ArrayList<>
+                (idGameV2Map.values())).map(gameV2s -> {
+            Collections.sort(gameV2s, (g1, g2) -> g1.getTimeUtc() < g2.getTimeUtc() ? -1 : 1);
+            return gameV2s;
                 });
-    }
-
-    @Override
-    public List<NbaGame> getCachedGames(String date) {
-        return cachedDayGamesMap.get(date);
     }
 }

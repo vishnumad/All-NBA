@@ -13,6 +13,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
@@ -28,10 +29,10 @@ import butterknife.ButterKnife;
  * RecyclerView Adapter used by the {@link GamesFragment} to display a list of games.
  */
 public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<NbaGame> nbaGameList;
+    private List<GameV2> nbaGameList;
     private GamesFragment.GameItemListener gameItemListener;
 
-    public GameAdapter(List<NbaGame> nbaGames,
+    public GameAdapter(List<GameV2> nbaGames,
                        GamesFragment.GameItemListener itemListener) {
         nbaGameList = nbaGames;
         gameItemListener = itemListener;
@@ -66,7 +67,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return null != nbaGameList ? nbaGameList.size() : 0;
     }
 
-    public void swap(List<NbaGame> data) {
+    public void swap(List<GameV2> data) {
         nbaGameList.clear();
         nbaGameList.addAll(data);
         notifyDataSetChanged();
@@ -77,27 +78,9 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void updateScores(List<NbaGame> data) {
-        for (NbaGame newGame : data) {
-            String id = newGame.getId();
-            String homeScore = newGame.getHomeTeamScore();
-            String awayScore = newGame.getAwayTeamScore();
-            String clock = newGame.getGameClock();
-            String periodValue = newGame.getPeriodValue();
-            String periodStatus = newGame.getPeriodStatus();
-            String gameStatus = newGame.getGameStatus();
-
-            for (NbaGame oldGame : nbaGameList) {
-                if (oldGame.getId().equals(id)) {
-                    oldGame.setHomeTeamScore(homeScore);
-                    oldGame.setAwayTeamScore(awayScore);
-                    oldGame.setGameClock(clock);
-                    oldGame.setPeriodValue(periodValue);
-                    oldGame.setPeriodStatus(periodStatus);
-                    oldGame.setGameStatus(gameStatus);
-                }
-            }
-        }
+    public void updateScores(List<GameV2> data) {
+        nbaGameList.clear();
+        nbaGameList.addAll(data);
         notifyDataSetChanged();
     }
 
@@ -121,7 +104,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(NbaGame nbaGame, GamesFragment.GameItemListener gameItemListener,
+        public void bindData(GameV2 nbaGame, GamesFragment.GameItemListener gameItemListener,
                              boolean isLastGame) {
             int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getHomeTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
@@ -205,7 +188,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(NbaGame nbaGame, GamesFragment.GameItemListener gameItemListener) {
+        public void bindData(GameV2 nbaGame, GamesFragment.GameItemListener gameItemListener) {
             int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getHomeTeamAbbr().toLowerCase(), "color", itemView.getContext()
                     .getPackageName());
