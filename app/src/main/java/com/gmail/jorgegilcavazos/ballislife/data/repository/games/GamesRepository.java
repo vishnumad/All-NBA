@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games;
 
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiModel;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 
@@ -14,4 +15,6 @@ import io.reactivex.Observable;
 public interface GamesRepository {
 
     Observable<List<GameV2>> getGames(Calendar date, boolean forceReload);
+
+    Observable<GamesUiModel> models(Calendar date, boolean forceNetwork);
 }

@@ -7,10 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.GameUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.Calendar;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -24,48 +22,61 @@ public class GamesPresenter extends BasePresenter<GamesView> {
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Inject
-    public GamesPresenter(GamesRepository gamesRepository,
-                          BaseSchedulerProvider schedulerProvider) {
+    public GamesPresenter(
+            GamesRepository gamesRepository, BaseSchedulerProvider schedulerProvider) {
         this.gamesRepository = gamesRepository;
         this.schedulerProvider = schedulerProvider;
     }
 
-    public void loadGames(Calendar selectedDate, boolean forceReload) {
-        view.dismissSnackbar();
-        view.setNoGamesIndicator(false);
-        view.setLoadingIndicator(true);
+    public void onDateChanged() {
         view.hideGames();
+    }
 
+    public void loadModels(Calendar selectedDate, boolean forceNetwork) {
+        view.dismissSnackbar();
         loadDateNavigatorText(selectedDate);
 
         disposables.clear();
-        disposables.add(gamesRepository.getGames(selectedDate, forceReload)
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.ui(), true)
-                                .subscribeWith(new DisposableObserver<List<GameV2>>() {
-                                    @Override
-                                    public void onNext(List<GameV2> games) {
-                                        view.showGames(games);
-                                        view.setLoadingIndicator(false);
-                                    }
+        disposables.add(gamesRepository.models(selectedDate, forceNetwork)
+                                       .observeOn(schedulerProvider.ui(), true)
+                                       .subscribeWith(new DisposableObserver<GamesUiModel>() {
+                                           @Override
+                                           public void onNext(GamesUiModel uiModel) {
+                                               if (uiModel.isMemorySuccess() && uiModel.getGames()
+                                                                                       .isEmpty()) {
+                                                   view.setLoadingIndicator(true);
+                                               }
 
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        view.setLoadingIndicator(false);
-                                        if (NetworkUtils.Companion.isNetworkAvailable()) {
-                                            view.showErrorSnackbar();
-                                            FirebaseCrash.log("Error getting games...");
-                                            FirebaseCrash.report(e);
-                                        } else {
-                                            view.showNoNetSnackbar();
-                                        }
-                                    }
+                                               if (uiModel.isNetworkSuccess()) {
+                                                   view.setLoadingIndicator(false);
+                                               }
 
-                                    @Override
-                                    public void onComplete() {
+                                               if (uiModel.getGames() != null && !uiModel.getGames()
+                                                                                         .isEmpty()) {
+                                                   view.showGames(uiModel.getGames());
+                                               }
 
-                                    }
-                                }));
+                                               view.setNoGamesIndicator(uiModel.isNetworkSuccess
+                                                       () && uiModel
+                                                       .getGames()
+                                                       .isEmpty());
+                                           }
+
+                                           @Override
+                                           public void onError(Throwable e) {
+                                               view.setLoadingIndicator(false);
+                                               if (NetworkUtils.Companion.isNetworkAvailable()) {
+                                                   view.showErrorSnackbar();
+                                               } else {
+                                                   view.showNoNetSnackbar();
+                                               }
+                                           }
+
+                                           @Override
+                                           public void onComplete() {
+
+                                           }
+                                       }));
     }
 
     public void loadDateNavigatorText(Calendar selectedDate) {

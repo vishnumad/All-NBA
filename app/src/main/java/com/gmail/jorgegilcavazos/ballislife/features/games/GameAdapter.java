@@ -73,11 +73,6 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void clearData() {
-        nbaGameList.clear();
-        notifyDataSetChanged();
-    }
-
     public void updateScores(List<GameV2> data) {
         nbaGameList.clear();
         nbaGameList.addAll(data);

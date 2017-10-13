@@ -1,8 +1,10 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games
 
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiModel
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.Single
 import timber.log.Timber
@@ -15,7 +17,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class GamesRepositoryImpl @Inject constructor(
-    private val gamesService: NbaGamesService) : GamesRepository {
+    private val gamesService: NbaGamesService,
+    private val schedulerProvider: BaseSchedulerProvider) : GamesRepository {
 
   private val gamesMap = HashMap<String, GameV2>()
 
@@ -31,6 +34,38 @@ class GamesRepositoryImpl @Inject constructor(
     return source
         .filter { it.isNotEmpty() }
         .concatMap { Observable.just(it.values.sortedBy { it.timeUtc }) }
+  }
+
+  override fun models(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
+    val network = networkSource(date).toObservable()
+        .concatMap {
+          if (it.isEmpty()) {
+            Observable.just(GamesUiModel.networkSuccess(emptyList()))
+          } else {
+            Observable.just(GamesUiModel.networkSuccess(it.values.sortedBy { it.id }))
+          }
+        }
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.ui())
+        .startWith(GamesUiModel.networkInProgress())
+
+    val memory = memorySource(date).toObservable()
+        .concatMap {
+          if (it.isEmpty()) {
+            Observable.just(GamesUiModel.memorySuccess(emptyList()))
+          } else {
+            Observable.just(GamesUiModel.memorySuccess(it.values.sortedBy { it.id }))
+          }
+        }
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.ui())
+        .startWith(GamesUiModel.memoryInProgress())
+
+    if (forceNetwork) {
+      return network
+    }
+
+    return Observable.concat(memory, network)
   }
 
   private fun networkSource(date: Calendar): Single<Map<String, GameV2>> {
@@ -49,5 +84,6 @@ class GamesRepositoryImpl @Inject constructor(
           it.timeUtc > DateFormatUtil.getDateStartUtc(date)
               && it.timeUtc < DateFormatUtil.getDateEndUtc(date)
         })
+        .doOnSuccess { gamesMap.putAll(it) }
   }
 }

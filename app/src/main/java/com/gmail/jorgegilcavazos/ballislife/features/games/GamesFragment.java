@@ -108,11 +108,13 @@ public class GamesFragment extends Fragment implements GamesView,
 
         btnPrevDay.setOnClickListener(v -> {
             selectedDate.add(Calendar.DAY_OF_YEAR, -1);
-            presenter.loadGames(selectedDate, false);
+            presenter.onDateChanged();
+            presenter.loadModels(selectedDate, false);
         });
         btnNextDay.setOnClickListener(v -> {
             selectedDate.add(Calendar.DAY_OF_YEAR, 1);
-            presenter.loadGames(selectedDate, false);
+            presenter.onDateChanged();
+            presenter.loadModels(selectedDate, false);
         });
 
         presenter.attachView(this);
@@ -135,7 +137,7 @@ public class GamesFragment extends Fragment implements GamesView,
     @Override
     public void onResume() {
         super.onResume();
-        presenter.loadGames(selectedDate, false);
+        presenter.loadModels(selectedDate, false);
         getActivity().registerReceiver(scoresUpdateReceiver,
                 new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
     }
@@ -164,7 +166,7 @@ public class GamesFragment extends Fragment implements GamesView,
 
     @Override
     public void onRefresh() {
-        presenter.loadGames(selectedDate, true);
+        presenter.loadModels(selectedDate, true);
     }
 
     @Override
@@ -179,12 +181,13 @@ public class GamesFragment extends Fragment implements GamesView,
 
     @Override
     public void hideGames() {
-        gameAdapter.clearData();
+        rvGames.setVisibility(View.GONE);
     }
 
     @Override
     public void showGames(List<GameV2> games) {
         gameAdapter.swap(games);
+        rvGames.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -221,7 +224,9 @@ public class GamesFragment extends Fragment implements GamesView,
         snackbar = Snackbar.make(getView(),
                                  R.string.your_device_is_offline,
                                  Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, v -> presenter.loadGames(selectedDate, true));
+                           .setAction(
+                                   R.string.retry,
+                                   v -> presenter.loadModels(selectedDate, true));
         snackbar.show();
     }
 
@@ -232,9 +237,10 @@ public class GamesFragment extends Fragment implements GamesView,
         }
 
         snackbar = Snackbar.make(getView(),
-                                 R.string.something_went_wrong,
-                                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, v -> presenter.loadGames(selectedDate, true));
+                                 R.string.something_went_wrong, Snackbar.LENGTH_SHORT)
+                           .setAction(
+                                   R.string.retry,
+                                   v -> presenter.loadModels(selectedDate, true));
         snackbar.show();
     }
 
