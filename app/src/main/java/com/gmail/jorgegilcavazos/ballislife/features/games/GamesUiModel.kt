@@ -10,20 +10,36 @@ class GamesUiModel(
     val games: List<GameV2>) {
 
   companion object {
-    fun memoryInProgress(): GamesUiModel {
-      return GamesUiModel(true, false, false, false, emptyList())
-    }
+    fun memoryInProgress(): GamesUiModel =
+        GamesUiModel(
+            isMemoryInProgress = true,
+            isMemorySuccess = false,
+            isNetworkInProgress = false,
+            isNetworkSuccess = false,
+            games = emptyList())
 
-    fun memorySuccess(games: List<GameV2>): GamesUiModel {
-      return GamesUiModel(false, true, false, false, games)
-    }
+    fun memorySuccess(games: List<GameV2>): GamesUiModel =
+        GamesUiModel(
+            isMemoryInProgress = false,
+            isMemorySuccess = true,
+            isNetworkInProgress = false,
+            isNetworkSuccess = false,
+            games = games)
 
-    fun networkInProgress(): GamesUiModel {
-      return GamesUiModel(false, false, true, false, emptyList())
-    }
+    fun networkInProgress(): GamesUiModel =
+        GamesUiModel(
+            isMemoryInProgress = false,
+            isMemorySuccess = false,
+            isNetworkInProgress = false,
+            isNetworkSuccess = false,
+            games = emptyList())
 
-    fun networkSuccess(games: List<GameV2>): GamesUiModel {
-      return GamesUiModel(false, false, false, true, games)
-    }
+    fun networkSuccess(games: List<GameV2>): GamesUiModel =
+        GamesUiModel(
+            isMemoryInProgress = false,
+            isMemorySuccess = false,
+            isNetworkInProgress = false,
+            isNetworkSuccess = true,
+            games = games)
   }
 }
