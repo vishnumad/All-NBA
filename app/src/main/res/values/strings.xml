@@ -450,5 +450,7 @@
     <string name="end_of_game">FINAL</string>
     <string name="error_loading_youtube">Error loading youtube video</string>
     <string name="unknown_source">Unknown source</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="your_device_is_offline">Your device is offline</string>
 
 </resources>

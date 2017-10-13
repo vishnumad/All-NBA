@@ -21,7 +21,9 @@ public interface GamesView {
 
     void setNoGamesIndicator(boolean active);
 
-    void showSnackbar(boolean canReload);
+    void showNoNetSnackbar();
+
+    void showErrorSnackbar();
 
     void dismissSnackbar();
 }

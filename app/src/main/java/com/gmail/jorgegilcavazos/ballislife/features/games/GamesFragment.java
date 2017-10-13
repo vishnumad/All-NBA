@@ -13,7 +13,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -109,11 +108,11 @@ public class GamesFragment extends Fragment implements GamesView,
 
         btnPrevDay.setOnClickListener(v -> {
             selectedDate.add(Calendar.DAY_OF_YEAR, -1);
-            presenter.loadFirstAvailable(selectedDate);
+            presenter.loadGames(selectedDate, false);
         });
         btnNextDay.setOnClickListener(v -> {
             selectedDate.add(Calendar.DAY_OF_YEAR, 1);
-            presenter.loadFirstAvailable(selectedDate);
+            presenter.loadGames(selectedDate, false);
         });
 
         presenter.attachView(this);
@@ -136,8 +135,7 @@ public class GamesFragment extends Fragment implements GamesView,
     @Override
     public void onResume() {
         super.onResume();
-        // Load from cache if available, or from network if not.
-        presenter.loadFirstAvailable(selectedDate);
+        presenter.loadGames(selectedDate, false);
         getActivity().registerReceiver(scoresUpdateReceiver,
                 new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
     }
@@ -165,18 +163,8 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_refresh:
-                presenter.loadGames(selectedDate);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onRefresh() {
-        presenter.loadGames(selectedDate);
+        presenter.loadGames(selectedDate, true);
     }
 
     @Override
@@ -225,11 +213,28 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void showSnackbar(boolean canReload) {
-        snackbar = Snackbar.make(getView(), R.string.failed_game_data, Snackbar.LENGTH_INDEFINITE);
-        if (canReload) {
-            snackbar.setAction(R.string.retry, v -> presenter.loadGames(selectedDate));
+    public void showNoNetSnackbar() {
+        if (getView() == null) {
+            return;
         }
+
+        snackbar = Snackbar.make(getView(),
+                                 R.string.your_device_is_offline,
+                                 Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, v -> presenter.loadGames(selectedDate, true));
+        snackbar.show();
+    }
+
+    @Override
+    public void showErrorSnackbar() {
+        if (getView() == null) {
+            return;
+        }
+
+        snackbar = Snackbar.make(getView(),
+                                 R.string.something_went_wrong,
+                                 Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, v -> presenter.loadGames(selectedDate, true));
         snackbar.show();
     }
 

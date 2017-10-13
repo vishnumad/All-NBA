@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
+import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.dagger.component.AppComponent;
 import com.gmail.jorgegilcavazos.ballislife.dagger.component.DaggerAppComponent;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
@@ -11,18 +12,26 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.squareup.leakcanary.LeakCanary;
 
 import jonathanfinerty.once.Once;
+import timber.log.Timber;
 
 public class BallIsLifeApplication extends Application {
 
+    private static Context context;
     private static AppComponent appComponent;
 
     public static AppComponent getAppComponent() {
         return appComponent;
     }
 
+    public static Context getAppContext() {
+        return context;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        context = getApplicationContext();
+
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
@@ -31,6 +40,10 @@ public class BallIsLifeApplication extends Application {
         LeakCanary.install(this);
 
         Once.initialise(this);
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))

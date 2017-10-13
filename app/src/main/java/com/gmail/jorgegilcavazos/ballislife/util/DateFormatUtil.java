@@ -196,6 +196,7 @@ public final class DateFormatUtil {
         dateEnd.set(Calendar.SECOND, 0);
         dateEnd.set(Calendar.MILLISECOND, 0);
         dateEnd.add(Calendar.DAY_OF_YEAR, 1);
+        dateEnd.add(Calendar.MINUTE, -1);
         return dateEnd.getTimeInMillis() / 1000;
     }
 }

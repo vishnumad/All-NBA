@@ -5,7 +5,9 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositor
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.GameUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.Calendar;
 import java.util.List;
@@ -13,35 +15,22 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.observers.DisposableObserver;
 
 public class GamesPresenter extends BasePresenter<GamesView> {
 
-    private GamesRepository gamesRepository;
-    private BaseSchedulerProvider schedulerProvider;
-    private CompositeDisposable disposables;
+    private final GamesRepository gamesRepository;
+    private final BaseSchedulerProvider schedulerProvider;
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Inject
     public GamesPresenter(GamesRepository gamesRepository,
                           BaseSchedulerProvider schedulerProvider) {
         this.gamesRepository = gamesRepository;
         this.schedulerProvider = schedulerProvider;
-        disposables = new CompositeDisposable();
     }
 
-    public void loadFirstAvailable(Calendar selectedDate) {
-        List<GameV2> nbaGames = null;
-        if (nbaGames == null || nbaGames.isEmpty()) {
-            loadGames(selectedDate);
-        } else {
-            loadDateNavigatorText(selectedDate);
-            view.setNoGamesIndicator(false);
-            view.showGames(nbaGames);
-            view.dismissSnackbar();
-        }
-    }
-
-    public void loadGames(Calendar selectedDate) {
+    public void loadGames(Calendar selectedDate, boolean forceReload) {
         view.dismissSnackbar();
         view.setNoGamesIndicator(false);
         view.setLoadingIndicator(true);
@@ -50,26 +39,33 @@ public class GamesPresenter extends BasePresenter<GamesView> {
         loadDateNavigatorText(selectedDate);
 
         disposables.clear();
-        disposables.add(gamesRepository.getGames(selectedDate)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<GameV2>>() {
-                    @Override
-                    public void onSuccess(List<GameV2> games) {
-                        if (games.isEmpty()) {
-                            view.setNoGamesIndicator(true);
-                        } else {
-                            view.showGames(games);
-                        }
-                        view.setLoadingIndicator(false);
-                    }
+        disposables.add(gamesRepository.getGames(selectedDate, forceReload)
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.ui(), true)
+                                .subscribeWith(new DisposableObserver<List<GameV2>>() {
+                                    @Override
+                                    public void onNext(List<GameV2> games) {
+                                        view.showGames(games);
+                                        view.setLoadingIndicator(false);
+                                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        view.setLoadingIndicator(false);
-                        view.showSnackbar(true);
-                    }
-                })
-        );
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        view.setLoadingIndicator(false);
+                                        if (NetworkUtils.Companion.isNetworkAvailable()) {
+                                            view.showErrorSnackbar();
+                                            FirebaseCrash.log("Error getting games...");
+                                            FirebaseCrash.report(e);
+                                        } else {
+                                            view.showNoNetSnackbar();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onComplete() {
+
+                                    }
+                                }));
     }
 
     public void loadDateNavigatorText(Calendar selectedDate) {
@@ -88,9 +84,7 @@ public class GamesPresenter extends BasePresenter<GamesView> {
     }
 
     public void stop() {
-        if (disposables != null) {
-            disposables.clear();
-        }
+        disposables.clear();
         view.dismissSnackbar();
     }
 

@@ -182,4 +182,23 @@ public class DateFormatUtilTest {
 
         assertEquals(expected, DateFormatUtil.getDateStartUtc(date));
     }
+
+    @Test
+    public void getDateEndUtc() {
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        date.add(Calendar.MINUTE, -1);
+
+        long expected = date.getTimeInMillis() / 1000;
+
+        date.set(Calendar.HOUR_OF_DAY, 5);
+        date.set(Calendar.MINUTE, 32);
+        date.set(Calendar.SECOND, 11);
+        date.set(Calendar.MILLISECOND, 7);
+
+        assertEquals(expected, DateFormatUtil.getDateEndUtc(date));
+    }
 }
