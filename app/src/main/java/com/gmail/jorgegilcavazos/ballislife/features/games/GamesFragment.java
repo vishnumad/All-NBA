@@ -224,9 +224,8 @@ public class GamesFragment extends Fragment implements GamesView,
         snackbar = Snackbar.make(getView(),
                                  R.string.your_device_is_offline,
                                  Snackbar.LENGTH_INDEFINITE)
-                           .setAction(
-                                   R.string.retry,
-                                   v -> presenter.loadModels(selectedDate, true));
+                           .setAction(R.string.retry,
+                                      v -> presenter.loadModels(selectedDate, true));
         snackbar.show();
     }
 
@@ -236,11 +235,9 @@ public class GamesFragment extends Fragment implements GamesView,
             return;
         }
 
-        snackbar = Snackbar.make(getView(),
-                                 R.string.something_went_wrong, Snackbar.LENGTH_SHORT)
-                           .setAction(
-                                   R.string.retry,
-                                   v -> presenter.loadModels(selectedDate, true));
+        snackbar = Snackbar.make(getView(), R.string.something_went_wrong, Snackbar.LENGTH_SHORT)
+                           .setAction(R.string.retry,
+                                      v -> presenter.loadModels(selectedDate, true));
         snackbar.show();
     }
 

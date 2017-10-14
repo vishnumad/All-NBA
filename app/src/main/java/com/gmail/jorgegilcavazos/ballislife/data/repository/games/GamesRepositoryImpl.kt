@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games
 
+import android.annotation.SuppressLint
+import android.support.annotation.VisibleForTesting
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiModel
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
@@ -7,7 +9,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.Single
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,21 +23,7 @@ class GamesRepositoryImpl @Inject constructor(
 
   private val gamesMap = HashMap<String, GameV2>()
 
-  override fun getGames(date: Calendar, forceReload: Boolean): Observable<List<GameV2>> {
-    val source: Observable<Map<String, GameV2>> = if (forceReload) {
-      Timber.i("Requesting games directly from the network source")
-      networkSource(date).toObservable()
-    } else {
-      Timber.i("Requesting games from anywhere")
-      Single.concat(memorySource(date), networkSource(date)).toObservable()
-    }
-
-    return source
-        .filter { it.isNotEmpty() }
-        .concatMap { Observable.just(it.values.sortedBy { it.timeUtc }) }
-  }
-
-  override fun models(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
+  override fun games(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
     val network = networkSource(date).toObservable()
         .concatMap {
           if (it.isEmpty()) {
@@ -78,12 +65,21 @@ class GamesRepositoryImpl @Inject constructor(
 
   }
 
+  @SuppressLint("VisibleForTests")
   private fun memorySource(date: Calendar): Single<Map<String, GameV2>> {
     return Single.just(gamesMap
         .filterValues {
           it.timeUtc > DateFormatUtil.getDateStartUtc(date)
               && it.timeUtc < DateFormatUtil.getDateEndUtc(date)
         })
-        .doOnSuccess { gamesMap.putAll(it) }
+        .doOnSuccess { saveGamesInCache(it) }
+  }
+
+  @VisibleForTesting
+  fun saveGamesInCache(gamesMap: Map<String, GameV2>, clear: Boolean = false) {
+    if (clear) {
+      this.gamesMap.clear()
+    }
+    this.gamesMap.putAll(gamesMap)
   }
 }

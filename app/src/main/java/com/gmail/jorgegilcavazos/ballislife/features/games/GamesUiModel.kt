@@ -30,7 +30,7 @@ class GamesUiModel(
         GamesUiModel(
             isMemoryInProgress = false,
             isMemorySuccess = false,
-            isNetworkInProgress = false,
+            isNetworkInProgress = true,
             isNetworkSuccess = false,
             games = emptyList())
 

@@ -27,7 +27,7 @@ class GamesPresenter @Inject constructor(
     loadDateNavigatorText(selectedDate)
 
     disposables.clear()
-    disposables.add(gamesRepository.models(selectedDate, forceNetwork)
+    disposables.add(gamesRepository.games(selectedDate, forceNetwork)
         .observeOn(schedulerProvider.ui(), true)
         .subscribeWith(object : DisposableObserver<GamesUiModel>() {
           override fun onNext(uiModel: GamesUiModel) {
