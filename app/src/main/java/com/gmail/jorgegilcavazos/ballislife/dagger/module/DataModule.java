@@ -8,6 +8,8 @@ import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtilsImpl;
 import com.google.gson.Gson;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -16,6 +18,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.disposables.CompositeDisposable;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -93,5 +96,15 @@ public class DataModule {
     @Singleton
     NbaGamesService provideNbaGamesService(Retrofit retrofit) {
         return retrofit.create(NbaGamesService.class);
+    }
+
+    @Provides
+    CompositeDisposable provideCompositeDisposables() {
+        return new CompositeDisposable();
+    }
+
+    @Provides
+    NetworkUtils provideNetworkUtils() {
+        return new NetworkUtilsImpl();
     }
 }

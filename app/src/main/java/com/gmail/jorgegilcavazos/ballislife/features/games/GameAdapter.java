@@ -19,23 +19,25 @@ import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * RecyclerView Adapter used by the {@link GamesFragment} to display a list of games.
  */
 public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<GameV2> nbaGameList;
-    private GamesFragment.GameItemListener gameItemListener;
 
-    public GameAdapter(List<GameV2> nbaGames,
-                       GamesFragment.GameItemListener itemListener) {
+    private List<GameV2> nbaGameList;
+    private PublishSubject<GameV2> gameClicks = PublishSubject.create();
+
+    public GameAdapter(List<GameV2> nbaGames) {
         nbaGameList = nbaGames;
-        gameItemListener = itemListener;
     }
 
     @Override
@@ -55,10 +57,10 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         if (Constants.NBA_MATERIAL_ENABLED) {
-            ((GameViewHolder) holder).bindData(nbaGameList.get(position), gameItemListener,
-                    nbaGameList.size() - 1 == position);
+            ((GameViewHolder) holder).bindData(nbaGameList.get(position), gameClicks,
+                                               nbaGameList.size() - 1 == position);
         } else {
-            ((GameViewHolderWithBars) holder).bindData(nbaGameList.get(position), gameItemListener);
+            ((GameViewHolderWithBars) holder).bindData(nbaGameList.get(position), gameClicks);
         }
     }
 
@@ -79,7 +81,11 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public static class GameViewHolder extends RecyclerView.ViewHolder {
+    public Observable<GameV2> getGameClicks() {
+        return gameClicks;
+    }
+
+    static class GameViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.gameCard) CardView gameCard;
         @BindView(R.id.layout_content) RelativeLayout container;
@@ -99,7 +105,8 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(GameV2 nbaGame, GamesFragment.GameItemListener gameItemListener,
+        public void bindData(
+                GameV2 nbaGame, PublishSubject<GameV2> gameClicks,
                              boolean isLastGame) {
             int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getHomeTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
@@ -150,7 +157,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     break;
             }
 
-            container.setOnClickListener(v -> gameItemListener.onGameClick(nbaGame));
+            RxView.clicks(container).map(v -> nbaGame).subscribe(gameClicks);
 
             int margin = (int) UnitUtils.convertDpToPixel(8, itemView.getContext());
             ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) gameCard
@@ -183,7 +190,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(GameV2 nbaGame, GamesFragment.GameItemListener gameItemListener) {
+        public void bindData(GameV2 nbaGame, PublishSubject<GameV2> gameClicks) {
             int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getHomeTeamAbbr().toLowerCase(), "color", itemView.getContext()
                     .getPackageName());
@@ -255,7 +262,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     break;
             }
 
-            container.setOnClickListener(v -> gameItemListener.onGameClick(nbaGame));
+            RxView.clicks(container).map(v -> nbaGame).subscribe(gameClicks);
         }
     }
 }

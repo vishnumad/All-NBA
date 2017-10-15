@@ -54,6 +54,6 @@ public abstract class BindModule {
             HighlightsRepositoryImpl highlightsRepositoryImpl);
 
     @Binds
-    public abstract SubmissionRepository bindSubmissionRepository(SubmissionRepositoryImpl
-                                                                              submissionRepositoryImpl);
+    public abstract SubmissionRepository bindSubmissionRepository(
+            SubmissionRepositoryImpl submissionRepositoryImpl);
 }

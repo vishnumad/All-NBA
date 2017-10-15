@@ -2,37 +2,56 @@ package com.gmail.jorgegilcavazos.ballislife.features.games
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository
-import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
-import com.gmail.jorgegilcavazos.ballislife.util.GameUtils
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableObserver
+import io.reactivex.rxkotlin.addTo
 import java.util.*
 import javax.inject.Inject
 
 class GamesPresenter @Inject constructor(
     private val gamesRepository: GamesRepository,
-    private val schedulerProvider: BaseSchedulerProvider) : BasePresenter<GamesView>() {
+    private val schedulerProvider: BaseSchedulerProvider,
+    private val disposables: CompositeDisposable,
+    private val networkUtils: NetworkUtils) : BasePresenter<GamesView>() {
 
-  private val disposables = CompositeDisposable()
+  private val calendar = Calendar.getInstance()
 
-  fun onDateChanged() {
-    view.hideGames()
+  override fun attachView(view: GamesView) {
+    super.attachView(view)
+
+    view.prevDayClicks()
+        .subscribe { _ ->
+          calendar.add(Calendar.DAY_OF_YEAR, -1)
+          view.hideGames()
+          loadGames()
+        }
+        .addTo(disposables)
+
+    view.nextDayClicks()
+        .subscribe { _ ->
+          calendar.add(Calendar.DAY_OF_YEAR, 1)
+          view.hideGames()
+          loadGames()
+        }
+        .addTo(disposables)
+
+    view.gameClicks()
+        .subscribe { view.showGameDetails(it, calendar.time.time) }
+        .addTo(disposables)
   }
 
-  fun loadModels(selectedDate: Calendar, forceNetwork: Boolean) {
+  fun loadGames(forceNetwork: Boolean = false) {
     view.dismissSnackbar()
-    loadDateNavigatorText(selectedDate)
+    loadDateNavigatorText(calendar)
 
-    disposables.clear()
-    disposables.add(gamesRepository.games(selectedDate, forceNetwork)
+    disposables.add(gamesRepository.games(calendar, forceNetwork)
         .observeOn(schedulerProvider.ui(), true)
         .subscribeWith(object : DisposableObserver<GamesUiModel>() {
           override fun onNext(uiModel: GamesUiModel) {
-            if (uiModel.isMemorySuccess && uiModel.games
-                .isEmpty()) {
+            if (uiModel.isMemorySuccess && uiModel.games.isEmpty()) {
               view.setLoadingIndicator(true)
             }
 
@@ -44,14 +63,12 @@ class GamesPresenter @Inject constructor(
               view.showGames(uiModel.games)
             }
 
-            view.setNoGamesIndicator(uiModel.isNetworkSuccess && uiModel
-                .games
-                .isEmpty())
+            view.setNoGamesIndicator(uiModel.isNetworkSuccess && uiModel.games.isEmpty())
           }
 
           override fun onError(e: Throwable) {
             view.setLoadingIndicator(false)
-            if (NetworkUtils.isNetworkAvailable()) {
+            if (networkUtils.isNetworkAvailable()) {
               view.showErrorSnackbar()
             } else {
               view.showNoNetSnackbar()
@@ -69,19 +86,16 @@ class GamesPresenter @Inject constructor(
     view.setDateNavigatorText(dateText)
   }
 
-  fun openGameDetails(requestedGame: GameV2, selectedDate: Calendar) {
-    view.showGameDetails(requestedGame, selectedDate)
+  fun getSelectedDate(): Long = calendar.time.time
+
+  fun setSelectedDate(millis: Long) {
+    calendar.timeInMillis = millis
   }
 
-  fun updateGames(gameData: String, selectedDate: Calendar) {
-    if (DateFormatUtil.isDateToday(selectedDate.time)) {
-      view.updateScores(GameUtils.getGamesListFromJson(gameData))
-    }
-  }
-
-  fun stop() {
+  override fun detachView() {
     disposables.clear()
     view.dismissSnackbar()
+    super.detachView()
   }
 
 }

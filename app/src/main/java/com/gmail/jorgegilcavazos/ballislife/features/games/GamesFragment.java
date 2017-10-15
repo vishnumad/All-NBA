@@ -1,11 +1,9 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -19,14 +17,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.firebase.MyMessagingService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.jakewharton.rxbinding2.view.RxView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -34,6 +33,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Displays a list of {@link NbaGame}s for the selected date.
@@ -47,8 +48,8 @@ public class GamesFragment extends Fragment implements GamesView,
     public final static String GAME_THREAD_AWAY = "GAME_THREAD_AWAY";
     public final static String GAME_ID = "GAME_ID";
     public final static String GAME_DATE = "GAME_DATE";
-    @Inject
-    GamesPresenter presenter;
+
+    @Inject GamesPresenter presenter;
 
     @BindView(R.id.navigator_button_left) ImageButton btnPrevDay;
     @BindView(R.id.navigator_button_right) ImageButton btnNextDay;
@@ -57,25 +58,13 @@ public class GamesFragment extends Fragment implements GamesView,
     @BindView(R.id.games_rv) RecyclerView rvGames;
     @BindView(R.id.swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
 
-    private Calendar selectedDate = Calendar.getInstance();
+    private PublishSubject<Integer> prevDays = PublishSubject.create();
+
     private Parcelable listState;
     private RecyclerView.LayoutManager layoutManager;
     private GameAdapter gameAdapter;
     private Snackbar snackbar;
     private Unbinder unbinder;
-    private GameItemListener gameItemListener = new GameItemListener() {
-        @Override
-        public void onGameClick(GameV2 clickedGame) {
-            presenter.openGameDetails(clickedGame, selectedDate);
-        }
-    };
-    private BroadcastReceiver scoresUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String gameData = intent.getStringExtra(MyMessagingService.KEY_SCORES_UPDATED);
-            presenter.updateGames(gameData, selectedDate);
-        }
-    };
 
     public GamesFragment() {
         // Required empty public constructor.
@@ -92,7 +81,7 @@ public class GamesFragment extends Fragment implements GamesView,
         setHasOptionsMenu(true);
 
         layoutManager = new LinearLayoutManager(getActivity());
-        gameAdapter = new GameAdapter(new ArrayList<>(0), gameItemListener);
+        gameAdapter = new GameAdapter(new ArrayList<>(0));
     }
 
     @Override
@@ -106,22 +95,11 @@ public class GamesFragment extends Fragment implements GamesView,
         rvGames.setLayoutManager(layoutManager);
         rvGames.setAdapter(gameAdapter);
 
-        btnPrevDay.setOnClickListener(v -> {
-            selectedDate.add(Calendar.DAY_OF_YEAR, -1);
-            presenter.onDateChanged();
-            presenter.loadModels(selectedDate, false);
-        });
-        btnNextDay.setOnClickListener(v -> {
-            selectedDate.add(Calendar.DAY_OF_YEAR, 1);
-            presenter.onDateChanged();
-            presenter.loadModels(selectedDate, false);
-        });
+        if (savedInstanceState != null) {
+            presenter.setSelectedDate(savedInstanceState.getLong(SELECTED_TIME));
+        }
 
         presenter.attachView(this);
-
-        if (savedInstanceState != null) {
-            selectedDate.setTimeInMillis(savedInstanceState.getLong(SELECTED_TIME));
-        }
 
         return view;
     }
@@ -137,36 +115,43 @@ public class GamesFragment extends Fragment implements GamesView,
     @Override
     public void onResume() {
         super.onResume();
-        presenter.loadModels(selectedDate, false);
-        getActivity().registerReceiver(scoresUpdateReceiver,
-                new IntentFilter(MyMessagingService.FILTER_SCORES_UPDATED));
+        presenter.loadGames(false);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         listState = layoutManager.onSaveInstanceState();
-        outState.putLong(SELECTED_TIME, selectedDate.getTime().getTime());
+        outState.putLong(SELECTED_TIME, presenter.getSelectedDate());
         outState.putParcelable(LIST_STATE, listState);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(scoresUpdateReceiver);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        presenter.stop();
         presenter.detachView();
     }
 
     @Override
     public void onRefresh() {
-        presenter.loadModels(selectedDate, true);
+        presenter.loadGames(true);
+    }
+
+    @Override
+    public Observable<Object> prevDayClicks() {
+        return RxView.clicks(btnPrevDay);
+    }
+
+    @Override
+    public Observable<Object> nextDayClicks() {
+        return RxView.clicks(btnNextDay);
+    }
+
+    @NotNull
+    @Override
+    public Observable<GameV2> gameClicks() {
+        return gameAdapter.getGameClicks();
     }
 
     @Override
@@ -191,19 +176,13 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public void showGameDetails(GameV2 game, Calendar selectedDate) {
+    public void showGameDetails(@NonNull GameV2 game, long selectedDate) {
         Intent intent = new Intent(getActivity(), CommentsActivity.class);
         intent.putExtra(GAME_THREAD_HOME, game.getHomeTeamAbbr());
         intent.putExtra(GAME_THREAD_AWAY, game.getAwayTeamAbbr());
         intent.putExtra(GAME_ID, game.getId());
-        intent.putExtra(GAME_DATE, selectedDate.getTimeInMillis());
+        intent.putExtra(GAME_DATE, selectedDate);
         startActivity(intent);
-    }
-
-    @Override
-    public void updateScores(List<GameV2> games) {
-        gameAdapter.updateScores(games);
-        rvGames.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -224,8 +203,7 @@ public class GamesFragment extends Fragment implements GamesView,
         snackbar = Snackbar.make(getView(),
                                  R.string.your_device_is_offline,
                                  Snackbar.LENGTH_INDEFINITE)
-                           .setAction(R.string.retry,
-                                      v -> presenter.loadModels(selectedDate, true));
+                           .setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 
@@ -236,8 +214,7 @@ public class GamesFragment extends Fragment implements GamesView,
         }
 
         snackbar = Snackbar.make(getView(), R.string.something_went_wrong, Snackbar.LENGTH_SHORT)
-                           .setAction(R.string.retry,
-                                      v -> presenter.loadModels(selectedDate, true));
+                           .setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 

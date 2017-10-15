@@ -6,11 +6,11 @@ public abstract class BasePresenter<V> {
 
     protected V view;
 
-    public final void attachView(@NonNull V view){
+    public void attachView(@NonNull V view) {
         this.view = view;
     }
 
-    public final void detachView() {
+    public void detachView() {
         this.view = null;
     }
 
