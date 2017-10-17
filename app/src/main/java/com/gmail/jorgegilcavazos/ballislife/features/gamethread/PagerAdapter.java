@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
-    int numOfTabs;
-    Bundle bundle;
+    private int numOfTabs;
+    private Bundle bundle;
     private Map<Integer, Fragment> fragmentMap;
 
     public PagerAdapter(FragmentManager fragmentManager, int numOfTabs, Bundle bundle) {

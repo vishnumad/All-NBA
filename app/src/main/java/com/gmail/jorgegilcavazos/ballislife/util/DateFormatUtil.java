@@ -199,4 +199,11 @@ public final class DateFormatUtil {
         dateEnd.add(Calendar.MINUTE, -1);
         return dateEnd.getTimeInMillis() / 1000;
     }
+
+    public static long addHoursToTime(long timeUtc, int hours) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeUtc * 1000);
+        calendar.add(Calendar.HOUR, hours);
+        return calendar.getTimeInMillis() / 1000;
+    }
 }

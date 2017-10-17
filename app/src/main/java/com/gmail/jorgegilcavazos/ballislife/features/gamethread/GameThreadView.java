@@ -1,14 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
-import com.hannesdorfmann.mosby.mvp.MvpView;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 
 import java.util.List;
 
-public interface GameThreadView extends MvpView {
+public interface GameThreadView {
 
     void setLoadingIndicator(boolean active);
 

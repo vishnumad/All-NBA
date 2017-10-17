@@ -8,6 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtilsImpl;
 import com.google.gson.Gson;
@@ -96,6 +97,12 @@ public class DataModule {
     @Singleton
     NbaGamesService provideNbaGamesService(Retrofit retrofit) {
         return retrofit.create(NbaGamesService.class);
+    }
+
+    @Provides
+    @Singleton
+    RedditGameThreadsService provideRedditGameThreadsService(Retrofit retrofit) {
+        return retrofit.create(RedditGameThreadsService.class);
     }
 
     @Provides

@@ -58,7 +58,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private SubmissionWrapper submissionWrapper;
 
     public ThreadAdapter(Context context,
-                         RedditAuthentication redditAuthentication, List<ThreadItem> commentsList,
+            RedditAuthentication redditAuthentication,
+            List<ThreadItem> commentsList,
                          boolean hasHeader) {
         this.context = context;
         this.commentsList = commentsList;

@@ -6,9 +6,9 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 import com.gmail.jorgegilcavazos.ballislife.features.common.FullCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.common.PostListViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,16 +108,7 @@ public final class RedditUtils {
             }
         }
 
-        int maxComments = -1;
-        String bestThreadId = "";
-        for (GameThreadSummary thread : matchingThreads) {
-            if (thread.getNum_comments() > maxComments) {
-                maxComments = thread.getNum_comments();
-                bestThreadId = thread.getId();
-            }
-        }
-
-        return bestThreadId;
+        return matchingThreads.size() > 0 ? matchingThreads.get(0).getId() : "";
     }
 
     public static CharSequence bindSnuDown(String rawHtml) {

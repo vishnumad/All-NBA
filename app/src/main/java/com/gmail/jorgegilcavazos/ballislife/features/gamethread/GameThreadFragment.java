@@ -1,7 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,8 +20,6 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
-import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
@@ -44,9 +41,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
-        .REDDIT_AUTH_PREFS;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
         .AWAY_TEAM_KEY;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
@@ -65,9 +59,8 @@ public class GameThreadFragment extends Fragment
     public static final String GAME_DATE_KEY = "GAME_DATE";
     public boolean isPremium = false;
 
-    @Inject RedditService redditService;
+    @Inject GameThreadPresenter presenter;
     @Inject RedditAuthentication redditAuthentication;
-    @Inject SubmissionRepository submissionRepository;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
@@ -80,7 +73,6 @@ public class GameThreadFragment extends Fragment
     private long gameDate;
     private boolean stream = false;
     private Switch streamSwitch;
-    private GameThreadPresenter presenter;
 
     private int commentToReplyToPos = -1;
     private String commentToReplyToFullName;
@@ -153,13 +145,14 @@ public class GameThreadFragment extends Fragment
             }
         });
 
-        SharedPreferences preferences = getActivity().getSharedPreferences(REDDIT_AUTH_PREFS,
-                MODE_PRIVATE);
-
-        presenter = new GameThreadPresenter(this, redditService, submissionRepository, gameDate,
-                preferences, redditAuthentication);
-        presenter.start();
-        presenter.loadComments(threadType, homeTeam, awayTeam, stream, false /* forceReload */);
+        presenter.attachView(this);
+        presenter.loadComments(
+                threadType,
+                homeTeam,
+                awayTeam,
+                stream,
+                false /* forceReload */,
+                gameDate);
 
         if (savedInstanceState != null) {
             commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
@@ -182,7 +175,7 @@ public class GameThreadFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-        presenter.stop();
+        presenter.detachView();
     }
 
     @Override
@@ -202,7 +195,7 @@ public class GameThreadFragment extends Fragment
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
-                forceReload */);
+                forceReload */, gameDate);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -210,7 +203,13 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(threadType, homeTeam, awayTeam, stream, true  /* forceReload */);
+        presenter.loadComments(
+                threadType,
+                homeTeam,
+                awayTeam,
+                stream,
+                true  /* forceReload */,
+                gameDate);
     }
 
     @Override
@@ -357,11 +356,17 @@ public class GameThreadFragment extends Fragment
             } else {
                 stream = true;
                 presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
-                forceReload */);
+                forceReload */, gameDate);
             }
         } else {
             stream = false;
-            presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /* forceReload */);
+            presenter.loadComments(
+                    threadType,
+                    homeTeam,
+                    awayTeam,
+                    stream,
+                    true /* forceReload */,
+                    gameDate);
         }
     }
 }

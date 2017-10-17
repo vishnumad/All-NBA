@@ -6,11 +6,14 @@ import java.util.Map;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface RedditGameThreadsService {
 
-    @GET("gamethreads/{date}.json")
-    Single<Map<String, GameThreadSummary>> fetchGameThreads(@Path("date") String date);
+    @GET("game_threads/2017-18/.json")
+    Single<Map<String, GameThreadSummary>> fetchGameThreads(
+            @Query("orderBy") String orderBy,
+            @Query("startAt") long startAt,
+            @Query("endAt") long endAt);
 
 }

@@ -181,7 +181,7 @@ public class GamesFragment extends Fragment implements GamesView,
         intent.putExtra(GAME_THREAD_HOME, game.getHomeTeamAbbr());
         intent.putExtra(GAME_THREAD_AWAY, game.getAwayTeamAbbr());
         intent.putExtra(GAME_ID, game.getId());
-        intent.putExtra(GAME_DATE, selectedDate);
+        intent.putExtra(GAME_DATE, game.getTimeUtc());
         startActivity(intent);
     }
 
