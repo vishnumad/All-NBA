@@ -4,9 +4,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.RedditClient;
-import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.SubmissionRequest;
 import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
@@ -30,11 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableEmitter;
-import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 
 @Singleton
 public class RedditServiceImpl implements RedditService {
@@ -46,15 +42,13 @@ public class RedditServiceImpl implements RedditService {
     @Override
     public Single<List<Contribution>> getUserContributions(
             final UserContributionPaginator paginator) {
-        return Single.create(new SingleOnSubscribe<List<Contribution>>() {
-            @Override
-            public void subscribe(SingleEmitter<List<Contribution>> e) throws Exception {
-                try {
-                    e.onSuccess(new ArrayList<>(paginator.next()));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Single.create(e -> {
+            try {
+                e.onSuccess(new ArrayList<>(paginator.next()));
+            } catch (Exception ex) {
+                FirebaseCrash.report(ex);
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -65,34 +59,32 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final String threadId,
             final String commentId) {
-        return Single.create(new SingleOnSubscribe<CommentNode>() {
-            @Override
-            public void subscribe(SingleEmitter<CommentNode> e) throws Exception {
-                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
-                builder.sort(CommentSort.NEW);
+        return Single.create(e -> {
+            SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+            builder.sort(CommentSort.NEW);
 
-                SubmissionRequest submissionRequest = builder.build();
-                Submission submission = null;
-                try {
-                    submission = redditClient.getSubmission(submissionRequest);
+            SubmissionRequest submissionRequest = builder.build();
+            Submission submission = null;
+            try {
+                submission = redditClient.getSubmission(submissionRequest);
 
-                    Iterable<CommentNode> iterable = submission.getComments().walkTree();
-                    for (CommentNode node : iterable) {
-                        if (node.getComment().getId().equals(commentId)) {
-                            if (!e.isDisposed()) {
-                                e.onSuccess(node);
-                                return;
-                            }
+                Iterable<CommentNode> iterable = submission.getComments().walkTree();
+                for (CommentNode node : iterable) {
+                    if (node.getComment().getId().equals(commentId)) {
+                        if (!e.isDisposed()) {
+                            e.onSuccess(node);
+                            return;
                         }
                     }
+                }
 
-                    if (!e.isDisposed()) {
-                        e.onError(new ReplyNotAvailableException());
-                    }
-                } catch (NetworkException ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+                if (!e.isDisposed()) {
+                    e.onError(new ReplyNotAvailableException());
+                }
+            } catch (Exception ex) {
+                FirebaseCrash.report(ex);
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -103,17 +95,14 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final Comment parent,
             final String text) {
-        return Single.create(new SingleOnSubscribe<String>() {
-            @Override
-            public void subscribe(SingleEmitter<String> e) throws Exception {
-                AccountManager accountManger = new AccountManager(redditClient);
-                try {
-                    String id = accountManger.reply(parent, text);
-                    e.onSuccess(id);
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(new ReplyToCommentException());
-                    }
+        return Single.create(e -> {
+            AccountManager accountManger = new AccountManager(redditClient);
+            try {
+                String id = accountManger.reply(parent, text);
+                e.onSuccess(id);
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(new ReplyToCommentException());
                 }
             }
         });
@@ -124,17 +113,15 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final Comment comment,
             final VoteDirection direction) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    accountManager.vote(comment, direction);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                accountManager.vote(comment, direction);
+                e.onComplete();
+            } catch (Exception ex) {
+                FirebaseCrash.report(ex);
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -142,17 +129,14 @@ public class RedditServiceImpl implements RedditService {
 
     @Override
     public Completable saveComment(final RedditClient redditClient, final Comment comment) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    accountManager.save(comment);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                accountManager.save(comment);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -160,17 +144,14 @@ public class RedditServiceImpl implements RedditService {
 
     @Override
     public Completable unsaveComment(final RedditClient redditClient, final Comment comment) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    accountManager.unsave(comment);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                accountManager.unsave(comment);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -198,21 +179,19 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final String threadId,
             final CommentSort sort) {
-        return Single.create(new SingleOnSubscribe<Submission>() {
-            @Override
-            public void subscribe(SingleEmitter<Submission> e) throws Exception {
-                SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
-                if (sort != null) {
-                    builder.sort(sort);
-                }
+        return Single.create(e -> {
+            SubmissionRequest.Builder builder = new SubmissionRequest.Builder(threadId);
+            if (sort != null) {
+                builder.sort(sort);
+            }
 
-                SubmissionRequest submissionRequest = builder.build();
-                try {
-                    e.onSuccess(redditClient.getSubmission(submissionRequest));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+            SubmissionRequest submissionRequest = builder.build();
+            try {
+                e.onSuccess(redditClient.getSubmission(submissionRequest));
+            } catch (Exception ex) {
+                FirebaseCrash.report(ex);
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -225,6 +204,7 @@ public class RedditServiceImpl implements RedditService {
                 Listing<Submission> listing = paginator.next(false);
                 e.onSuccess(listing);
             } catch (Exception ex) {
+                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }
@@ -237,17 +217,14 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final Submission submission,
             final VoteDirection vote) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    accountManager.vote(submission, vote);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                accountManager.vote(submission, vote);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -258,21 +235,18 @@ public class RedditServiceImpl implements RedditService {
             final RedditClient redditClient,
             final Submission submission,
             final boolean saved) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                AccountManager accountManager = new AccountManager(redditClient);
-                try {
-                    if (saved) {
-                        accountManager.save(submission);
-                    } else {
-                        accountManager.unsave(submission);
-                    }
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            AccountManager accountManager = new AccountManager(redditClient);
+            try {
+                if (saved) {
+                    accountManager.save(submission);
+                } else {
+                    accountManager.unsave(submission);
+                }
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -282,19 +256,16 @@ public class RedditServiceImpl implements RedditService {
     public Single<SubscriberCount> getSubscriberCount(
             final RedditClient redditClient,
             final String subreddit) {
-        return Single.create(new SingleOnSubscribe<SubscriberCount>() {
-            @Override
-            public void subscribe(SingleEmitter<SubscriberCount> e) throws Exception {
-                try {
-                    Subreddit rnba = redditClient.getSubreddit(subreddit);
-                    Long subscribers = rnba.getSubscriberCount();
-                    int activeUsers = rnba.getAccountsActive();
+        return Single.create(e -> {
+            try {
+                Subreddit rnba = redditClient.getSubreddit(subreddit);
+                Long subscribers = rnba.getSubscriberCount();
+                int activeUsers = rnba.getAccountsActive();
 
-                    e.onSuccess(new SubscriberCount(subscribers, activeUsers));
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+                e.onSuccess(new SubscriberCount(subscribers, activeUsers));
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -303,17 +274,14 @@ public class RedditServiceImpl implements RedditService {
     @Override
     public Completable userlessAuthentication(final RedditClient reddit,
                                               final Credentials credentials) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                try {
-                    OAuthData oAuthData = reddit.getOAuthHelper().easyAuth(credentials);
-                    reddit.authenticate(oAuthData);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            try {
+                OAuthData oAuthData = reddit.getOAuthHelper().easyAuth(credentials);
+                reddit.authenticate(oAuthData);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -322,19 +290,16 @@ public class RedditServiceImpl implements RedditService {
     @Override
     public Completable userAuthentication(final RedditClient reddit, final Credentials credentials,
                                           final String url) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                OAuthHelper oAuthHelper = reddit.getOAuthHelper();
+        return Completable.create(e -> {
+            OAuthHelper oAuthHelper = reddit.getOAuthHelper();
 
-                try {
-                    OAuthData oAuthData = oAuthHelper.onUserChallenge(url, credentials);
-                    reddit.authenticate(oAuthData);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+            try {
+                OAuthData oAuthData = oAuthHelper.onUserChallenge(url, credentials);
+                reddit.authenticate(oAuthData);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -343,20 +308,17 @@ public class RedditServiceImpl implements RedditService {
     @Override
     public Completable refreshToken(final RedditClient reddit, final Credentials credentials,
                                           final String refreshToken) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                OAuthHelper helper = reddit.getOAuthHelper();
-                helper.setRefreshToken(refreshToken);
+        return Completable.create(e -> {
+            OAuthHelper helper = reddit.getOAuthHelper();
+            helper.setRefreshToken(refreshToken);
 
-                try {
-                    OAuthData oAuthData = helper.refreshToken(credentials);
-                    reddit.authenticate(oAuthData);
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+            try {
+                OAuthData oAuthData = helper.refreshToken(credentials);
+                reddit.authenticate(oAuthData);
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
@@ -364,18 +326,15 @@ public class RedditServiceImpl implements RedditService {
 
     @Override
     public Completable deAuthenticate(final RedditClient reddit, final Credentials credentials) {
-        return Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(CompletableEmitter e) throws Exception {
-                OAuthHelper helper = reddit.getOAuthHelper();
-                try {
-                    helper.revokeAccessToken(credentials);
-                    reddit.deauthenticate();
-                    e.onComplete();
-                } catch (Exception ex) {
-                    if (!e.isDisposed()) {
-                        e.onError(ex);
-                    }
+        return Completable.create(e -> {
+            OAuthHelper helper = reddit.getOAuthHelper();
+            try {
+                helper.revokeAccessToken(credentials);
+                reddit.deauthenticate();
+                e.onComplete();
+            } catch (Exception ex) {
+                if (!e.isDisposed()) {
+                    e.onError(ex);
                 }
             }
         });
