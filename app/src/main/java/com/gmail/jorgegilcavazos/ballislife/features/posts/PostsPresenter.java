@@ -25,10 +25,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Function;
 import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -70,7 +68,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     }
 
     public void loadSubscriberCount() {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(service.getSubscriberCount(redditAuthentication.getRedditClient(),
                         subreddit))
                 .subscribeOn(schedulerProvider.io())
@@ -116,7 +114,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         view.dismissSnackbar();
 
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(postsRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<SubmissionWrapper>>() {
@@ -159,19 +157,14 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return service.voteSubmission(
-                                    redditAuthentication.getRedditClient(),
-                                    submission,
-                                    direction);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+        disposables.add(redditAuthentication.authenticate()
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable(loggedIn -> {
+                    if (loggedIn) {
+                        return service.voteSubmission(redditAuthentication.getRedditClient(),
+                                                      submission,
+                                                      direction);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())
@@ -196,19 +189,14 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             return;
         }
 
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
-                .andThen(redditAuthentication.checkUserLoggedIn())
-                .flatMapCompletable(new Function<Boolean, CompletableSource>() {
-                    @Override
-                    public CompletableSource apply(Boolean loggedIn) throws Exception {
-                        if (loggedIn) {
-                            return service.saveSubmission(
-                                    redditAuthentication.getRedditClient(),
-                                    submission,
-                                    saved);
-                        } else {
-                            throw new NotLoggedInException();
-                        }
+        disposables.add(redditAuthentication.authenticate()
+                .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable(loggedIn -> {
+                    if (loggedIn) {
+                        return service.saveSubmission(redditAuthentication.getRedditClient(),
+                                                      submission,
+                                                      saved);
+                    } else {
+                        throw new NotLoggedInException();
                     }
                 })
                 .subscribeOn(schedulerProvider.io())

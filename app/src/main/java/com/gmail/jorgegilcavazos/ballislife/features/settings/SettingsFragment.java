@@ -23,10 +23,6 @@ import javax.inject.Inject;
 
 import io.reactivex.observers.DisposableCompletableObserver;
 
-import static android.content.Context.MODE_PRIVATE;
-import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl
-        .REDDIT_AUTH_PREFS;
-
 public class SettingsFragment extends PreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
     // Should match string values in strings.xml
@@ -188,16 +184,13 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     private void initListeners() {
-        final SharedPreferences redditPrefs = getActivity()
-                .getSharedPreferences(REDDIT_AUTH_PREFS, MODE_PRIVATE);
-
         Preference logInStatusPref = findPreference("log_in_status_pref");
         logInStatusPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (redditAuthentication.isUserLoggedIn()) {
-                    redditAuthentication.deAuthenticateUser(redditPrefs)
-                            .andThen(redditAuthentication.authenticate(redditPrefs))
+                    redditAuthentication.deAuthenticateUser()
+                            .andThen(redditAuthentication.authenticate())
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.ui())
                             .subscribeWith(new DisposableCompletableObserver() {

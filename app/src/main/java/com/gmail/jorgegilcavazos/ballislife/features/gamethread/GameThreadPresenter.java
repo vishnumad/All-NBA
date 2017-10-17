@@ -85,7 +85,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
         view.hideComments();
         view.hideText();
 
-        Observable<List<CommentNode>> observable = redditAuthentication.authenticate(preferences)
+        Observable<List<CommentNode>> observable = redditAuthentication.authenticate()
                 .andThen(gameThreadsService.fetchGameThreads("\"created_utc\"",
                                                              DateFormatUtil.addHoursToTime(gameUtc,
                                                                                            -2),
@@ -171,7 +171,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
     }
 
     public void vote(final Comment comment, final VoteDirection voteDirection) {
-        disposables.add(redditAuthentication.authenticate(preferences)
+        disposables.add(redditAuthentication.authenticate()
                                 .andThen(redditAuthentication.checkUserLoggedIn())
                                 .flatMapCompletable((loggedIn -> {
                                     if (loggedIn) {
@@ -201,7 +201,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
     }
 
     public void save(final Comment comment) {
-        disposables.add(redditAuthentication.authenticate(preferences)
+        disposables.add(redditAuthentication.authenticate()
                                 .andThen(redditAuthentication.checkUserLoggedIn())
                                 .flatMapCompletable((loggedIn -> {
                                     if (loggedIn) {
@@ -229,7 +229,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
     }
 
     public void unsave(final Comment comment) {
-        disposables.add(redditAuthentication.authenticate(preferences)
+        disposables.add(redditAuthentication.authenticate()
                                 .andThen(redditAuthentication.checkUserLoggedIn())
                                 .flatMapCompletable((loggedIn -> {
                                     if (loggedIn) {
@@ -274,7 +274,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
         }
 
         view.showSavingToast();
-        disposables.add(redditAuthentication.authenticate(preferences)
+        disposables.add(redditAuthentication.authenticate()
                                 .andThen(redditAuthentication.checkUserLoggedIn())
                                 .flatMap((loggedIn -> {
                                     if (loggedIn) {
@@ -332,7 +332,7 @@ public class GameThreadPresenter extends BasePresenter<GameThreadView> {
         }
 
         view.showSavingToast();
-        disposables.add(redditAuthentication.authenticate(preferences)
+        disposables.add(redditAuthentication.authenticate()
                                 .andThen(redditAuthentication.checkUserLoggedIn())
                                 .flatMapCompletable((loggedIn) -> {
                                     if (!loggedIn) {

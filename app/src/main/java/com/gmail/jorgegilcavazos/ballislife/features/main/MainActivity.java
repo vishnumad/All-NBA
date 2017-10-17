@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Move this out of here, either to application start or a presenter.
         disposables = new CompositeDisposable();
-        disposables.add(redditAuthentication.authenticate(redditSharedPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribeWith(new DisposableCompletableObserver() {

@@ -1,7 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
-import android.content.SharedPreferences;
-
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository;
@@ -27,7 +25,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
@@ -38,7 +35,6 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     private RedditAuthentication redditAuthentication;
     private RedditService redditService;
     private SubmissionRepository submissionRepository;
-    private SharedPreferences redditPrefs;
     private CompositeDisposable disposables;
     private BaseSchedulerProvider schedulerProvider;
 
@@ -46,12 +42,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     public SubmissionPresenter(
             RedditAuthentication redditAuthentication,
             RedditService redditService, SubmissionRepository submissionRepository,
-            @Named("redditSharedPreferences") SharedPreferences redditPrefs,
             BaseSchedulerProvider schedulerProvider) {
         this.redditAuthentication = redditAuthentication;
         this.redditService = redditService;
         this.submissionRepository = submissionRepository;
-        this.redditPrefs = redditPrefs;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
@@ -65,8 +59,10 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
             commentIdToScroll, boolean forceReload) {
         view.hideFab();
         view.setLoadingIndicator(true);
-        disposables.add(redditAuthentication.authenticate(redditPrefs).andThen
-                (submissionRepository.getSubmission(threadId, sorting, forceReload))
+        disposables.add(redditAuthentication.authenticate()
+                                .andThen(submissionRepository.getSubmission(threadId,
+                                                                            sorting,
+                                                                            forceReload))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<SubmissionWrapper>() {
                     @Override
@@ -94,7 +90,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onVoteSubmission(final Submission submission, final VoteDirection vote) {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
                         -> {
                     if (loggedIn) {
@@ -123,7 +119,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onSaveSubmission(final Submission submission, final boolean saved) {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
                         -> {
                     if (loggedIn) {
@@ -151,7 +147,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onVoteComment(final Comment comment, final VoteDirection vote) {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
                         -> {
                     if (loggedIn) {
@@ -180,7 +176,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onSaveComment(final Comment comment) {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
                         -> {
                     if (loggedIn) {
@@ -208,7 +204,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
     }
 
     public void onUnsaveComment(final Comment comment) {
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable((loggedIn)
                         -> {
                     if (loggedIn) {
@@ -257,7 +253,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         }
 
         view.showSavingToast();
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn) -> {
                     if (loggedIn) {
                         return redditService.replyToComment(redditAuthentication.getRedditClient
@@ -312,7 +308,7 @@ public class SubmissionPresenter extends BasePresenter<SubmissionView> {
         }
 
         view.showSavingToast();
-        disposables.add(redditAuthentication.authenticate(redditPrefs)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMap((loggedIn) -> {
                     if (loggedIn) {
                         return redditService.replyToThread(redditAuthentication.getRedditClient()

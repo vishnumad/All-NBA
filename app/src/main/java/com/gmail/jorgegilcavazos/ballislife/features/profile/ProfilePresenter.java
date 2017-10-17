@@ -1,7 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
-import android.content.SharedPreferences;
-
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepository;
@@ -17,7 +15,6 @@ import net.dean.jraw.paginators.TimePeriod;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -29,17 +26,14 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
     private CompositeDisposable disposables;
     private ProfileRepository profileRepository;
     private RedditAuthentication redditAuthentication;
-    private SharedPreferences redditSharedPreferences;
     private BaseSchedulerProvider schedulerProvider;
 
     @Inject
     public ProfilePresenter(ProfileRepository profileRepository,
                             RedditAuthentication redditAuthentication,
-                            @Named("redditSharedPreferences") SharedPreferences redditPreferences,
                             BaseSchedulerProvider schedulerProvider) {
         this.profileRepository = profileRepository;
         this.redditAuthentication = redditAuthentication;
-        this.redditSharedPreferences = redditPreferences;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
@@ -75,7 +69,7 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
 
         view.dismissSnackbar();
 
-        disposables.add(redditAuthentication.authenticate(redditSharedPreferences)
+        disposables.add(redditAuthentication.authenticate()
                 .andThen(profileRepository.next())
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())

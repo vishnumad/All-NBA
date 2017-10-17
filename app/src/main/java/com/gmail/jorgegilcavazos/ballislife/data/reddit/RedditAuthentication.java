@@ -1,7 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.data.reddit;
 
-import android.content.SharedPreferences;
-
 import net.dean.jraw.RedditClient;
 
 import java.net.URL;
@@ -27,18 +25,18 @@ public interface RedditAuthentication {
      * Authenticates with user context if a refresh token is saved in shared preferences. Otherwise
      * authenticates without a user context.
      */
-    Completable authenticate(SharedPreferences sharedPreferences);
+    Completable authenticate();
 
     /**
      * Authenticates with a user context. On success, saves the refresh token to a shared
      * preferences file.
      */
-    Completable authenticateUser(String url, SharedPreferences sharedPreferences);
+    Completable authenticateUser(String url);
 
     /**
      * De-authenticates the user if one is logged in.
      */
-    Completable deAuthenticateUser(SharedPreferences sharedPreferences);
+    Completable deAuthenticateUser();
 
     URL getAuthorizationUrl();
 }
