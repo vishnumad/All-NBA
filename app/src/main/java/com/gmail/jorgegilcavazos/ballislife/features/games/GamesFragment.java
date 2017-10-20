@@ -128,9 +128,9 @@ public class GamesFragment extends Fragment implements GamesView,
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         unbinder.unbind();
         presenter.detachView();
+        super.onDestroyView();
     }
 
     @Override

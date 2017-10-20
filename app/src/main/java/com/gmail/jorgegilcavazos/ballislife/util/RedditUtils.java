@@ -1,13 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.common.FullCardViewHolder;
-import com.gmail.jorgegilcavazos.ballislife.features.common.PostListViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 
 import java.util.ArrayList;
@@ -16,7 +11,6 @@ import java.util.List;
 public final class RedditUtils {
     public final static String LIVE_GT_TYPE = "LIVE_GAME_THREAD";
     public final static String POST_GT_TYPE = "POST_GAME_THREAD";
-    private final static String TAG = "RedditUtils";
 
     /**
      * Parses a given /r/NBA flair into a readable friendly string.
@@ -56,8 +50,8 @@ public final class RedditUtils {
 
     /**
      * Given a list of {@link GameThreadSummary}, a couple of teams and a type (LIVE or POST). Finds
-     * and returns the id of the reddit thread for the corresponding game thread or
-     * post game thread.
+     * and returns the id of the reddit threadId for the corresponding game threadId or
+     * post game threadId.
      */
     public static String findGameThreadId(List<GameThreadSummary> threadList,
                                           String type,
@@ -150,65 +144,6 @@ public final class RedditUtils {
         String capsTeam = fullTeamName.toUpperCase(); // Ex. "SAN ANTONIO SPURS".
         String capsName = capsTeam.substring(capsTeam.lastIndexOf(" ") + 1); // Ex. "SPURS".
         return capsTitle.contains(capsName);
-    }
-
-    // TODO: make generic holder and make FullCard, PostList and WideCard extend from it.
-    public static void setUpvotedColors(Context context, final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentUpvoted));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
-    }
-
-    public static void setDownvotedColors(Context context, final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentDownvoted));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
-    }
-
-    public static void setNoVoteColors(Context context, final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
-    }
-
-    public static void setUpvotedColors(Context context, final PostListViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentUpvoted));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentUpvoted));
-    }
-
-    public static void setDownvotedColors(Context context, final PostListViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentDownvoted));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
-    }
-
-    public static void setNoVoteColors(Context context, final PostListViewHolder holder) {
-        DrawableCompat.setTint(holder.btnUpvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        DrawableCompat.setTint(holder.btnDownvote.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
-        holder.tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
-    }
-
-    public static void setSavedColors(Context context, final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.amber));
-    }
-
-    public static void setUnsavedColors(Context context, final FullCardViewHolder holder) {
-        DrawableCompat.setTint(holder.btnSave.getDrawable().mutate(),
-                ContextCompat.getColor(context, R.color.commentNeutral));
     }
 
     public static int getTeamLogo(String subreddit) {
@@ -627,19 +562,6 @@ public final class RedditUtils {
                 return R.drawable.east;
         }
         return -1;
-    }
-
-    public static String formatScoreToDigits(int score) {
-        if (score < 1000) {
-            return String.valueOf(score);
-        } else {
-            double res = ((double) score) / 1000.0;
-            if (res < 10) {
-                return String.valueOf(res).substring(0, 3) + "k";
-            } else {
-                return String.valueOf(res).substring(0, 2) + "k";
-            }
-        }
     }
 
     // Should match pref_teams_list_values in strings.xml

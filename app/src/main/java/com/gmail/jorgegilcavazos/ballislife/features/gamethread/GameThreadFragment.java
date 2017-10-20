@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,15 +22,16 @@ import android.widget.Toast;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
-import net.dean.jraw.models.VoteDirection;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 import static android.app.Activity.RESULT_OK;
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
@@ -49,34 +53,31 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 public class GameThreadFragment extends Fragment
         implements GameThreadView,
         SwipeRefreshLayout.OnRefreshListener,
-        OnCommentClickListener,
         CompoundButton.OnCheckedChangeListener {
-    private static final String TAG = "GameThreadFragment";
-    private static final String KEY_COMMENT_TO_REPLY_POS = "CommentToReplyPos";
-    private static final String KEY_COMMENT_TO_REPLY_FULL_NAME = "CommentToReplyFullName";
-    private static final String KEY_SUBMISSION_ID = "SubmissionId";
+
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
     public boolean isPremium = false;
 
-    @Inject GameThreadPresenter presenter;
+    @Inject GameThreadPresenterV2 presenter;
     @Inject RedditAuthentication redditAuthentication;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
-    @BindView(R.id.text_message) TextView tvMessage;
+    @BindView(R.id.noThreadText) TextView noThreadText;
+    @BindView(R.id.noCommentsText) TextView noCommentsText;
+    @BindView(R.id.errorLoadingText) TextView errorLoadingText;
+
+    private PublishSubject<Object> fabClicks = PublishSubject.create();
 
     private RecyclerView.LayoutManager lmComments;
     private ThreadAdapter threadAdapter;
     private Unbinder unbinder;
-    private String homeTeam, awayTeam, threadType;
+    private String homeTeam, awayTeam;
+    private GameThreadType threadType;
     private long gameDate;
     private boolean stream = false;
     private Switch streamSwitch;
-
-    private int commentToReplyToPos = -1;
-    private String commentToReplyToFullName;
-    private String submissionId;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -89,15 +90,14 @@ public class GameThreadFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            if (commentToReplyToPos == -1 || commentToReplyToFullName == null) {
-                throw new IllegalStateException("Invalid reply pos or fullname");
-            }
-            presenter.reply(commentToReplyToPos, submissionId, commentToReplyToFullName, data
-                    .getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
+            String parentFullname = data.getStringExtra(ReplyActivity.KEY_COMMENT_FULLNAME);
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
+            presenter.replyToComment(parentFullname, response);
         } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
-            presenter.replyToThread(data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
-                    submissionId);
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
+            String submissionId = data.getStringExtra(ReplyActivity.KEY_SUBMISSION_ID);
+            presenter.replyToSubmission(submissionId, response);
         }
     }
 
@@ -106,12 +106,11 @@ public class GameThreadFragment extends Fragment
         BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
 
         if (getArguments() != null) {
             homeTeam = getArguments().getString(HOME_TEAM_KEY);
             awayTeam = getArguments().getString(AWAY_TEAM_KEY);
-            threadType = getArguments().getString(THREAD_TYPE_KEY);
+            threadType = (GameThreadType) getArguments().getSerializable(THREAD_TYPE_KEY);
             gameDate = getArguments().getLong(GAME_DATE_KEY);
         }
     }
@@ -129,7 +128,6 @@ public class GameThreadFragment extends Fragment
 
         threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
                 false);
-        threadAdapter.setCommentClickListener(this);
         
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
@@ -146,29 +144,9 @@ public class GameThreadFragment extends Fragment
         });
 
         presenter.attachView(this);
-        presenter.loadComments(
-                threadType,
-                homeTeam,
-                awayTeam,
-                stream,
-                false /* forceReload */,
-                gameDate);
-
-        if (savedInstanceState != null) {
-            commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
-            commentToReplyToFullName = savedInstanceState.getString(KEY_COMMENT_TO_REPLY_FULL_NAME);
-            submissionId = savedInstanceState.getString(KEY_SUBMISSION_ID);
-        }
+        presenter.loadGameThread();
 
         return view;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(KEY_COMMENT_TO_REPLY_POS, commentToReplyToPos);
-        outState.putString(KEY_COMMENT_TO_REPLY_FULL_NAME, commentToReplyToFullName);
-        outState.putString(KEY_SUBMISSION_ID, submissionId);
     }
 
     @Override
@@ -194,8 +172,7 @@ public class GameThreadFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
-                forceReload */, gameDate);
+                presenter.loadGameThread();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -203,13 +180,30 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        presenter.loadComments(
-                threadType,
-                homeTeam,
-                awayTeam,
-                stream,
-                true  /* forceReload */,
-                gameDate);
+        presenter.loadGameThread();
+    }
+
+    @NonNull
+    @Override
+    public GameThreadType getThreadType() {
+        return threadType;
+    }
+
+    @NonNull
+    @Override
+    public String getHome() {
+        return homeTeam;
+    }
+
+    @NonNull
+    @Override
+    public String getVisitor() {
+        return awayTeam;
+    }
+
+    @Override
+    public long getGameTimeUtc() {
+        return gameDate;
     }
 
     @Override
@@ -234,51 +228,95 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void hideText() {
-        tvMessage.setVisibility(View.GONE);
+    public void showNoThreadText() {
+        noThreadText.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showNoThreadText() {
-        tvMessage.setVisibility(View.VISIBLE);
-        tvMessage.setText(R.string.no_thread_made);
+    public void hideNoThreadText() {
+        noThreadText.setVisibility(View.GONE);
     }
 
     @Override
     public void showNoCommentsText() {
-        tvMessage.setVisibility(View.VISIBLE);
-        tvMessage.setText(R.string.no_comments_available);
+        noCommentsText.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showFailedToLoadCommentsText() {
-        tvMessage.setVisibility(View.VISIBLE);
-        tvMessage.setText(R.string.failed_load_comments);
+    public void hideNoCommentsText() {
+        noCommentsText.setVisibility(View.GONE);
     }
 
     @Override
-    public void showReplySavedToast() {
-        Toast.makeText(getActivity(), R.string.reply_saved, Toast.LENGTH_SHORT).show();
+    public void showErrorLoadingText() {
+        errorLoadingText.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void showReplyErrorToast() {
-        Toast.makeText(getActivity(), R.string.reply_error, Toast.LENGTH_SHORT).show();
+    public void hideErrorLoadingText() {
+        errorLoadingText.setVisibility(View.GONE);
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> commentSaves() {
+        return threadAdapter.getCommentSaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> commentUnsaves() {
+        return threadAdapter.getCommentUnsaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> upvotes() {
+        return threadAdapter.getUpvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> downvotes() {
+        return threadAdapter.getDownvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> novotes() {
+        return threadAdapter.getNovotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Comment> replies() {
+        return threadAdapter.getReplies();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Object> submissionReplies() {
+        return fabClicks;
     }
 
     @Override
-    public void showSavedToast() {
-        Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
+    public void openReplyToCommentActivity(@NonNull Comment parentComment) {
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
+        Bundle extras = new Bundle();
+        extras.putString(ReplyActivity.KEY_COMMENT_FULLNAME, parentComment.getFullName());
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
+                               RedditUtils.bindSnuDown(parentComment.data("body_html")));
+        intent.putExtras(extras);
+        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }
 
     @Override
-    public void showNotLoggedInToast() {
-        Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showReplyToSubmissionFailedToast() {
-        Toast.makeText(getActivity(), R.string.reply_to_sub_failed, Toast.LENGTH_SHORT).show();
+    public void openReplyToSubmissionActivity(@NonNull String submissionId) {
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
+        Bundle extras = new Bundle();
+        extras.putString(ReplyActivity.KEY_SUBMISSION_ID, submissionId);
+        intent.putExtras(extras);
+        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
     @Override
@@ -287,27 +325,52 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void openReplyToCommentActivity(final int position, final Comment parentComment) {
-        commentToReplyToFullName = parentComment.getFullName();
-        commentToReplyToPos = position;
-
-        Intent intent = new Intent(getActivity(), ReplyActivity.class);
-        Bundle extras = new Bundle();
-        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
-                RedditUtils.bindSnuDown(parentComment.data("body_html")));
-        intent.putExtras(extras);
-        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
+    public void showSavedToast() {
+        Toast.makeText(getActivity(), R.string.saved, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void openReplyToSubmissionActivity() {
-        Intent intent = new Intent(getActivity(), ReplyActivity.class);
-        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
+    public void showUnsavingToast() {
+        Toast.makeText(getActivity(), R.string.unsaving, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void setSubmissionId(String submissionId) {
-        this.submissionId = submissionId;
+    public void showUnsavedToast() {
+        Toast.makeText(getActivity(), R.string.unsaved, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSubmittingCommentToast() {
+        Toast.makeText(getActivity(), "Saving comment", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSubmittedCommentToast() {
+        Toast.makeText(getActivity(), "Reply saved", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showMissingParentToast() {
+        Toast.makeText(getActivity(), "Couldn't save comment, missing parent", Toast.LENGTH_SHORT)
+                .show();
+    }
+
+    @Override
+    public void showMissingSubmissionToast() {
+        Toast.makeText(
+                getActivity(),
+                "Couldn't save comment, missing submission",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showErrorSavingCommentToast() {
+        Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showNotLoggedInToast() {
+        Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -320,30 +383,9 @@ public class GameThreadFragment extends Fragment
         ((CommentsActivity) getActivity()).hideFab();
     }
 
-    @Override
-    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
-        presenter.vote(comment, voteDirection);
-    }
 
-    @Override
-    public void onSaveComment(Comment comment) {
-        presenter.save(comment);
-    }
-
-    @Override
-    public void onUnsaveComment(Comment comment) {
-        presenter.unsave(comment);
-    }
-
-    @Override
-    public void onReplyToComment(final int position, final Comment parentComment) {
-        presenter.replyToCommentBtnClick(position, parentComment);
-    }
-
-    public void replyToThread() {
-        if (presenter != null) {
-            presenter.replyToThreadBtnClick();
-        }
+    public void fabClicked() {
+        fabClicks.onNext(new Object());
     }
 
     @Override
@@ -355,18 +397,20 @@ public class GameThreadFragment extends Fragment
                 streamSwitch.setChecked(false);
             } else {
                 stream = true;
-                presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
-                forceReload */, gameDate);
+                //presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
+                //forceReload */, gameDate);
             }
         } else {
             stream = false;
+            presenter.loadGameThread();
+            /*
             presenter.loadComments(
                     threadType,
                     homeTeam,
                     awayTeam,
                     stream,
-                    true /* forceReload */,
-                    gameDate);
+                    true /* forceReload *///,
+            //gameDate);
         }
     }
 }

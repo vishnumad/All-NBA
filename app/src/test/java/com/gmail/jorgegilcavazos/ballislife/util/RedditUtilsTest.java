@@ -1,18 +1,14 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 
-import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.Submission;
-
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RedditUtilsTest {
 
@@ -94,22 +90,6 @@ public class RedditUtilsTest {
     }
 
     @Test
-    public void testFindGameThreadId_multipleThreadsForOneGame() {
-        // Create fake threads with different titles.
-        List<GameThreadSummary> gameThreadList = new ArrayList<>();
-        gameThreadList.add(new GameThreadSummary("id1", "Post Game Thread: Los Angeles Clippers @ Hawks", 0, 20));
-        gameThreadList.add(new GameThreadSummary("id2", "Post Game Thread: Los Angeles Clippers @ Hawks", 0, 0));
-        gameThreadList.add(new GameThreadSummary("id3", "Post Game Thread: Los Angeles Clippers @ Hawks", 0, 100));
-        gameThreadList.add(new GameThreadSummary("id4", "Post Game Thread: Los Angeles Clippers @ Hawks", 0, 101));
-        gameThreadList.add(new GameThreadSummary("id5", "Post Game Thread: Los Angeles Clippers @ Hawks", 0, 78));
-
-        String actual = RedditUtils.findGameThreadId(gameThreadList,
-                RedditUtils.POST_GT_TYPE, "ATL", "LAC");
-
-        assertEquals("id4", actual);
-    }
-
-    @Test
     public void testTitleContainsTeam_FullName() {
         boolean isInTitle = RedditUtils.titleContainsTeam(
                 "Game Thread: Los Angeles Lakers @ San Antonio Spurs", "San Antonio Spurs");
@@ -131,10 +111,6 @@ public class RedditUtilsTest {
     }
 
     private GameThreadSummary makeFakeGameThreadSummary(String id, String title, long createdUtc) {
-        GameThreadSummary gameThreadSummary = new GameThreadSummary();
-        gameThreadSummary.setId(id);
-        gameThreadSummary.setTitle(title);
-        gameThreadSummary.setCreated_utc(createdUtc);
-        return gameThreadSummary;
+        return new GameThreadSummary(id, title, createdUtc);
     }
 }

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreFragment;
-import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0: // GAME THREAD
-                bundle.putString(GameThreadFragment.THREAD_TYPE_KEY, RedditUtils.LIVE_GT_TYPE);
+                bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.LIVE);
                 if (fragmentMap.get(position) != null) {
                     return fragmentMap.get(position);
                 } else {
@@ -47,7 +47,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 fragmentMap.put(1, tab2);
                 return tab2;
             case 2: // POST GAME THREAD
-                bundle.putString(GameThreadFragment.THREAD_TYPE_KEY, RedditUtils.POST_GT_TYPE);
+                bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.POST);
                 if (fragmentMap.get(2) != null) {
                     return fragmentMap.get(2);
                 } else {

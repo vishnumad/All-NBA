@@ -47,7 +47,7 @@ class GamesPresenter @Inject constructor(
     view.dismissSnackbar()
     loadDateNavigatorText(calendar)
 
-    disposables.add(gamesRepository.games(calendar, forceNetwork)
+    gamesRepository.games(calendar, forceNetwork)
         .observeOn(schedulerProvider.ui(), true)
         .subscribeWith(object : DisposableObserver<GamesUiModel>() {
           override fun onNext(uiModel: GamesUiModel) {
@@ -78,7 +78,8 @@ class GamesPresenter @Inject constructor(
           override fun onComplete() {
 
           }
-        }))
+        })
+        .addTo(disposables)
   }
 
   private fun loadDateNavigatorText(selectedDate: Calendar) {

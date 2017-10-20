@@ -1,11 +1,17 @@
 package com.gmail.jorgegilcavazos.ballislife.dagger.module;
 
+import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions;
+import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActionsImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
@@ -56,4 +62,15 @@ public abstract class BindModule {
     @Binds
     public abstract SubmissionRepository bindSubmissionRepository(
             SubmissionRepositoryImpl submissionRepositoryImpl);
+
+    @Binds
+    public abstract GameThreadsRepository bindGameThreadsRepository(
+            GameThreadsRepositoryImpl gameThreadsRepositoryImpl);
+
+    @Binds
+    public abstract RedditActions bindRedditActions(RedditActionsImpl redditActionsImpl);
+
+    @Binds
+    public abstract ContributionRepository bindCommentsRepository(
+            ContributionRepositoryImpl commentsRepositoryImpl);
 }

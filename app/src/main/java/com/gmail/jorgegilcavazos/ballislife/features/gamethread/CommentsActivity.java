@@ -156,9 +156,7 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
 
         if (pos == 0 || pos == 2) {
             GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
-            if (gameThreadFragment.isAdded() && gameThreadFragment.isVisible()) {
-                gameThreadFragment.replyToThread();
-            }
+            gameThreadFragment.fabClicked();
         }
     }
 

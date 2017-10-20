@@ -1,7 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.features.profile;
 
-import android.content.SharedPreferences;
-
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepository;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedException;
@@ -56,9 +54,6 @@ public class ProfilePresenterTest {
     @Mock
     RedditAuthentication mockRedditAuthentication;
 
-    @Mock
-    SharedPreferences mockSharedPreferences;
-
     private ProfilePresenter presenter;
 
     @Before
@@ -66,7 +61,6 @@ public class ProfilePresenterTest {
         presenter = new ProfilePresenter(
                 mockRepository,
                 mockRedditAuthentication,
-                mockSharedPreferences,
                 new TrampolineSchedulerProvider());
         presenter.attachView(mockView);
     }
@@ -88,9 +82,8 @@ public class ProfilePresenterTest {
 
     @Test
     public void testLoadFirstAvailable_cacheNotAvailable() {
-        when(mockRepository.getCachedContributions())
-                .thenReturn(Collections.<Contribution>emptyList());
-        when(mockRedditAuthentication.authenticate(mockSharedPreferences))
+        when(mockRepository.getCachedContributions()).thenReturn(Collections.emptyList());
+        when(mockRedditAuthentication.authenticate())
                 .thenReturn(Completable.complete());
         when(mockRepository.next()).thenReturn(Single.just(contributions));
 
@@ -101,7 +94,7 @@ public class ProfilePresenterTest {
         verify(mockView).resetScrollingState();
         verify(mockRepository).reset();
         verify(mockView).dismissSnackbar();
-        verify(mockRedditAuthentication).authenticate(mockSharedPreferences);
+        verify(mockRedditAuthentication).authenticate();
         verify(mockRepository).next();
         verify(mockView).showContent(contributions, true);
         verify(mockView).scrollToTop();
@@ -113,9 +106,8 @@ public class ProfilePresenterTest {
 
     @Test
     public void testLoadFirstAvailable_cacheNotAvailableAndEmptyNetworkList() {
-        when(mockRepository.getCachedContributions())
-                .thenReturn(Collections.<Contribution>emptyList());
-        when(mockRedditAuthentication.authenticate(mockSharedPreferences))
+        when(mockRepository.getCachedContributions()).thenReturn(Collections.emptyList());
+        when(mockRedditAuthentication.authenticate())
                 .thenReturn(Completable.complete());
         when(mockRepository.next()).thenReturn(Single.just(emptyContributions));
 
@@ -126,7 +118,7 @@ public class ProfilePresenterTest {
         verify(mockView).resetScrollingState();
         verify(mockRepository).reset();
         verify(mockView).dismissSnackbar();
-        verify(mockRedditAuthentication).authenticate(mockSharedPreferences);
+        verify(mockRedditAuthentication).authenticate();
         verify(mockRepository).next();
         verify(mockView).showNothingToShowSnackbar();
         verify(mockView).hideContent();
@@ -139,9 +131,8 @@ public class ProfilePresenterTest {
 
     @Test
     public void testLoadFirstAvailable_cacheNotAvailableAndNetworkError() {
-        when(mockRepository.getCachedContributions())
-                .thenReturn(Collections.<Contribution>emptyList());
-        when(mockRedditAuthentication.authenticate(mockSharedPreferences))
+        when(mockRepository.getCachedContributions()).thenReturn(Collections.emptyList());
+        when(mockRedditAuthentication.authenticate())
                 .thenReturn(Completable.complete());
         Single<List<Contribution>> errorSingle = Single.error(new Exception());
         when(mockRepository.next()).thenReturn(errorSingle);
@@ -153,7 +144,7 @@ public class ProfilePresenterTest {
         verify(mockView).resetScrollingState();
         verify(mockRepository).reset();
         verify(mockView).dismissSnackbar();
-        verify(mockRedditAuthentication).authenticate(mockSharedPreferences);
+        verify(mockRedditAuthentication).authenticate();
         verify(mockRepository).next();
         verify(mockView).showContributionsLoadingFailedSnackbar(true);
         verify(mockView).setLoadingIndicator(false);
@@ -165,9 +156,8 @@ public class ProfilePresenterTest {
 
     @Test
     public void testLoadFirstAvailable_cacheNotAvailableAndUserNotLoggedIn() {
-        when(mockRepository.getCachedContributions())
-                .thenReturn(Collections.<Contribution>emptyList());
-        when(mockRedditAuthentication.authenticate(mockSharedPreferences))
+        when(mockRepository.getCachedContributions()).thenReturn(Collections.emptyList());
+        when(mockRedditAuthentication.authenticate())
                 .thenReturn(Completable.complete());
         Single<List<Contribution>> errorSingle = Single.error(new NotAuthenticatedException());
         when(mockRepository.next()).thenReturn(errorSingle);
@@ -179,7 +169,7 @@ public class ProfilePresenterTest {
         verify(mockView).resetScrollingState();
         verify(mockRepository).reset();
         verify(mockView).dismissSnackbar();
-        verify(mockRedditAuthentication).authenticate(mockSharedPreferences);
+        verify(mockRedditAuthentication).authenticate();
         verify(mockRepository).next();
         verify(mockView).showNotAuthenticatedToast();
         verify(mockView).setLoadingIndicator(false);
