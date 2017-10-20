@@ -5,6 +5,8 @@ import android.text.Html;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
 
+import net.dean.jraw.models.Submission;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,6 +136,11 @@ public final class RedditUtils {
             text = text.substring(0, text.length() - 1);
         }
         return text;
+    }
+
+    public static boolean isRemovedOrDeleted(Submission submission) {
+        return submission.getSelftext().equals("[removed]") || submission.getSelftext()
+                .equals("[deleted]");
     }
 
     /**

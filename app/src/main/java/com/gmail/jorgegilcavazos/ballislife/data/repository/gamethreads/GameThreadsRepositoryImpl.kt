@@ -7,7 +7,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType.LIVE
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType.POST
+import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
+import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.Observable
@@ -34,10 +36,22 @@ class GameThreadsRepositoryImpl @Inject constructor(
               LIVE -> CommentSort.NEW
               POST -> CommentSort.TOP
             }
-            // TODO: select correct one if multiple
-            submissionRepository.getSubmission(gameThreads[0].id, sort, true /* forceReload */)
-                .toObservable()
-                .flatMap { Observable.just(GameThreadsUIModel.found(it.submission!!)) }
+
+            val submissionObservables = gameThreads
+                .map { submissionRepository.getSubmission(it.id, sort, true).toObservable() }
+                .toList()
+
+            // Return found model of first non deleted thread or not found if there aren't any.
+            Observable.merge(submissionObservables)
+                .filter { !RedditUtils.isRemovedOrDeleted(it.submission!!) }
+                .first(SubmissionWrapper("", null, "", ""))
+                .flatMapObservable {
+                  if (it.id.isEmpty()) {
+                    Observable.just(GameThreadsUIModel.notFound())
+                  } else {
+                    Observable.just(GameThreadsUIModel.found(it.submission!!))
+                  }
+                }
           }
         }
         .subscribeOn(schedulerProvider.io())

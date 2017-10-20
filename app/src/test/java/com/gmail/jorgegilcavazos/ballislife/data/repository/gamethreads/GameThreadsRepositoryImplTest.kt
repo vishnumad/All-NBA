@@ -44,6 +44,7 @@ class GameThreadsRepositoryImplTest {
   @Test
   fun gameThreadsFoundMatching() {
     val mockSubmission = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission.selftext).thenReturn("Non empty")
     val wrapper = SubmissionWrapper(mockSubmission)
     `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID, CommentSort.NEW, true))
         .thenReturn(Single.just(wrapper))
@@ -72,12 +73,19 @@ class GameThreadsRepositoryImplTest {
   }
 
   @Test
-  fun gameThreadsFoundMultipleMatching() {
+  fun gameThreadsFoundMultipleMatchingReturnFirst() {
+    val mockSubmission1 = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission1.selftext).thenReturn("Non empty")
     val mockSubmission2 = prepareMockSubmission(SUBMISSION_ID_2, SUBMISSION_TITLE_2)
-    val wrapper = SubmissionWrapper(mockSubmission2)
+    `when`(mockSubmission2.selftext).thenReturn("Non empty")
 
+    val wrapper1 = SubmissionWrapper(mockSubmission1)
+    val wrapper2 = SubmissionWrapper(mockSubmission2)
+
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper1))
     `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID_2, CommentSort.NEW, true))
-        .thenReturn(Single.just(wrapper))
+        .thenReturn(Single.just(wrapper2))
     `when`(
         mockRedditGameThreadsService.fetchGameThreads(
             "\"created_utc\"",
@@ -109,10 +117,143 @@ class GameThreadsRepositoryImplTest {
   }
 
   @Test
+  fun gameThreadsFoundMultipleMatchingFilterNonRemoved() {
+    val mockSubmission1 = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission1.selftext).thenReturn("Non empty")
+    val mockSubmission2 = prepareMockSubmission(SUBMISSION_ID_2, SUBMISSION_TITLE_2)
+    `when`(mockSubmission2.selftext).thenReturn("[removed]")
+
+    val wrapper1 = SubmissionWrapper(mockSubmission1)
+    val wrapper2 = SubmissionWrapper(mockSubmission2)
+
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper1))
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID_2, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper2))
+    `when`(
+        mockRedditGameThreadsService.fetchGameThreads(
+            "\"created_utc\"",
+            DateFormatUtil.addHoursToTime(0, -2),
+            DateFormatUtil.addHoursToTime(0, 5)))
+        .thenReturn(
+            Single.just(
+                mapOf(
+                    "2393d83" to GameThreadSummary(
+                        SUBMISSION_ID_2,
+                        SUBMISSION_TITLE_2,
+                        0
+                    ),
+                    "9813hd2" to GameThreadSummary(
+                        SUBMISSION_ID,
+                        SUBMISSION_TITLE,
+                        0)
+                )))
+
+    val testObserver = gameThreadsRepository.gameThreads(
+        "SAS",
+        "GSW",
+        0L,
+        GameThreadType.LIVE).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.found && it.submission == mockSubmission1 })
+  }
+
+  @Test
+  fun gameThreadsFoundMultipleMatchingFilterNonDeleted() {
+    val mockSubmission1 = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission1.selftext).thenReturn("Non empty")
+    val mockSubmission2 = prepareMockSubmission(SUBMISSION_ID_2, SUBMISSION_TITLE_2)
+    `when`(mockSubmission2.selftext).thenReturn("[deleted]")
+
+    val wrapper1 = SubmissionWrapper(mockSubmission1)
+    val wrapper2 = SubmissionWrapper(mockSubmission2)
+
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper1))
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID_2, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper2))
+    `when`(
+        mockRedditGameThreadsService.fetchGameThreads(
+            "\"created_utc\"",
+            DateFormatUtil.addHoursToTime(0, -2),
+            DateFormatUtil.addHoursToTime(0, 5)))
+        .thenReturn(
+            Single.just(
+                mapOf(
+                    "2393d83" to GameThreadSummary(
+                        SUBMISSION_ID_2,
+                        SUBMISSION_TITLE_2,
+                        0
+                    ),
+                    "9813hd2" to GameThreadSummary(
+                        SUBMISSION_ID,
+                        SUBMISSION_TITLE,
+                        0)
+                )))
+
+    val testObserver = gameThreadsRepository.gameThreads(
+        "SAS",
+        "GSW",
+        0L,
+        GameThreadType.LIVE).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.found && it.submission == mockSubmission1 })
+  }
+
+  @Test
+  fun gameThreadsFoundMultipleMatchingButAllRemovedOrDeleted() {
+    val mockSubmission1 = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission1.selftext).thenReturn("[removed]")
+    val mockSubmission2 = prepareMockSubmission(SUBMISSION_ID_2, SUBMISSION_TITLE_2)
+    `when`(mockSubmission2.selftext).thenReturn("[deleted]")
+
+    val wrapper1 = SubmissionWrapper(mockSubmission1)
+    val wrapper2 = SubmissionWrapper(mockSubmission2)
+
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper1))
+    `when`(mockSubmissionRepository.getSubmission(SUBMISSION_ID_2, CommentSort.NEW, true))
+        .thenReturn(Single.just(wrapper2))
+    `when`(
+        mockRedditGameThreadsService.fetchGameThreads(
+            "\"created_utc\"",
+            DateFormatUtil.addHoursToTime(0, -2),
+            DateFormatUtil.addHoursToTime(0, 5)))
+        .thenReturn(
+            Single.just(
+                mapOf(
+                    "2393d83" to GameThreadSummary(
+                        SUBMISSION_ID_2,
+                        SUBMISSION_TITLE_2,
+                        0
+                    ),
+                    "9813hd2" to GameThreadSummary(
+                        SUBMISSION_ID,
+                        SUBMISSION_TITLE,
+                        0)
+                )))
+
+    val testObserver = gameThreadsRepository.gameThreads(
+        "SAS",
+        "GSW",
+        0L,
+        GameThreadType.LIVE).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.notFound })
+  }
+
+  @Test
   fun gameThreadsFilterTitle() {
     val goodSubmissionId = "id5"
     val goodSubmissionTitle = "POST GAME THREAD: Spurs @ Warriors"
     val mockSubmission1 = prepareMockSubmission(SUBMISSION_ID, SUBMISSION_TITLE)
+    `when`(mockSubmission1.selftext).thenReturn("Non empty")
     val wrapper = SubmissionWrapper(mockSubmission1)
 
     `when`(mockSubmissionRepository.getSubmission(goodSubmissionId, CommentSort.TOP, true))
