@@ -131,9 +131,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         presenter.detachView();
         presenter.stop();
+        super.onDestroy();
     }
 
     @Override

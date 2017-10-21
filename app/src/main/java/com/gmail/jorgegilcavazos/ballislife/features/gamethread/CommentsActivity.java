@@ -95,10 +95,10 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (billingProcessor != null) {
             billingProcessor.release();
         }
+        super.onDestroy();
     }
 
     @Override

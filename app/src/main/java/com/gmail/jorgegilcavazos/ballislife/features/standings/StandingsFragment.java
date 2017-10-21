@@ -95,12 +95,12 @@ public class StandingsFragment extends Fragment implements StandingsView,
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (disposables != null) {
             disposables.clear();
         }
         unbinder.unbind();
         presenter.detachView();
+        super.onDestroyView();
     }
 
     @Override

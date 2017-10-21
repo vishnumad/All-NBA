@@ -150,10 +150,10 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         unbinder.unbind();
         presenter.stop();
         presenter.detachView();
+        super.onDestroyView();
     }
 
     @Override

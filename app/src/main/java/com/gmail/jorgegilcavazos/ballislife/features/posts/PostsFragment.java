@@ -176,11 +176,11 @@ public class PostsFragment extends Fragment implements PostsView,
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         unbinder.unbind();
         presenter.detachView();
         presenter.stop();
         dismissSnackbar();
+        super.onDestroyView();
     }
 
     @Override

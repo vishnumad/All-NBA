@@ -60,9 +60,9 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         presenter.stop();
         presenter.detachView();
+        super.onDestroy();
     }
 
     @Override

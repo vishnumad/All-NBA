@@ -112,9 +112,9 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         unbinder.unbind();
         presenter.stop();
+        super.onDestroyView();
     }
 
     @Override
