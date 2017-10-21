@@ -1,6 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -240,7 +239,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     public void addRowToPlayersTable2(String content) {
         TableRow row = new TableRow(getActivity());
-        row.setBackgroundColor(Color.WHITE);
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         int width = (int) UnitUtils.convertDpToPixel(100, getActivity());
@@ -261,7 +259,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     public void addRowToStatsTable2(Optional<StatLine> statLineOptional) {
         TableRow row = new TableRow(getActivity());
-        row.setBackgroundColor(Color.WHITE);
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
         if (statLineOptional.isPresent()) {

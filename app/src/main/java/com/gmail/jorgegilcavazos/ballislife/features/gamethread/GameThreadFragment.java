@@ -122,7 +122,7 @@ public class GameThreadFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_game_thread, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        isPremium = ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium");
+        isPremium = false;
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -390,27 +390,5 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            if (!isPremium) {
-                ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(),
-                        "premium");
-                streamSwitch.setChecked(false);
-            } else {
-                stream = true;
-                //presenter.loadComments(threadType, homeTeam, awayTeam, stream, true /*
-                //forceReload */, gameDate);
-            }
-        } else {
-            stream = false;
-            presenter.loadGameThread();
-            /*
-            presenter.loadComments(
-                    threadType,
-                    homeTeam,
-                    awayTeam,
-                    stream,
-                    true /* forceReload *///,
-            //gameDate);
-        }
     }
 }

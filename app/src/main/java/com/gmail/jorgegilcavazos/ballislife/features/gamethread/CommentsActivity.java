@@ -28,24 +28,15 @@ import butterknife.ButterKnife;
 public class CommentsActivity extends AppCompatActivity implements TabLayout
         .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener,
         BillingProcessor.IBillingHandler {
-    private static final String TAG = "CommentsActivity";
-    private static final String LICENSE_KEY =
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJK4rNHNjwBh9Xc0a29VV" +
-                    "+V8UaEfAAoJuBKv9RfbGtCtwFhJI6UPbH" +
-                    "/gulND9bX43DRyw5zSrhCaz1eUSm3XbOVMcrnhv4gfNOeLLhzzN9vzcoiOjzI4z" +
-                    "+75j45MUWI3M6AmJGHCfl1c0zOCObwz71/BHte5peR" +
-                    "/O8nFisMAkdDSGV846xvBiviSTRBlI4HBy1TE+8mFQVYs4bxY6V9bIOqhALCwithQpgZF" +
-                    "/TMk1xy9sbz2Ab9NJVaYPqICrco5POEVAPMBTv0QI14M1ECuZQZaNNR9jc6V" +
-                    "+fQoVBD2xdetCEjh1fdxb5HBNboWxC5xdLlPpnoZ8dkFENOz1yzoLQIDAQAB"; // PUT YOUR
-    // MERCHANT KEY HERE;
     public static final String GAME_ID_KEY = "gameId";
     public static final String HOME_TEAM_KEY = "homeTeamKey";
     public static final String AWAY_TEAM_KEY = "awayTeamKey";
-    public BillingProcessor billingProcessor;
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.tabLayout) TabLayout tabLayout;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
+
     private String homeTeam;
     private String awayTeam;
     private String gameId;
@@ -91,16 +82,6 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
         tabLayout.addOnTabSelectedListener(this);
 
         fab.setOnClickListener(this);
-
-        billingProcessor = new BillingProcessor(this, LICENSE_KEY, this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (billingProcessor != null) {
-            billingProcessor.release();
-        }
-        super.onDestroy();
     }
 
     @Override
@@ -163,13 +144,6 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
         Fragment fragment = pagerAdapter.getItem(0);
         GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
@@ -200,7 +174,9 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
     }
 
     public void showFab() {
-        fab.show();
+        if (viewPager.getCurrentItem() != 1) {
+            fab.show();
+        }
     }
 
     public void hideFab() {
