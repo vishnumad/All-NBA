@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -80,7 +81,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             homeTeam = getArguments().getString(HOME_TEAM_KEY);
             awayTeam = getArguments().getString(AWAY_TEAM_KEY);
             gameId = getArguments().getString(CommentsActivity.GAME_ID_KEY);
-            gameId = "0041600405";
         }
     }
 
@@ -151,6 +151,9 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Override
     public void showVisitorBoxScore(BoxScoreValues values) {
+        playersTable.removeAllViews();
+        statsTable.removeAllViews();
+
         List<String> players = new ArrayList<>();
 
         for (StatLine statLine : values.getVls().getPstsg()) {
@@ -161,10 +164,25 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 players.add(statLine.getLn());
             }
         }
+
+        addRowToPlayersTable2("PLAYER");
+        for (String player : players) {
+            addRowToPlayersTable2(player);
+        }
+
+        addRowToStatsTable2(Optional.absent());
+        for (StatLine statLine : values.getVls().getPstsg()) {
+            addRowToStatsTable2(Optional.of(statLine));
+        }
+
+        scrollView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showHomeBoxScore(BoxScoreValues values) {
+        playersTable.removeAllViews();
+        statsTable.removeAllViews();
+
         List<String> players = new ArrayList<>();
 
         for (StatLine statLine : values.getHls().getPstsg()) {
@@ -176,14 +194,14 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             }
         }
 
-        addRowToPlayersTable("PLAYER");
+        addRowToPlayersTable2("PLAYER");
         for (String player : players) {
-            addRowToPlayersTable(player);
+            addRowToPlayersTable2(player);
         }
 
-        addRowToStatsTable(Optional.absent());
+        addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getHls().getPstsg()) {
-            addRowToStatsTable(Optional.of(statLine));
+            addRowToStatsTable2(Optional.of(statLine));
         }
 
         scrollView.setVisibility(View.VISIBLE);
@@ -220,16 +238,28 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         tvLoadMessage.setVisibility(View.GONE);
     }
 
-    public void addRowToPlayersTable(String content) {
+    public void addRowToPlayersTable2(String content) {
         TableRow row = new TableRow(getActivity());
         row.setBackgroundColor(Color.WHITE);
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
-        row.addView(createTextView(content, 200, false));
+        int width = (int) UnitUtils.convertDpToPixel(100, getActivity());
+        row.setMinimumWidth(width);
+
+        if (content.equals("PLAYER")) {
+            TextView tv = addHeaderItem(row, content);
+            tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            row.addView(tv);
+        } else {
+            TextView tv = addNormalItem(row, content);
+            tv.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            row.addView(tv);
+        }
+
         playersTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
     }
 
-    public void addRowToStatsTable(Optional<StatLine> statLineOptional) {
+    public void addRowToStatsTable2(Optional<StatLine> statLineOptional) {
         TableRow row = new TableRow(getActivity());
         row.setBackgroundColor(Color.WHITE);
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
@@ -237,59 +267,43 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         if (statLineOptional.isPresent()) {
             StatLine statLine = statLineOptional.get();
 
-            row.addView(createTextView(String.valueOf(statLine.getMin())));
-            row.addView(createTextView(String.valueOf(statLine.getPts())));
-            row.addView(createTextView(String.valueOf(statLine.getReb())));
-            row.addView(createTextView(String.valueOf(statLine.getAst())));
-            row.addView(createTextView(String.valueOf(statLine.getStl())));
-            row.addView(createTextView(String.valueOf(statLine.getBlk())));
-            row.addView(createTextView(String.valueOf(statLine.getPf())));
-            row.addView(createTextView(String.valueOf(statLine.getTov())));
-            row.addView(createTextView(String.valueOf(statLine.getReb())));
-            row.addView(createTextView("DREB"));
-            row.addView(createTextView(String.valueOf(statLine.getFga() + "/" + statLine.getFgm()
-            )));
-            row.addView(createTextView("FG%"));
-            row.addView(createTextView("FT"));
-            row.addView(createTextView("FT%"));
-            row.addView(createTextView("3P"));
-            row.addView(createTextView("3P%"));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getMin())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getPts())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getReb())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getAst())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getPf())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getTov())));
         } else {
-            row.addView(createTextView("MIN"));
-            row.addView(createTextView("PTS"));
-            row.addView(createTextView("REB"));
-            row.addView(createTextView("AST"));
-            row.addView(createTextView("STL"));
-            row.addView(createTextView("BLK"));
-            row.addView(createTextView("PF"));
-            row.addView(createTextView("TO"));
-            row.addView(createTextView("OREB"));
-            row.addView(createTextView("DREB"));
-            row.addView(createTextView("FG"));
-            row.addView(createTextView("FG%"));
-            row.addView(createTextView("FT"));
-            row.addView(createTextView("FT%"));
-            row.addView(createTextView("3P"));
-            row.addView(createTextView("3P%"));
+            row.addView(addHeaderItem(row, "MIN"));
+            row.addView(addHeaderItem(row, "PTS"));
+            row.addView(addHeaderItem(row, "REB"));
+            row.addView(addHeaderItem(row, "AST"));
+            row.addView(addHeaderItem(row, "STL"));
+            row.addView(addHeaderItem(row, "BLK"));
+            row.addView(addHeaderItem(row, "PF"));
+            row.addView(addHeaderItem(row, "TO"));
         }
 
         statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
     }
 
-    private TextView createTextView(String text) {
-        return createTextView(text, 60, true);
+    private TextView addHeaderItem(TableRow row, String text) {
+        TextView view = (TextView) LayoutInflater.from(getActivity())
+                .inflate(R.layout.boxscore_item, row, false);
+        view.setText(text);
+        view.setTypeface(null, Typeface.BOLD);
+        view.setMinWidth((int) UnitUtils.convertDpToPixel(30, getActivity()));
+        return view;
     }
 
-    private TextView createTextView(String text, int width, boolean center) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(text);
-        textView.setTextColor(ContextCompat.getColor(getActivity(), R.color.primaryText));
-        if (center) {
-            textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        }
-        int padding = (int) UnitUtils.convertDpToPixel(8, getActivity());
-        textView.setPadding(padding, padding, padding, padding);
-        textView.setTextSize(18);
-        return textView;
+    private TextView addNormalItem(TableRow row, String text) {
+        TextView view = (TextView) LayoutInflater.from(getActivity())
+                .inflate(R.layout.boxscore_item, row, false);
+        view.setText(text);
+        view.setTypeface(null, Typeface.NORMAL);
+        view.setMinWidth((int) UnitUtils.convertDpToPixel(30, getActivity()));
+        return view;
     }
 }

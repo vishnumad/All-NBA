@@ -25,8 +25,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class CommentsActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
-        View.OnClickListener, BillingProcessor.IBillingHandler {
+public class CommentsActivity extends AppCompatActivity implements TabLayout
+        .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener,
+        BillingProcessor.IBillingHandler {
     private static final String TAG = "CommentsActivity";
     private static final String LICENSE_KEY =
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJK4rNHNjwBh9Xc0a29VV" +
@@ -86,6 +87,8 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
                 tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.addOnPageChangeListener(this);
         tabLayout.addOnTabSelectedListener(this);
 
         fab.setOnClickListener(this);
@@ -203,5 +206,26 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout.OnT
 
     public void hideFab() {
         fab.hide();
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        tabLayout.setScrollPosition(position, 0f, true);
+        switch (position) {
+            case 1:
+                fab.hide();
+                expandToolbar();
+                break;
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }
