@@ -33,7 +33,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         switch (position) {
             case 0: // GAME THREAD
                 bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.LIVE);
-                if (fragmentMap.get(position) != null) {
+                if (fragmentMap.get(0) != null) {
                     return fragmentMap.get(position);
                 } else {
                     GameThreadFragment tab1 = GameThreadFragment.newInstance();
