@@ -18,6 +18,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.google.common.base.Optional;
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.picasso.Picasso;
 
 import net.dean.jraw.models.Submission;
@@ -69,7 +70,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return new HeaderViewHolder(view);
         }
 
-        switch (contentViewType) {
+        switch (viewType) {
             case POSTS_VIEW_LIST:
                 view = inflater.inflate(R.layout.post_layout_list, parent, false);
                 return new PostListViewHolder(view);
@@ -112,7 +113,12 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (position == 0) {
             return VIEW_HEADER;
         }
+        if (contentViewType == 0) {
+            FirebaseCrash.report(new IllegalArgumentException("contentViewType should not be 0"));
+            return POSTS_VIEW_WIDE_CARD;
+        }
         return contentViewType;
+
     }
 
     @Override

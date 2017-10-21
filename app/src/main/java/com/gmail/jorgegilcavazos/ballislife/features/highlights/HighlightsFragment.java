@@ -307,7 +307,9 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
                 break;
             default:
-                throw new IllegalStateException("Highlight view icon neither small nor large");
+                drawable = ContextCompat.getDrawable(getContext(),
+                                                     R.drawable.ic_view_list_white_24dp);
+                break;
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);
     }
