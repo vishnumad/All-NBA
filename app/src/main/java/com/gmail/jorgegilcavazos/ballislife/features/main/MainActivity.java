@@ -44,6 +44,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Arrays;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -123,8 +124,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Subscribe to all default firebase messaging topics if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SUBSCRIBE_TO_TOPICS)) {
-            subscribeToDefaultTopics();
+            //resubscribeToTopics();
         }
+        resubscribeToTopics();
 
         setUpToolbar();
         setUpNavigationView();
@@ -528,11 +530,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void subscribeToDefaultTopics() {
+    private void resubscribeToTopics() {
         // Subscribe to all CGA topics
-        String[] topics = getResources().getStringArray(R.array.pref_cga_values);
-        for (String topic : topics) {
-            FirebaseMessaging.getInstance().subscribeToTopic(topic);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> cgaTopics = preferences.getStringSet(
+                SettingsFragment.KEY_PREF_CGA_TOPICS,
+                null);
+        String[] availableGameTopics = getResources().getStringArray(R.array.pref_cga_values);
+        updateTopicSubscriptions(cgaTopics, availableGameTopics);
+    }
+
+    private void updateTopicSubscriptions(Set<String> newTopics, String[] availableTopics) {
+        if (newTopics != null) {
+            for (String availableTopic : availableTopics) {
+                if (newTopics.contains(availableTopic)) {
+                    FirebaseMessaging.getInstance().subscribeToTopic(availableTopic);
+                } else {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
+                }
+            }
+        } else {
+            for (String availableTopic : availableTopics) {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
+            }
         }
     }
 

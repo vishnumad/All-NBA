@@ -336,36 +336,6 @@
 
     <!-- DO NOT TRANSLATE -->
     <string-array name="pref_cga_values_def">
-        <item>CGA-Atlanta</item>
-        <item>CGA-Brooklyn</item>
-        <item>CGA-Boston</item>
-        <item>CGA-Charlotte</item>
-        <item>CGA-Chicago</item>
-        <item>CGA-Cleveland</item>
-        <item>CGA-Dallas</item>
-        <item>CGA-Denver</item>
-        <item>CGA-Detroit</item>
-        <item>CGA-Golden-State</item>
-        <item>CGA-Houston</item>
-        <item>CGA-Indiana</item>
-        <item>CGA-Los-Angeles-C</item>
-        <item>CGA-Los-Angeles-L</item>
-        <item>CGA-Memphis</item>
-        <item>CGA-Miami</item>
-        <item>CGA-Milwaukee</item>
-        <item>CGA-Minnesota</item>
-        <item>CGA-New-Orleans</item>
-        <item>CGA-New-York</item>
-        <item>CGA-Oklahoma-City</item>
-        <item>CGA-Orlando</item>
-        <item>CGA-Philadelphia</item>
-        <item>CGA-Phoenix</item>
-        <item>CGA-Portland</item>
-        <item>CGA-Sacramento</item>
-        <item>CGA-San-Antonio</item>
-        <item>CGA-Toronto</item>
-        <item>CGA-Utah</item>
-        <item>CGA-Washington</item>
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
