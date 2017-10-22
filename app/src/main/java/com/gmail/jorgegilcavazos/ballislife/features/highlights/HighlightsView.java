@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface HighlightsView {
 
     void shareHighlight(Highlight highlight);
 
-    void changeViewType(int viewType);
+    void changeViewType(HighlightViewType viewType);
 
     void hideSnackbar();
 }

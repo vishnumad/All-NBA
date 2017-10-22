@@ -4,6 +4,7 @@ import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -146,7 +147,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         );
     }
 
-    public void onViewTypeSelected(int viewType) {
+    public void onViewTypeSelected(HighlightViewType viewType) {
         localRepository.saveFavoriteHighlightViewType(viewType);
         view.changeViewType(viewType);
     }

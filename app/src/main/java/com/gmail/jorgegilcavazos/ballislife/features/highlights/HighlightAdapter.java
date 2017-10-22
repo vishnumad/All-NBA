@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
-import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.squareup.picasso.Picasso;
 
@@ -28,14 +28,17 @@ import static android.view.View.VISIBLE;
 public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
     private Context context;
     private List<Highlight> highlights;
-    private int contentViewType;
+    private HighlightViewType highlightViewType;
     private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> shareClickSubject = PublishSubject.create();
 
-    public HighlightAdapter(Context context, List<Highlight> highlights, int contentViewType) {
+    public HighlightAdapter(
+            Context context,
+            List<Highlight> highlights,
+            HighlightViewType highlightViewType) {
         this.context = context;
         this.highlights = highlights;
-        this.contentViewType = contentViewType;
+        this.highlightViewType = highlightViewType;
     }
 
     @Override
@@ -43,29 +46,23 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view;
-        switch (contentViewType) {
-            case Constants.HIGHLIGHTS_VIEW_SMALL:
-                view = inflater.inflate(R.layout.row_highlight_small, parent, false);
-                break;
-            case Constants.HIGHLIGHTS_VIEW_LARGE:
-                view = inflater.inflate(R.layout.row_highlight, parent, false);
-                break;
-            default:
-                throw new IllegalStateException("Highlight view type is neither small nor large");
+        if (viewType == HighlightViewType.LARGE.getValue()) {
+            view = inflater.inflate(R.layout.row_highlight, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.row_highlight_small, parent, false);
         }
-
         return new HighlightHolder(view);
     }
 
     @Override
     public void onBindViewHolder(HighlightHolder holder, int position) {
-        holder.bindData(context, contentViewType, highlights.get(position), viewClickSubject,
-                shareClickSubject);
+        holder.bindData(context, highlightViewType, highlights.get(position), viewClickSubject,
+                        shareClickSubject);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return contentViewType;
+        return highlightViewType.getValue();
     }
 
     @Override
@@ -86,8 +83,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         notifyDataSetChanged();
     }
 
-    public void setContentViewType(int viewType) {
-        contentViewType = viewType;
+    public void setContentViewType(HighlightViewType viewType) {
+        this.highlightViewType = viewType;
         notifyDataSetChanged();
     }
 
@@ -129,8 +126,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             ButterKnife.bind(this, itemView);
         }
 
-        void bindData(Context context,
-                      int contentViewType,
+        void bindData(Context context, HighlightViewType contentViewType,
                       final Highlight highlight,
                       final PublishSubject<Highlight> viewClickSubject,
                       final PublishSubject<Highlight> shareClickSubject) {
@@ -147,8 +143,9 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             }
 
             // Set bball background visibility only for list type view.
-            ivThumbnailUnavailable.setVisibility(contentViewType == Constants
-                    .HIGHLIGHTS_VIEW_SMALL && !thumbnailAvailable ? VISIBLE : GONE);
+            ivThumbnailUnavailable.setVisibility(
+                    contentViewType == HighlightViewType.SMALL && !thumbnailAvailable ? VISIBLE :
+                            GONE);
 
             container.setOnClickListener(v -> viewClickSubject.onNext(highlight));
 

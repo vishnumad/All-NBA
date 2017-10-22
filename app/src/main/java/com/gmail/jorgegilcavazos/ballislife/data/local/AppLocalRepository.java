@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.local;
 
 import android.content.SharedPreferences;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
@@ -36,16 +37,23 @@ public class AppLocalRepository implements LocalRepository {
     }
 
     @Override
-    public void saveFavoriteHighlightViewType(int viewType) {
+    public void saveFavoriteHighlightViewType(HighlightViewType viewType) {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
-        editor.putInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, viewType);
+        editor.putInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE, viewType.getValue());
         editor.apply();
     }
 
     @Override
-    public int getFavoriteHighlightViewType() {
-        return localSharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE,
-                Constants.HIGHLIGHTS_VIEW_SMALL);
+    public HighlightViewType getFavoriteHighlightViewType() {
+        int value = localSharedPreferences.getInt(LocalSharedPreferences.HIGHLIGHTS_VIEW_TYPE,
+                                                  HighlightViewType.SMALL.getValue());
+        for (HighlightViewType viewType : HighlightViewType.values()) {
+            if (viewType.getValue() == value) {
+                return viewType;
+            }
+        }
+        saveFavoriteHighlightViewType(HighlightViewType.SMALL);
+        return HighlightViewType.SMALL;
     }
 
     @Override

@@ -26,8 +26,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
-import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
@@ -63,7 +63,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
 
     Parcelable listState;
-    private int viewType;
+    private HighlightViewType viewType;
     private Unbinder unbinder;
     private HighlightAdapter highlightAdapter;
     private LinearLayoutManager linearLayoutManager;
@@ -85,11 +85,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         super.onCreate(savedInstanceState);
         BallIsLifeApplication.getAppComponent().inject(this);
 
-        if (localRepository.getFavoriteHighlightViewType() != -1) {
-            viewType = localRepository.getFavoriteHighlightViewType();
-        } else {
-            viewType = Constants.HIGHLIGHTS_VIEW_SMALL;
-        }
+        viewType = localRepository.getFavoriteHighlightViewType();
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
         highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<>(25), viewType);
@@ -260,7 +256,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public void changeViewType(int viewType) {
+    public void changeViewType(HighlightViewType viewType) {
         highlightAdapter.setContentViewType(viewType);
         setViewIcon(viewType);
     }
@@ -285,31 +281,29 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         View viewTypeList = view.findViewById(R.id.layout_type_list);
 
         viewTypeCard.setOnClickListener(v -> {
-            presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_LARGE);
+            presenter.onViewTypeSelected(HighlightViewType.LARGE);
             materialDialog.dismiss();
         });
 
         viewTypeList.setOnClickListener(v -> {
-            presenter.onViewTypeSelected(Constants.HIGHLIGHTS_VIEW_SMALL);
+            presenter.onViewTypeSelected(HighlightViewType.SMALL);
             materialDialog.dismiss();
         });
 
         materialDialog.show();
     }
 
-    private void setViewIcon(int viewType) {
+    private void setViewIcon(HighlightViewType viewType) {
         Drawable drawable;
         switch (viewType) {
-            case Constants.HIGHLIGHTS_VIEW_LARGE:
+            case LARGE:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
                 break;
-            case Constants.HIGHLIGHTS_VIEW_SMALL:
+            case SMALL:
                 drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
                 break;
             default:
-                drawable = ContextCompat.getDrawable(getContext(),
-                                                     R.drawable.ic_view_list_white_24dp);
-                break;
+                throw new IllegalArgumentException("Invalid viewtype: " + viewType);
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);
     }

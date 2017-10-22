@@ -1,14 +1,16 @@
 package com.gmail.jorgegilcavazos.ballislife.data.local;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+
 public interface LocalRepository {
 
     void saveFavoritePostsViewType(int viewType);
 
     int getFavoritePostsViewType();
 
-    void saveFavoriteHighlightViewType(int viewType);
+    void saveFavoriteHighlightViewType(HighlightViewType viewType);
 
-    int getFavoriteHighlightViewType();
+    HighlightViewType getFavoriteHighlightViewType();
 
     void saveUsername(String username);
 
