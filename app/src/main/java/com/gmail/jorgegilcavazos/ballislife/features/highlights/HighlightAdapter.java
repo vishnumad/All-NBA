@@ -138,6 +138,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             } else if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
                 Picasso.with(context).load(highlight.getThumbnail()).into(ivThumbnail);
             } else {
+                Picasso.with(context).cancelRequest(ivThumbnail);
                 ivThumbnail.setImageDrawable(null);
                 thumbnailAvailable = false;
             }
