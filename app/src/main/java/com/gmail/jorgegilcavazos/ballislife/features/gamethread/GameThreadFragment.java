@@ -57,7 +57,6 @@ public class GameThreadFragment extends Fragment
 
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
-    public boolean isPremium = false;
 
     @Inject GameThreadPresenterV2 presenter;
     @Inject RedditAuthentication redditAuthentication;
@@ -69,6 +68,7 @@ public class GameThreadFragment extends Fragment
     @BindView(R.id.errorLoadingText) TextView errorLoadingText;
 
     private PublishSubject<Object> fabClicks = PublishSubject.create();
+    private PublishSubject<Boolean> streamChanges = PublishSubject.create();
 
     private RecyclerView.LayoutManager lmComments;
     private ThreadAdapter threadAdapter;
@@ -76,7 +76,6 @@ public class GameThreadFragment extends Fragment
     private String homeTeam, awayTeam;
     private GameThreadType threadType;
     private long gameDate;
-    private boolean stream = false;
     private Switch streamSwitch;
 
     public GameThreadFragment() {
@@ -122,8 +121,6 @@ public class GameThreadFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_game_thread, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        isPremium = false;
-
         swipeRefreshLayout.setOnRefreshListener(this);
 
         threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
@@ -158,12 +155,12 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (threadType.equals(RedditUtils.LIVE_GT_TYPE)) {
+        if (threadType == GameThreadType.LIVE) {
             inflater.inflate(R.menu.menu_game_thread, menu);
             streamSwitch = menu.findItem(R.id.action_stream).getActionView()
                     .findViewById(R.id.switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
-            streamSwitch.setChecked(stream);
+            streamSwitch.setChecked(false);
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -204,6 +201,11 @@ public class GameThreadFragment extends Fragment
     @Override
     public long getGameTimeUtc() {
         return gameDate;
+    }
+
+    @Override
+    public boolean isPremiumPurchased() {
+        return ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium");
     }
 
     @Override
@@ -390,5 +392,24 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        streamChanges.onNext(isChecked);
+    }
+
+    @NotNull
+    @Override
+    public Observable<Boolean> streamChanges() {
+        return streamChanges;
+    }
+
+    @Override
+    public void purchasePremium() {
+        ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(), "premium");
+    }
+
+    @Override
+    public void setStreamSwitch(boolean isChecked) {
+        if (streamSwitch != null) {
+            streamSwitch.setChecked(isChecked);
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
+import com.gmail.jorgegilcavazos.ballislife.util.CrashReporter
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import com.google.common.collect.FluentIterable
 import io.reactivex.Observable
@@ -42,13 +43,16 @@ class GameThreadPresenterV2Test {
     val novotes: PublishSubject<Comment> = PublishSubject.create()
     val replies: PublishSubject<Comment> = PublishSubject.create()
     val submissionReplies: PublishSubject<Any> = PublishSubject.create()
+    val streamChanges: PublishSubject<Boolean> = PublishSubject.create()
   }
 
   @Mock private lateinit var mockView: GameThreadView
   @Mock private lateinit var mockGameThreadsRepository: GameThreadsRepository
   @Mock private lateinit var mockRedditActions: RedditActions
   @Mock private lateinit var mockContributionsRepository: ContributionRepository
+  @Mock private lateinit var threadsDisposable: CompositeDisposable
   @Mock private lateinit var disposable: CompositeDisposable
+  @Mock private lateinit var mockCrashReporter: CrashReporter
 
   private lateinit var presenter: GameThreadPresenterV2
 
@@ -67,13 +71,16 @@ class GameThreadPresenterV2Test {
     `when`(mockView.novotes()).thenReturn(novotes)
     `when`(mockView.replies()).thenReturn(replies)
     `when`(mockView.submissionReplies()).thenReturn(submissionReplies)
+    `when`(mockView.streamChanges()).thenReturn(streamChanges)
 
     presenter = GameThreadPresenterV2(
         mockGameThreadsRepository,
         mockRedditActions,
         mockContributionsRepository,
         TrampolineSchedulerProvider(),
-        disposable)
+        threadsDisposable,
+        disposable,
+        mockCrashReporter)
     presenter.attachView(mockView)
   }
 
@@ -82,6 +89,7 @@ class GameThreadPresenterV2Test {
     presenter.detachView()
 
     verify(disposable).clear()
+    verify(threadsDisposable).clear()
   }
 
   @Test
@@ -297,13 +305,31 @@ class GameThreadPresenterV2Test {
 
   @Test
   fun loadGameThreadError() {
+    val e = Exception()
     `when`(mockGameThreadsRepository.gameThreads(HOME, VISITOR, GAME_TIME_UTC, THREAD_TYPE))
-        .thenReturn(Observable.error(Exception()))
+        .thenReturn(Observable.error(e))
 
     presenter.loadGameThread()
 
     verify(mockView).setLoadingIndicator(false)
     verify(mockView).showErrorLoadingText()
+    verify(mockCrashReporter).report(e)
+  }
+
+  @Test
+  fun loadGameThreadInProgressWhileStreaming() {
+    `when`(mockGameThreadsRepository.gameThreads(HOME, VISITOR, GAME_TIME_UTC, THREAD_TYPE))
+        .thenReturn(Observable.just(GameThreadsUIModel.inProgress()))
+
+    presenter.setShouldStream(true)
+    presenter.loadGameThread()
+
+    verify(mockGameThreadsRepository).gameThreads(HOME, VISITOR, GAME_TIME_UTC, THREAD_TYPE)
+    verify(mockView).setLoadingIndicator(false)
+    verify(mockView).hideErrorLoadingText()
+    verify(mockView).hideNoCommentsText()
+    verify(mockView, times(0)).hideFab()
+    verify(mockView).hideNoThreadText()
   }
 
   @Test
@@ -386,5 +412,27 @@ class GameThreadPresenterV2Test {
     presenter.replyToSubmission(SUBMISSION_ID, RESPONSE)
 
     verify(mockView).showSubmittedCommentToast()
+  }
+
+  @Test
+  fun turnOnStreamingWithPremiumPurchased() {
+    `when`(mockView.isPremiumPurchased()).thenReturn(true)
+
+    streamChanges.onNext(true)
+
+    verify(mockView).isPremiumPurchased()
+    verify(mockView, times(0)).setStreamSwitch(false)
+    verify(mockView, times(0)).purchasePremium()
+  }
+
+  @Test
+  fun turnOnStreamingWithoutPremiumPurchased() {
+    `when`(mockView.isPremiumPurchased()).thenReturn(false)
+
+    streamChanges.onNext(true)
+
+    verify(mockView).isPremiumPurchased()
+    verify(mockView).setStreamSwitch(false)
+    verify(mockView).purchasePremium()
   }
 }

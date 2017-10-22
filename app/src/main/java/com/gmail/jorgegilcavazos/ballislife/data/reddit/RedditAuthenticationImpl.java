@@ -59,7 +59,9 @@ public class RedditAuthenticationImpl implements RedditAuthentication {
         this.redditPrefs = redditPrefs;
 
         mRedditClient = new RedditClient(UserAgent.of("android",
-                "com.gmail.jorgegilcavazos.ballislife", "v0.5.3", "Obi-Wan_Ginobili"));
+                                                      "com.gmail.jorgegilcavazos.ballislife",
+                                                      "v1.0.0.5",
+                                                      "Obi-Wan_Ginobili"));
     }
 
     @Override

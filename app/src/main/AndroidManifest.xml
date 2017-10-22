@@ -52,7 +52,8 @@
             android:name=".features.gamethread.CommentsActivity"
             android:label="Comments"
             android:parentActivityName=".features.main.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".features.settings.SettingsActivity"
             android:label="@string/title_activity_settings"/>

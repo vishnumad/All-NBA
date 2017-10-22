@@ -37,11 +37,8 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    private String homeTeam;
-    private String awayTeam;
-    private String gameId;
-    private long date;
     private PagerAdapter pagerAdapter;
+    public BillingProcessor billingProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +46,19 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
         setContentView(R.layout.comments_activity);
         ButterKnife.bind(this);
 
+        String billingLicense = getString(R.string.play_billing_license_key);
+        billingProcessor = new BillingProcessor(this, billingLicense, this);
+
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
         Intent intent = getIntent();
-        homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);
-        awayTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_AWAY);
-        gameId = intent.getStringExtra(GamesFragment.GAME_ID);
-        date = intent.getLongExtra(GamesFragment.GAME_DATE, -1);
+        String homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);
+        String awayTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_AWAY);
+        String gameId = intent.getStringExtra(GamesFragment.GAME_ID);
+        long date = intent.getLongExtra(GamesFragment.GAME_DATE, -1);
 
         setTitle(awayTeam + " @ " + homeTeam);
 
@@ -82,6 +82,13 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
         tabLayout.addOnTabSelectedListener(this);
 
         fab.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -145,26 +152,23 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
 
     @Override
     public void onProductPurchased(String productId, TransactionDetails details) {
-        Fragment fragment = pagerAdapter.getItem(0);
-        GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
-        if (gameThreadFragment.isAdded()) {
-            gameThreadFragment.isPremium = true;
-        }
-
         Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPurchaseHistoryRestored() {
+
     }
 
     @Override
     public void onBillingError(int errorCode, Throwable error) {
+        FirebaseCrash.log("Billing error code: " + errorCode);
         FirebaseCrash.report(error);
     }
 
     @Override
     public void onBillingInitialized() {
+
     }
 
     private void expandToolbar() {

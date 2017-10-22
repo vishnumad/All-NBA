@@ -22,6 +22,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.Submissi
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditServiceImpl;
+import com.gmail.jorgegilcavazos.ballislife.util.CrashReporter;
+import com.gmail.jorgegilcavazos.ballislife.util.CrashReporterImpl;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.SchedulerProvider;
 
@@ -73,4 +75,7 @@ public abstract class BindModule {
     @Binds
     public abstract ContributionRepository bindCommentsRepository(
             ContributionRepositoryImpl commentsRepositoryImpl);
+
+    @Binds
+    public abstract CrashReporter bindCrashReporter(CrashReporterImpl crashReporterImpl);
 }

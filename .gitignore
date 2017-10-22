@@ -16,3 +16,5 @@
 /captures
 /projectFilesBackup
 *.apk
+/app/src/main/res/values/secrets.xml
+/app/release

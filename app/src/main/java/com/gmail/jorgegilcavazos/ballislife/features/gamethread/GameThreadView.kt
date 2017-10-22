@@ -17,6 +17,8 @@ interface GameThreadView {
 
   fun getGameTimeUtc(): Long
 
+  fun isPremiumPurchased(): Boolean
+
   fun setLoadingIndicator(active: Boolean)
 
   fun showComments(comments: List<ThreadItem>)
@@ -51,6 +53,8 @@ interface GameThreadView {
 
   fun submissionReplies(): Observable<Any>
 
+  fun streamChanges(): Observable<Boolean>
+
   fun openReplyToCommentActivity(parentComment: Comment)
 
   fun openReplyToSubmissionActivity(submissionId: String)
@@ -78,4 +82,8 @@ interface GameThreadView {
   fun showFab()
 
   fun hideFab()
+
+  fun purchasePremium()
+
+  fun setStreamSwitch(isChecked: Boolean)
 }
