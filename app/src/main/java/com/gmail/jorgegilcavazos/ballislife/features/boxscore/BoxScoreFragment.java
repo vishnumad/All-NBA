@@ -270,8 +270,15 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addNormalItem(row, String.valueOf(statLine.getAst())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getFgm())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getFga())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getTpm())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getTpa())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getFtm())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getFta())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getPf())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getTov())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getPm())));
         } else {
             row.addView(addHeaderItem(row, "MIN"));
             row.addView(addHeaderItem(row, "PTS"));
@@ -279,8 +286,15 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addHeaderItem(row, "AST"));
             row.addView(addHeaderItem(row, "STL"));
             row.addView(addHeaderItem(row, "BLK"));
+            row.addView(addHeaderItem(row, "FGM"));
+            row.addView(addHeaderItem(row, "FGA"));
+            row.addView(addHeaderItem(row, "3PM"));
+            row.addView(addHeaderItem(row, "3PA"));
+            row.addView(addHeaderItem(row, "FTM"));
+            row.addView(addHeaderItem(row, "FTA"));
             row.addView(addHeaderItem(row, "PF"));
             row.addView(addHeaderItem(row, "TO"));
+            row.addView(addHeaderItem(row, "+/-"));
         }
 
         statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));

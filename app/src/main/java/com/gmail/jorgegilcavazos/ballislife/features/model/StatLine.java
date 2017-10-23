@@ -12,10 +12,32 @@ public class StatLine {
     private int pf;
     private int fga;
     private int fgm;
+    private int tpa;
+    private int tpm;
+    private int fta;
+    private int ftm;
+    private int pm;
     private String fn;
     private String ln;
 
-    public StatLine(int pts, int min, int ast, int reb, int blk, int stl, int tov, int pf, int fga, int fgm, String fn, String ln) {
+    public StatLine(
+            int pts,
+            int min,
+            int ast,
+            int reb,
+            int blk,
+            int stl,
+            int tov,
+            int pf,
+            int fga,
+            int fgm,
+            int tpa,
+            int tpm,
+            int fta,
+            int ftm,
+            int pm,
+            String fn,
+            String ln) {
         this.pts = pts;
         this.min = min;
         this.ast = ast;
@@ -26,6 +48,11 @@ public class StatLine {
         this.pf = pf;
         this.fga = fga;
         this.fgm = fgm;
+        this.tpa = tpa;
+        this.tpm = tpm;
+        this.fta = fta;
+        this.ftm = ftm;
+        this.pm = pm;
         this.fn = fn;
         this.ln = ln;
     }
@@ -108,6 +135,46 @@ public class StatLine {
 
     public void setFgm(int fgm) {
         this.fgm = fgm;
+    }
+
+    public int getTpa() {
+        return tpa;
+    }
+
+    public void setTpa(int tpa) {
+        this.tpa = tpa;
+    }
+
+    public int getTpm() {
+        return tpm;
+    }
+
+    public void setTpm(int tpm) {
+        this.tpm = tpm;
+    }
+
+    public int getFta() {
+        return fta;
+    }
+
+    public void setFta(int fta) {
+        this.fta = fta;
+    }
+
+    public int getFtm() {
+        return ftm;
+    }
+
+    public void setFtm(int ftm) {
+        this.ftm = ftm;
+    }
+
+    public int getPm() {
+        return pm;
+    }
+
+    public void setPm(int pm) {
+        this.pm = pm;
     }
 
     public String getFn() {
