@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads
 
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadsUIModel
@@ -22,6 +23,7 @@ import javax.inject.Singleton
 class GameThreadsRepositoryImpl @Inject constructor(
     private val threadsService: RedditGameThreadsService,
     private val submissionRepository: SubmissionRepository,
+    private val redditAuthentication: RedditAuthentication,
     private val schedulerProvider: BaseSchedulerProvider) : GameThreadsRepository {
 
   override fun gameThreads(home: String, visitor: String, gameTimeUtc: Long, type: GameThreadType)
@@ -42,7 +44,8 @@ class GameThreadsRepositoryImpl @Inject constructor(
                 .toList()
 
             // Return found model of first non deleted thread or not found if there aren't any.
-            Observable.merge(submissionObservables)
+            redditAuthentication.authenticate()
+                .andThen(Observable.merge(submissionObservables))
                 .filter { !RedditUtils.isRemovedOrDeleted(it.submission!!) }
                 .first(SubmissionWrapper("", null, "", ""))
                 .flatMapObservable {
