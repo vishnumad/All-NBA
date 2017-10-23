@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/layout_comment_content"
@@ -111,7 +112,7 @@
             android:id="@+id/button_comment_upvote"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_arrow_upward_black_24dp"
+            app:srcCompat="@drawable/ic_arrow_upward_black_24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:tint="@color/white"
             android:layout_weight="1"/>
@@ -120,7 +121,7 @@
             android:id="@+id/button_comment_downvote"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_arrow_downward_black_24dp"
+            app:srcCompat="@drawable/ic_arrow_downward_black_24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:tint="@color/white"
             android:layout_weight="1"/>
@@ -140,7 +141,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_reply_black_24dp"
+            app:srcCompat="@drawable/ic_reply_black_24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:tint="@color/white"
             android:layout_weight="1"/>

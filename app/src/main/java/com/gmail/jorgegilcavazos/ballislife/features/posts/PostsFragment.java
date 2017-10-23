@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.Snackbar;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -457,13 +458,19 @@ public class PostsFragment extends Fragment implements PostsView,
         Drawable drawable;
         switch (viewType) {
             case Constants.POSTS_VIEW_WIDE_CARD:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                drawable = VectorDrawableCompat.create(getContext().getResources(),
+                                                       R.drawable.ic_image_white_24dp,
+                                                       null);
                 break;
             case Constants.POSTS_VIEW_LIST:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
+                drawable = VectorDrawableCompat.create(getContext().getResources(),
+                                                       R.drawable.ic_view_list_white_24dp,
+                                                       null);
                 break;
             default:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                drawable = VectorDrawableCompat.create(getContext().getResources(),
+                                                       R.drawable.ic_image_white_24dp,
+                                                       null);
                 break;
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);

@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -297,10 +297,14 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         Drawable drawable;
         switch (viewType) {
             case LARGE:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_image_white_24dp);
+                drawable = VectorDrawableCompat.create(getContext().getResources(),
+                                                       R.drawable.ic_image_white_24dp,
+                                                       null);
                 break;
             case SMALL:
-                drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_view_list_white_24dp);
+                drawable = VectorDrawableCompat.create(getContext().getResources(),
+                                                       R.drawable.ic_view_list_white_24dp,
+                                                       null);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid viewtype: " + viewType);
