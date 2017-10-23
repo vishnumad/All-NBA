@@ -140,9 +140,9 @@
     <string name="pref_enable_alerts">Enable Alerts</string>
     <string name="key_enable_alerts">pref_enable_alerts</string>
 
-    <string name="title_settings_cga">Close Game Alert</string>
+    <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
-    <string name="summary_settings_cga">Receive an alert when a game is getting exciting towards the end</string>
+    <string name="summary_settings_cga">Receive an alert for close games</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_cga">pref_cga_topics</string>
 
@@ -280,8 +280,8 @@
         <item>Golden State</item>
         <item>Houston</item>
         <item>Indiana</item>
-        <item>Los Angeles C</item>
-        <item>Los Angeles L</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
         <item>Memphis</item>
         <item>Miami</item>
         <item>Milwaukee</item>
@@ -352,8 +352,8 @@
         <item>Golden State</item>
         <item>Houston</item>
         <item>Indiana</item>
-        <item>Los Angeles C</item>
-        <item>Los Angeles L</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
         <item>Memphis</item>
         <item>Miami</item>
         <item>Milwaukee</item>
