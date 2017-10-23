@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads
 
+import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary
@@ -7,6 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
+import io.reactivex.Completable
 import io.reactivex.Single
 import net.dean.jraw.models.CommentSort
 import net.dean.jraw.models.Submission
@@ -28,6 +30,7 @@ class GameThreadsRepositoryImplTest {
 
   @Mock private lateinit var mockRedditGameThreadsService: RedditGameThreadsService
   @Mock private lateinit var mockSubmissionRepository: SubmissionRepository
+  @Mock private lateinit var mockRedditAuthentication: RedditAuthentication
 
   private lateinit var gameThreadsRepository: GameThreadsRepositoryImpl
 
@@ -35,9 +38,12 @@ class GameThreadsRepositoryImplTest {
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
+    `when`(mockRedditAuthentication.authenticate()).thenReturn(Completable.complete())
+
     gameThreadsRepository = GameThreadsRepositoryImpl(
         mockRedditGameThreadsService,
         mockSubmissionRepository,
+        mockRedditAuthentication,
         TrampolineSchedulerProvider())
   }
 
