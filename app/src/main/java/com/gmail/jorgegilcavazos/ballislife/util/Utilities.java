@@ -36,7 +36,12 @@ public final class Utilities {
         if (url.contains("youtu.be")) {
             return url.substring(url.lastIndexOf("/") + 1);
         } else if (url.contains("youtube.com")) {
-            return url.substring(url.lastIndexOf("=") + 1);
+            String a = url.substring(url.lastIndexOf("v=") + 2);
+            if (a.contains("&")) {
+                return a.substring(0, a.indexOf("&"));
+            } else {
+                return a;
+            }
         } else {
             return null;
         }
