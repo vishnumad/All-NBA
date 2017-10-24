@@ -108,6 +108,9 @@ public final class RedditUtils {
     }
 
     public static CharSequence bindSnuDown(String rawHtml) {
+        if (StringUtils.Companion.isNullOrEmpty(rawHtml)) {
+            return "";
+        }
         rawHtml = rawHtml.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
                 .replace("&apos;", "'").replace("&amp;", "&").replace("<li><p>", "<p>• ")
                 .replace("</li>", "<br>").replaceAll("<li.*?>", "•").replace("<p>", "<div>")

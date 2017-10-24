@@ -60,13 +60,13 @@ public final class Utilities {
             }
         }
 
-        if (StringUtils.Companion.isEmpty(thumbnail) && StringUtils.Companion.isEmpty
+        if (StringUtils.Companion.isNullOrEmpty(thumbnail) && StringUtils.Companion.isNullOrEmpty
                 (highResThumbnail)) {
             return Optional.absent();
         }
 
         // Show HD thumbnail over lower res version.
-        if (StringUtils.Companion.isEmpty(highResThumbnail)) {
+        if (StringUtils.Companion.isNullOrEmpty(highResThumbnail)) {
             return Optional.of(new Pair<>(ThumbnailType.LOW_RES, thumbnail));
         } else {
             return Optional.of(new Pair<>(ThumbnailType.HIGH_RES, highResThumbnail));

@@ -291,7 +291,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             }
         }
-        if (!StringUtils.Companion.isEmpty(brodcasters)) {
+        if (!StringUtils.Companion.isNullOrEmpty(brodcasters)) {
             // Remove last "/"
             brodcasters = brodcasters.substring(0, brodcasters.length() - 1);
         }
