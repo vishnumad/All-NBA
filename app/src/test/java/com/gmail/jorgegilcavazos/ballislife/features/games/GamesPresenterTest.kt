@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.games
 
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import io.reactivex.Observable
@@ -23,6 +24,7 @@ class GamesPresenterTest {
   @Mock private lateinit var mockView: GamesView
   @Mock private lateinit var mockRepository: GamesRepository
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
+  @Mock private lateinit var mockErrorHandler: ErrorHandler
 
   private val prevDayClicks = PublishSubject.create<Any>()
   private val nextDayClicks = PublishSubject.create<Any>()
@@ -38,7 +40,7 @@ class GamesPresenterTest {
     `when`(mockRepository.games(anyObject(), anyBoolean())).thenReturn(Observable.empty())
 
     presenter = GamesPresenter(mockRepository, TrampolineSchedulerProvider(), CompositeDisposable(),
-        mockNetworkUtils)
+        mockNetworkUtils, mockErrorHandler)
     presenter.attachView(mockView)
   }
 
@@ -155,10 +157,11 @@ class GamesPresenterTest {
     `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(true)
     `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Observable.error(Exception()))
+    `when`(mockErrorHandler.handleError(anyObject())).thenReturn(404)
 
     presenter.loadGames(false)
 
-    verify(mockView).showErrorSnackbar()
+    verify(mockView).showErrorSnackbar(404)
   }
 
   @Test

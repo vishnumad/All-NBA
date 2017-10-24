@@ -3,6 +3,8 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
 
 import org.junit.Before;
@@ -19,20 +21,22 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HighlightsPresenterTest {
 
     @Mock
     HighlightsView mockView;
-
     @Mock
     HighlightsRepositoryImpl mockHighlightsRepository;
-
     @Mock
     LocalRepository mockLocalRepository;
+    @Mock NetworkUtils mockNetworkUtils;
+    @Mock ErrorHandler mockErrorHandler;
 
     HighlightsPresenter presenter;
 
@@ -40,7 +44,9 @@ public class HighlightsPresenterTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         presenter = new HighlightsPresenter(mockHighlightsRepository, mockLocalRepository,
-                new TrampolineSchedulerProvider());
+                                            new TrampolineSchedulerProvider(),
+                                            mockNetworkUtils,
+                                            mockErrorHandler);
         presenter.attachView(mockView);
     }
 
@@ -60,6 +66,7 @@ public class HighlightsPresenterTest {
         verify(mockHighlightsRepository).next();
         verify(mockView).showHighlights(highlightList, true);
         verify(mockView).setLoadingIndicator(false);
+        verify(mockView).hideSnackbar();
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsRepository);
     }
@@ -78,14 +85,17 @@ public class HighlightsPresenterTest {
         verify(mockHighlightsRepository).next();
         verify(mockView).showNoHighlightsAvailable();
         verify(mockView).setLoadingIndicator(false);
+        verify(mockView).hideSnackbar();
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsRepository);
     }
 
     @Test
-    public void testLoadHighlights_errorLoading_shouldShowErrorMessage() {
+    public void testLoadHighlights_errorLoadingWithNetAvailable_shouldShowErrorMessage() {
         Single<List<Highlight>> errorSingle = Single.error(new Exception());
-        Mockito.when(mockHighlightsRepository.next()).thenReturn(errorSingle);
+        when(mockHighlightsRepository.next()).thenReturn(errorSingle);
+        when(mockNetworkUtils.isNetworkAvailable()).thenReturn(true);
+        when(mockErrorHandler.handleError(any())).thenReturn(404);
 
         presenter.loadHighlights(true); // reset to get first batch.
 
@@ -93,7 +103,25 @@ public class HighlightsPresenterTest {
         verify(mockView).resetScrollState();
         verify(mockHighlightsRepository).reset();
         verify(mockHighlightsRepository).next();
-        verify(mockView).showErrorLoadingHighlights();
+        verify(mockView).showErrorLoadingHighlights(404);
+        verify(mockView).setLoadingIndicator(false);
+        verifyNoMoreInteractions(mockView);
+        verifyNoMoreInteractions(mockHighlightsRepository);
+    }
+
+    @Test
+    public void testLoadHighlights_errorLoadingWithNoNetAvailable_shouldShowErrorMessage() {
+        Single<List<Highlight>> errorSingle = Single.error(new Exception());
+        when(mockHighlightsRepository.next()).thenReturn(errorSingle);
+        when(mockNetworkUtils.isNetworkAvailable()).thenReturn(false);
+
+        presenter.loadHighlights(true); // reset to get first batch.
+
+        verify(mockView).setLoadingIndicator(true);
+        verify(mockView).resetScrollState();
+        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).next();
+        verify(mockView).showNoNetAvailable();
         verify(mockView).setLoadingIndicator(false);
         verifyNoMoreInteractions(mockView);
         verifyNoMoreInteractions(mockHighlightsRepository);
@@ -111,6 +139,7 @@ public class HighlightsPresenterTest {
 
         verify(mockHighlightsRepository).next();
         verify(mockView).showHighlights(highlightList, false);
+        verify(mockView).hideSnackbar();
         verifyNoMoreInteractions(mockHighlightsRepository);
         verifyNoMoreInteractions(mockView);
     }

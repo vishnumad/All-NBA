@@ -3,8 +3,6 @@ package com.gmail.jorgegilcavazos.ballislife.data.service;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyNotAvailableException;
 import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToCommentException;
-import com.gmail.jorgegilcavazos.ballislife.util.exception.ReplyToThreadException;
-import com.google.firebase.crash.FirebaseCrash;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.SubmissionRequest;
@@ -46,7 +44,6 @@ public class RedditServiceImpl implements RedditService {
             try {
                 e.onSuccess(new ArrayList<>(paginator.next()));
             } catch (Exception ex) {
-                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }
@@ -82,7 +79,6 @@ public class RedditServiceImpl implements RedditService {
                     e.onError(new ReplyNotAvailableException());
                 }
             } catch (Exception ex) {
-                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }
@@ -119,7 +115,6 @@ public class RedditServiceImpl implements RedditService {
                 accountManager.vote(comment, direction);
                 e.onComplete();
             } catch (Exception ex) {
-                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }
@@ -168,7 +163,7 @@ public class RedditServiceImpl implements RedditService {
                 e.onSuccess(accountManager.reply(submission, text));
             } catch (Exception ex) {
                 if (!e.isDisposed()) {
-                    e.onError(new ReplyToThreadException());
+                    e.onError(ex);
                 }
             }
         });
@@ -189,7 +184,6 @@ public class RedditServiceImpl implements RedditService {
             try {
                 e.onSuccess(redditClient.getSubmission(submissionRequest));
             } catch (Exception ex) {
-                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }
@@ -204,7 +198,6 @@ public class RedditServiceImpl implements RedditService {
                 Listing<Submission> listing = paginator.next(false);
                 e.onSuccess(listing);
             } catch (Exception ex) {
-                FirebaseCrash.report(ex);
                 if (!e.isDisposed()) {
                     e.onError(ex);
                 }

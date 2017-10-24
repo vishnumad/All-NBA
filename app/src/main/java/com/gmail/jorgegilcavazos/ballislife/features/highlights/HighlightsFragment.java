@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,9 +206,26 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public void showErrorLoadingHighlights() {
-        snackbar = Snackbar.make(getView(), R.string.error_loading_highlights, Snackbar
-                .LENGTH_SHORT);
+    public void showNoNetAvailable() {
+        if (getView() == null) {
+            return;
+        }
+
+        snackbar = Snackbar.make(getView(),
+                                 R.string.your_device_is_offline,
+                                 Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+
+    @Override
+    public void showErrorLoadingHighlights(int code) {
+        if (getView() == null) {
+            return;
+        }
+
+        snackbar = Snackbar.make(getView(),
+                                 getString(R.string.error_loading_highlights, code),
+                                 Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
 
@@ -224,6 +243,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void openYoutubeVideo(String videoId) {
+        FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video: " + videoId);
         Intent intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
                 "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
                 videoId, 0, /* Start millisecond */

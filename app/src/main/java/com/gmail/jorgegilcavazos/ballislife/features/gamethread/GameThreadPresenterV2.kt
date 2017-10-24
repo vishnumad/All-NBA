@@ -10,9 +10,9 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThre
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
-import com.gmail.jorgegilcavazos.ballislife.util.CrashReporter
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
-import com.google.firebase.crash.FirebaseCrash
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import net.dean.jraw.models.Comment
@@ -28,7 +28,8 @@ class GameThreadPresenterV2 @Inject constructor(
     private val schedulerProvider: BaseSchedulerProvider,
     private val threadsDisposable: CompositeDisposable,
     private val disposable: CompositeDisposable,
-    private val crashReporter: CrashReporter) : BasePresenter<GameThreadView>() {
+    private val networkUtils: NetworkUtils,
+    private val errorHandler: ErrorHandler) : BasePresenter<GameThreadView>() {
 
   private lateinit var type: GameThreadType
   private lateinit var home: String
@@ -162,8 +163,11 @@ class GameThreadPresenterV2 @Inject constructor(
               }
             },
             { e ->
-              crashReporter.report(e)
-              view.showErrorLoadingText()
+              if (!networkUtils.isNetworkAvailable()) {
+                view.showNoNetAvailable()
+              } else {
+                view.showErrorLoadingText(errorHandler.handleError(e))
+              }
               view.setLoadingIndicator(false)
             }
         )
@@ -190,7 +194,13 @@ class GameThreadPresenterV2 @Inject constructor(
                 view.showSubmittedCommentToast()
               }
             },
-            { view.showErrorSavingCommentToast() }
+            { e ->
+              if (!networkUtils.isNetworkAvailable()) {
+                view.showNoNetAvailable()
+              } else {
+                view.showErrorSavingCommentToast(errorHandler.handleError(e))
+              }
+            }
         )
   }
 
@@ -214,7 +224,13 @@ class GameThreadPresenterV2 @Inject constructor(
                 view.showSubmittedCommentToast()
               }
             },
-            { view.showErrorSavingCommentToast() }
+            { e ->
+              if (!networkUtils.isNetworkAvailable()) {
+                view.showNoNetAvailable()
+              } else {
+                view.showErrorSavingCommentToast(errorHandler.handleError(e))
+              }
+            }
         )
   }
 
@@ -234,26 +250,41 @@ class GameThreadPresenterV2 @Inject constructor(
                 view.showSavingToast()
               }
             },
-            { t: Throwable -> FirebaseCrash.report(t) }
+            { e ->
+              if (!networkUtils.isNetworkAvailable()) {
+                view.showNoNetAvailable()
+              } else {
+                errorHandler.handleError(e)
+              }
+            }
         )
         .addTo(disposable)
   }
 
   private fun unsaveComment(comment: Comment) {
     redditActions.unsaveComment(comment)
-        .subscribe {
-          if (it.notLoggedIn) {
-            view.showNotLoggedInToast()
-          }
+        .subscribe(
+            {
+              if (it.notLoggedIn) {
+                view.showNotLoggedInToast()
+              }
 
-          if (it.success) {
-            view.showUnsavedToast()
-          }
+              if (it.success) {
+                view.showUnsavedToast()
+              }
 
-          if (it.inProgress) {
-            view.showUnsavingToast()
-          }
-        }
+              if (it.inProgress) {
+                view.showUnsavingToast()
+              }
+            },
+            { e ->
+              if (!networkUtils.isNetworkAvailable()) {
+                view.showNoNetAvailable()
+              } else {
+                errorHandler.handleError(e)
+              }
+            }
+        )
         .addTo(disposable)
   }
 

@@ -250,7 +250,8 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void showErrorLoadingText() {
+    public void showErrorLoadingText(int code) {
+        errorLoadingText.setText(getString(R.string.error_loading_comments, code));
         errorLoadingText.setVisibility(View.VISIBLE);
     }
 
@@ -366,13 +367,22 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void showErrorSavingCommentToast() {
-        Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_SHORT).show();
+    public void showErrorSavingCommentToast(int code) {
+        Toast.makeText(getActivity(),
+                       getString(R.string.something_went_wrong, code),
+                       Toast.LENGTH_SHORT)
+                .show();
     }
 
     @Override
     public void showNotLoggedInToast() {
         Toast.makeText(getActivity(), R.string.not_logged_in, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showNoNetAvailable() {
+        errorLoadingText.setText(R.string.your_device_is_offline);
+        errorLoadingText.setVisibility(View.VISIBLE);
     }
 
     @Override

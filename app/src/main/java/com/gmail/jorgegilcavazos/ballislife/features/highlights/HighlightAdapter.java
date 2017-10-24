@@ -90,8 +90,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     private void preFetchImages(List<Highlight> highlights) {
         for (Highlight highlight : highlights) {
-            if (StringUtils.Companion.isEmpty(highlight.getHdThumbnail())) {
-                if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
+            if (StringUtils.Companion.isNullOrEmpty(highlight.getHdThumbnail())) {
+                if (!StringUtils.Companion.isNullOrEmpty(highlight.getThumbnail())) {
                     Picasso.with(context).load(highlight.getThumbnail()).fetch();
                 }
             } else {
@@ -133,9 +133,9 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
             tvTitle.setText(highlight.getTitle());
 
             boolean thumbnailAvailable = true;
-            if (!StringUtils.Companion.isEmpty(highlight.getHdThumbnail())) {
+            if (!StringUtils.Companion.isNullOrEmpty(highlight.getHdThumbnail())) {
                 Picasso.with(context).load(highlight.getHdThumbnail()).into(ivThumbnail);
-            } else if (!StringUtils.Companion.isEmpty(highlight.getThumbnail())) {
+            } else if (!StringUtils.Companion.isNullOrEmpty(highlight.getThumbnail())) {
                 Picasso.with(context).load(highlight.getThumbnail()).into(ivThumbnail);
             } else {
                 Picasso.with(context).cancelRequest(ivThumbnail);

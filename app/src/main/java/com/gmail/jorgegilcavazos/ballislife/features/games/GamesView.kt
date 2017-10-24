@@ -25,7 +25,7 @@ interface GamesView {
 
   fun showNoNetSnackbar()
 
-  fun showErrorSnackbar()
+  fun showErrorSnackbar(code: Int)
 
   fun dismissSnackbar()
 }
