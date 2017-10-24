@@ -19,6 +19,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.MediaSource;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -137,7 +138,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             tvTime.setVisibility(View.GONE);
             tvBroadcaster.setVisibility(View.GONE);
 
-            String nationalBroadcaster = findNationalBroadcaster(nbaGame.getBroadcasters());
+            String nationalBroadcaster = findNationalBroadcasters(nbaGame.getBroadcasters());
 
             switch (nbaGame.getGameStatus()) {
                 case NbaGame.PRE_GAME:
@@ -276,19 +277,24 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    private static String findNationalBroadcaster(Map<String, MediaSource> mapMediaSources) {
+    private static String findNationalBroadcasters(Map<String, MediaSource> mapMediaSources) {
         if (mapMediaSources == null) {
             return "";
         }
+        String brodcasters = "";
         for (Map.Entry<String, MediaSource> entry : mapMediaSources.entrySet()) {
             if (entry.getKey().equals("tv")) {
                 for (Broadcaster broadcaster : entry.getValue().getBroadcaster()) {
                     if (broadcaster.getScope().equals("natl")) {
-                        return broadcaster.getDisplayName();
+                        brodcasters += broadcaster.getDisplayName() + "/";
                     }
                 }
             }
         }
-        return "";
+        if (!StringUtils.Companion.isEmpty(brodcasters)) {
+            // Remove last "/"
+            brodcasters = brodcasters.substring(0, brodcasters.length() - 1);
+        }
+        return brodcasters;
     }
 }
