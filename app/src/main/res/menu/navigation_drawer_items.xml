@@ -1,6 +1,5 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".features.main.MainActivity">
 
@@ -25,6 +24,15 @@
             android:id="@+id/navigation_item_2"
             android:icon="@drawable/ic_equalizer_black_24dp"
             android:title="Standings"/>
+    </group>
+
+    <group
+        android:id="@+id/premium_group"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/go_premium"
+            android:title="@string/go_premium"/>
     </group>
 
     <group
