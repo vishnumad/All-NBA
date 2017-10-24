@@ -154,7 +154,6 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     if (nbaGame.getPeriodStatus().equals("Halftime")) {
                         tvFinal.setVisibility(View.VISIBLE);
                         tvFinal.setText(R.string.halftime);
-                        tvTime.setVisibility(View.VISIBLE);
                     } else {
                         tvClock.setVisibility(View.VISIBLE);
                         tvPeriod.setVisibility(View.VISIBLE);
