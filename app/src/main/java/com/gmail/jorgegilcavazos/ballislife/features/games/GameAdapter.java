@@ -13,7 +13,9 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.model.Broadcaster;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
+import com.gmail.jorgegilcavazos.ballislife.features.model.MediaSource;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
@@ -22,6 +24,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -99,6 +102,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.text_final) TextView tvFinal;
         @BindView(R.id.homeicon) ImageView ivHomeLogo;
         @BindView(R.id.awayicon) ImageView ivAwayLogo;
+        @BindView(R.id.broadcaster) TextView tvBroadcaster;
 
         public GameViewHolder(View view) {
             super(view);
@@ -131,11 +135,18 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             tvPeriod.setVisibility(View.GONE);
             tvFinal.setVisibility(View.GONE);
             tvTime.setVisibility(View.GONE);
+            tvBroadcaster.setVisibility(View.GONE);
+
+            String nationalBroadcaster = findNationalBroadcaster(nbaGame.getBroadcasters());
 
             switch (nbaGame.getGameStatus()) {
                 case NbaGame.PRE_GAME:
                     tvTime.setVisibility(View.VISIBLE);
                     tvTime.setText(DateFormatUtil.localizeGameTime(nbaGame.getPeriodStatus()));
+                    if (!nationalBroadcaster.equals("")) {
+                        tvBroadcaster.setText(nationalBroadcaster);
+                        tvBroadcaster.setVisibility(View.VISIBLE);
+                    }
                     break;
                 case NbaGame.IN_GAME:
                     tvHomeScore.setVisibility(View.VISIBLE);
@@ -264,5 +275,21 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             RxView.clicks(container).map(v -> nbaGame).subscribe(gameClicks);
         }
+    }
+
+    private static String findNationalBroadcaster(Map<String, MediaSource> mapMediaSources) {
+        if (mapMediaSources == null) {
+            return "";
+        }
+        for (Map.Entry<String, MediaSource> entry : mapMediaSources.entrySet()) {
+            if (entry.getKey().equals("tv")) {
+                for (Broadcaster broadcaster : entry.getValue().getBroadcaster()) {
+                    if (broadcaster.getScope().equals("natl")) {
+                        return broadcaster.getDisplayName();
+                    }
+                }
+            }
+        }
+        return "";
     }
 }

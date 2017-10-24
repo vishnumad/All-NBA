@@ -57,17 +57,31 @@
             android:textColor="@color/secondaryText"
             android:textSize="15sp"/>
 
-        <TextView
-            android:id="@+id/text_time"
+        <RelativeLayout
+            android:id="@+id/timeBroadCasterContainer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
+            android:layout_height="match_parent"
             android:layout_toEndOf="@id/awayicon"
-            android:layout_toStartOf="@id/homeicon"
-            android:gravity="center"
-            android:textColor="@color/primaryText"
-            android:textSize="20sp"/>
+            android:layout_toStartOf="@id/homeicon">
+
+            <TextView
+                android:id="@+id/text_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/primaryText"
+                android:textSize="20sp"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:id="@+id/broadcaster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_time"
+                android:layout_centerHorizontal="true"
+                android:text="ESPN"/>
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/text_final"
