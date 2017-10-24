@@ -193,7 +193,8 @@ class GamesPresenterTest {
         periodValue = "",
         time = "",
         timeUtc = 23894341,
-        totalPeriods = "")
+        totalPeriods = "",
+        broadcasters = mapOf())
   }
 
   private fun <T> anyObject(): T {

@@ -131,6 +131,7 @@ class GamesRepositoryImplTest {
         periodValue = "",
         time = "",
         timeUtc = calendar.timeInMillis / 1000,
-        totalPeriods = "")
+        totalPeriods = "",
+        broadcasters = mapOf())
   }
 }
