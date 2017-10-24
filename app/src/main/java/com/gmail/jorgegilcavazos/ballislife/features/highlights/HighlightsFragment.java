@@ -204,9 +204,26 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public void showErrorLoadingHighlights() {
-        snackbar = Snackbar.make(getView(), R.string.error_loading_highlights, Snackbar
-                .LENGTH_SHORT);
+    public void showNoNetAvailable() {
+        if (getView() == null) {
+            return;
+        }
+
+        snackbar = Snackbar.make(getView(),
+                                 R.string.your_device_is_offline,
+                                 Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+
+    @Override
+    public void showErrorLoadingHighlights(int code) {
+        if (getView() == null) {
+            return;
+        }
+
+        snackbar = Snackbar.make(getView(),
+                                 getString(R.string.error_loading_highlights, code),
+                                 Snackbar.LENGTH_SHORT);
         snackbar.show();
     }
 

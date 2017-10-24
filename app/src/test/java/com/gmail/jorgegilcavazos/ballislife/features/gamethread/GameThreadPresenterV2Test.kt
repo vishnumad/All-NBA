@@ -7,7 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
-import com.gmail.jorgegilcavazos.ballislife.util.CrashReporter
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import com.google.common.collect.FluentIterable
 import io.reactivex.Observable
@@ -52,7 +53,8 @@ class GameThreadPresenterV2Test {
   @Mock private lateinit var mockContributionsRepository: ContributionRepository
   @Mock private lateinit var threadsDisposable: CompositeDisposable
   @Mock private lateinit var disposable: CompositeDisposable
-  @Mock private lateinit var mockCrashReporter: CrashReporter
+  @Mock private lateinit var mockNetworkUtils: NetworkUtils
+  @Mock private lateinit var mockErrorHandler: ErrorHandler
 
   private lateinit var presenter: GameThreadPresenterV2
 
@@ -80,7 +82,8 @@ class GameThreadPresenterV2Test {
         TrampolineSchedulerProvider(),
         threadsDisposable,
         disposable,
-        mockCrashReporter)
+        mockNetworkUtils,
+        mockErrorHandler)
     presenter.attachView(mockView)
   }
 
@@ -304,16 +307,30 @@ class GameThreadPresenterV2Test {
   }
 
   @Test
-  fun loadGameThreadError() {
+  fun loadGameThreadErrorNetAvailable() {
     val e = Exception()
     `when`(mockGameThreadsRepository.gameThreads(HOME, VISITOR, GAME_TIME_UTC, THREAD_TYPE))
         .thenReturn(Observable.error(e))
+    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(true)
+    `when`(mockErrorHandler.handleError(e)).thenReturn(404)
 
     presenter.loadGameThread()
 
     verify(mockView).setLoadingIndicator(false)
-    verify(mockView).showErrorLoadingText()
-    verify(mockCrashReporter).report(e)
+    verify(mockView).showErrorLoadingText(404)
+  }
+
+  @Test
+  fun loadGameThreadErrorNoNetAvailable() {
+    val e = Exception()
+    `when`(mockGameThreadsRepository.gameThreads(HOME, VISITOR, GAME_TIME_UTC, THREAD_TYPE))
+        .thenReturn(Observable.error(e))
+    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(false)
+
+    presenter.loadGameThread()
+
+    verify(mockView).setLoadingIndicator(false)
+    verify(mockView).showNoNetAvailable()
   }
 
   @Test

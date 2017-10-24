@@ -39,8 +39,8 @@ import io.reactivex.subjects.PublishSubject;
 /**
  * Displays a list of {@link NbaGame}s for the selected date.
  */
-public class GamesFragment extends Fragment implements GamesView,
-        SwipeRefreshLayout.OnRefreshListener {
+public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLayout
+        .OnRefreshListener {
     private static final String SELECTED_TIME = "SelectedTime";
     private static final String LIST_STATE = "ListState";
     public final static String TAG = "GamesFragment";
@@ -85,8 +85,8 @@ public class GamesFragment extends Fragment implements GamesView,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games, container, false);
         unbinder = ButterKnife.bind(this, view);
 
@@ -203,18 +203,20 @@ public class GamesFragment extends Fragment implements GamesView,
         snackbar = Snackbar.make(getView(),
                                  R.string.your_device_is_offline,
                                  Snackbar.LENGTH_INDEFINITE)
-                           .setAction(R.string.retry, v -> presenter.loadGames(true));
+                .setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 
     @Override
-    public void showErrorSnackbar() {
+    public void showErrorSnackbar(int code) {
         if (getView() == null) {
             return;
         }
 
-        snackbar = Snackbar.make(getView(), R.string.something_went_wrong, Snackbar.LENGTH_SHORT)
-                           .setAction(R.string.retry, v -> presenter.loadGames(true));
+        snackbar = Snackbar.make(getView(),
+                                 getString(R.string.something_went_wrong, code),
+                                 Snackbar.LENGTH_SHORT)
+                .setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 

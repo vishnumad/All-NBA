@@ -5,6 +5,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -25,14 +27,21 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     private LocalRepository localRepository;
     private BaseSchedulerProvider schedulerProvider;
     private CompositeDisposable disposables;
+    private NetworkUtils networkUtils;
+    private ErrorHandler errorHandler;
 
     @Inject
-    public HighlightsPresenter(HighlightsRepository highlightsRepository,
-                               LocalRepository localRepository,
-                               BaseSchedulerProvider schedulerProvider) {
+    public HighlightsPresenter(
+            HighlightsRepository highlightsRepository,
+            LocalRepository localRepository,
+            BaseSchedulerProvider schedulerProvider,
+            NetworkUtils networkUtils,
+            ErrorHandler errorHandler) {
         this.highlightsRepository = highlightsRepository;
         this.localRepository = localRepository;
         this.schedulerProvider = schedulerProvider;
+        this.networkUtils = networkUtils;
+        this.errorHandler = errorHandler;
 
         disposables = new CompositeDisposable();
     }
@@ -71,11 +80,16 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                         if (reset) {
                             view.setLoadingIndicator(false);
                         }
+                        view.hideSnackbar();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        view.showErrorLoadingHighlights();
+                        if (!networkUtils.isNetworkAvailable()) {
+                            view.showNoNetAvailable();
+                        } else {
+                            view.showErrorLoadingHighlights(errorHandler.handleError(e));
+                        }
 
                         if (reset) {
                             view.setLoadingIndicator(false);

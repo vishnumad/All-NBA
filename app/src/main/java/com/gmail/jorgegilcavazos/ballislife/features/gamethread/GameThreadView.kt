@@ -35,7 +35,7 @@ interface GameThreadView {
 
   fun hideNoCommentsText()
 
-  fun showErrorLoadingText()
+  fun showErrorLoadingText(code: Int)
 
   fun hideErrorLoadingText()
 
@@ -75,9 +75,11 @@ interface GameThreadView {
 
   fun showMissingSubmissionToast()
 
-  fun showErrorSavingCommentToast()
+  fun showErrorSavingCommentToast(code: Int)
 
   fun showNotLoggedInToast()
+
+  fun showNoNetAvailable()
 
   fun showFab()
 

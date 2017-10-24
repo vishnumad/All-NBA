@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.games
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
@@ -15,7 +16,8 @@ class GamesPresenter @Inject constructor(
     private val gamesRepository: GamesRepository,
     private val schedulerProvider: BaseSchedulerProvider,
     private val disposables: CompositeDisposable,
-    private val networkUtils: NetworkUtils) : BasePresenter<GamesView>() {
+    private val networkUtils: NetworkUtils,
+    private val errorHandler: ErrorHandler) : BasePresenter<GamesView>() {
 
   private val calendar = Calendar.getInstance()
 
@@ -69,7 +71,7 @@ class GamesPresenter @Inject constructor(
           override fun onError(e: Throwable) {
             view.setLoadingIndicator(false)
             if (networkUtils.isNetworkAvailable()) {
-              view.showErrorSnackbar()
+              view.showErrorSnackbar(errorHandler.handleError(e))
             } else {
               view.showNoNetSnackbar()
             }
