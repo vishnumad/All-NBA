@@ -247,7 +247,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         Intent intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
                 "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
                 videoId, 0, /* Start millisecond */
-                true /* Autoplay */, false /* Lightbox */);
+                true /* Autoplay */, true /* Lightbox */);
         startActivity(intent);
     }
 
