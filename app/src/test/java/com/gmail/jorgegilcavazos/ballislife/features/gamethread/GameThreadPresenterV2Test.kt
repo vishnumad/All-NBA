@@ -98,12 +98,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun saveCommentInProgress() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
+    `when`(mockRedditActions.savePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.inProgress()))
 
     commentSaves.onNext(mockComment)
 
-    verify(mockRedditActions).saveComment(mockComment)
+    verify(mockRedditActions).savePublicContribution(mockComment)
     verify(mockView).showSavingToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showSavedToast()
@@ -112,12 +112,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun saveCommentSuccess() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
+    `when`(mockRedditActions.savePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.success()))
 
     commentSaves.onNext(mockComment)
 
-    verify(mockRedditActions).saveComment(mockComment)
+    verify(mockRedditActions).savePublicContribution(mockComment)
     verify(mockView).showSavedToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showSavingToast()
@@ -126,12 +126,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun saveCommentNotLoggedIn() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
+    `when`(mockRedditActions.savePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.notLoggedIn()))
 
     commentSaves.onNext(mockComment)
 
-    verify(mockRedditActions).saveComment(mockComment)
+    verify(mockRedditActions).savePublicContribution(mockComment)
     verify(mockView).showNotLoggedInToast()
     verify(mockView, times(0)).showSavingToast()
     verify(mockView, times(0)).showSavedToast()
@@ -140,12 +140,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun unsaveCommentInProgress() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
+    `when`(mockRedditActions.unsavePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.inProgress()))
 
     commentUnsaves.onNext(mockComment)
 
-    verify(mockRedditActions).unsaveComment(mockComment)
+    verify(mockRedditActions).unsavePublicContribution(mockComment)
     verify(mockView).showUnsavingToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showUnsavedToast()
@@ -154,12 +154,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun unsaveCommentSuccess() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
+    `when`(mockRedditActions.unsavePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.success()))
 
     commentUnsaves.onNext(mockComment)
 
-    verify(mockRedditActions).unsaveComment(mockComment)
+    verify(mockRedditActions).unsavePublicContribution(mockComment)
     verify(mockView).showUnsavedToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showUnsavingToast()
@@ -168,12 +168,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun unsaveCommentNotLoggedIn() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
+    `when`(mockRedditActions.unsavePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.notLoggedIn()))
 
     commentUnsaves.onNext(mockComment)
 
-    verify(mockRedditActions).unsaveComment(mockComment)
+    verify(mockRedditActions).unsavePublicContribution(mockComment)
     verify(mockView).showNotLoggedInToast()
     verify(mockView, times(0)).showUnsavingToast()
     verify(mockView, times(0)).showUnsavedToast()

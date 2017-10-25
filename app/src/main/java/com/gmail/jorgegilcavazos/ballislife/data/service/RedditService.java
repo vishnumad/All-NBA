@@ -9,6 +9,7 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.SubredditPaginator;
@@ -51,14 +52,16 @@ public interface RedditService {
     Completable voteComment(RedditClient redditClient, Comment comment, VoteDirection direction);
 
     /**
-     * Returns an Rx Completable that saves the given comment for the currently logged-in user.
+     * Returns an Rx Completable that saves the given contribution for the currently logged-in user.
      */
-    Completable saveComment(RedditClient redditClient, Comment comment);
+    Completable savePublicContribution(RedditClient redditClient,
+            PublicContribution publicContribution);
 
     /**
      * Returns an Rx Completable that un-saves the given comment for the currently logged-in user.
      */
-    Completable unsaveComment(RedditClient redditClient, Comment comment);
+    Completable unsavePublicContribution(RedditClient redditClient,
+            PublicContribution publicContribution);
 
     /**
      * Returns an Rx Single that posts a reply to a given submission.

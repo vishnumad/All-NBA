@@ -55,8 +55,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Context context;
     private List<ThreadItem> commentsList;
     private boolean hasHeader;
-    private OnCommentClickListener commentClickListener;
-    private OnSubmissionClickListener submissionClickListener;
     private SubmissionWrapper submissionWrapper;
 
     private PublishSubject<Comment> commentSaves = PublishSubject.create();
@@ -65,6 +63,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private PublishSubject<Comment> downvotes = PublishSubject.create();
     private PublishSubject<Comment> novotes = PublishSubject.create();
     private PublishSubject<Comment> replies = PublishSubject.create();
+    private PublishSubject<Submission> submissionSaves = PublishSubject.create();
+    private PublishSubject<Submission> submissionUnsaves = PublishSubject.create();
+    private PublishSubject<Submission> submissionUpvotes = PublishSubject.create();
+    private PublishSubject<Submission> submissionDownvotes = PublishSubject.create();
+    private PublishSubject<Submission> submissionNovotes = PublishSubject.create();
+    private PublishSubject<String> submissionContentClicks = PublishSubject.create();
 
     public ThreadAdapter(Context context,
             RedditAuthentication redditAuthentication,
@@ -74,14 +78,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
         this.redditAuthentication = redditAuthentication;
-    }
-
-    public void setCommentClickListener(OnCommentClickListener commentClickListener) {
-        this.commentClickListener = commentClickListener;
-    }
-
-    public void setSubmissionClickListener(OnSubmissionClickListener submissionClickListener) {
-        this.submissionClickListener = submissionClickListener;
     }
 
     public void setSubmissionWrapper(SubmissionWrapper submissionWrapper) {
@@ -116,9 +112,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FullCardViewHolder) {
             ((FullCardViewHolder) holder).bindData(
-                    context, redditAuthentication, submissionWrapper,
-                    false,
-                    submissionClickListener);
+                    context,
+                    redditAuthentication,
+                    submissionWrapper,
+                    submissionSaves,
+                    submissionUnsaves,
+                    submissionUpvotes,
+                    submissionDownvotes,
+                    submissionNovotes,
+                    submissionContentClicks);
         } else if (holder instanceof CommentViewHolder) {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
@@ -134,7 +136,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             commentHolder.bindData(
                     context,
                     commentNode,
-                    commentClickListener,
                     redditAuthentication,
                     commentSaves,
                     commentUnsaves,
@@ -229,6 +230,30 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return replies;
     }
 
+    public Observable<Submission> getSubmissionSaves() {
+        return submissionSaves;
+    }
+
+    public Observable<Submission> getSubmissionUnsaves() {
+        return submissionUnsaves;
+    }
+
+    public Observable<Submission> getSubmissionUpvotes() {
+        return submissionUpvotes;
+    }
+
+    public Observable<Submission> getSubmissionDownvotes() {
+        return submissionDownvotes;
+    }
+
+    public Observable<Submission> getSubmissionNovotes() {
+        return submissionNovotes;
+    }
+
+    public Observable<String> getSubmissionContentClicks() {
+        return submissionContentClicks;
+    }
+
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.layout_comment_content) View commentContentLayout;
@@ -254,7 +279,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public void bindData(
                 final Context context,
                 final CommentNode commentNode,
-                final OnCommentClickListener commentClickListener,
                 final RedditAuthentication redditAuthentication,
                 PublishSubject<Comment> commentSaves,
                 PublishSubject<Comment> commentUnsaves,
@@ -349,12 +373,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 scoreTextView.setTextColor(colorNeutral);
             }
 
-            // Show saved text if saved
-            if (comment.isSaved()) {
-                tvSaved.setVisibility(View.VISIBLE);
-            } else {
-                tvSaved.setVisibility(View.GONE);
-            }
+            tvSaved.setVisibility(View.GONE);
 
             // Add a "*" to indicate that a comment has been edited.
             if (comment.hasBeenEdited()) {
@@ -366,16 +385,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (redditAuthentication.isUserLoggedIn()) {
                         scoreTextView.setTextColor(colorNeutral);
                     }
-                    if (commentClickListener != null) {
-                        commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
-                    }
                     novotes.onNext(comment);
                 } else {
                     if (redditAuthentication.isUserLoggedIn()) {
                         scoreTextView.setTextColor(colorUpvoted);
-                    }
-                    if (commentClickListener != null) {
-                        commentClickListener.onVoteComment(comment, VoteDirection.UPVOTE);
                     }
                     upvotes.onNext(comment);
                 }
@@ -386,16 +399,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (redditAuthentication.isUserLoggedIn()) {
                         scoreTextView.setTextColor(colorNeutral);
                     }
-                    if (commentClickListener != null) {
-                        commentClickListener.onVoteComment(comment, VoteDirection.NO_VOTE);
-                    }
                     novotes.onNext(comment);
                 } else {
                     if (redditAuthentication.isUserLoggedIn()) {
                         scoreTextView.setTextColor(colorDownvoted);
-                    }
-                    if (commentClickListener != null) {
-                        commentClickListener.onVoteComment(comment, VoteDirection.DOWNVOTE);
                     }
                     downvotes.onNext(comment);
                 }
@@ -403,25 +410,14 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             });
             btnSave.setOnClickListener(v -> {
                 if (tvSaved.getVisibility() == View.VISIBLE) {
-                    if (commentClickListener != null) {
-                        commentClickListener.onUnsaveComment(comment);
-                    }
                     commentUnsaves.onNext(comment);
-                    tvSaved.setVisibility(View.GONE);
                 } else {
-                    if (commentClickListener != null) {
-                        commentClickListener.onSaveComment(comment);
-                    }
                     commentSaves.onNext(comment);
-                    tvSaved.setVisibility(View.VISIBLE);
                 }
                 hideActions(context, commentHolder, commentNode);
             });
             btnReply.setOnClickListener(v -> {
                 replies.onNext(comment);
-                if (commentClickListener != null) {
-                    commentClickListener.onReplyToComment(getAdapterPosition(), comment);
-                }
                 hideActions(context, commentHolder, commentNode);
             });
         }

@@ -44,11 +44,11 @@ class RedditActionsImplTest {
   @Test
   fun saveCommentWhenUserLoggedIn() {
     val mockComment = mock(Comment::class.java)
-    `when`(mockRedditService.saveComment(redditClient, mockComment))
+    `when`(mockRedditService.savePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
     `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
 
-    val testObserver = redditActions.saveComment(mockComment).test()
+    val testObserver = redditActions.savePublicContribution(mockComment).test()
 
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
@@ -58,11 +58,11 @@ class RedditActionsImplTest {
   @Test
   fun saveCommentWhenUserNotLoggedIn() {
     val mockComment = mock(Comment::class.java)
-    `when`(mockRedditService.saveComment(redditClient, mockComment))
+    `when`(mockRedditService.savePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
     `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(false))
 
-    val testObserver = redditActions.saveComment(mockComment).test()
+    val testObserver = redditActions.savePublicContribution(mockComment).test()
 
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
@@ -72,11 +72,11 @@ class RedditActionsImplTest {
   @Test
   fun unsaveCommentWhenUserLoggedIn() {
     val mockComment = mock(Comment::class.java)
-    `when`(mockRedditService.unsaveComment(redditClient, mockComment))
+    `when`(mockRedditService.unsavePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
     `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
 
-    val testObserver = redditActions.unsaveComment(mockComment).test()
+    val testObserver = redditActions.unsavePublicContribution(mockComment).test()
 
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
@@ -86,11 +86,11 @@ class RedditActionsImplTest {
   @Test
   fun unsaveCommentWhenUserNotLoggedIn() {
     val mockComment = mock(Comment::class.java)
-    `when`(mockRedditService.unsaveComment(redditClient, mockComment))
+    `when`(mockRedditService.unsavePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
     `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(false))
 
-    val testObserver = redditActions.unsaveComment(mockComment).test()
+    val testObserver = redditActions.unsavePublicContribution(mockComment).test()
 
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })

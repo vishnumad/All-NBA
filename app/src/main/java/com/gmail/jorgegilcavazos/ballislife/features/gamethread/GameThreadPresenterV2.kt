@@ -235,7 +235,7 @@ class GameThreadPresenterV2 @Inject constructor(
   }
 
   private fun saveComment(comment: Comment) {
-    redditActions.saveComment(comment)
+    redditActions.savePublicContribution(comment)
         .subscribe(
             { uiModel: SaveUIModel ->
               if (uiModel.notLoggedIn) {
@@ -244,10 +244,6 @@ class GameThreadPresenterV2 @Inject constructor(
 
               if (uiModel.success) {
                 view.showSavedToast()
-              }
-
-              if (uiModel.inProgress) {
-                view.showSavingToast()
               }
             },
             { e ->
@@ -262,7 +258,7 @@ class GameThreadPresenterV2 @Inject constructor(
   }
 
   private fun unsaveComment(comment: Comment) {
-    redditActions.unsaveComment(comment)
+    redditActions.unsavePublicContribution(comment)
         .subscribe(
             {
               if (it.notLoggedIn) {
@@ -271,10 +267,6 @@ class GameThreadPresenterV2 @Inject constructor(
 
               if (it.success) {
                 view.showUnsavedToast()
-              }
-
-              if (it.inProgress) {
-                view.showUnsavingToast()
               }
             },
             { e ->
