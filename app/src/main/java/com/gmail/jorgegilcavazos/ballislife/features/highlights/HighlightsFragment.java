@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -243,11 +244,17 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void openYoutubeVideo(String videoId) {
-        FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video: " + videoId);
-        Intent intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
-                "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
-                videoId, 0, /* Start millisecond */
-                true /* Autoplay */, true /* Lightbox */);
+        Intent intent;
+        if (localRepository.getOpenYouTubeInApp()) {
+            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in app: " + videoId);
+            intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
+                    "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
+                    videoId, 0, /* Start millisecond */
+                    true /* Autoplay */, true /* Lightbox */);
+        } else {
+            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in YouTube: " + videoId);
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+        }
         startActivity(intent);
     }
 

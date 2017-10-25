@@ -30,6 +30,7 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_PREF_START_TOPICS = "pref_start_topics";
     public static final String KEY_ENABLE_ALERTS = "pref_enable_alerts";
     public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
+    public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";

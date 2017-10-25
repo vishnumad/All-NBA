@@ -19,6 +19,11 @@
             android:key="key_startup_fragment"
             android:title="@string/pref_startup_fragment_title"/>
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_enable_youtube_in_app"
+            android:title="@string/pref_enable_youtube_in_app"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

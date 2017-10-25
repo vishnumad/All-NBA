@@ -73,4 +73,9 @@ public class AppLocalRepository implements LocalRepository {
         return defaultSharedPreferences.getString(SettingsFragment.KEY_STARTUP_FRAGMENT,
                 SettingsFragment.STARTUP_FRAGMENT_GAMES);
     }
+
+    @Override
+    public boolean getOpenYouTubeInApp() {
+        return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_YOUTUBE_IN_APP, true);
+    }
 }
