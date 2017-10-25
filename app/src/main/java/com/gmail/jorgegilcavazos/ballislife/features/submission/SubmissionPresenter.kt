@@ -7,10 +7,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
-import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import com.gmail.jorgegilcavazos.ballislife.util.*
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
-import com.google.common.base.Optional
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import net.dean.jraw.models.Comment
@@ -35,41 +33,57 @@ class SubmissionPresenter @Inject constructor(
     super.attachView(view)
 
     view.commentSaves()
-        .subscribe { saveComment(it) }
-        .addTo(disposables)
+        .subscribe {
+          // TODO: allow operations on null comments (own replies).
+          // Empty comment in wrapper means we don't have the actual [Comment], usually because this
+          // comment was created after a reply (where we don't have the [Comment] object).
+          if (it.comment != null) {
+            saveComment(it.comment)
+          }
+        }.addTo(disposables)
 
     view.commentUnsaves()
-        .subscribe { unsaveComment(it) }
+        .subscribe {
+          if (it.comment != null) {
+            unsaveComment(it.comment)
+          }
+        }
         .addTo(disposables)
 
     view.commentUpvotes()
         .subscribe {
-          redditActions.voteComment(it, VoteDirection.UPVOTE)
-              .subscribe {
-                if (it.notLoggedIn) {
-                  view.showNotLoggedInError()
-                }
-              }.addTo(disposables)
+          if (it.comment != null) {
+            redditActions.voteComment(it.comment, VoteDirection.UPVOTE)
+                .subscribe {
+                  if (it.notLoggedIn) {
+                    view.showNotLoggedInError()
+                  }
+                }.addTo(disposables)
+          }
         }.addTo(disposables)
 
     view.commentDownvotes()
         .subscribe {
-          redditActions.voteComment(it, VoteDirection.DOWNVOTE)
-              .subscribe {
-                if (it.notLoggedIn) {
-                  view.showNotLoggedInError()
-                }
-              }.addTo(disposables)
+          if (it.comment != null) {
+            redditActions.voteComment(it.comment, VoteDirection.DOWNVOTE)
+                .subscribe {
+                  if (it.notLoggedIn) {
+                    view.showNotLoggedInError()
+                  }
+                }.addTo(disposables)
+          }
         }.addTo(disposables)
 
     view.commentNovotes()
         .subscribe {
-          redditActions.voteComment(it, VoteDirection.NO_VOTE)
-              .subscribe {
-                if (it.notLoggedIn) {
-                  view.showNotLoggedInError()
-                }
-              }.addTo(disposables)
+          if (it.comment != null) {
+            redditActions.voteComment(it.comment, VoteDirection.NO_VOTE)
+                .subscribe {
+                  if (it.notLoggedIn) {
+                    view.showNotLoggedInError()
+                  }
+                }.addTo(disposables)
+          }
         }.addTo(disposables)
 
     view.submissionSaves()
@@ -126,8 +140,10 @@ class SubmissionPresenter @Inject constructor(
     view.commentReplies()
         .subscribe {
           if (redditAuthentication.isUserLoggedIn) {
-            contributionRepository.saveComment(it)
-            view.openReplyToCommentActivity(it)
+            if (it.comment != null) {
+              contributionRepository.saveComment(it.comment)
+              view.openReplyToCommentActivity(it.comment)
+            }
           } else {
             view.showNotLoggedInError()
           }
@@ -183,15 +199,9 @@ class SubmissionPresenter @Inject constructor(
               val items = CommentsTraverser
                   .flattenCommentTree(submissionWrapper.submission.comments.children)
 
-              val pos = findComment(items, commentIdToScroll)
-
               view.showComments(items, submissionWrapper.submission)
               view.setLoadingIndicator(false)
               view.showFab()
-
-              if (pos.isPresent) {
-                view.scrollToComment(pos.get())
-              }
             },
             { e ->
               view.setLoadingIndicator(false)
@@ -200,15 +210,14 @@ class SubmissionPresenter @Inject constructor(
         .addTo(disposables)
   }
 
-  fun replyToComment(parentFullname: String, response: String) {
-    redditActions.replyToComment(parentFullname, response)
+  fun replyToComment(parentId: String, response: String) {
+    redditActions.replyToComment(parentId, response)
         .subscribe(
             { uiModel: ReplyUIModel ->
               if (uiModel.success) {
-                val commentResponse = uiModel.commentItem
-                val parentComment = contributionRepository.getComment(parentFullname)
+                val parentComment = contributionRepository.getComment(parentId)
                 if (uiModel.commentItem != null && parentComment != null) {
-                  view.addCommentItem(uiModel.commentItem, parentComment.fullName)
+                  view.addCommentItem(uiModel.commentItem, parentId)
                 }
               }
             },
@@ -266,18 +275,5 @@ class SubmissionPresenter @Inject constructor(
     } else {
       view.showContentUnavailableToast()
     }
-  }
-
-  private fun findComment(items: List<ThreadItem>, id: String?): Optional<Int> {
-    if (id == null) {
-      return Optional.absent()
-    }
-    for (i in items.indices) {
-      val node = items[i].commentNode
-      if (node != null && node.comment.id == id) {
-        return Optional.of(i)
-      }
-    }
-    return Optional.absent()
   }
 }

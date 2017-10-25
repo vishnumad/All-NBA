@@ -8,6 +8,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
@@ -16,6 +18,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import net.dean.jraw.models.Comment
+import net.dean.jraw.models.CommentNode
 import net.dean.jraw.models.Submission
 import net.dean.jraw.models.VoteDirection
 import java.util.concurrent.TimeUnit
@@ -46,29 +49,29 @@ class GameThreadPresenterV2 @Inject constructor(
     gameTimeUtc = view.getGameTimeUtc()
 
     view.commentSaves()
-        .subscribe { saveComment(it) }
+        .subscribe { saveComment(it.comment!!) }
         .addTo(disposable)
 
     view.commentUnsaves()
-        .subscribe { unsaveComment(it) }
+        .subscribe { unsaveComment(it.comment!!) }
         .addTo(disposable)
 
     view.upvotes()
-        .subscribe { redditActions.voteComment(it, VoteDirection.UPVOTE).subscribe() }
+        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.UPVOTE).subscribe() }
         .addTo(disposable)
 
     view.downvotes()
-        .subscribe { redditActions.voteComment(it, VoteDirection.DOWNVOTE).subscribe() }
+        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.DOWNVOTE).subscribe() }
         .addTo(disposable)
 
     view.novotes()
-        .subscribe { redditActions.voteComment(it, VoteDirection.NO_VOTE).subscribe() }
+        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.NO_VOTE).subscribe() }
         .addTo(disposable)
 
     view.replies()
         .subscribe {
-          contributionRepository.saveComment(it)
-          view.openReplyToCommentActivity(it)
+          contributionRepository.saveComment(it.comment!!)
+          view.openReplyToCommentActivity(it.comment)
         }
         .addTo(disposable)
 
@@ -139,7 +142,7 @@ class GameThreadPresenterV2 @Inject constructor(
                 iterator?.forEach {
                   threadItems.add(
                       ThreadItem(
-                          ThreadAdapter.TYPE_COMMENT, it,
+                          ThreadAdapter.TYPE_COMMENT, createCommentItem(it),
                           it.depth))
                 }
 
@@ -174,8 +177,8 @@ class GameThreadPresenterV2 @Inject constructor(
         .addTo(threadsDisposable)
   }
 
-  fun replyToComment(parentFullname: String, response: String) {
-    redditActions.replyToComment(parentFullname, response)
+  fun replyToComment(parentId: String, response: String) {
+    redditActions.replyToComment(parentId, response)
         .subscribe(
             { uiModel: ReplyUIModel ->
               if (uiModel.inProgress) {
@@ -288,5 +291,23 @@ class GameThreadPresenterV2 @Inject constructor(
   @VisibleForTesting
   fun setShouldStream(shouldStream: Boolean) {
     this.shouldStream = shouldStream
+  }
+
+  private fun createCommentItem(root: CommentNode): CommentItem {
+    val comment = root.comment
+    return CommentItem(
+        commentWrapper = CommentWrapper(
+            comment = comment,
+            id = comment.id,
+            saved = comment.isSaved,
+            author = comment.author,
+            score = comment.score,
+            created = comment.created,
+            body = comment.body,
+            bodyHtml = comment.data("body_html"),
+            authorFlair = comment.authorFlair,
+            vote = comment.vote,
+            edited = comment.hasBeenEdited()),
+        depth = root.depth)
   }
 }

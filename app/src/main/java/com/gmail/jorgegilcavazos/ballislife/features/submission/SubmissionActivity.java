@@ -22,6 +22,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
@@ -162,9 +163,9 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            String parentFullname = data.getStringExtra(ReplyActivity.KEY_COMMENT_FULLNAME);
+            String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
             String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
-            presenter.replyToComment(parentFullname, response);
+            presenter.replyToComment(parentId, response);
         } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
             String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
@@ -175,31 +176,31 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @NotNull
     @Override
-    public Observable<Comment> commentSaves() {
+    public Observable<CommentWrapper> commentSaves() {
         return threadAdapter.getCommentSaves();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> commentUnsaves() {
+    public Observable<CommentWrapper> commentUnsaves() {
         return threadAdapter.getCommentUnsaves();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> commentUpvotes() {
+    public Observable<CommentWrapper> commentUpvotes() {
         return threadAdapter.getUpvotes();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> commentDownvotes() {
+    public Observable<CommentWrapper> commentDownvotes() {
         return threadAdapter.getDownvotes();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> commentNovotes() {
+    public Observable<CommentWrapper> commentNovotes() {
         return threadAdapter.getNovotes();
     }
 
@@ -235,7 +236,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     @NotNull
     @Override
-    public Observable<Comment> commentReplies() {
+    public Observable<CommentWrapper> commentReplies() {
         return threadAdapter.getReplies();
     }
 
@@ -269,8 +270,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void addCommentItem(@NotNull CommentItem commentItem, @NotNull String parentFullname) {
-
+    public void addCommentItem(@NotNull CommentItem commentItem, @NotNull String parentId) {
+        threadAdapter.addCommentItem(commentItem, parentId);
     }
 
     @Override
@@ -297,7 +298,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     public void openReplyToCommentActivity(@NonNull final Comment parentComment) {
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyActivity.KEY_COMMENT_FULLNAME, parentComment.getFullName());
+        extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
         extras.putCharSequence(ReplyActivity.KEY_COMMENT,
                 RedditUtils.bindSnuDown(parentComment.data("body_html")));
         intent.putExtras(extras);

@@ -19,7 +19,7 @@ interface RedditActions {
 
   fun voteSubmission(submission: Submission, voteDirection: VoteDirection): Observable<VoteUIModel>
 
-  fun replyToComment(parentFullname: String, response: String): Observable<ReplyUIModel>
+  fun replyToComment(parentId: String, response: String): Observable<ReplyUIModel>
 
   fun replyToSubmission(submissionId: String, response: String): Observable<ReplyUIModel>
 }

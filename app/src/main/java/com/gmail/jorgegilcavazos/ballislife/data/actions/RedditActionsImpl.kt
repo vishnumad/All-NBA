@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.actions
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService
@@ -21,7 +22,8 @@ class RedditActionsImpl @Inject constructor(
     private val redditAuthentication: RedditAuthentication,
     private val redditService: RedditService,
     private val contributionRepository: ContributionRepository,
-    private val schedulerProvider: BaseSchedulerProvider) : RedditActions {
+    private val schedulerProvider: BaseSchedulerProvider,
+    private val localRepository: LocalRepository) : RedditActions {
 
 
   override fun savePublicContribution(contribution: PublicContribution): Observable<SaveUIModel> {
@@ -97,23 +99,19 @@ class RedditActionsImpl @Inject constructor(
         .startWith(VoteUIModel.inProgress())
   }
 
-  override fun replyToComment(parentFullname: String, response: String)
-      : Observable<ReplyUIModel> {
+  override fun replyToComment(parentId: String, response: String): Observable<ReplyUIModel> {
     return redditAuthentication.authenticate()
         .andThen(redditAuthentication.checkUserLoggedIn())
         .toObservable()
         .flatMap {
           if (it) {
-            val parent = contributionRepository.getComment(parentFullname)
+            val parent = contributionRepository.getComment(parentId)
             if (parent != null) {
               redditService.replyToComment(redditAuthentication.redditClient, parent, response)
                   .flatMapObservable {
                     Observable.just(
                         ReplyUIModel.success(
-                            createCommentItem(
-                                it,
-                                parentFullname,
-                                response)))
+                            createCommentItem(it, response)))
                   }
             } else {
               Observable.just(ReplyUIModel.parentNotFound())
@@ -149,18 +147,19 @@ class RedditActionsImpl @Inject constructor(
         .startWith(ReplyUIModel.inProgress())
   }
 
-  private fun createCommentItem(id: String, parentFullname: String, body: String): CommentItem {
+  private fun createCommentItem(id: String, body: String): CommentItem {
     return CommentItem(
         commentWrapper = CommentWrapper(
             comment = null,
             id = id,
-            parentFullname = parentFullname,
             saved = false,
-            author = "",
+            author = localRepository.username,
             score = 1,
             created = Calendar.getInstance().time,
             body = body,
             bodyHtml = "",
-            authorFlair = null), depth = 0)
+            authorFlair = null,
+            vote = VoteDirection.UPVOTE,
+            edited = false), depth = 0)
   }
 }

@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.Observable
 
@@ -10,15 +11,15 @@ import net.dean.jraw.models.Submission
 
 interface SubmissionView {
 
-  fun commentSaves(): Observable<Comment>
+  fun commentSaves(): Observable<CommentWrapper>
 
-  fun commentUnsaves(): Observable<Comment>
+  fun commentUnsaves(): Observable<CommentWrapper>
 
-  fun commentUpvotes(): Observable<Comment>
+  fun commentUpvotes(): Observable<CommentWrapper>
 
-  fun commentDownvotes(): Observable<Comment>
+  fun commentDownvotes(): Observable<CommentWrapper>
 
-  fun commentNovotes(): Observable<Comment>
+  fun commentNovotes(): Observable<CommentWrapper>
 
   fun submissionSaves(): Observable<Submission>
 
@@ -30,7 +31,7 @@ interface SubmissionView {
 
   fun submissionNovotes(): Observable<Submission>
 
-  fun commentReplies(): Observable<Comment>
+  fun commentReplies(): Observable<CommentWrapper>
 
   fun submissionReplies(): Observable<Any>
 
@@ -42,7 +43,7 @@ interface SubmissionView {
 
   fun addComment(comment: CommentNode, position: Int)
 
-  fun addCommentItem(commentItem: CommentItem, parentFullname: String)
+  fun addCommentItem(commentItem: CommentItem, parentId: String)
 
   fun showErrorAddingComment()
 
