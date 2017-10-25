@@ -1,5 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.videoplayer;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -20,7 +25,7 @@ import butterknife.ButterKnife;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class VideoPlayerActivity extends AppCompatActivity implements VideoPlayerView ,
+public class VideoPlayerActivity extends AppCompatActivity implements VideoPlayerView,
         EasyVideoCallback {
     public static final String SHORTCODE = "videoUrl";
     private static final String TAG = "VideoPlayerActivity";
@@ -56,6 +61,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
 
         String shortcode = getIntent().getStringExtra(SHORTCODE);
         presenter.loadStreamable(shortcode);
+
+        //Strange bug with Easy Video player messed up aspect ratio if you changed orientation
+        //before the video started playing
+        //https://github.com/afollestad/easy-video-player/issues/25
+        if (Configuration.ORIENTATION_PORTRAIT == getResources().getConfiguration().orientation)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override
@@ -88,7 +101,16 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
 
     @Override
     public void onStarted(EasyVideoPlayer player) {
-
+        //If you don't use a timer the aspect ratio still misbehaves
+        //https://github.com/afollestad/easy-video-player/issues/25
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                VideoPlayerActivity.this.runOnUiThread(() -> setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR));
+            }
+        };
+        timer.schedule(task, 400);
     }
 
     @Override
