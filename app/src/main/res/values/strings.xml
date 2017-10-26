@@ -431,5 +431,7 @@
     <string name="unsaving">Unsaving</string>
     <string name="go_premium">Go Premium!</string>
     <string name="you_are_a_premium_user_already">You are a Premium user already!</string>
+    <string name="self">self</string>
+    <string name="submitting_comment">Submitting comment</string>
 
 </resources>

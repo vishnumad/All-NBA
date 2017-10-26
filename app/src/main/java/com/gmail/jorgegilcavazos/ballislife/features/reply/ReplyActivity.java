@@ -28,14 +28,14 @@ public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFra
     public static final int POST_SUBMISSION_REPLY_REQUEST = 2;
     public static final String KEY_COMMENT = "Comment";
     public static final String KEY_POSTED_COMMENT = "PostedComment";
-    public static final String KEY_COMMENT_FULLNAME = "CommentFullname";
+    public static final String KEY_COMMENT_ID = "CommentFullname";
     public static final String KEY_SUBMISSION_ID = "SubmissionId";
 
     @BindView(R.id.text_comment) TextView tvComment;
     @BindView(R.id.edit_response) EditText etResponse;
     @BindView(R.id.view_separator) View separatorView;
 
-    private String parentFullname;
+    private String parentId;
     private String submissionId;
 
     @Override
@@ -56,7 +56,7 @@ public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFra
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             comment = extras.getCharSequence(KEY_COMMENT);
-            parentFullname = extras.getString(KEY_COMMENT_FULLNAME);
+            parentId = extras.getString(KEY_COMMENT_ID);
             submissionId = extras.getString(KEY_SUBMISSION_ID);
         }
 
@@ -173,7 +173,7 @@ public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFra
         } else {
             Intent intent = new Intent();
             intent.putExtra(KEY_POSTED_COMMENT, etResponse.getText().toString());
-            intent.putExtra(KEY_COMMENT_FULLNAME, parentFullname);
+            intent.putExtra(KEY_COMMENT_ID, parentId);
             intent.putExtra(KEY_SUBMISSION_ID, submissionId);
             setResult(RESULT_OK, intent);
             finish();

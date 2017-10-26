@@ -6,6 +6,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
@@ -25,6 +26,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+import java.util.*
 
 class GameThreadPresenterV2Test {
 
@@ -37,12 +39,12 @@ class GameThreadPresenterV2Test {
     val PARENT_FULLNAME = "9n1uid3"
     val RESPONSE = "This is a reply!"
 
-    val commentSaves: PublishSubject<Comment> = PublishSubject.create()
-    val commentUnsaves: PublishSubject<Comment> = PublishSubject.create()
-    val upvotes: PublishSubject<Comment> = PublishSubject.create()
-    val downvotes: PublishSubject<Comment> = PublishSubject.create()
-    val novotes: PublishSubject<Comment> = PublishSubject.create()
-    val replies: PublishSubject<Comment> = PublishSubject.create()
+    val commentSaves: PublishSubject<CommentWrapper> = PublishSubject.create()
+    val commentUnsaves: PublishSubject<CommentWrapper> = PublishSubject.create()
+    val upvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    val downvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    val novotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    val replies: PublishSubject<CommentWrapper> = PublishSubject.create()
     val submissionReplies: PublishSubject<Any> = PublishSubject.create()
     val streamChanges: PublishSubject<Boolean> = PublishSubject.create()
   }
@@ -96,28 +98,14 @@ class GameThreadPresenterV2Test {
   }
 
   @Test
-  fun saveCommentInProgress() {
-    val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
-        .thenReturn(Observable.just(SaveUIModel.inProgress()))
-
-    commentSaves.onNext(mockComment)
-
-    verify(mockRedditActions).saveComment(mockComment)
-    verify(mockView).showSavingToast()
-    verify(mockView, times(0)).showNotLoggedInToast()
-    verify(mockView, times(0)).showSavedToast()
-  }
-
-  @Test
   fun saveCommentSuccess() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
+    `when`(mockRedditActions.savePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.success()))
 
-    commentSaves.onNext(mockComment)
+    commentSaves.onNext(CommentWrapper(mockComment))
 
-    verify(mockRedditActions).saveComment(mockComment)
+    verify(mockRedditActions).savePublicContribution(mockComment)
     verify(mockView).showSavedToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showSavingToast()
@@ -126,40 +114,26 @@ class GameThreadPresenterV2Test {
   @Test
   fun saveCommentNotLoggedIn() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.saveComment(mockComment))
+    `when`(mockRedditActions.savePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.notLoggedIn()))
 
-    commentSaves.onNext(mockComment)
+    commentSaves.onNext(CommentWrapper(mockComment))
 
-    verify(mockRedditActions).saveComment(mockComment)
+    verify(mockRedditActions).savePublicContribution(mockComment)
     verify(mockView).showNotLoggedInToast()
     verify(mockView, times(0)).showSavingToast()
     verify(mockView, times(0)).showSavedToast()
   }
 
   @Test
-  fun unsaveCommentInProgress() {
-    val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
-        .thenReturn(Observable.just(SaveUIModel.inProgress()))
-
-    commentUnsaves.onNext(mockComment)
-
-    verify(mockRedditActions).unsaveComment(mockComment)
-    verify(mockView).showUnsavingToast()
-    verify(mockView, times(0)).showNotLoggedInToast()
-    verify(mockView, times(0)).showUnsavedToast()
-  }
-
-  @Test
   fun unsaveCommentSuccess() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
+    `when`(mockRedditActions.unsavePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.success()))
 
-    commentUnsaves.onNext(mockComment)
+    commentUnsaves.onNext(CommentWrapper(mockComment))
 
-    verify(mockRedditActions).unsaveComment(mockComment)
+    verify(mockRedditActions).unsavePublicContribution(mockComment)
     verify(mockView).showUnsavedToast()
     verify(mockView, times(0)).showNotLoggedInToast()
     verify(mockView, times(0)).showUnsavingToast()
@@ -168,12 +142,12 @@ class GameThreadPresenterV2Test {
   @Test
   fun unsaveCommentNotLoggedIn() {
     val mockComment = Mockito.mock(Comment::class.java)
-    `when`(mockRedditActions.unsaveComment(mockComment))
+    `when`(mockRedditActions.unsavePublicContribution(mockComment))
         .thenReturn(Observable.just(SaveUIModel.notLoggedIn()))
 
-    commentUnsaves.onNext(mockComment)
+    commentUnsaves.onNext(CommentWrapper(mockComment))
 
-    verify(mockRedditActions).unsaveComment(mockComment)
+    verify(mockRedditActions).unsavePublicContribution(mockComment)
     verify(mockView).showNotLoggedInToast()
     verify(mockView, times(0)).showUnsavingToast()
     verify(mockView, times(0)).showUnsavedToast()
@@ -185,7 +159,7 @@ class GameThreadPresenterV2Test {
     `when`(mockRedditActions.voteComment(mockComment, VoteDirection.UPVOTE))
         .thenReturn(Observable.just(VoteUIModel.success()))
 
-    upvotes.onNext(mockComment)
+    upvotes.onNext(CommentWrapper(mockComment))
 
     verify(mockRedditActions).voteComment(mockComment, VoteDirection.UPVOTE)
   }
@@ -196,7 +170,7 @@ class GameThreadPresenterV2Test {
     `when`(mockRedditActions.voteComment(mockComment, VoteDirection.DOWNVOTE))
         .thenReturn(Observable.just(VoteUIModel.success()))
 
-    downvotes.onNext(mockComment)
+    downvotes.onNext(CommentWrapper(mockComment))
 
     verify(mockRedditActions).voteComment(mockComment, VoteDirection.DOWNVOTE)
   }
@@ -207,7 +181,7 @@ class GameThreadPresenterV2Test {
     `when`(mockRedditActions.voteComment(mockComment, VoteDirection.NO_VOTE))
         .thenReturn(Observable.just(VoteUIModel.success()))
 
-    novotes.onNext(mockComment)
+    novotes.onNext(CommentWrapper(mockComment))
 
     verify(mockRedditActions).voteComment(mockComment, VoteDirection.NO_VOTE)
   }
@@ -216,7 +190,7 @@ class GameThreadPresenterV2Test {
   fun openReplyActivityOnCommentReply() {
     val mockComment = Mockito.mock(Comment::class.java)
 
-    replies.onNext(mockComment)
+    replies.onNext(CommentWrapper(mockComment))
 
     verify(mockContributionsRepository).saveComment(mockComment)
     verify(mockView).openReplyToCommentActivity(mockComment)
@@ -266,8 +240,10 @@ class GameThreadPresenterV2Test {
   @Test
   fun loadGameThreadFoundWithComments() {
     val mockCommentNode1 = Mockito.mock(CommentNode::class.java)
+    setupMocksForNode(mockCommentNode1)
     `when`(mockCommentNode1.depth).thenReturn(0)
     val mockCommentNode2 = Mockito.mock(CommentNode::class.java)
+    setupMocksForNode(mockCommentNode2)
     `when`(mockCommentNode2.depth).thenReturn(1)
     val mockSubmission = Mockito.mock(Submission::class.java)
     `when`(mockSubmission.comments).thenReturn(mockCommentNode1)
@@ -451,5 +427,20 @@ class GameThreadPresenterV2Test {
     verify(mockView).isPremiumPurchased()
     verify(mockView).setStreamSwitch(false)
     verify(mockView).purchasePremium()
+  }
+
+  private fun setupMocksForNode(commentNode: CommentNode) {
+    val mockComment1 = Mockito.mock(Comment::class.java)
+    `when`(mockComment1.id).thenReturn("id")
+    `when`(mockComment1.isSaved).thenReturn(false)
+    `when`(mockComment1.author).thenReturn("")
+    `when`(mockComment1.score).thenReturn(1)
+    `when`(mockComment1.created).thenReturn(Calendar.getInstance().time)
+    `when`(mockComment1.body).thenReturn("")
+    `when`(mockComment1.data("body_html")).thenReturn("")
+    `when`(mockComment1.authorFlair).thenReturn(null)
+    `when`(mockComment1.vote).thenReturn(VoteDirection.UPVOTE)
+    `when`(mockComment1.hasBeenEdited()).thenReturn(false)
+    `when`(commentNode.comment).thenReturn(mockComment1)
   }
 }

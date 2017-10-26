@@ -21,7 +21,7 @@ public final class RedditUtils {
      */
     public static String parseNbaFlair(String flair) {
         final int EXPECTED_SECTIONS = 5;
-        if (flair == null) {
+        if (StringUtils.Companion.isNullOrEmpty(flair)) {
             return "";
         }
 

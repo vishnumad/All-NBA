@@ -1,10 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.data.actions.models
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
+
 class ReplyUIModel(
     val inProgress: Boolean,
     val success: Boolean,
     val parentNotFound: Boolean,
-    val notLoggedIn: Boolean) {
+    val notLoggedIn: Boolean,
+    val commentItem: CommentItem? = null) {
 
   companion object {
     fun inProgress(): ReplyUIModel = ReplyUIModel(
@@ -18,6 +21,13 @@ class ReplyUIModel(
         success = true,
         parentNotFound = false,
         notLoggedIn = false)
+
+    fun success(commentItem: CommentItem): ReplyUIModel = ReplyUIModel(
+        inProgress = false,
+        success = true,
+        parentNotFound = false,
+        notLoggedIn = false,
+        commentItem = commentItem)
 
     fun parentNotFound(): ReplyUIModel = ReplyUIModel(
         inProgress = false,

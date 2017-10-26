@@ -8,15 +8,15 @@ import javax.inject.Singleton
 @Singleton
 class ContributionRepositoryImpl @Inject constructor() : ContributionRepository {
 
-  private val fullNameToCommentMap = mutableMapOf<String, Comment>()
+  private val idToCommentMap = mutableMapOf<String, Comment>()
   private val idToSubmissionMap = mutableMapOf<String, Submission>()
 
-  override fun getComment(fullname: String): Comment? {
-    return fullNameToCommentMap[fullname]
+  override fun getComment(id: String): Comment? {
+    return idToCommentMap[id]
   }
 
   override fun saveComment(comment: Comment) {
-    fullNameToCommentMap.put(comment.fullName, comment)
+    idToCommentMap.put(comment.id, comment)
   }
 
   override fun getSubmission(id: String): Submission? {

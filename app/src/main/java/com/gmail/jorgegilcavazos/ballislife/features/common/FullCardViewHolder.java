@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.common;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
@@ -21,16 +22,19 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.google.common.base.Optional;
 import com.squareup.picasso.Picasso;
 
+import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.subjects.PublishSubject;
 
 public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
@@ -54,25 +58,25 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void bindData(
-            final Context context,
-            final RedditAuthentication redditAuthentication, final SubmissionWrapper
-                    submissionWrapper,
-            boolean isDisplayedInList,
-            final OnSubmissionClickListener submissionClickListener) {
+    @SuppressLint("ClickableViewAccessibility")
+    public void bindData(final Context context, final RedditAuthentication redditAuthentication,
+            final SubmissionWrapper submissionWrapper,
+            final PublishSubject<Submission> submissionSaves,
+            final PublishSubject<Submission> submissionUnsaves,
+            final PublishSubject<Submission> submissionUpvotes,
+            final PublishSubject<Submission> submissionDownvotes,
+            final PublishSubject<Submission> submissionNovotes,
+            final PublishSubject<String> submissionContentClicks) {
 
-        String title, author, commentCount, score, selfTextHtml, domain, thumbnail,
-                highResThumbnail, thumbnailToShow;
+        String title, author, score, selfTextHtml, domain, thumbnailToShow;
         final String url;
         boolean isSelf, isStickied, isSaved;
         VoteDirection vote;
         long timestamp;
 
-        // Get data from real submission if available, otherwise used data from fake one.
         title = submissionWrapper.getTitle();
         author = submissionWrapper.getAuthor();
         timestamp = submissionWrapper.getCreated();
-        commentCount = String.valueOf(submissionWrapper.getCommentCount());
         score = String.valueOf(submissionWrapper.getScore());
         selfTextHtml = submissionWrapper.getSelfTextHtml();
         domain = submissionWrapper.getDomain();
@@ -82,8 +86,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         isSaved = submissionWrapper.isSaved();
         vote = submissionWrapper.getVoteDirection();
 
-        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl = Utilities
-                .getThumbnailToShowFromCustomSubmission(submissionWrapper);
+        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl = Utilities.getThumbnailToShowFromCustomSubmission(submissionWrapper);
         thumbnailToShow = thumbnailTypeUrl.isPresent() ? thumbnailTypeUrl.get().second : null;
 
         // Bind data to views.
@@ -131,13 +134,13 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         });
 
         if (isSelf) {
-            if (!isDisplayedInList && selfTextHtml != null) {
+            if (!StringUtils.Companion.isNullOrEmpty(selfTextHtml)) {
                 tvBody.setVisibility(View.VISIBLE);
                 tvBody.setText(RedditUtils.bindSnuDown(selfTextHtml));
             } else {
                 tvBody.setVisibility(View.GONE);
             }
-            tvDomain.setText("self");
+            tvDomain.setText(R.string.self);
             ivThumbnail.setVisibility(View.GONE);
             containerLink.setVisibility(View.GONE);
         } else {
@@ -146,9 +149,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             if (thumbnailToShow != null) {
                 ivThumbnail.setVisibility(View.VISIBLE);
                 containerLink.setVisibility(View.GONE);
-                Picasso.with(context)
-                        .load(thumbnailToShow)
-                        .into(ivThumbnail);
+                Picasso.with(context).load(thumbnailToShow).into(ivThumbnail);
             } else {
                 ivThumbnail.setVisibility(View.GONE);
                 containerLink.setVisibility(View.VISIBLE);
@@ -182,23 +183,21 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             setUnsavedIcon();
         }
 
-        final FullCardViewHolder holder = this;
-
         btnUpvote.setOnClickListener(v -> {
             if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                submissionNovotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                     setNoVoteColors(context);
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                submissionUpvotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                     setUpvotedColors(context);
                 }
             } else {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
+                submissionUpvotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.UPVOTE);
                     setUpvotedColors(context);
@@ -208,19 +207,19 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
         btnDownvote.setOnClickListener(v -> {
             if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
+                submissionNovotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
                     setNoVoteColors(context);
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                submissionDownvotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                     setDownvotedColors(context);
                 }
             } else {
-                submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
+                submissionDownvotes.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.DOWNVOTE);
                     setDownvotedColors(context);
@@ -230,13 +229,13 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
 
         btnSave.setOnClickListener(v -> {
             if (submissionWrapper.isSaved()) {
-                submissionClickListener.onSaveSubmission(submissionWrapper, false);
+                submissionUnsaves.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     setUnsavedIcon();
                     submissionWrapper.setSaved(false);
                 }
             } else {
-                submissionClickListener.onSaveSubmission(submissionWrapper, true);
+                submissionSaves.onNext(submissionWrapper.getSubmission());
                 if (redditAuthentication.isUserLoggedIn()) {
                     setSavedIcon();
                     submissionWrapper.setSaved(true);
@@ -244,15 +243,9 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        ivThumbnail.setOnClickListener(v -> submissionClickListener.onContentClick(url));
+        ivThumbnail.setOnClickListener(v -> submissionContentClicks.onNext(url));
 
-        containerLink.setOnClickListener(v -> submissionClickListener.onContentClick(url));
-
-        if (isDisplayedInList) {
-            // Enable buttons to navigate to SubmissionActivity.
-            headerLayout.setOnClickListener(v -> submissionClickListener.onSubmissionClick
-                    (submissionWrapper));
-        }
+        containerLink.setOnClickListener(v -> submissionContentClicks.onNext(url));
     }
 
     private void setUpvotedColors(Context context) {
