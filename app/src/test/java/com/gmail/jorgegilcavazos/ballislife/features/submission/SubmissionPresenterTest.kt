@@ -47,6 +47,8 @@ class SubmissionPresenterTest {
   private val commentReplies = PublishSubject.create<CommentWrapper>()
   private val submissionReplies = PublishSubject.create<Any>()
   private val submissionContentClicks = PublishSubject.create<String>()
+  private val commentCollapses = PublishSubject.create<String>()
+  private val commentUncollapses = PublishSubject.create<String>()
 
   private lateinit var presenter: SubmissionPresenter
 
@@ -67,6 +69,8 @@ class SubmissionPresenterTest {
     `when`(mockView.commentReplies()).thenReturn(commentReplies)
     `when`(mockView.submissionReplies()).thenReturn(submissionReplies)
     `when`(mockView.submissionContentClicks()).thenReturn(submissionContentClicks)
+    `when`(mockView.commentCollapses()).thenReturn(commentCollapses)
+    `when`(mockView.commentUnCollapses()).thenReturn(commentUncollapses)
 
     presenter = SubmissionPresenter(
         mockRedditAuthentication,
@@ -248,5 +252,19 @@ class SubmissionPresenterTest {
     presenter.detachView()
 
     verify(mockCompositeDisposable).clear()
+  }
+
+  @Test
+  fun collapseComments() {
+    commentCollapses.onNext("COMMENT_ID")
+
+    verify(mockView).collapseComments("COMMENT_ID")
+  }
+
+  @Test
+  fun uncollapseComments() {
+    commentUncollapses.onNext("COMMENT_ID")
+
+    verify(mockView).uncollapseComments("COMMENT_ID")
   }
 }

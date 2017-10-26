@@ -30,7 +30,6 @@ import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.models.Comment;
-import net.dean.jraw.models.CommentNode;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -226,11 +225,6 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void addComment(int position, CommentNode comment) {
-        threadAdapter.addComment(position, comment);
-    }
-
-    @Override
     public void showNoThreadText() {
         noThreadText.setVisibility(View.VISIBLE);
     }
@@ -422,5 +416,27 @@ public class GameThreadFragment extends Fragment
         if (streamSwitch != null) {
             streamSwitch.setChecked(isChecked);
         }
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentCollapses() {
+        return threadAdapter.getCommentCollapses();
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentUnCollapses() {
+        return threadAdapter.getCommentUnCollapses();
+    }
+
+    @Override
+    public void collapseComments(@NotNull String id) {
+        threadAdapter.collapseComments(id);
+    }
+
+    @Override
+    public void uncollapseComments(@NotNull String id) {
+        threadAdapter.unCollapseComments(id);
     }
 }

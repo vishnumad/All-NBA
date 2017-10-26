@@ -35,6 +35,10 @@ interface SubmissionView {
 
   fun submissionContentClicks(): Observable<String>
 
+  fun commentCollapses(): Observable<String>
+
+  fun commentUnCollapses(): Observable<String>
+
   fun setLoadingIndicator(active: Boolean)
 
   fun showComments(commentNodes: List<ThreadItem>, submission: Submission)
@@ -68,4 +72,8 @@ interface SubmissionView {
   fun hideFab()
 
   fun showFab()
+
+  fun collapseComments(id: String)
+
+  fun uncollapseComments(id: String)
 }

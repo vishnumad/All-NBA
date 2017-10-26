@@ -102,6 +102,14 @@ class GameThreadPresenterV2 @Inject constructor(
           }
         }
         .addTo(disposable)
+
+    view.commentCollapses()
+        .subscribe { view.collapseComments(it) }
+        .addTo(disposable)
+
+    view.commentUnCollapses()
+        .subscribe { view.uncollapseComments(it) }
+        .addTo(disposable)
   }
 
   override fun detachView() {

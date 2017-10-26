@@ -4,9 +4,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.Observable
-
 import net.dean.jraw.models.Comment
-import net.dean.jraw.models.CommentNode
 
 interface GameThreadView {
 
@@ -25,8 +23,6 @@ interface GameThreadView {
   fun showComments(comments: List<ThreadItem>)
 
   fun hideComments()
-
-  fun addComment(position: Int, comment: CommentNode)
 
   fun showNoThreadText()
 
@@ -89,4 +85,12 @@ interface GameThreadView {
   fun purchasePremium()
 
   fun setStreamSwitch(isChecked: Boolean)
+
+  fun commentCollapses(): Observable<String>
+
+  fun commentUnCollapses(): Observable<String>
+
+  fun collapseComments(id: String)
+
+  fun uncollapseComments(id: String)
 }

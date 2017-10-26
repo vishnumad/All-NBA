@@ -166,6 +166,14 @@ class SubmissionPresenter @Inject constructor(
     view.submissionContentClicks()
         .subscribe { onContentClick(it) }
         .addTo(disposables)
+
+    view.commentCollapses()
+        .subscribe { view.collapseComments(it) }
+        .addTo(disposables)
+
+    view.commentUnCollapses()
+        .subscribe { view.uncollapseComments(it) }
+        .addTo(disposables)
   }
 
   override fun detachView() {

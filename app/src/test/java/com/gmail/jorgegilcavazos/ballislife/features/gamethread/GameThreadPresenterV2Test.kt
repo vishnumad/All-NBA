@@ -39,14 +39,16 @@ class GameThreadPresenterV2Test {
     val PARENT_FULLNAME = "9n1uid3"
     val RESPONSE = "This is a reply!"
 
-    val commentSaves: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val commentUnsaves: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val upvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val downvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val novotes: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val replies: PublishSubject<CommentWrapper> = PublishSubject.create()
-    val submissionReplies: PublishSubject<Any> = PublishSubject.create()
-    val streamChanges: PublishSubject<Boolean> = PublishSubject.create()
+    private val commentSaves: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val commentUnsaves: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val upvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val downvotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val novotes: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val replies: PublishSubject<CommentWrapper> = PublishSubject.create()
+    private val submissionReplies: PublishSubject<Any> = PublishSubject.create()
+    private val streamChanges: PublishSubject<Boolean> = PublishSubject.create()
+    private val commentCollapses = PublishSubject.create<String>()
+    private val commentUncollapses = PublishSubject.create<String>()
   }
 
   @Mock private lateinit var mockView: GameThreadView
@@ -76,6 +78,8 @@ class GameThreadPresenterV2Test {
     `when`(mockView.replies()).thenReturn(replies)
     `when`(mockView.submissionReplies()).thenReturn(submissionReplies)
     `when`(mockView.streamChanges()).thenReturn(streamChanges)
+    `when`(mockView.commentCollapses()).thenReturn(commentCollapses)
+    `when`(mockView.commentUnCollapses()).thenReturn(commentUncollapses)
 
     presenter = GameThreadPresenterV2(
         mockGameThreadsRepository,
@@ -427,6 +431,20 @@ class GameThreadPresenterV2Test {
     verify(mockView).isPremiumPurchased()
     verify(mockView).setStreamSwitch(false)
     verify(mockView).purchasePremium()
+  }
+
+  @Test
+  fun collapseComments() {
+    commentCollapses.onNext("COMMENT_ID")
+
+    verify(mockView).collapseComments("COMMENT_ID")
+  }
+
+  @Test
+  fun uncollapseComments() {
+    commentUncollapses.onNext("COMMENT_ID")
+
+    verify(mockView).uncollapseComments("COMMENT_ID")
   }
 
   private fun setupMocksForNode(commentNode: CommentNode) {

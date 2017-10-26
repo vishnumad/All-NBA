@@ -25,7 +25,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 
-import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
@@ -71,6 +70,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private PublishSubject<Submission> submissionDownvotes = PublishSubject.create();
     private PublishSubject<Submission> submissionNovotes = PublishSubject.create();
     private PublishSubject<String> submissionContentClicks = PublishSubject.create();
+    private PublishSubject<String> commentCollapses = PublishSubject.create();
+    private PublishSubject<String> commentUnCollapses = PublishSubject.create();
 
     public ThreadAdapter(Context context,
             RedditAuthentication redditAuthentication,
@@ -126,27 +127,24 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         } else if (holder instanceof CommentViewHolder) {
             final CommentViewHolder commentHolder = (CommentViewHolder) holder;
 
-            final CommentItem commentItem;
+            final ThreadItem item;
             if (hasHeader && submissionWrapper != null) {
-                commentItem = commentsList.get(position - 1).getCommentItem();
+                item = commentsList.get(position - 1);
             } else {
-                commentItem = commentsList.get(position).getCommentItem();
+                item = commentsList.get(position);
             }
-            commentHolder.bindData(
-                    context, commentItem,
-                    redditAuthentication,
-                    commentSaves,
-                    commentUnsaves,
-                    upvotes,
-                    downvotes,
-                    novotes,
-                    replies);
+            commentHolder.bindData(context, item,
+                                   redditAuthentication,
+                                   commentSaves,
+                                   commentUnsaves,
+                                   upvotes,
+                                   downvotes,
+                                   novotes, replies, commentCollapses, commentUnCollapses);
         } else if (holder instanceof LoadMoreCommentsHolder) {
             if (hasHeader) {
-                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position - 1)
-                        .getDepth());
+                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position - 1));
             } else {
-                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position).getDepth());
+                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position));
             }
         }
     }
@@ -184,28 +182,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
-    public void addComment(int position, CommentNode comment) {
-        /*
-        if (position == 0) {
-            // Coming from a reply to threadId. Show comment in first position.
-            commentsList.add(0, new ThreadItem(ThreadAdapter.TYPE_COMMENT, comment, comment
-                    .getDepth()));
-        } else {
-            // Coming from a comment reply, position param is comment adapter position + 1, which
-            // means that if there is a header we need to subtract 1 to place comment in desired
-            // position.
-            if (hasHeader) {
-                commentsList.add(position - 1, new ThreadItem(ThreadAdapter.TYPE_COMMENT,
-                        comment, comment.getDepth()));
-            } else {
-                commentsList.add(position, new ThreadItem(ThreadAdapter.TYPE_COMMENT, comment,
-                        comment.getDepth()));
-            }
-        }
-        notifyItemInserted(position);
-        */
-    }
-
     public void addCommentItem(CommentItem commentItem, String parentId) {
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
@@ -213,7 +189,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper().getId().equals(parentId)) {
                     commentItem.setDepth(item.getCommentItem().getDepth() + 1);
                     commentsList.add(i + 1, new ThreadItem(TYPE_COMMENT, commentItem, commentItem
-                            .getDepth()));
+                            .getDepth(),
+                                                           false));
                     int adapterPosInserted;
                     if (hasHeader) {
                         adapterPosInserted = i + 2;
@@ -228,7 +205,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addCommentItem(CommentItem commentItem) {
-        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0));
+        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0, false));
         int adapterPosInserted;
         if (hasHeader) {
             adapterPosInserted = 1;
@@ -236,6 +213,92 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             adapterPosInserted = 0;
         }
         notifyItemInserted(adapterPosInserted);
+    }
+
+    public void collapseComments(String commentId) {
+        boolean collapse = false;
+        int depth = Integer.MAX_VALUE;
+
+        int firstCollapse = -1;
+        int lastCollapse = -1;
+        for (int i = 0; i < commentsList.size(); i++) {
+            ThreadItem item = commentsList.get(i);
+            if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper().getId()
+                    .equals(commentId)) {
+                collapse = true;
+                depth = item.getCommentItem().getDepth();
+            } else {
+                int nextDepth;
+                if (item.getType() == TYPE_COMMENT) {
+                    nextDepth = item.getCommentItem().getDepth();
+                } else {
+                    nextDepth = item.getDepth();
+                }
+
+                if (collapse) {
+                    if (nextDepth > depth) {
+                        item.setHidden(true);
+                        if (firstCollapse == -1) {
+                            firstCollapse = i;
+                        }
+                    } else {
+                        lastCollapse = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (firstCollapse != -1 && lastCollapse != -1) {
+            if (hasHeader) {
+                notifyItemRangeChanged(firstCollapse + 1, lastCollapse + 1);
+            } else {
+                notifyItemRangeChanged(firstCollapse, lastCollapse);
+            }
+        }
+    }
+
+    public void unCollapseComments(String commentId) {
+        boolean uncollapse = false;
+        int depth = Integer.MAX_VALUE;
+
+        int firstCollapse = -1;
+        int lastCollapse = -1;
+        for (int i = 0; i < commentsList.size(); i++) {
+            ThreadItem item = commentsList.get(i);
+            if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper().getId()
+                    .equals(commentId)) {
+                uncollapse = true;
+                depth = item.getCommentItem().getDepth();
+            } else {
+                int nextDepth;
+                if (item.getType() == TYPE_COMMENT) {
+                    nextDepth = item.getCommentItem().getDepth();
+                } else {
+                    nextDepth = item.getDepth();
+                }
+
+                if (uncollapse) {
+                    if (nextDepth > depth) {
+                        item.setHidden(false);
+                        if (firstCollapse == -1) {
+                            firstCollapse = i;
+                        }
+                    } else {
+                        lastCollapse = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (firstCollapse != -1 && lastCollapse != -1) {
+            if (hasHeader) {
+                notifyItemRangeChanged(firstCollapse + 1, lastCollapse + 1);
+            } else {
+                notifyItemRangeChanged(firstCollapse, lastCollapse);
+            }
+        }
     }
 
     public Observable<CommentWrapper> getCommentSaves() {
@@ -286,6 +349,14 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return submissionContentClicks;
     }
 
+    public Observable<String> getCommentCollapses() {
+        return commentCollapses;
+    }
+
+    public Observable<String> getCommentUnCollapses() {
+        return commentUnCollapses;
+    }
+
     public static class CommentViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.layout_comment_content) View commentContentLayout;
@@ -302,19 +373,35 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.button_comment_downvote) ImageButton btnDownvote;
         @BindView(R.id.button_comment_save) ImageButton btnSave;
         @BindView(R.id.button_comment_reply) ImageButton btnReply;
+        @BindView(R.id.collapsedIndicator) TextView collapseIndicator;
 
         public CommentViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
 
-        public void bindData(
-                final Context context, final CommentItem commentItem,
+        public void bindData(final Context context, final ThreadItem threadItem,
                 final RedditAuthentication redditAuthentication,
                 PublishSubject<CommentWrapper> commentSaves,
                 PublishSubject<CommentWrapper> commentUnsaves,
                 PublishSubject<CommentWrapper> upvotes, PublishSubject<CommentWrapper> downvotes,
-                PublishSubject<CommentWrapper> novotes, PublishSubject<CommentWrapper> replies) {
+                PublishSubject<CommentWrapper> novotes, PublishSubject<CommentWrapper> replies,
+                PublishSubject<String> commentCollapses,
+                PublishSubject<String> commentUncollapses) {
+            if (threadItem.getHidden()) {
+                itemView.setVisibility(View.GONE);
+                itemView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0));
+                return;
+            } else {
+                itemView.setVisibility(View.VISIBLE);
+                itemView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+
+            final CommentItem commentItem = threadItem.getCommentItem();
             final CommentWrapper comment = commentItem.getCommentWrapper();
             int depth = commentItem.getDepth();
             String author = comment.getAuthor();
@@ -380,6 +467,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             setBackgroundAndPadding(context, depth, this, false /* dark */);
 
+            if (commentItem.getChildrenCollapsed()) {
+                collapseIndicator.setVisibility(View.VISIBLE);
+            } else {
+                collapseIndicator.setVisibility(View.GONE);
+            }
+
             final CommentViewHolder commentHolder = this;
 
             // On comment click hide/show actions (upvote, downvote, save, etc...).
@@ -389,6 +482,18 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 } else {
                     showActions(context, commentHolder, depth);
                 }
+            });
+            commentContentLayout.setOnLongClickListener(v -> {
+                if (commentItem.getChildrenCollapsed()) {
+                    commentUncollapses.onNext(comment.getId());
+                    commentItem.setChildrenCollapsed(false);
+                    collapseIndicator.setVisibility(View.GONE);
+                } else {
+                    commentCollapses.onNext(comment.getId());
+                    commentItem.setChildrenCollapsed(true);
+                    collapseIndicator.setVisibility(View.VISIBLE);
+                }
+                return true;
             });
 
             final int colorUpvoted = ContextCompat.getColor(context, R.color.commentUpvoted);
@@ -537,8 +642,21 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ButterKnife.bind(this, itemView);
         }
 
-        public void bindData(int depth) {
-            setBackgroundAndPadding(depth);
+        public void bindData(ThreadItem threadItem) {
+            if (threadItem.getHidden()) {
+                itemView.setVisibility(View.GONE);
+                itemView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0));
+                return;
+            } else {
+                itemView.setVisibility(View.VISIBLE);
+                itemView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+            }
+
+            setBackgroundAndPadding(threadItem.getDepth());
         }
 
         private void setBackgroundAndPadding(int depth) {

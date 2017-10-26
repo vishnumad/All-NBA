@@ -250,6 +250,18 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         return threadAdapter.getSubmissionContentClicks();
     }
 
+    @NotNull
+    @Override
+    public Observable<String> commentCollapses() {
+        return threadAdapter.getCommentCollapses();
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentUnCollapses() {
+        return threadAdapter.getCommentUnCollapses();
+    }
+
     @Override
     public void setLoadingIndicator(boolean active) {
         swipeRefreshLayout.setRefreshing(active);
@@ -352,6 +364,16 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void showFab() {
         fab.show();
+    }
+
+    @Override
+    public void collapseComments(@NotNull String id) {
+        threadAdapter.collapseComments(id);
+    }
+
+    @Override
+    public void uncollapseComments(@NotNull String id) {
+        threadAdapter.unCollapseComments(id);
     }
 
     @Override
