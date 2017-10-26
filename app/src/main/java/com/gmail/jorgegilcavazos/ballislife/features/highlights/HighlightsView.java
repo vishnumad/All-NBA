@@ -34,4 +34,6 @@ public interface HighlightsView {
     void changeViewType(HighlightViewType viewType);
 
     void hideSnackbar();
+
+    void onSubmissionClick(Highlight highlight);
 }
