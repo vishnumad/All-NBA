@@ -17,4 +17,6 @@ public interface LocalRepository {
     String getUsername();
 
     String getStartupFragment();
+
+    boolean getOpenYouTubeInApp();
 }

@@ -140,6 +140,9 @@
     <string name="pref_enable_alerts">Enable Alerts</string>
     <string name="key_enable_alerts">pref_enable_alerts</string>
 
+    <string name="key_enable_youtube_in_app">in_app_youtube</string>
+    <string name="pref_enable_youtube_in_app">In-app player for YouTube</string>
+
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
     <string name="summary_settings_cga">Receive an alert for close games</string>
