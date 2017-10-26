@@ -68,7 +68,6 @@
         <activity
             android:name=".features.videoplayer.VideoPlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenLayout|screenSize"
-            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar.Dark"/>
         <activity
             android:name=".features.tour.TourLoginActivity"
