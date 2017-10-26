@@ -4,9 +4,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.Observable
-
 import net.dean.jraw.models.Comment
-import net.dean.jraw.models.CommentNode
 import net.dean.jraw.models.Submission
 
 interface SubmissionView {
@@ -41,9 +39,11 @@ interface SubmissionView {
 
   fun showComments(commentNodes: List<ThreadItem>, submission: Submission)
 
-  fun addComment(comment: CommentNode, position: Int)
-
   fun addCommentItem(commentItem: CommentItem, parentId: String)
+
+  fun addCommentItem(commentItem: CommentItem)
+
+  fun showSubmittingCommentToast()
 
   fun showErrorAddingComment()
 

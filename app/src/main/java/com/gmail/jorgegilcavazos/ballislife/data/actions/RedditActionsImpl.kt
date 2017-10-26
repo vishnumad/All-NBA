@@ -134,7 +134,11 @@ class RedditActionsImpl @Inject constructor(
             val submission = contributionRepository.getSubmission(submissionId)
             if (submission != null) {
               redditService.replyToThread(redditAuthentication.redditClient, submission, response)
-                  .flatMapObservable { Observable.just(ReplyUIModel.success()) }
+                  .flatMapObservable {
+                    Observable.just(
+                        ReplyUIModel.success(
+                            createCommentItem(it, response)))
+                  }
             } else {
               Observable.just(ReplyUIModel.parentNotFound())
             }
@@ -160,6 +164,6 @@ class RedditActionsImpl @Inject constructor(
             bodyHtml = "",
             authorFlair = null,
             vote = VoteDirection.UPVOTE,
-            edited = false), depth = 0)
+            edited = false), depth = 1)
   }
 }

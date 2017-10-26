@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.actions
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService
@@ -20,9 +21,14 @@ import org.mockito.MockitoAnnotations
 
 class RedditActionsImplTest {
 
+  companion object {
+    val USERNAME = "USERNAME"
+  }
+
   @Mock private lateinit var mockRedditAuthentication: RedditAuthentication
   @Mock private lateinit var mockRedditService: RedditService
   @Mock private lateinit var mockContributionsRepository: ContributionRepository
+  @Mock private lateinit var mockLocalRepository: LocalRepository
 
   private lateinit var redditActions: RedditActions
   private val redditClient = RedditClient(UserAgent.of("user agent"))
@@ -33,12 +39,14 @@ class RedditActionsImplTest {
 
     `when`(mockRedditAuthentication.authenticate()).thenReturn(Completable.complete())
     `when`(mockRedditAuthentication.redditClient).thenReturn(redditClient)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
 
     redditActions = RedditActionsImpl(
         mockRedditAuthentication,
         mockRedditService,
         mockContributionsRepository,
-        TrampolineSchedulerProvider())
+        TrampolineSchedulerProvider(),
+        mockLocalRepository)
   }
 
   @Test
@@ -127,15 +135,15 @@ class RedditActionsImplTest {
 
   @Test
   fun replyToCommentWhenUserLoggedIn() {
-    val fullname = "abcdefgh"
+    val id = "abcdefgh"
     val response = "A reply!"
     val mockComment = mock(Comment::class.java)
     `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
-    `when`(mockContributionsRepository.getComment(fullname)).thenReturn(mockComment)
+    `when`(mockContributionsRepository.getComment(id)).thenReturn(mockComment)
     `when`(mockRedditService.replyToComment(redditClient, mockComment, response))
         .thenReturn(Single.just(""))
 
-    val testObserver = redditActions.replyToComment(fullname, response).test()
+    val testObserver = redditActions.replyToComment(id, response).test()
 
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })

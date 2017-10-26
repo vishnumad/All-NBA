@@ -8,13 +8,13 @@ import java.util.*
 
 class CommentWrapper(
     val comment: Comment?,
-    val id: String,
-    val saved: Boolean,
-    val author: String,
-    val score: Int,
-    val created: Date,
-    val body: String,
-    val bodyHtml: String,
-    val authorFlair: Flair?,
-    val vote: VoteDirection,
-    val edited: Boolean) : Serializable
+    val id: String = "",
+    val saved: Boolean = false,
+    val author: String = "",
+    val score: Int = 0,
+    val created: Date = Calendar.getInstance().time,
+    val body: String = "",
+    val bodyHtml: String = "",
+    val authorFlair: Flair? = null,
+    val vote: VoteDirection = VoteDirection.UPVOTE,
+    val edited: Boolean = false) : Serializable

@@ -210,13 +210,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
             if (item.getType() == TYPE_COMMENT) {
-                if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper()
-                        .getId().equals(parentId)) {
+                if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper().getId().equals(parentId)) {
                     commentItem.setDepth(item.getCommentItem().getDepth() + 1);
-                    commentsList.add(i + 1,
-                                     new ThreadItem(TYPE_COMMENT,
-                                                    commentItem,
-                                                    commentItem.getDepth()));
+                    commentsList.add(i + 1, new ThreadItem(TYPE_COMMENT, commentItem, commentItem
+                            .getDepth()));
                     int adapterPosInserted;
                     if (hasHeader) {
                         adapterPosInserted = i + 2;
@@ -228,7 +225,17 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             }
         }
+    }
 
+    public void addCommentItem(CommentItem commentItem) {
+        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0));
+        int adapterPosInserted;
+        if (hasHeader) {
+            adapterPosInserted = 1;
+        } else {
+            adapterPosInserted = 0;
+        }
+        notifyItemInserted(adapterPosInserted);
     }
 
     public Observable<CommentWrapper> getCommentSaves() {

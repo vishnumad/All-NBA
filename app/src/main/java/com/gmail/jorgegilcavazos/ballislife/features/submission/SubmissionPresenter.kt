@@ -1,13 +1,15 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission
 
+import android.support.annotation.VisibleForTesting
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions
-import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
-import com.gmail.jorgegilcavazos.ballislife.util.*
+import com.gmail.jorgegilcavazos.ballislife.util.CommentsTraverser
+import com.gmail.jorgegilcavazos.ballislife.util.Constants
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -23,9 +25,7 @@ class SubmissionPresenter @Inject constructor(
     private val schedulerProvider: BaseSchedulerProvider,
     private val disposables: CompositeDisposable,
     private val redditActions: RedditActions,
-    private val contributionRepository: ContributionRepository,
-    private val networkUtils: NetworkUtils,
-    private val errorHandler: ErrorHandler) : BasePresenter<SubmissionView>() {
+    private val contributionRepository: ContributionRepository) : BasePresenter<SubmissionView>() {
 
   private var currentSubmission: Submission? = null
 
@@ -173,14 +173,9 @@ class SubmissionPresenter @Inject constructor(
     super.detachView()
   }
 
-  fun loadComments(threadId: String, sorting: CommentSort, forceReload: Boolean) {
-    loadComments(threadId, sorting, null, forceReload)
-  }
-
   fun loadComments(
       threadId: String,
       sorting: CommentSort,
-      commentIdToScroll: String?,
       forceReload: Boolean) {
     view.hideFab()
     view.setLoadingIndicator(true)
@@ -213,7 +208,10 @@ class SubmissionPresenter @Inject constructor(
   fun replyToComment(parentId: String, response: String) {
     redditActions.replyToComment(parentId, response)
         .subscribe(
-            { uiModel: ReplyUIModel ->
+            { uiModel ->
+              if (uiModel.inProgress) {
+                view.showSubmittingCommentToast()
+              }
               if (uiModel.success) {
                 val parentComment = contributionRepository.getComment(parentId)
                 if (uiModel.commentItem != null && parentComment != null) {
@@ -221,7 +219,8 @@ class SubmissionPresenter @Inject constructor(
                 }
               }
             },
-            { e ->
+            { _ ->
+              view.showErrorAddingComment()
             }
         )
   }
@@ -230,8 +229,17 @@ class SubmissionPresenter @Inject constructor(
     redditActions.replyToSubmission(submissionId, response)
         .subscribe(
             { uiModel ->
+              if (uiModel.inProgress) {
+                view.showSubmittingCommentToast()
+              }
+              if (uiModel.success) {
+                if (uiModel.commentItem != null) {
+                  view.addCommentItem(uiModel.commentItem)
+                }
+              }
             },
-            { e ->
+            { _ ->
+              view.showErrorAddingComment()
             }
         )
   }
@@ -276,4 +284,10 @@ class SubmissionPresenter @Inject constructor(
       view.showContentUnavailableToast()
     }
   }
+
+  @VisibleForTesting
+  fun setCurrentSubmission(submission: Submission) {
+    currentSubmission = submission
+  }
+
 }

@@ -31,7 +31,6 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import net.dean.jraw.models.Comment;
-import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
 
@@ -46,7 +45,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
-public class SubmissionActivity extends AppCompatActivity implements SubmissionView, SwipeRefreshLayout.OnRefreshListener {
+public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
+        SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
 
@@ -63,7 +63,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     private String threadId;
     private String title;
-    private String commentIdToScrollTo;
 
     private ThreadAdapter threadAdapter;
     private CommentSort sorting = CommentSort.TOP;
@@ -85,7 +84,6 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
             title = extras.getString(KEY_TITLE);
-            commentIdToScrollTo = extras.getString(KEY_COMMENT_TO_SCROLL_ID);
         }
 
         setTitle(title);
@@ -109,7 +107,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         });
 
         presenter.attachView(this);
-        presenter.loadComments(threadId, sorting, commentIdToScrollTo, false /* forceReload */);
+        presenter.loadComments(threadId, sorting, false /* forceReload */);
     }
 
     @Override
@@ -265,13 +263,19 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void addComment(CommentNode comment, int position) {
-        threadAdapter.addComment(position, comment);
+    public void addCommentItem(@NotNull CommentItem commentItem, @NotNull String parentId) {
+        threadAdapter.addCommentItem(commentItem, parentId);
     }
 
     @Override
-    public void addCommentItem(@NotNull CommentItem commentItem, @NotNull String parentId) {
-        threadAdapter.addCommentItem(commentItem, parentId);
+    public void addCommentItem(@NotNull CommentItem commentItem) {
+        threadAdapter.addCommentItem(commentItem);
+        submissionRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void showSubmittingCommentToast() {
+        Toast.makeText(this, R.string.submitting_comment, Toast.LENGTH_SHORT).show();
     }
 
     @Override
