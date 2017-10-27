@@ -1,21 +1,17 @@
 package com.gmail.jorgegilcavazos.ballislife.data.actions.models
 
-class SaveUIModel(val inProgress: Boolean, val success: Boolean, val notLoggedIn: Boolean) {
+class SaveUIModel(val inProgress: Boolean = false,
+									val success: Boolean = false,
+									val notLoggedIn: Boolean = false,
+									val error: Throwable? = null) {
 
-  companion object {
-    fun inProgress(): SaveUIModel = SaveUIModel(
-        inProgress = true,
-        success = false,
-        notLoggedIn = false)
+	companion object {
+		fun inProgress(): SaveUIModel = SaveUIModel(inProgress = true)
 
-    fun success(): SaveUIModel = SaveUIModel(
-        inProgress = false,
-        success = true,
-        notLoggedIn = false)
+		fun success(): SaveUIModel = SaveUIModel(success = true)
 
-    fun notLoggedIn(): SaveUIModel = SaveUIModel(
-        inProgress = false,
-        success = false,
-        notLoggedIn = true)
-  }
+		fun notLoggedIn(): SaveUIModel = SaveUIModel(notLoggedIn = true)
+
+		fun error(e: Throwable): SaveUIModel = SaveUIModel(error = e)
+	}
 }

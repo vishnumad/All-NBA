@@ -38,6 +38,9 @@ class RedditActionsImpl @Inject constructor(
             Observable.just(SaveUIModel.notLoggedIn())
           }
         }
+        .onErrorReturn {
+          SaveUIModel.error(it)
+        }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())
         .startWith(SaveUIModel.inProgress())
@@ -54,6 +57,9 @@ class RedditActionsImpl @Inject constructor(
           } else {
             Observable.just(SaveUIModel.notLoggedIn())
           }
+        }
+        .onErrorReturn {
+          SaveUIModel.error(it)
         }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())
@@ -72,6 +78,9 @@ class RedditActionsImpl @Inject constructor(
           } else {
             Observable.just(VoteUIModel.notLoggedIn())
           }
+        }
+        .onErrorReturn {
+          VoteUIModel.error(it)
         }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())
@@ -93,6 +102,9 @@ class RedditActionsImpl @Inject constructor(
           } else {
             Observable.just(VoteUIModel.notLoggedIn())
           }
+        }
+        .onErrorReturn {
+          VoteUIModel.error(it)
         }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())
@@ -120,6 +132,9 @@ class RedditActionsImpl @Inject constructor(
             Observable.just(ReplyUIModel.notLoggedIn())
           }
         }
+        .onErrorReturn {
+          ReplyUIModel.error(it)
+        }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())
         .startWith(ReplyUIModel.inProgress())
@@ -145,6 +160,9 @@ class RedditActionsImpl @Inject constructor(
           } else {
             Observable.just(ReplyUIModel.notLoggedIn())
           }
+        }
+        .onErrorReturn {
+          ReplyUIModel.error(it)
         }
         .subscribeOn(schedulerProvider.io())
         .observeOn(schedulerProvider.ui())

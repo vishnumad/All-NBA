@@ -50,7 +50,7 @@ class RedditActionsImplTest {
   }
 
   @Test
-  fun saveCommentWhenUserLoggedIn() {
+  fun saveContributionWhenUserLoggedIn() {
     val mockComment = mock(Comment::class.java)
     `when`(mockRedditService.savePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
@@ -64,7 +64,7 @@ class RedditActionsImplTest {
   }
 
   @Test
-  fun saveCommentWhenUserNotLoggedIn() {
+  fun saveContributionWhenUserNotLoggedIn() {
     val mockComment = mock(Comment::class.java)
     `when`(mockRedditService.savePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
@@ -78,7 +78,22 @@ class RedditActionsImplTest {
   }
 
   @Test
-  fun unsaveCommentWhenUserLoggedIn() {
+  fun saveContributionWrapError() {
+    val mockComment = mock(Comment::class.java)
+    val error = Exception()
+    `when`(mockRedditService.savePublicContribution(redditClient, mockComment))
+        .thenReturn(Completable.error(error))
+    `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
+
+    val testObserver = redditActions.savePublicContribution(mockComment).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.error == error })
+  }
+
+  @Test
+  fun unsaveContributionWhenUserLoggedIn() {
     val mockComment = mock(Comment::class.java)
     `when`(mockRedditService.unsavePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
@@ -92,7 +107,7 @@ class RedditActionsImplTest {
   }
 
   @Test
-  fun unsaveCommentWhenUserNotLoggedIn() {
+  fun unsaveContributionWhenUserNotLoggedIn() {
     val mockComment = mock(Comment::class.java)
     `when`(mockRedditService.unsavePublicContribution(redditClient, mockComment))
         .thenReturn(Completable.complete())
@@ -103,6 +118,21 @@ class RedditActionsImplTest {
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
     testObserver.assertValueAt(1, { it.notLoggedIn })
+  }
+
+  @Test
+  fun unsaveContributionWrapError() {
+    val mockComment = mock(Comment::class.java)
+    val error = Exception()
+    `when`(mockRedditService.unsavePublicContribution(redditClient, mockComment))
+        .thenReturn(Completable.error(error))
+    `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
+
+    val testObserver = redditActions.unsavePublicContribution(mockComment).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.error == error })
   }
 
   @Test
@@ -131,6 +161,21 @@ class RedditActionsImplTest {
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
     testObserver.assertValueAt(1, { it.notLoggedIn })
+  }
+
+  @Test
+  fun voteCommentWrapError() {
+    val error = Exception()
+    val mockComment = mock(Comment::class.java)
+    `when`(mockRedditService.voteComment(redditClient, mockComment, VoteDirection.UPVOTE))
+        .thenReturn(Completable.error(error))
+    `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
+
+    val testObserver = redditActions.voteComment(mockComment, VoteDirection.UPVOTE).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.error == error })
   }
 
   @Test
@@ -213,5 +258,23 @@ class RedditActionsImplTest {
     testObserver.assertValueCount(2)
     testObserver.assertValueAt(0, { it.inProgress })
     testObserver.assertValueAt(1, { it.notLoggedIn })
+  }
+
+  @Test
+  fun replyToSubmissionWrapError() {
+    val id = "abcdefgh"
+    val response = "A reply!"
+    val error = Exception()
+    val mockSubmission = mock(Submission::class.java)
+    `when`(mockRedditAuthentication.checkUserLoggedIn()).thenReturn(Single.just(true))
+    `when`(mockContributionsRepository.getSubmission(id)).thenReturn(mockSubmission)
+    `when`(mockRedditService.replyToThread(redditClient, mockSubmission, response))
+        .thenReturn(Single.error(error))
+
+    val testObserver = redditActions.replyToSubmission(id, response).test()
+
+    testObserver.assertValueCount(2)
+    testObserver.assertValueAt(0, { it.inProgress })
+    testObserver.assertValueAt(1, { it.error == error })
   }
 }
