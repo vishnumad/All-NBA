@@ -52,7 +52,6 @@
                 android:id="@+id/text_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:maxLines="3"
@@ -79,6 +78,7 @@
                 android:layout_alignParentEnd="true"
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 app:srcCompat="@drawable/ic_share_black_24dp"/>
 
