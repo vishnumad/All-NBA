@@ -161,6 +161,28 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         );
     }
 
+    public void subscribeToSubmissionClick(Observable<Highlight> highlightShare) {
+        disposables.add(highlightShare
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribeWith(new DisposableObserver<Highlight>() {
+                    @Override
+                    public void onNext(Highlight highlight) {
+                        view.onSubmissionClick(highlight);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    public void onComplete() {
+
+                    }
+                })
+        );
+    }
+
     public void onViewTypeSelected(HighlightViewType viewType) {
         localRepository.saveFavoriteHighlightViewType(viewType);
         view.changeViewType(viewType);

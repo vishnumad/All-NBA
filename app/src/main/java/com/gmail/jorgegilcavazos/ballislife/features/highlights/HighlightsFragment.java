@@ -29,7 +29,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.firebase.crash.FirebaseCrash;
@@ -120,6 +122,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
+        presenter.subscribeToSubmissionClick(highlightAdapter.getSubmissionClickObservable());
 
         return view;
     }
@@ -293,6 +296,16 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         if (snackbar != null) {
             snackbar.dismiss();
         }
+    }
+
+    @Override
+    public void onSubmissionClick(Highlight highlight) {
+        Intent intent = new Intent(getActivity(), SubmissionActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.THREAD_ID, highlight.getId());
+        bundle.putString(SubmissionActivity.KEY_TITLE, highlight.getTitle());
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     private void openViewPickerDialog() {
