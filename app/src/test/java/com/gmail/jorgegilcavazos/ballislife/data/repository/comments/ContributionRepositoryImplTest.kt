@@ -23,15 +23,15 @@ class ContributionRepositoryImplTest {
   @Test
   fun saveAndGetComment() {
     val mockComment1 = mock(Comment::class.java)
-    `when`(mockComment1.fullName).thenReturn("fullname1")
+    `when`(mockComment1.id).thenReturn("commId1")
     val mockComment2 = mock(Comment::class.java)
-    `when`(mockComment2.fullName).thenReturn("fullname2")
+    `when`(mockComment2.id).thenReturn("commId2")
 
     repository.saveComment(mockComment1)
     repository.saveComment(mockComment2)
 
-    assertEquals(mockComment1, repository.getComment("fullname1"))
-    assertEquals(mockComment2, repository.getComment("fullname2"))
+    assertEquals(mockComment1, repository.getComment("commId1"))
+    assertEquals(mockComment2, repository.getComment("commId2"))
   }
 
   @Test

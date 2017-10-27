@@ -8,7 +8,7 @@ import net.dean.jraw.models.Submission
  */
 interface ContributionRepository {
 
-  fun getComment(fullname: String): Comment?
+  fun getComment(id: String): Comment?
 
   fun saveComment(comment: Comment)
 

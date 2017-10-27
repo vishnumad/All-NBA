@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.submission;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -14,27 +15,26 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.common.OnCommentClickListener;
-import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.jakewharton.rxbinding2.view.RxView;
 
 import net.dean.jraw.models.Comment;
-import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
-import net.dean.jraw.models.VoteDirection;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +43,10 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 
 public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
-        SwipeRefreshLayout.OnRefreshListener, OnCommentClickListener, OnSubmissionClickListener,
-        View.OnClickListener {
-    private static final String TAG = "SubmissionActivity";
-    private static final String KEY_COMMENT_TO_REPLY_POS = "CommentToReplyPos";
-    private static final String KEY_COMMENT_TO_REPLY_FULL_NAME = "CommentToReplyFullName";
+        SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
 
@@ -66,14 +63,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
     private String threadId;
     private String title;
-    private String commentIdToScrollTo;
 
-    private int commentToReplyToPos = -1;
-    private String commentToReplyToFullName;
-
-    private LinearLayoutManager linearLayoutManager;
     private ThreadAdapter threadAdapter;
-
     private CommentSort sorting = CommentSort.TOP;
 
     @Override
@@ -93,19 +84,15 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         if (getIntent() != null && getIntent().getExtras() != null) {
             threadId = extras.getString(Constants.THREAD_ID);
             title = extras.getString(KEY_TITLE);
-            commentIdToScrollTo = extras.getString(KEY_COMMENT_TO_SCROLL_ID);
         }
 
         setTitle(title);
 
-        fab.setOnClickListener(this);
         swipeRefreshLayout.setOnRefreshListener(this);
 
         threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true);
-        threadAdapter.setCommentClickListener(this);
-        threadAdapter.setSubmissionClickListener(this);
 
-        linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         submissionRecyclerView.setLayoutManager(linearLayoutManager);
         submissionRecyclerView.setAdapter(threadAdapter);
         submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -119,29 +106,14 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
             }
         });
 
-        if (savedInstanceState != null) {
-            commentToReplyToPos = savedInstanceState.getInt(KEY_COMMENT_TO_REPLY_POS);
-            commentToReplyToFullName = savedInstanceState.getString(KEY_COMMENT_TO_REPLY_FULL_NAME);
-            commentIdToScrollTo = savedInstanceState.getString(KEY_COMMENT_TO_SCROLL_ID);
-        }
-
         presenter.attachView(this);
-        presenter.loadComments(threadId, sorting, commentIdToScrollTo, false /* forceReload */);
+        presenter.loadComments(threadId, sorting, false /* forceReload */);
     }
 
     @Override
     protected void onDestroy() {
         presenter.detachView();
-        presenter.stop();
         super.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(KEY_COMMENT_TO_REPLY_POS, commentToReplyToPos);
-        outState.putString(KEY_COMMENT_TO_REPLY_FULL_NAME, commentToReplyToFullName);
-        outState.putString(KEY_COMMENT_TO_SCROLL_ID, commentIdToScrollTo);
     }
 
     @Override
@@ -189,17 +161,105 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            if (commentToReplyToPos == -1 || commentToReplyToFullName == null) {
-                throw new IllegalStateException("Invalid reply pos or fullname");
-            }
-            presenter.onReplyToComment(
-                    commentToReplyToPos, threadId, commentToReplyToFullName,
-                    data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT));
-        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST
-                && resultCode == RESULT_OK) {
-            presenter.onReplyToThread(data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT),
-                    threadId);
+            String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
+            presenter.replyToComment(parentId, response);
+        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
+                RESULT_OK) {
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
+            String submissionId = data.getStringExtra(ReplyActivity.KEY_SUBMISSION_ID);
+            presenter.replyToSubmission(submissionId, response);
         }
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentSaves() {
+        return threadAdapter.getCommentSaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentUnsaves() {
+        return threadAdapter.getCommentUnsaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentUpvotes() {
+        return threadAdapter.getUpvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentDownvotes() {
+        return threadAdapter.getDownvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentNovotes() {
+        return threadAdapter.getNovotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Submission> submissionSaves() {
+        return threadAdapter.getSubmissionSaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Submission> submissionUnsaves() {
+        return threadAdapter.getSubmissionUnsaves();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Submission> submissionUpvotes() {
+        return threadAdapter.getSubmissionUpvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Submission> submissionDownvotes() {
+        return threadAdapter.getSubmissionDownvotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Submission> submissionNovotes() {
+        return threadAdapter.getSubmissionNovotes();
+    }
+
+    @NotNull
+    @Override
+    public Observable<CommentWrapper> commentReplies() {
+        return threadAdapter.getReplies();
+    }
+
+    @NotNull
+    @Override
+    public Observable<Object> submissionReplies() {
+        return RxView.clicks(fab);
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> submissionContentClicks() {
+        return threadAdapter.getSubmissionContentClicks();
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentCollapses() {
+        return threadAdapter.getCommentCollapses();
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentUnCollapses() {
+        return threadAdapter.getCommentUnCollapses();
     }
 
     @Override
@@ -208,14 +268,26 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void showComments(List<ThreadItem> commentNodes, Submission submission) {
+    public void showComments(@NonNull List<ThreadItem> commentNodes,
+            @NonNull Submission submission) {
         threadAdapter.setData(commentNodes);
         threadAdapter.setSubmission(submission);
     }
 
     @Override
-    public void addComment(CommentNode comment, int position) {
-        threadAdapter.addComment(position, comment);
+    public void addCommentItem(@NotNull CommentItem commentItem, @NotNull String parentId) {
+        threadAdapter.addCommentItem(commentItem, parentId);
+    }
+
+    @Override
+    public void addCommentItem(@NotNull CommentItem commentItem) {
+        threadAdapter.addCommentItem(commentItem);
+        submissionRecyclerView.smoothScrollToPosition(0);
+    }
+
+    @Override
+    public void showSubmittingCommentToast() {
+        Toast.makeText(this, R.string.submitting_comment, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -229,28 +301,20 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void showSavingToast() {
-        Toast.makeText(this, R.string.saving, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showSavedToast() {
+    public void showSavedCommentToast() {
         Toast.makeText(this, R.string.saved, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void showErrorSavingToast() {
-        Toast.makeText(this, R.string.saving_failed, Toast.LENGTH_SHORT).show();
+    public void showUnsavedCommentToast() {
+        Toast.makeText(this, R.string.unsaved, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void openReplyToCommentActivity(final int position, final Comment parentComment) {
-        commentToReplyToFullName = parentComment.getFullName();
-        commentToReplyToPos = position;
-        commentIdToScrollTo = parentComment.getId();
-
+    public void openReplyToCommentActivity(@NonNull final Comment parentComment) {
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
         Bundle extras = new Bundle();
+        extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
         extras.putCharSequence(ReplyActivity.KEY_COMMENT,
                 RedditUtils.bindSnuDown(parentComment.data("body_html")));
         intent.putExtras(extras);
@@ -258,8 +322,11 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void openReplyToSubmissionActivity() {
+    public void openReplyToSubmissionActivity(@NonNull String submissionId) {
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
+        Bundle extras = new Bundle();
+        extras.putString(ReplyActivity.KEY_SUBMISSION_ID, submissionId);
+        intent.putExtras(extras);
         startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
@@ -300,60 +367,17 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
+    public void collapseComments(@NotNull String id) {
+        threadAdapter.collapseComments(id);
+    }
+
+    @Override
+    public void uncollapseComments(@NotNull String id) {
+        threadAdapter.unCollapseComments(id);
+    }
+
+    @Override
     public void onRefresh() {
         presenter.loadComments(threadId, sorting, true /* forceReload */);
-    }
-
-    @Override
-    public void onVoteComment(Comment comment, VoteDirection voteDirection) {
-        presenter.onVoteComment(comment, voteDirection);
-    }
-
-    @Override
-    public void onSaveComment(Comment comment) {
-        presenter.onSaveComment(comment);
-    }
-
-    @Override
-    public void onUnsaveComment(Comment comment) {
-        presenter.onUnsaveComment(comment);
-    }
-
-    @Override
-    public void onReplyToComment(int position, Comment parentComment) {
-        presenter.onReplyToCommentBtnClick(position, parentComment);
-    }
-
-    @Override
-    public void onSubmissionClick(SubmissionWrapper submissionWrapper) {
-        // No action on submission click.
-    }
-
-    @Override
-    public void onVoteSubmission(SubmissionWrapper submissionWrapper, VoteDirection voteDirection) {
-        if (submissionWrapper != null) {
-            presenter.onVoteSubmission(submissionWrapper.getSubmission(), voteDirection);
-        }
-    }
-
-    @Override
-    public void onSaveSubmission(SubmissionWrapper submissionWrapper, boolean saved) {
-        if (submissionWrapper != null) {
-            presenter.onSaveSubmission(submissionWrapper.getSubmission(), saved);
-        }
-    }
-
-    @Override
-    public void onContentClick(String url) {
-        presenter.onContentClick(url);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fab:
-                presenter.onReplyToThreadBtnClick();
-                break;
-        }
     }
 }

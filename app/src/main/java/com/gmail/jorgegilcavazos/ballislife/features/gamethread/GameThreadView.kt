@@ -1,11 +1,10 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.Observable
-
 import net.dean.jraw.models.Comment
-import net.dean.jraw.models.CommentNode
 
 interface GameThreadView {
 
@@ -25,8 +24,6 @@ interface GameThreadView {
 
   fun hideComments()
 
-  fun addComment(position: Int, comment: CommentNode)
-
   fun showNoThreadText()
 
   fun hideNoThreadText()
@@ -39,17 +36,17 @@ interface GameThreadView {
 
   fun hideErrorLoadingText()
 
-  fun commentSaves(): Observable<Comment>
+  fun commentSaves(): Observable<CommentWrapper>
 
-  fun commentUnsaves(): Observable<Comment>
+  fun commentUnsaves(): Observable<CommentWrapper>
 
-  fun upvotes(): Observable<Comment>
+  fun upvotes(): Observable<CommentWrapper>
 
-  fun downvotes(): Observable<Comment>
+  fun downvotes(): Observable<CommentWrapper>
 
-  fun novotes(): Observable<Comment>
+  fun novotes(): Observable<CommentWrapper>
 
-  fun replies(): Observable<Comment>
+  fun replies(): Observable<CommentWrapper>
 
   fun submissionReplies(): Observable<Any>
 
@@ -88,4 +85,12 @@ interface GameThreadView {
   fun purchasePremium()
 
   fun setStreamSwitch(isChecked: Boolean)
+
+  fun commentCollapses(): Observable<String>
+
+  fun commentUnCollapses(): Observable<String>
+
+  fun collapseComments(id: String)
+
+  fun uncollapseComments(id: String)
 }

@@ -15,6 +15,7 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.Subreddit;
 import net.dean.jraw.models.VoteDirection;
@@ -123,11 +124,12 @@ public class RedditServiceImpl implements RedditService {
     }
 
     @Override
-    public Completable saveComment(final RedditClient redditClient, final Comment comment) {
+    public Completable savePublicContribution(final RedditClient redditClient,
+            final PublicContribution contribution) {
         return Completable.create(e -> {
             AccountManager accountManager = new AccountManager(redditClient);
             try {
-                accountManager.save(comment);
+                accountManager.save(contribution);
                 e.onComplete();
             } catch (Exception ex) {
                 if (!e.isDisposed()) {
@@ -138,11 +140,12 @@ public class RedditServiceImpl implements RedditService {
     }
 
     @Override
-    public Completable unsaveComment(final RedditClient redditClient, final Comment comment) {
+    public Completable unsavePublicContribution(final RedditClient redditClient,
+            final PublicContribution contribution) {
         return Completable.create(e -> {
             AccountManager accountManager = new AccountManager(redditClient);
             try {
-                accountManager.unsave(comment);
+                accountManager.unsave(contribution);
                 e.onComplete();
             } catch (Exception ex) {
                 if (!e.isDisposed()) {

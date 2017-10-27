@@ -430,5 +430,9 @@
     <string name="no_comments_have_been_made">No comments have been made</string>
     <string name="unsaving">Unsaving</string>
     <string name="view_thread">View thread</string>
+    <string name="go_premium">Go Premium!</string>
+    <string name="you_are_a_premium_user_already">You are a Premium user already!</string>
+    <string name="self">self</string>
+    <string name="submitting_comment">Submitting comment</string>
 
 </resources>

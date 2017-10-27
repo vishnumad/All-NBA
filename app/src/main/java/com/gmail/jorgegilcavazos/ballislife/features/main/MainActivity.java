@@ -8,6 +8,8 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -21,7 +23,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -55,7 +60,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
     private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
     String subreddit;
 
     private CompositeDisposable disposables;
+    private BillingProcessor billingProcessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +128,10 @@ public class MainActivity extends AppCompatActivity {
             Once.markDone(SHOW_TOUR);
         }
 
-        // Subscribe to all default firebase messaging topics if first install.
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, SUBSCRIBE_TO_TOPICS)) {
-            //resubscribeToTopics();
-        }
-        resubscribeToTopics();
+        String billingLicense = getString(R.string.play_billing_license_key);
+        billingProcessor = new BillingProcessor(this, billingLicense, this);
 
+        resubscribeToTopics();
         setUpToolbar();
         setUpNavigationView();
         setUpDrawerContent();
@@ -249,6 +253,11 @@ public class MainActivity extends AppCompatActivity {
                 NavigationMenuView navMenuView = (NavigationMenuView) navigationView.getChildAt(0);
                 if (navMenuView != null) {
                     navMenuView.setVerticalScrollBarEnabled(false);
+                }
+
+                // Hide "Go Premium!" if premium.
+                if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+                    hideGoPremiumMenuItem();
                 }
             }
         }
@@ -411,6 +420,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_was:
                     setPostsFragment(Constants.SUB_WAS);
                     drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+                case R.id.go_premium:
+                    onGoPremiumClick();
                     return true;
                 default:
                     setGamesFragment();
@@ -627,5 +639,46 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadRedditUsername();
+    }
+
+    @Override
+    public void onProductPurchased(
+            @NonNull String productId, @Nullable TransactionDetails details) {
+        if (productId.equals(Constants.PREMIUM_PRODUCT_ID)) {
+            hideGoPremiumMenuItem();
+            Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
+    }
+
+    private void hideGoPremiumMenuItem() {
+        if (navigationView != null) {
+            Menu navMenu = navigationView.getMenu();
+            navMenu.findItem(R.id.go_premium).setVisible(false);
+        }
+    }
+
+    private void onGoPremiumClick() {
+        if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+            Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
+                    .show();
+            hideGoPremiumMenuItem();
+        } else {
+            billingProcessor.purchase(this, Constants.PREMIUM_PRODUCT_ID);
+        }
     }
 }
