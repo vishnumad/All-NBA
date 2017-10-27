@@ -31,6 +31,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     private HighlightViewType highlightViewType;
     private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> shareClickSubject = PublishSubject.create();
+    private PublishSubject<Highlight> submissionClickSubject = PublishSubject.create();
 
     public HighlightAdapter(
             Context context,
@@ -57,7 +58,7 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
     @Override
     public void onBindViewHolder(HighlightHolder holder, int position) {
         holder.bindData(context, highlightViewType, highlights.get(position), viewClickSubject,
-                        shareClickSubject);
+                        shareClickSubject, submissionClickSubject);
     }
 
     @Override
@@ -108,6 +109,10 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         return shareClickSubject;
     }
 
+    public Observable<Highlight> getSubmissionClickObservable() {
+        return submissionClickSubject;
+    }
+
     static class HighlightHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.container)
@@ -118,6 +123,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         ImageView ivThumbnailUnavailable;
         @BindView(R.id.text_title)
         TextView tvTitle;
+        @BindView(R.id.text_view_thread)
+        TextView tvViewThread;
         @BindView(R.id.button_share)
         ImageButton ibShare;
 
@@ -129,7 +136,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
         void bindData(Context context, HighlightViewType contentViewType,
                       final Highlight highlight,
                       final PublishSubject<Highlight> viewClickSubject,
-                      final PublishSubject<Highlight> shareClickSubject) {
+                      final PublishSubject<Highlight> shareClickSubject,
+                      final PublishSubject<Highlight> submissionClickSubject) {
             tvTitle.setText(highlight.getTitle());
 
             boolean thumbnailAvailable = true;
@@ -149,6 +157,8 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
                             GONE);
 
             container.setOnClickListener(v -> viewClickSubject.onNext(highlight));
+
+            tvViewThread.setOnClickListener(v -> submissionClickSubject.onNext(highlight));
 
             ibShare.setOnClickListener(v -> shareClickSubject.onNext(highlight));
         }

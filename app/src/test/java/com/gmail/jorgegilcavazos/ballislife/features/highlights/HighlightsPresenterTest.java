@@ -165,6 +165,18 @@ public class HighlightsPresenterTest {
     }
 
     @Test
+    public void testSubscribeToSubmissionClick() {
+        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0);
+
+        Observable<Highlight> highlightObservable = Observable.just(hl1);
+
+        presenter.subscribeToSubmissionClick(highlightObservable);
+
+        verify(mockView).onSubmissionClick(hl1);
+        verifyNoMoreInteractions(mockView);
+    }
+
+    @Test
     public void onDestroyHideSnackbar() {
         presenter.stop();
 
