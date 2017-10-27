@@ -66,6 +66,7 @@
                 android:layout_alignParentBottom="true"
                 android:id="@+id/text_view_thread"
                 android:padding="8dp"
+                android:textColor="@color/primaryText"
                 android:text="@string/view_thread"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
