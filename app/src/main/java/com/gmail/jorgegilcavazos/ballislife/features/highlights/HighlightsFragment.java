@@ -303,7 +303,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         Intent intent = new Intent(getActivity(), SubmissionActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, highlight.getId());
-        bundle.putString(SubmissionActivity.KEY_TITLE, highlight.getTitle());
+        bundle.putString(SubmissionActivity.KEY_TITLE, getString(R.string.highlights));
         intent.putExtras(bundle);
         startActivity(intent);
     }
