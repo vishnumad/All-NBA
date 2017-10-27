@@ -5,6 +5,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.Observable
 import net.dean.jraw.models.Comment
+import net.dean.jraw.models.CommentNode
 import net.dean.jraw.models.Submission
 
 interface SubmissionView {
@@ -38,6 +39,8 @@ interface SubmissionView {
   fun commentCollapses(): Observable<String>
 
   fun commentUnCollapses(): Observable<String>
+
+	fun loadMoreComments(): Observable<CommentItem>
 
   fun setLoadingIndicator(active: Boolean)
 
@@ -76,4 +79,8 @@ interface SubmissionView {
   fun collapseComments(id: String)
 
   fun uncollapseComments(id: String)
+
+	fun insertItemsBelowParent(threadItems: List<ThreadItem>, parentNode: CommentNode)
+
+	fun showErrorLoadingMoreComments()
 }

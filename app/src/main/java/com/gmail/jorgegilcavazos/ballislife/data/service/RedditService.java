@@ -121,4 +121,9 @@ public interface RedditService {
      * Returns an Rx Completable that de-authenticates the current reddit session.
      */
     Completable deAuthenticate(RedditClient reddit, Credentials credentials);
+
+    /**
+     * Returns an Rx Single of the load more comments response of a {@link CommentNode}.
+     */
+    Single<List<CommentNode>> loadMoreComments(RedditClient reddit, CommentNode commentNode);
 }

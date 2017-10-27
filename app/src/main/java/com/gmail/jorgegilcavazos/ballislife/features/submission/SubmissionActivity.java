@@ -31,6 +31,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import net.dean.jraw.models.Comment;
+import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Submission;
 
@@ -262,6 +263,13 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         return threadAdapter.getCommentUnCollapses();
     }
 
+    @NotNull
+    @Override
+    public Observable<CommentItem> loadMoreComments() {
+        return threadAdapter.getLoadMoreComments();
+    }
+
+
     @Override
     public void setLoadingIndicator(boolean active) {
         swipeRefreshLayout.setRefreshing(active);
@@ -379,5 +387,16 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     @Override
     public void onRefresh() {
         presenter.loadComments(threadId, sorting, true /* forceReload */);
+    }
+
+    @Override
+    public void insertItemsBelowParent(@NotNull List<ThreadItem> threadItems, @NotNull
+            CommentNode parentNode) {
+        threadAdapter.insertItemsBelowParent(threadItems, parentNode);
+    }
+
+    @Override
+    public void showErrorLoadingMoreComments() {
+        Toast.makeText(this, "Error loading more comments", Toast.LENGTH_SHORT).show();
     }
 }

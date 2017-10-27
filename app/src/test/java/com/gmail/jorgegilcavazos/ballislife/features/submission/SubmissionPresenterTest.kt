@@ -6,6 +6,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
+import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import io.reactivex.Observable
@@ -31,6 +33,7 @@ class SubmissionPresenterTest {
   @Mock private lateinit var mockRedditAuthentication: RedditAuthentication
   @Mock private lateinit var mockSubmissionRepository: SubmissionRepository
   @Mock private lateinit var mockCompositeDisposable: CompositeDisposable
+  @Mock private lateinit var mockRedditService: RedditService
   @Mock private lateinit var mockRedditActions: RedditActions
   @Mock private lateinit var mockContributionRepository: ContributionRepository
 
@@ -49,6 +52,7 @@ class SubmissionPresenterTest {
   private val submissionContentClicks = PublishSubject.create<String>()
   private val commentCollapses = PublishSubject.create<String>()
   private val commentUncollapses = PublishSubject.create<String>()
+  private val loadMoreComments = PublishSubject.create<CommentItem>()
 
   private lateinit var presenter: SubmissionPresenter
 
@@ -71,12 +75,14 @@ class SubmissionPresenterTest {
     `when`(mockView.submissionContentClicks()).thenReturn(submissionContentClicks)
     `when`(mockView.commentCollapses()).thenReturn(commentCollapses)
     `when`(mockView.commentUnCollapses()).thenReturn(commentUncollapses)
+    `when`(mockView.loadMoreComments()).thenReturn(loadMoreComments)
 
     presenter = SubmissionPresenter(
         mockRedditAuthentication,
         mockSubmissionRepository,
         TrampolineSchedulerProvider(),
         mockCompositeDisposable,
+        mockRedditService,
         mockRedditActions,
         mockContributionRepository)
 

@@ -419,6 +419,7 @@
     <string name="skip">SKIP</string>
     <string name="sign_in">Sign in</string>
     <string name="load_more_comments">Load more comments</string>
+    <string name="load_more_comments_loading">Load more comments...</string>
     <string name="halftime">Halftime</string>
     <string name="end_of_game">FINAL</string>
     <string name="error_loading_youtube">Error loading youtube video</string>

@@ -335,4 +335,10 @@ public class RedditServiceImpl implements RedditService {
             }
         });
     }
+
+    @Override
+    public Single<List<CommentNode>> loadMoreComments(RedditClient reddit, CommentNode
+            commentNode) {
+        return Single.create(e -> e.onSuccess(commentNode.loadMoreComments(reddit)));
+    }
 }
