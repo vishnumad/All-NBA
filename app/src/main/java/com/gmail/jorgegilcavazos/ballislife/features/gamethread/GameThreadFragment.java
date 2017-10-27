@@ -27,7 +27,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
+import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.dean.jraw.models.Comment;
 
@@ -408,6 +410,12 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void purchasePremium() {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, Constants.PREMIUM_DIALOG_NAME);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
+        bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_GAME_THREAD_SWITCH);
+        FirebaseAnalytics.getInstance(getActivity()).logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
+                bundle);
         ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(), "premium");
     }
 

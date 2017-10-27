@@ -54,4 +54,11 @@ public class Constants {
 
     // Premium IAP
     public static final String PREMIUM_PRODUCT_ID = "premium";
+
+    // Firebase Analytics
+    public static final String PREMIUM_DIALOG_NAME = "Premium Dialog";
+    public static final String PREMIUM_DIALOG_ID = "premium_dialog";
+
+    public static final String ORIGIN_NAV_DRAWER = "Nav Drawer";
+    public static final String ORIGIN_GAME_THREAD_SWITCH = "Game Thread Switch";
 }

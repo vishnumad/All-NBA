@@ -46,6 +46,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Arrays;
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
     int selectedFragment;
     String subreddit;
 
+    private FirebaseAnalytics firebaseAnalytics;
     private CompositeDisposable disposables;
     private BillingProcessor billingProcessor;
 
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
         BallIsLifeApplication.getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {
@@ -673,6 +676,11 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
     }
 
     private void onGoPremiumClick() {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, Constants.PREMIUM_DIALOG_NAME);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
+        bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_NAV_DRAWER);
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
         if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
             Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
                     .show();

@@ -21,6 +21,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import org.jetbrains.annotations.NotNull;
@@ -85,10 +86,12 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     }
 
     @Override
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games, container, false);
         unbinder = ButterKnife.bind(this, view);
+        FirebaseAnalytics.getInstance(getActivity()).setCurrentScreen(getActivity(), this
+                .getClass().getSimpleName(), this.getClass().getSimpleName());
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -200,10 +203,8 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
             return;
         }
 
-        snackbar = Snackbar.make(getView(),
-                                 R.string.your_device_is_offline,
-                                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, v -> presenter.loadGames(true));
+        snackbar = Snackbar.make(getView(), R.string.your_device_is_offline, Snackbar
+                .LENGTH_INDEFINITE).setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 
@@ -213,10 +214,8 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
             return;
         }
 
-        snackbar = Snackbar.make(getView(),
-                                 getString(R.string.something_went_wrong, code),
-                                 Snackbar.LENGTH_SHORT)
-                .setAction(R.string.retry, v -> presenter.loadGames(true));
+        snackbar = Snackbar.make(getView(), getString(R.string.something_went_wrong, code),
+                Snackbar.LENGTH_SHORT).setAction(R.string.retry, v -> presenter.loadGames(true));
         snackbar.show();
     }
 

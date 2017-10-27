@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.LoadMoreCommentsViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
@@ -29,7 +30,10 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +60,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private RedditAuthentication redditAuthentication;
     private Context context;
     private List<ThreadItem> commentsList;
+    private Map<String, List<ThreadItem>> collapsedItems = new HashMap<>();
     private boolean hasHeader;
     private SubmissionWrapper submissionWrapper;
 
@@ -105,7 +110,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new CommentViewHolder(view);
         } else if (viewType == TYPE_LOAD_MORE) {
             view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
-            return new LoadMoreCommentsHolder(view);
+            return new LoadMoreCommentsViewHolder(view);
         } else {
             throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
@@ -129,12 +134,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             commentHolder.bindData(context, item, redditAuthentication, commentSaves,
                     commentUnsaves, upvotes, downvotes, novotes, replies, commentCollapses,
                     commentUnCollapses);
-        } else if (holder instanceof LoadMoreCommentsHolder) {
+        } else if (holder instanceof LoadMoreCommentsViewHolder) {
             if (hasHeader) {
-                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position - 1),
+                ((LoadMoreCommentsViewHolder) holder).bindData(commentsList.get(position - 1),
                         loadMoreComments);
             } else {
-                ((LoadMoreCommentsHolder) holder).bindData(commentsList.get(position),
+                ((LoadMoreCommentsViewHolder) holder).bindData(commentsList.get(position),
                         loadMoreComments);
             }
         }
@@ -180,8 +185,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper()
                         .getId().equals(parentId)) {
                     commentItem.setDepth(item.getCommentItem().getDepth() + 1);
-                    commentsList.add(i + 1, new ThreadItem(TYPE_COMMENT, commentItem, commentItem
-                            .getDepth(), false, false));
+                    commentsList.add(i + 1, new ThreadItem(TYPE_COMMENT, commentItem, commentItem.getDepth(), false));
                     int adapterPosInserted;
                     if (hasHeader) {
                         adapterPosInserted = i + 2;
@@ -196,7 +200,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addCommentItem(CommentItem commentItem) {
-        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0, false, false));
+        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0, false));
         int adapterPosInserted;
         if (hasHeader) {
             adapterPosInserted = 1;
@@ -207,6 +211,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void collapseComments(String commentId) {
+        List<ThreadItem> itemsToCollapse = new ArrayList<>();
         boolean collapse = false;
         int depth = Integer.MAX_VALUE;
 
@@ -214,13 +219,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         int lastCollapse = -1;
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
-            if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper().getId
-                    ().equals(commentId)) {
+            int itemType = item.getType();
+            String itemId = item.getCommentItem().getCommentWrapper().getId();
+
+            if (itemType == TYPE_COMMENT && itemId.equals(commentId)) {
                 collapse = true;
                 depth = item.getCommentItem().getDepth();
             } else {
                 int nextDepth;
-                if (item.getType() == TYPE_COMMENT) {
+                if (itemType == TYPE_COMMENT) {
                     nextDepth = item.getCommentItem().getDepth();
                 } else {
                     nextDepth = item.getDepth();
@@ -228,66 +235,46 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
                 if (collapse) {
                     if (nextDepth > depth) {
-                        item.setHidden(true);
+                        itemsToCollapse.add(item);
                         if (firstCollapse == -1) {
                             firstCollapse = i;
                         }
                     } else {
-                        lastCollapse = i;
+                        lastCollapse = i - 1;
                         break;
                     }
                 }
             }
         }
 
+        commentsList.removeAll(itemsToCollapse);
+
+        collapsedItems.put(commentId, itemsToCollapse);
         if (firstCollapse != -1 && lastCollapse != -1) {
             if (hasHeader) {
-                notifyItemRangeChanged(firstCollapse + 1, lastCollapse + 1);
+                notifyItemRangeRemoved(firstCollapse + 1, itemsToCollapse.size());
             } else {
-                notifyItemRangeChanged(firstCollapse, lastCollapse);
+                notifyItemRangeRemoved(firstCollapse, itemsToCollapse.size());
             }
         }
     }
 
     public void unCollapseComments(String commentId) {
-        boolean uncollapse = false;
-        int depth = Integer.MAX_VALUE;
-
-        int firstCollapse = -1;
-        int lastCollapse = -1;
-        for (int i = 0; i < commentsList.size(); i++) {
-            ThreadItem item = commentsList.get(i);
-            if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper().getId
-                    ().equals(commentId)) {
-                uncollapse = true;
-                depth = item.getCommentItem().getDepth();
-            } else {
-                int nextDepth;
-                if (item.getType() == TYPE_COMMENT) {
-                    nextDepth = item.getCommentItem().getDepth();
-                } else {
-                    nextDepth = item.getDepth();
-                }
-
-                if (uncollapse) {
-                    if (nextDepth > depth) {
-                        item.setHidden(false);
-                        if (firstCollapse == -1) {
-                            firstCollapse = i;
-                        }
+        List<ThreadItem> itemsToUnCollapse = collapsedItems.get(commentId);
+        if (itemsToUnCollapse != null && !itemsToUnCollapse.isEmpty()) {
+            for (int i = 0; i < commentsList.size(); i++) {
+                ThreadItem item = commentsList.get(i);
+                if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper()
+                        .getId().equals(commentId)) {
+                    commentsList.addAll(i + 1, itemsToUnCollapse);
+                    if (hasHeader) {
+                        notifyItemRangeInserted(i + 2, itemsToUnCollapse.size());
                     } else {
-                        lastCollapse = i;
-                        break;
+                        notifyItemRangeInserted(i + 1, itemsToUnCollapse.size());
                     }
+                    collapsedItems.remove(commentId);
+                    break;
                 }
-            }
-        }
-
-        if (firstCollapse != -1 && lastCollapse != -1) {
-            if (hasHeader) {
-                notifyItemRangeChanged(firstCollapse + 1, lastCollapse + 1);
-            } else {
-                notifyItemRangeChanged(firstCollapse, lastCollapse);
             }
         }
     }
@@ -405,17 +392,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                              PublishSubject<CommentWrapper> novotes,
                              PublishSubject<CommentWrapper> replies, PublishSubject<String>
                                      commentCollapses, PublishSubject<String> commentUncollapses) {
-            if (threadItem.getHidden()) {
-                itemView.setVisibility(View.GONE);
-                itemView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, 0));
-                return;
-            } else {
-                itemView.setVisibility(View.VISIBLE);
-                itemView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
-
             final CommentItem commentItem = threadItem.getCommentItem();
             final CommentWrapper comment = commentItem.getCommentWrapper();
             int depth = commentItem.getDepth();
@@ -655,80 +631,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             // Add padding depending on level.
             holder.commentContentLayout.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
-        }
-    }
-
-    static class LoadMoreCommentsHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.innerLayout) View innerLayout;
-        @BindView(R.id.loadMoreText) TextView loadMoreText;
-
-        public LoadMoreCommentsHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        public void bindData(ThreadItem threadItem, PublishSubject<CommentItem> loadMoreComments) {
-            if (threadItem.getHidden()) {
-                itemView.setVisibility(View.GONE);
-                itemView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, 0));
-                return;
-            } else {
-                itemView.setVisibility(View.VISIBLE);
-                itemView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
-
-            loadMoreText.setOnClickListener(v -> {
-                threadItem.setLoading(true);
-                setLoadingIndicator(true);
-                loadMoreComments.onNext(threadItem.getCommentItem());
-            });
-
-            setLoadingIndicator(threadItem.getLoading());
-            setBackgroundAndPadding(threadItem.getDepth());
-        }
-
-        private void setLoadingIndicator(boolean loading) {
-            if (loading) {
-                loadMoreText.setText(R.string.load_more_comments_loading);
-            } else {
-                loadMoreText.setText(R.string.load_more_comments);
-            }
-        }
-
-        private void setBackgroundAndPadding(int depth) {
-            int padding_in_dp = 5;
-            final float scale = itemView.getContext().getResources().getDisplayMetrics().density;
-            int padding_in_px = (int) (padding_in_dp * scale + 0.5F);
-
-            // Add color if it is not a top-level comment.
-            if (depth > 1) {
-                int depthFromZero = depth - 2;
-                int res = (depthFromZero) % 5;
-                switch (res) {
-                    case 0:
-                        innerLayout.setBackgroundResource(R.drawable.borderblue);
-                        break;
-                    case 1:
-                        innerLayout.setBackgroundResource(R.drawable.bordergreen);
-                        break;
-                    case 2:
-                        innerLayout.setBackgroundResource(R.drawable.borderbrown);
-                        break;
-                    case 3:
-                        innerLayout.setBackgroundResource(R.drawable.borderorange);
-                        break;
-                    case 4:
-                        innerLayout.setBackgroundResource(R.drawable.borderred);
-                }
-            } else {
-                innerLayout.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), R
-                        .color.commentBgLight));
-            }
-            // Add padding depending on level.
-            itemView.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
         }
     }
 }
