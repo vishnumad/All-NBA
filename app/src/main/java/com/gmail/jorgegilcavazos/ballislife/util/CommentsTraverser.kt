@@ -1,9 +1,10 @@
 package com.gmail.jorgegilcavazos.ballislife.util
 
-import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.COMMENT
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.LOAD_MORE_COMMENTS
 import net.dean.jraw.models.CommentNode
 import java.util.*
 
@@ -18,12 +19,12 @@ class CommentsTraverser {
 		}
 
 		private fun traverse(root: CommentNode, items: MutableList<ThreadItem>) {
-			items.add(ThreadItem(ThreadAdapter.TYPE_COMMENT, createCommentItem(root), root.depth))
+			items.add(ThreadItem(COMMENT, createCommentItem(root), root.depth))
 			for (node in root.children) {
 				traverse(node, items)
 			}
 			if (root.hasMoreComments()) {
-				items.add(ThreadItem(ThreadAdapter.TYPE_LOAD_MORE, createCommentItem(root), root.depth + 1))
+				items.add(ThreadItem(LOAD_MORE_COMMENTS, createCommentItem(root), root.depth + 1))
 			}
 		}
 

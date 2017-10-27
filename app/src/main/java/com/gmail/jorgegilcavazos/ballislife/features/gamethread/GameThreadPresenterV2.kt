@@ -7,11 +7,11 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
-import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.COMMENT
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
@@ -150,7 +150,8 @@ class GameThreadPresenterV2 @Inject constructor(
                 iterator?.forEach {
                   threadItems.add(
                       ThreadItem(
-                          ThreadAdapter.TYPE_COMMENT, createCommentItem(it),
+                          COMMENT,
+                          createCommentItem(it),
                           it.depth))
                 }
 

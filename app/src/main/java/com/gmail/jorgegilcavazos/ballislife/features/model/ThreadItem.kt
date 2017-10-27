@@ -1,10 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.model
 
 class ThreadItem(
-		/**
-		 * One of
-		 */
-		val type: Int,
+		val type: ThreadItemType,
 		/**
 		 * If type = COMMENT then it holds [CommentItem] for that comment.
 		 * If type = LOAD_MORE_COMMENTS = then it holds the [CommentItem] of it's parent comment.

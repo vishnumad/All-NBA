@@ -22,6 +22,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
@@ -40,6 +41,10 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
+import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.COMMENT;
+import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.LOAD_MORE_COMMENTS;
+import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.SUBMISSION_HEADER;
+
 /**
  * Adapter used to hold all of the comments from a threadId. It also supports loading a header view
  * as the first element of the recycler view.
@@ -52,10 +57,6 @@ import io.reactivex.subjects.PublishSubject;
  * {@link com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity}.
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    public static final int TYPE_SUBMISSION_HEADER = 0;
-    public static final int TYPE_COMMENT = 1;
-    public static final int TYPE_LOAD_MORE = 2;
 
     private RedditAuthentication redditAuthentication;
     private Context context;
@@ -102,13 +103,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         View view;
 
-        if (viewType == TYPE_SUBMISSION_HEADER) {
+        if (viewType == SUBMISSION_HEADER.getValue()) {
             view = inflater.inflate(R.layout.post_layout_card, parent, false);
             return new FullCardViewHolder(view);
-        } else if (viewType == TYPE_COMMENT) {
+        } else if (viewType == COMMENT.getValue()) {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
             return new CommentViewHolder(view);
-        } else if (viewType == TYPE_LOAD_MORE) {
+        } else if (viewType == LOAD_MORE_COMMENTS.getValue()) {
             view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
             return new LoadMoreCommentsViewHolder(view);
         } else {
@@ -150,12 +151,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         // Submission data guaranteed to be not null at this point.
         if (hasHeader) {
             if (position == 0) {
-                return TYPE_SUBMISSION_HEADER;
+                return SUBMISSION_HEADER.getValue();
             } else {
-                return commentsList.get(position - 1).getType();
+                return commentsList.get(position - 1).getType().getValue();
             }
         }
-        return commentsList.get(position).getType();
+        return commentsList.get(position).getType().getValue();
     }
 
     @Override
@@ -181,11 +182,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void addCommentItem(CommentItem commentItem, String parentId) {
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
-            if (item.getType() == TYPE_COMMENT) {
+            if (item.getType() == COMMENT) {
                 if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper()
                         .getId().equals(parentId)) {
                     commentItem.setDepth(item.getCommentItem().getDepth() + 1);
-                    commentsList.add(i + 1, new ThreadItem(TYPE_COMMENT, commentItem, commentItem.getDepth(), false));
+                    commentsList.add(i + 1, new ThreadItem(COMMENT, commentItem, commentItem
+                            .getDepth(), false));
                     int adapterPosInserted;
                     if (hasHeader) {
                         adapterPosInserted = i + 2;
@@ -200,7 +202,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void addCommentItem(CommentItem commentItem) {
-        commentsList.add(0, new ThreadItem(TYPE_COMMENT, commentItem, 0, false));
+        commentsList.add(0, new ThreadItem(COMMENT, commentItem, 0, false));
         int adapterPosInserted;
         if (hasHeader) {
             adapterPosInserted = 1;
@@ -219,15 +221,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         int lastCollapse = -1;
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
-            int itemType = item.getType();
+            ThreadItemType itemType = item.getType();
             String itemId = item.getCommentItem().getCommentWrapper().getId();
 
-            if (itemType == TYPE_COMMENT && itemId.equals(commentId)) {
+            if (itemType == COMMENT && itemId.equals(commentId)) {
                 collapse = true;
                 depth = item.getCommentItem().getDepth();
             } else {
                 int nextDepth;
-                if (itemType == TYPE_COMMENT) {
+                if (itemType == COMMENT) {
                     nextDepth = item.getCommentItem().getDepth();
                 } else {
                     nextDepth = item.getDepth();
@@ -264,7 +266,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (itemsToUnCollapse != null && !itemsToUnCollapse.isEmpty()) {
             for (int i = 0; i < commentsList.size(); i++) {
                 ThreadItem item = commentsList.get(i);
-                if (item.getType() == TYPE_COMMENT && item.getCommentItem().getCommentWrapper()
+                if (item.getType() == COMMENT && item.getCommentItem().getCommentWrapper()
                         .getId().equals(commentId)) {
                     commentsList.addAll(i + 1, itemsToUnCollapse);
                     if (hasHeader) {
@@ -282,7 +284,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void insertItemsBelowParent(List<ThreadItem> items, CommentNode parent) {
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
-            if (item.getType() == TYPE_LOAD_MORE && item.getCommentItem().getCommentWrapper()
+            if (item.getType() == LOAD_MORE_COMMENTS && item.getCommentItem().getCommentWrapper()
                     .getId().equals(parent.getComment().getId())) {
                 commentsList.remove(i);
                 if (hasHeader) {
