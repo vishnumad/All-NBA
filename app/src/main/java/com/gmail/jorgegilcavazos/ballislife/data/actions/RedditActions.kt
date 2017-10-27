@@ -5,17 +5,21 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import io.reactivex.Observable
 import net.dean.jraw.models.Comment
+import net.dean.jraw.models.PublicContribution
+import net.dean.jraw.models.Submission
 import net.dean.jraw.models.VoteDirection
 
 interface RedditActions {
 
-  fun saveComment(comment: Comment): Observable<SaveUIModel>
+  fun savePublicContribution(contribution: PublicContribution): Observable<SaveUIModel>
 
-  fun unsaveComment(comment: Comment): Observable<SaveUIModel>
+  fun unsavePublicContribution(contribution: PublicContribution): Observable<SaveUIModel>
 
   fun voteComment(comment: Comment, voteDirection: VoteDirection): Observable<VoteUIModel>
 
-  fun replyToComment(parentFullname: String, response: String): Observable<ReplyUIModel>
+  fun voteSubmission(submission: Submission, voteDirection: VoteDirection): Observable<VoteUIModel>
+
+  fun replyToComment(parentId: String, response: String): Observable<ReplyUIModel>
 
   fun replyToSubmission(submissionId: String, response: String): Observable<ReplyUIModel>
 }

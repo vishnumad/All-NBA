@@ -52,7 +52,6 @@ public class Constants {
     public static final int POSTS_VIEW_WIDE_CARD = 1;
     public static final int POSTS_VIEW_LIST = 2;
 
-    // Highlights view types
-    public static final int HIGHLIGHTS_VIEW_SMALL = 1;
-    public static final int HIGHLIGHTS_VIEW_LARGE = 2;
+    // Premium IAP
+    public static final String PREMIUM_PRODUCT_ID = "premium";
 }

@@ -23,13 +23,13 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 
 import net.dean.jraw.models.Comment;
-import net.dean.jraw.models.CommentNode;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -89,9 +89,9 @@ public class GameThreadFragment extends Fragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            String parentFullname = data.getStringExtra(ReplyActivity.KEY_COMMENT_FULLNAME);
+            String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
             String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
-            presenter.replyToComment(parentFullname, response);
+            presenter.replyToComment(parentId, response);
         } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
             String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
@@ -225,11 +225,6 @@ public class GameThreadFragment extends Fragment
     }
 
     @Override
-    public void addComment(int position, CommentNode comment) {
-        threadAdapter.addComment(position, comment);
-    }
-
-    @Override
     public void showNoThreadText() {
         noThreadText.setVisibility(View.VISIBLE);
     }
@@ -262,37 +257,37 @@ public class GameThreadFragment extends Fragment
 
     @NotNull
     @Override
-    public Observable<Comment> commentSaves() {
+    public Observable<CommentWrapper> commentSaves() {
         return threadAdapter.getCommentSaves();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> commentUnsaves() {
+    public Observable<CommentWrapper> commentUnsaves() {
         return threadAdapter.getCommentUnsaves();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> upvotes() {
+    public Observable<CommentWrapper> upvotes() {
         return threadAdapter.getUpvotes();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> downvotes() {
+    public Observable<CommentWrapper> downvotes() {
         return threadAdapter.getDownvotes();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> novotes() {
+    public Observable<CommentWrapper> novotes() {
         return threadAdapter.getNovotes();
     }
 
     @NotNull
     @Override
-    public Observable<Comment> replies() {
+    public Observable<CommentWrapper> replies() {
         return threadAdapter.getReplies();
     }
 
@@ -306,7 +301,7 @@ public class GameThreadFragment extends Fragment
     public void openReplyToCommentActivity(@NonNull Comment parentComment) {
         Intent intent = new Intent(getActivity(), ReplyActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyActivity.KEY_COMMENT_FULLNAME, parentComment.getFullName());
+        extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
         extras.putCharSequence(ReplyActivity.KEY_COMMENT,
                                RedditUtils.bindSnuDown(parentComment.data("body_html")));
         intent.putExtras(extras);
@@ -421,5 +416,27 @@ public class GameThreadFragment extends Fragment
         if (streamSwitch != null) {
             streamSwitch.setChecked(isChecked);
         }
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentCollapses() {
+        return threadAdapter.getCommentCollapses();
+    }
+
+    @NotNull
+    @Override
+    public Observable<String> commentUnCollapses() {
+        return threadAdapter.getCommentUnCollapses();
+    }
+
+    @Override
+    public void collapseComments(@NotNull String id) {
+        threadAdapter.collapseComments(id);
+    }
+
+    @Override
+    public void uncollapseComments(@NotNull String id) {
+        threadAdapter.unCollapseComments(id);
     }
 }
