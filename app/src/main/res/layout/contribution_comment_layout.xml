@@ -25,8 +25,8 @@
             android:layout_height="wrap_content"
             android:paddingEnd="10dp"
             android:paddingStart="10dp"
-            android:text="submissionWrapper title"
-            android:textColor="@color/primaryText"
+            android:text="submission title"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp"
             android:textStyle="bold"/>
 
@@ -37,8 +37,8 @@
             android:layout_below="@id/comment_post_title"
             android:paddingLeft="10dp"
             android:text="Author"
-            android:textColor="@color/secondaryText"
-            android:textSize="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textSize="10sp"
             android:textStyle="bold"/>
 
         <TextView
@@ -49,8 +49,8 @@
             android:layout_toEndOf="@+id/comment_author"
             android:paddingLeft="2dp"
             android:text="1000 points"
-            android:textColor="@color/secondaryText"
-            android:textSize="10dp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textSize="10sp"/>
 
         <TextView
             android:id="@+id/comment_timestamp"
@@ -60,8 +60,8 @@
             android:layout_toRightOf="@+id/comment_score"
             android:paddingLeft="2dp"
             android:text="10 hours ago"
-            android:textColor="@color/secondaryText"
-            android:textSize="10dp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textSize="10sp"/>
 
         <TextView
             android:id="@+id/comment_body"
@@ -71,8 +71,8 @@
             android:paddingLeft="10dp"
             android:paddingTop="2dp"
             android:text="This is a comment"
-            android:textColor="@color/primaryText"
-            android:textSize="12dp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textSize="12sp"/>
 
     </RelativeLayout>
 

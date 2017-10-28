@@ -119,7 +119,7 @@ public class ProfilePresenter extends BasePresenter<ProfileView> {
                             view.openSubmissionAndScrollToComment(submissionId,
                                     contribution.getId());
                         } else {
-                            view.openSubmission(contribution.getId().substring(3));
+                            view.openSubmission(contribution.getId());
                         }
                     }
 

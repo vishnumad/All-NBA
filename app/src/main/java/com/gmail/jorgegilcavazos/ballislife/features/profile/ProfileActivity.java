@@ -7,7 +7,6 @@ import android.os.PersistableBundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.google.firebase.crash.FirebaseCrash;
@@ -36,7 +36,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProfileActivity extends AppCompatActivity
+public class ProfileActivity extends BaseNoActionBarActivity
         implements ProfileView, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "ProfileActivity";
 
@@ -90,11 +90,15 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
-        BallIsLifeApplication.getAppComponent().inject(this);
 
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
