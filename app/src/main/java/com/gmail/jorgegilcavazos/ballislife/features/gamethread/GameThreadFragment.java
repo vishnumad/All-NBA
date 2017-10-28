@@ -344,23 +344,23 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Override
     public void showSubmittingCommentToast() {
-        Toast.makeText(getActivity(), "Saving comment", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.submitting_comment, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showSubmittedCommentToast() {
-        Toast.makeText(getActivity(), "Reply saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.submitted_comment, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showMissingParentToast() {
-        Toast.makeText(getActivity(), "Couldn't save comment, missing parent", Toast
+        Toast.makeText(getActivity(), R.string.could_not_save_comment_missing_parent, Toast
                 .LENGTH_SHORT).show();
     }
 
     @Override
     public void showMissingSubmissionToast() {
-        Toast.makeText(getActivity(), "Couldn't save comment, missing submission", Toast
+        Toast.makeText(getActivity(), R.string.could_not_save_comment_missing_submmission, Toast
                 .LENGTH_SHORT).show();
     }
 
@@ -376,9 +376,14 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     }
 
     @Override
-    public void showNoNetAvailable() {
+    public void showNoNetAvailableText() {
         errorLoadingText.setText(R.string.your_device_is_offline);
         errorLoadingText.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showNoNetAvailableToast() {
+        Toast.makeText(getActivity(), R.string.your_device_is_offline, Toast.LENGTH_SHORT).show();
     }
 
     @Override

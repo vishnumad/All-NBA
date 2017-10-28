@@ -176,7 +176,7 @@ class GameThreadPresenterV2 @Inject constructor(
             },
             { e ->
               if (!networkUtils.isNetworkAvailable()) {
-                view.showNoNetAvailable()
+                view.showNoNetAvailableText()
               } else {
                 view.showErrorLoadingText(errorHandler.handleError(e))
               }
@@ -205,15 +205,15 @@ class GameThreadPresenterV2 @Inject constructor(
               if (uiModel.success) {
                 view.showSubmittedCommentToast()
               }
-            },
-            { e ->
-              if (!networkUtils.isNetworkAvailable()) {
-                view.showNoNetAvailable()
-              } else {
-                view.showErrorSavingCommentToast(errorHandler.handleError(e))
+
+              if (uiModel.error != null) {
+                if (!networkUtils.isNetworkAvailable()) {
+                  view.showNoNetAvailableToast()
+                } else {
+                  view.showErrorSavingCommentToast(errorHandler.handleError(uiModel.error))
+                }
               }
-            }
-        )
+            }).addTo(disposable)
   }
 
   fun replyToSubmission(submissionId: String, response: String) {
@@ -235,15 +235,15 @@ class GameThreadPresenterV2 @Inject constructor(
               if (uiModel.success) {
                 view.showSubmittedCommentToast()
               }
-            },
-            { e ->
-              if (!networkUtils.isNetworkAvailable()) {
-                view.showNoNetAvailable()
-              } else {
-                view.showErrorSavingCommentToast(errorHandler.handleError(e))
+
+              if (uiModel.error != null) {
+                if (!networkUtils.isNetworkAvailable()) {
+                  view.showNoNetAvailableToast()
+                } else {
+                  view.showErrorSavingCommentToast(errorHandler.handleError(uiModel.error))
+                }
               }
-            }
-        )
+            }).addTo(disposable)
   }
 
   private fun saveComment(comment: Comment) {
@@ -257,12 +257,13 @@ class GameThreadPresenterV2 @Inject constructor(
               if (uiModel.success) {
                 view.showSavedToast()
               }
-            },
-            { e ->
-              if (!networkUtils.isNetworkAvailable()) {
-                view.showNoNetAvailable()
-              } else {
-                errorHandler.handleError(e)
+
+              if (uiModel.error != null) {
+                if (!networkUtils.isNetworkAvailable()) {
+                  view.showNoNetAvailableToast()
+                } else {
+                  errorHandler.handleError(uiModel.error)
+                }
               }
             }
         )
@@ -280,12 +281,13 @@ class GameThreadPresenterV2 @Inject constructor(
               if (it.success) {
                 view.showUnsavedToast()
               }
-            },
-            { e ->
-              if (!networkUtils.isNetworkAvailable()) {
-                view.showNoNetAvailable()
-              } else {
-                errorHandler.handleError(e)
+
+              if (it.error != null) {
+                if (!networkUtils.isNetworkAvailable()) {
+                  view.showNoNetAvailableToast()
+                } else {
+                  errorHandler.handleError(it.error)
+                }
               }
             }
         )

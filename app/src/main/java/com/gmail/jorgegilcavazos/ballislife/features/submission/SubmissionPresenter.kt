@@ -8,9 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.SubmissionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService
-import com.gmail.jorgegilcavazos.ballislife.util.CommentsTraverser
-import com.gmail.jorgegilcavazos.ballislife.util.Constants
-import com.gmail.jorgegilcavazos.ballislife.util.Utilities
+import com.gmail.jorgegilcavazos.ballislife.util.*
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -24,7 +22,9 @@ class SubmissionPresenter @Inject constructor(
 		private val disposables: CompositeDisposable,
 		private val redditService: RedditService,
 		private val redditActions: RedditActions,
-		private val contributionRepository: ContributionRepository) : BasePresenter<SubmissionView>() {
+		private val contributionRepository: ContributionRepository,
+		private val networkUtils: NetworkUtils,
+		private val errorHandler: ErrorHandler) : BasePresenter<SubmissionView>() {
 
 	private var currentSubmission: Submission? = null
 
@@ -213,6 +213,11 @@ class SubmissionPresenter @Inject constructor(
 							view.showFab()
 						},
 						{ e ->
+							if (!networkUtils.isNetworkAvailable()) {
+								view.showNoNetAvailable()
+							} else {
+								errorHandler.handleError(e)
+							}
 							view.setLoadingIndicator(false)
 						}
 				)
@@ -232,11 +237,15 @@ class SubmissionPresenter @Inject constructor(
 									view.addCommentItem(uiModel.commentItem, parentId)
 								}
 							}
-						},
-						{ _ ->
-							view.showErrorAddingComment()
-						}
-				)
+							if (uiModel.error != null) {
+								if (!networkUtils.isNetworkAvailable()) {
+									view.showNoNetAvailable()
+								} else {
+									errorHandler.handleError(uiModel.error)
+									view.showErrorAddingComment()
+								}
+							}
+						}).addTo(disposables)
 	}
 
 	fun replyToSubmission(submissionId: String, response: String) {
@@ -251,11 +260,15 @@ class SubmissionPresenter @Inject constructor(
 									view.addCommentItem(uiModel.commentItem)
 								}
 							}
-						},
-						{ _ ->
-							view.showErrorAddingComment()
-						}
-				)
+							if (uiModel.error != null) {
+								if (!networkUtils.isNetworkAvailable()) {
+									view.showNoNetAvailable()
+								} else {
+									errorHandler.handleError(uiModel.error)
+									view.showErrorAddingComment()
+								}
+							}
+						}).addTo(disposables)
 	}
 
 	private fun saveComment(comment: Comment) {
@@ -264,6 +277,18 @@ class SubmissionPresenter @Inject constructor(
 						{ uiModel: SaveUIModel ->
 							if (uiModel.notLoggedIn) {
 								view.showNotLoggedInError()
+							}
+
+							if (uiModel.success) {
+								view.showSavedCommentToast()
+							}
+
+							if (uiModel.error != null) {
+								if (!networkUtils.isNetworkAvailable()) {
+									view.showNoNetAvailable()
+								} else {
+									errorHandler.handleError(uiModel.error)
+								}
 							}
 						}
 				)
@@ -276,6 +301,18 @@ class SubmissionPresenter @Inject constructor(
 						{
 							if (it.notLoggedIn) {
 								view.showNotLoggedInError()
+							}
+
+							if (it.success) {
+								view.showUnsavedCommentToast()
+							}
+
+							if (it.error != null) {
+								if (!networkUtils.isNetworkAvailable()) {
+									view.showNoNetAvailable()
+								} else {
+									errorHandler.handleError(it.error)
+								}
 							}
 						}
 				)

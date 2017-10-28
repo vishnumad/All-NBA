@@ -310,7 +310,7 @@ class GameThreadPresenterV2Test {
     presenter.loadGameThread()
 
     verify(mockView).setLoadingIndicator(false)
-    verify(mockView).showNoNetAvailable()
+    verify(mockView).showNoNetAvailableText()
   }
 
   @Test

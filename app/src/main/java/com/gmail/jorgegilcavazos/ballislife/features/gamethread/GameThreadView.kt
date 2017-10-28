@@ -76,7 +76,9 @@ interface GameThreadView {
 
   fun showNotLoggedInToast()
 
-  fun showNoNetAvailable()
+  fun showNoNetAvailableText()
+
+  fun showNoNetAvailableToast()
 
   fun showFab()
 

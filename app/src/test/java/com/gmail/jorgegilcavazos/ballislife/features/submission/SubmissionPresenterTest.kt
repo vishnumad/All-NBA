@@ -9,6 +9,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.submissions.Submissi
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
+import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
+import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -36,6 +38,8 @@ class SubmissionPresenterTest {
   @Mock private lateinit var mockRedditService: RedditService
   @Mock private lateinit var mockRedditActions: RedditActions
   @Mock private lateinit var mockContributionRepository: ContributionRepository
+  @Mock private lateinit var mockNetworkUtils: NetworkUtils
+  @Mock private lateinit var mockErrorHandler: ErrorHandler
 
   private val commentSaves = PublishSubject.create<CommentWrapper>()
   private val commentUnsaves = PublishSubject.create<CommentWrapper>()
@@ -84,7 +88,9 @@ class SubmissionPresenterTest {
         mockCompositeDisposable,
         mockRedditService,
         mockRedditActions,
-        mockContributionRepository)
+        mockContributionRepository,
+        mockNetworkUtils,
+        mockErrorHandler)
 
     presenter.attachView(mockView)
   }

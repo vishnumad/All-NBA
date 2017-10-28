@@ -407,4 +407,9 @@ public class SubmittionActivity extends BaseNoActionBarActivity implements
     public void showErrorLoadingMoreComments() {
         Toast.makeText(this, "Error loading more comments", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void showNoNetAvailable() {
+        Toast.makeText(this, R.string.your_device_is_offline, Toast.LENGTH_SHORT).show();
+    }
 }

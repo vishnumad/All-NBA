@@ -60,6 +60,8 @@ interface SubmissionView {
 
   fun showUnsavedCommentToast()
 
+  fun showNoNetAvailable()
+
   fun openReplyToCommentActivity(parentComment: Comment)
 
   fun openReplyToSubmissionActivity(submissionId: String)

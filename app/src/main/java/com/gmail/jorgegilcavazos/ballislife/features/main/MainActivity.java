@@ -90,21 +90,15 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     // Should match value in strings.xml
     private static final String NO_FAV_TEAM_VAL = "noteam";
 
-    @Inject
-    LocalRepository localRepository;
+    @Inject LocalRepository localRepository;
 
-    @Inject
-    @Named("redditSharedPreferences")
-    SharedPreferences redditSharedPrefs;
+    @Inject @Named("redditSharedPreferences") SharedPreferences redditSharedPrefs;
 
-    @Inject
-    PostsRepository postsRepository;
+    @Inject PostsRepository postsRepository;
 
-    @Inject
-    RedditAuthentication redditAuthentication;
+    @Inject RedditAuthentication redditAuthentication;
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
 
     @BindView(R.id.mainAppBarLayout) AppBarLayout appBarLayout;
     Toolbar toolbar;
@@ -174,8 +168,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
                     public void onError(Throwable e) {
 
                     }
-                })
-        );
+                }));
 
         // Set default fragment to selected startup page from preferences.
         switch (localRepository.getStartupFragment()) {
@@ -567,8 +560,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     private void resubscribeToTopics() {
         // Subscribe to all CGA topics
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> cgaTopics = preferences.getStringSet(
-                SettingsFragment.KEY_PREF_CGA_TOPICS,
+        Set<String> cgaTopics = preferences.getStringSet(SettingsFragment.KEY_PREF_CGA_TOPICS,
                 null);
         String[] availableGameTopics = getResources().getStringArray(R.array.pref_cga_values);
         updateTopicSubscriptions(cgaTopics, availableGameTopics);
@@ -597,11 +589,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
                 ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
 
                 ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, TEAM_SUB_SHORTCUT_ID)
-                        .setShortLabel(teamSub)
-                        .setLongLabel(teamSub)
-                        .setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r)).setIntent(new Intent(this, MainActivity.class)
-                                .setAction(Intent.ACTION_VIEW)
-                                .putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
+                        .setShortLabel(teamSub).setLongLabel(teamSub).setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r)).setIntent(new Intent(this, MainActivity.class).setAction(Intent.ACTION_VIEW).putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
                         .build();
 
                 shortcutManager.setDynamicShortcuts(Arrays.asList(shortcutInfo));
@@ -663,8 +651,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     }
 
     @Override
-    public void onProductPurchased(
-            @NonNull String productId, @Nullable TransactionDetails details) {
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
         if (productId.equals(Constants.PREMIUM_PRODUCT_ID)) {
             hideGoPremiumMenuItem();
             Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
