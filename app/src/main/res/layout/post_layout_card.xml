@@ -40,8 +40,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="jorgegil96"
-                    android:textColor="@color/blue"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="@color/blue"
                     android:textSize="10sp"
                     android:textStyle="bold"/>
 
