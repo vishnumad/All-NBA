@@ -142,6 +142,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
     @Override
     public void hideStandings() {
         layoutContent.removeAllViews();
+        layoutContent.setVisibility(View.GONE);
     }
 
     @Override

@@ -11,9 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/eastern_conference"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/primaryText"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:layout_margin="10dp"/>
 
     <LinearLayout
@@ -28,8 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/team"
-            android:textSize="12sp"
-            android:textColor="@color/secondaryText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:layout_weight="1"/>
 
         <TextView
@@ -37,36 +34,32 @@
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="@string/wins_abbrev"
-            android:textSize="12sp"
-            android:textAlignment="center"
-            android:textColor="@color/secondaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/text_losses"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="@string/losses_abbrev"
-            android:textSize="12sp"
             android:textAlignment="center"
-            android:textColor="@color/secondaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:id="@+id/text_pct"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="@string/pct_abbrev"
-            android:textSize="12sp"
             android:textAlignment="center"
-            android:textColor="@color/secondaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:id="@+id/text_gb"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="@string/gb_abbrev"
-            android:textSize="12sp"
             android:textAlignment="center"
-            android:textColor="@color/secondaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
     </LinearLayout>
 

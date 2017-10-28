@@ -19,17 +19,17 @@
             android:layout_height="wrap_content"
             android:text="1"
             android:textAlignment="center"
-            android:textSize="14sp"
-            android:layout_marginRight="15dp"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_marginRight="15dp"/>
 
         <TextView
             android:id="@+id/text_team"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Spurs"
-            android:textSize="14sp"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"/>
 
     </LinearLayout>
 
@@ -43,36 +43,36 @@
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="61"
-            android:textSize="14sp"
-            android:textAlignment="center"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/text_losses"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="21"
-            android:textSize="14sp"
-            android:textAlignment="center"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/text_pct"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text=".680"
-            android:textSize="14sp"
-            android:textAlignment="center"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/text_gb"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:text="4"
-            android:textSize="14sp"
-            android:textAlignment="center"
-            android:textColor="@color/primaryText"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textAlignment="center"/>
 
     </LinearLayout>
 
