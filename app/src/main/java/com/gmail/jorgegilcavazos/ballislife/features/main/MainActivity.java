@@ -16,7 +16,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,7 +62,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
-public class MainActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+public class MainActivity extends BaseActivity implements BillingProcessor.IBillingHandler {
     private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
@@ -119,9 +118,12 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
     private BillingProcessor billingProcessor;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void injectAppComponent() {
         BallIsLifeApplication.getAppComponent().inject(this);
-        setAppTheme();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -249,12 +251,7 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
                 actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu_white);
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
-
-            if (localRepository.getAppTheme() == SwishTheme.DARK) {
-                toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);
-            } else {
-                toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Light);
-            }
+            setToolbarPopupTheme(toolbar);
         }
     }
 
@@ -697,18 +694,6 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
             hideGoPremiumMenuItem();
         } else {
             billingProcessor.purchase(this, Constants.PREMIUM_PRODUCT_ID);
-        }
-    }
-
-    private void setAppTheme() {
-        SwishTheme theme = localRepository.getAppTheme();
-        switch (theme) {
-            case LIGHT:
-                setTheme(R.style.AppTheme_NoActionBar);
-                break;
-            case DARK:
-                setTheme(R.style.AppTheme_Dark_NoActionBar);
-                break;
         }
     }
 

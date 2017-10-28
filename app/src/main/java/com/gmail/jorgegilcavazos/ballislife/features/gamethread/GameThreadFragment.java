@@ -1,6 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,11 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -62,6 +66,7 @@ public class GameThreadFragment extends Fragment
 
     @Inject GameThreadPresenterV2 presenter;
     @Inject RedditAuthentication redditAuthentication;
+    @Inject LocalRepository localRepository;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
@@ -125,8 +130,7 @@ public class GameThreadFragment extends Fragment
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
-                false);
+        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(), false, getTextColor());
         
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
@@ -446,5 +450,18 @@ public class GameThreadFragment extends Fragment
     @Override
     public void uncollapseComments(@NotNull String id) {
         threadAdapter.unCollapseComments(id);
+    }
+
+    private int getTextColor() {
+        int[] attrs = {android.R.attr.textColorPrimary};
+        TypedArray typedArray;
+        if (localRepository.getAppTheme() == SwishTheme.DARK) {
+            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme_Dark, attrs);
+        } else {
+            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme, attrs);
+        }
+        int textColor = typedArray.getColor(0, Color.BLACK);
+        typedArray.recycle();
+        return textColor;
     }
 }

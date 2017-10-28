@@ -1,6 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,7 +10,6 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,8 +22,10 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
@@ -46,16 +49,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
-public class SubmissionActivity extends AppCompatActivity implements SubmissionView,
+public class SubmissionActivity extends BaseActivity implements SubmissionView,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
 
-    @Inject
-    RedditAuthentication redditAuthentication;
+    @Inject RedditAuthentication redditAuthentication;
 
-    @Inject
-    SubmissionPresenter presenter;
+    @Inject SubmissionPresenter presenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -69,8 +70,12 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     private CommentSort sorting = CommentSort.TOP;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void injectAppComponent() {
         BallIsLifeApplication.getAppComponent().inject(this);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submission);
         ButterKnife.bind(this);
@@ -80,6 +85,7 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setSubtitle("TOP");
         }
+        setToolbarPopupTheme(toolbar);
 
         Bundle extras = getIntent().getExtras();
         if (getIntent() != null && getIntent().getExtras() != null) {
@@ -91,14 +97,25 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true);
+        int[] attrs = {android.R.attr.textColorPrimary};
+        TypedArray typedArray;
+        if (localRepository.getAppTheme() == SwishTheme.DARK) {
+            typedArray = obtainStyledAttributes(R.style.AppTheme_Dark, attrs);
+        } else {
+            typedArray = obtainStyledAttributes(R.style.AppTheme, attrs);
+        }
+        int textColor = typedArray.getColor(0, Color.BLACK);
+        typedArray.recycle();
+
+        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true,
+                textColor);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         submissionRecyclerView.setLayoutManager(linearLayoutManager);
         submissionRecyclerView.setAdapter(threadAdapter);
         submissionRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) {
                     fab.hide();
                 } else if (dy < 0) {
@@ -276,8 +293,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
     }
 
     @Override
-    public void showComments(@NonNull List<ThreadItem> commentNodes,
-            @NonNull Submission submission) {
+    public void showComments(@NonNull List<ThreadItem> commentNodes, @NonNull Submission
+            submission) {
         threadAdapter.setData(commentNodes);
         threadAdapter.setSubmission(submission);
     }
@@ -323,8 +340,8 @@ public class SubmissionActivity extends AppCompatActivity implements SubmissionV
         Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
         Bundle extras = new Bundle();
         extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
-        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
-                RedditUtils.bindSnuDown(parentComment.data("body_html")));
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT, RedditUtils.bindSnuDown(parentComment
+                .data("body_html")));
         intent.putExtras(extras);
         startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }

@@ -64,6 +64,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Map<String, List<ThreadItem>> collapsedItems = new HashMap<>();
     private boolean hasHeader;
     private SubmissionWrapper submissionWrapper;
+    private int textColor;
 
     private PublishSubject<CommentWrapper> commentSaves = PublishSubject.create();
     private PublishSubject<CommentWrapper> commentUnsaves = PublishSubject.create();
@@ -81,12 +82,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private PublishSubject<String> commentUnCollapses = PublishSubject.create();
     private PublishSubject<CommentItem> loadMoreComments = PublishSubject.create();
 
-    public ThreadAdapter(Context context, RedditAuthentication redditAuthentication,
-                         List<ThreadItem> commentsList, boolean hasHeader) {
+    public ThreadAdapter(Context context, RedditAuthentication redditAuthentication, List
+            <ThreadItem> commentsList, boolean hasHeader, int textColor) {
         this.context = context;
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
         this.redditAuthentication = redditAuthentication;
+        this.textColor = textColor;
     }
 
     public void setSubmissionWrapper(SubmissionWrapper submissionWrapper) {
@@ -105,10 +107,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         if (viewType == SUBMISSION_HEADER.getValue()) {
             view = inflater.inflate(R.layout.post_layout_card, parent, false);
-            return new FullCardViewHolder(view);
+            return new FullCardViewHolder(view, textColor);
         } else if (viewType == COMMENT.getValue()) {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
-            return new CommentViewHolder(view);
+            return new CommentViewHolder(view, textColor);
         } else if (viewType == LOAD_MORE_COMMENTS.getValue()) {
             view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
             return new LoadMoreCommentsViewHolder(view);
@@ -372,7 +374,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.comment_timestamp) TextView timestampTextView;
         @BindView(R.id.comment_body) TextView bodyTextView;
         @BindView(R.id.comment_flair) TextView flairTextView;
-        @BindView(R.id.comment_saved) TextView tvSaved;
         @BindView(R.id.image_flair) ImageView ivFlair;
         @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
         @BindView(R.id.button_comment_upvote) ImageButton btnUpvote;
@@ -381,9 +382,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.button_comment_reply) ImageButton btnReply;
         @BindView(R.id.collapsedIndicator) TextView collapseIndicator;
 
-        public CommentViewHolder(View view) {
+        private int textColor;
+
+        public CommentViewHolder(View view, int textColor) {
             super(view);
             ButterKnife.bind(this, view);
+            this.textColor = textColor;
         }
 
         public void bindData(final Context context, final ThreadItem threadItem, final
@@ -491,7 +495,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             final int colorUpvoted = ContextCompat.getColor(context, R.color.commentUpvoted);
             final int colorDownvoted = ContextCompat.getColor(context, R.color.commentDownvoted);
-            final int colorNeutral = ContextCompat.getColor(context, R.color.commentNeutral);
 
             // Set score color base on vote.
             if (comment.getVote() == VoteDirection.UPVOTE) {
@@ -499,10 +502,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             } else if (comment.getVote() == VoteDirection.DOWNVOTE) {
                 scoreTextView.setTextColor(colorDownvoted);
             } else {
-                scoreTextView.setTextColor(colorNeutral);
+                scoreTextView.setTextColor(textColor);
             }
-
-            tvSaved.setVisibility(View.GONE);
 
             // Add a "*" to indicate that a comment has been edited.
             if (comment.getEdited()) {
@@ -512,7 +513,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             btnUpvote.setOnClickListener(v -> {
                 if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
                     if (redditAuthentication.isUserLoggedIn()) {
-                        scoreTextView.setTextColor(colorNeutral);
+                        scoreTextView.setTextColor(textColor);
                     }
                     novotes.onNext(comment);
                 } else {
@@ -526,7 +527,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             btnDownvote.setOnClickListener(v -> {
                 if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
                     if (redditAuthentication.isUserLoggedIn()) {
-                        scoreTextView.setTextColor(colorNeutral);
+                        scoreTextView.setTextColor(textColor);
                     }
                     novotes.onNext(comment);
                 } else {
@@ -538,10 +539,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 hideActions(context, commentHolder, depth);
             });
             btnSave.setOnClickListener(v -> {
-                if (tvSaved.getVisibility() == View.VISIBLE) {
+                if (comment.getSaved()) {
                     commentUnsaves.onNext(comment);
+                    comment.setSaved(false);
                 } else {
                     commentSaves.onNext(comment);
+                    comment.setSaved(true);
                 }
                 hideActions(context, commentHolder, depth);
             });
@@ -624,11 +627,11 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
             } else {
                 if (dark) {
-                    holder.commentInnerContentLayout.setBackgroundColor(ContextCompat.getColor
-                            (context, R.color.commentBgDark));
+                    holder.commentInnerContentLayout.setBackgroundResource(R.drawable
+                            .border_no_comment_dark);
                 } else {
-                    holder.commentInnerContentLayout.setBackgroundColor(ContextCompat.getColor
-                            (context, R.color.commentBgLight));
+                    holder.commentInnerContentLayout.setBackgroundResource(R.drawable
+                            .border_no_comment);
                 }
             }
             // Add padding depending on level.

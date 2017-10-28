@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp"
-            android:background="@color/commentBgLight"
             android:clickable="false">
 
             <LinearLayout
@@ -33,7 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Author"
-                    android:textColor="@color/secondaryText"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textStyle="bold"
                     android:textSize="10sp"
                     android:clickable="false"/>
@@ -63,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="2dp"
                     android:text="1000 points"
-                    android:textColor="@color/commentNeutral"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textSize="10sp"
                     android:clickable="false"/>
 
@@ -73,17 +72,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="2dp"
                     android:text="10 hours ago"
-                    android:textColor="@color/secondaryText"
-                    android:textSize="10sp"
-                    android:clickable="false"/>
-
-                <TextView
-                    android:id="@+id/comment_saved"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="2dp"
-                    android:text="@string/saved"
-                    android:textColor="@color/commentSaved"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="10sp"
                     android:clickable="false"/>
 
@@ -95,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
                 android:text="This is a comment"
-                android:textColor="@color/primaryText"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="12sp"/>
 
         </LinearLayout>
@@ -107,6 +96,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_margin="5dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:text="[ + ]"
             android:textSize="10sp"/>
 
@@ -116,7 +106,7 @@
         android:id="@+id/layout_comment_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
+        android:background="?attr/colorPrimary">
 
         <ImageButton
             android:id="@+id/button_comment_upvote"

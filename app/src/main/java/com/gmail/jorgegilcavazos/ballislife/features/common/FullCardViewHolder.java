@@ -53,9 +53,12 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.text_link) TextView tvLink;
     public @BindView(R.id.header_layout) View  headerLayout;
 
-    public FullCardViewHolder(View itemView) {
+    private int textColor;
+
+    public FullCardViewHolder(View itemView, int textColor) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.textColor = textColor;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -163,7 +166,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
             tvTitle.setTextColor(ContextCompat.getColor(context, R.color.stickiedColor));
             tvTitle.setTypeface(null, Typeface.BOLD);
         } else {
-            tvTitle.setTextColor(ContextCompat.getColor(context, R.color.primaryText));
+            tvTitle.setTextColor(textColor);
             tvTitle.setTypeface(null, Typeface.NORMAL);
         }
 
@@ -263,22 +266,24 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     private void setNoVoteColors(Context context) {
         setUpvoteIcon(false);
         setDownvoteIcon(false);
-        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+        tvPoints.setTextColor(textColor);
     }
 
     private void setUpvoteIcon(boolean active) {
         if (active) {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_orange_18dp);
+            btnUpvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentUpvoted));
         } else {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_black_18dp);
+            btnUpvote.setColorFilter(textColor);
         }
     }
 
     private void setDownvoteIcon(boolean active) {
         if (active) {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_purple_18dp);
+            btnDownvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentDownvoted));
         } else {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_black_18dp);
+            btnDownvote.setColorFilter(textColor);
         }
     }
 
