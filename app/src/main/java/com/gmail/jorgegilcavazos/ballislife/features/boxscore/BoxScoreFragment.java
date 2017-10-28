@@ -156,6 +156,11 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Override
     public void showVisitorBoxScore(BoxScoreValues values) {
+        btnHome.setText(getString(R.string.box_score_team_score, homeTeam,
+                values.getHls().getScore()));
+        btnAway.setText(getString(R.string.box_score_team_score, awayTeam,
+                values.getVls().getScore()));
+
         playersTable.removeAllViews();
         statsTable.removeAllViews();
 
@@ -195,6 +200,11 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Override
     public void showHomeBoxScore(BoxScoreValues values) {
+        btnHome.setText(getString(R.string.box_score_team_score, homeTeam,
+                values.getHls().getScore()));
+        btnAway.setText(getString(R.string.box_score_team_score, awayTeam,
+                values.getVls().getScore()));
+
         playersTable.removeAllViews();
         statsTable.removeAllViews();
 
@@ -244,12 +254,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     @Override
     public void hideBoxScore() {
         scrollView.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void showLoadingBoxScoreErrorMessage() {
-        tvLoadMessage.setText(R.string.failed_to_load_box_score);
-        tvLoadMessage.setVisibility(View.VISIBLE);
     }
 
     @Override

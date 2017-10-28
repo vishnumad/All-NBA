@@ -452,4 +452,6 @@
     <string name="submitted_comment">Submitted comment</string>
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
     <string name="could_not_save_comment_missing_submmission">Couldn\'t save comment, missing submission</string>
+
+    <string name="box_score_team_score">%1$s (%2$d)</string> <!-- SAS (90) -->
 </resources>

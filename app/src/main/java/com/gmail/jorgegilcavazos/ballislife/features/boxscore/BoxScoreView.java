@@ -12,8 +12,6 @@ public interface BoxScoreView {
 
     void hideBoxScore();
 
-    void showLoadingBoxScoreErrorMessage();
-
     void showBoxScoreNotAvailableMessage();
 
     void hideLoadMessage();

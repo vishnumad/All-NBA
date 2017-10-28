@@ -20,7 +20,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:background="@drawable/square_white"
-                android:text="SAS"/>
+                android:text="SAS - 81"/>
 
             <Button
                 android:id="@+id/button_home"
@@ -28,7 +28,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:background="@drawable/square_black"
-                android:text="ATL"
+                android:text="ATL (67)"
                 android:textColor="@color/white"/>
 
         </LinearLayout>
