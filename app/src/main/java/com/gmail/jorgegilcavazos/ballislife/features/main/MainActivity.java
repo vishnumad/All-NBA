@@ -133,10 +133,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
         } else {
             if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW) && localRepository
                     .shouldShowWhatsNew()) {
-                new MaterialDialog.Builder(this).title(R.string.whats_new).content(R.string
-                        .whats_new_content).positiveText(R.string.got_it).negativeText(R.string
-                        .dont_show_again).onNegative((d, w) -> localRepository
-                        .setShouldShowWhatsNew(false)).show();
+                new MaterialDialog.Builder(this).title(R.string.whats_new)
+                        .content(R.string.whats_new_content)
+                        .positiveText(R.string.got_it)
+                        .negativeText(R.string.dont_show_again)
+                        .onNegative((d, w) -> localRepository.setShouldShowWhatsNew(false))
+                        .show();
                 Once.markDone(SHOW_WHATS_NEW);
             }
         }
@@ -589,7 +591,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
                 ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
 
                 ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, TEAM_SUB_SHORTCUT_ID)
-                        .setShortLabel(teamSub).setLongLabel(teamSub).setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r)).setIntent(new Intent(this, MainActivity.class).setAction(Intent.ACTION_VIEW).putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
+                        .setShortLabel(teamSub)
+                        .setLongLabel(teamSub)
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r))
+                        .setIntent(new Intent(this, MainActivity.class).setAction(Intent
+                                .ACTION_VIEW)
+                                .putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
                         .build();
 
                 shortcutManager.setDynamicShortcuts(Arrays.asList(shortcutInfo));
@@ -651,7 +658,8 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     }
 
     @Override
-    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails
+            details) {
         if (productId.equals(Constants.PREMIUM_PRODUCT_ID)) {
             hideGoPremiumMenuItem();
             Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
