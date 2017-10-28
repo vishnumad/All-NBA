@@ -447,7 +447,7 @@
         New setting to open youtube videos in native app\n•
         Replies are now shown immediately after posting\n•
         Fixed "load more comments" button\n•
-        Fixed issue where standing could appear unsorted
+        Fixed issue where standings could appear unsorted
     </string>
     <string name="submitted_comment">Submitted comment</string>
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
