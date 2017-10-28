@@ -276,12 +276,16 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addNormalItem(row, String.valueOf(statLine.getAst())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getBlka())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFgm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFga())));
+            row.addView(addNormalItem(row, getShootingPct(statLine.getFga(), statLine.getFgm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getTpm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getTpa())));
+            row.addView(addNormalItem(row, getShootingPct(statLine.getTpa(), statLine.getTpm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFtm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFta())));
+            row.addView(addNormalItem(row, getShootingPct(statLine.getFta(), statLine.getFtm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getPf())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getTov())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getPm())));
@@ -292,12 +296,16 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addHeaderItem(row, "AST"));
             row.addView(addHeaderItem(row, "STL"));
             row.addView(addHeaderItem(row, "BLK"));
+            row.addView(addHeaderItem(row, "BA"));
             row.addView(addHeaderItem(row, "FGM"));
             row.addView(addHeaderItem(row, "FGA"));
+            row.addView(addHeaderItem(row, "FG%"));
             row.addView(addHeaderItem(row, "3PM"));
             row.addView(addHeaderItem(row, "3PA"));
+            row.addView(addHeaderItem(row, "3P%"));
             row.addView(addHeaderItem(row, "FTM"));
             row.addView(addHeaderItem(row, "FTA"));
+            row.addView(addHeaderItem(row, "FT%"));
             row.addView(addHeaderItem(row, "PF"));
             row.addView(addHeaderItem(row, "TO"));
             row.addView(addHeaderItem(row, "+/-"));
@@ -322,5 +330,14 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         view.setTypeface(null, Typeface.NORMAL);
         view.setMinWidth((int) UnitUtils.convertDpToPixel(30, getActivity()));
         return view;
+    }
+
+    private String getShootingPct(double attempts, double makes) {
+        if (attempts == 0) {
+            return "-";
+        }
+
+        int pct = (int) ((makes / attempts) * 100);
+        return pct + "%";
     }
 }

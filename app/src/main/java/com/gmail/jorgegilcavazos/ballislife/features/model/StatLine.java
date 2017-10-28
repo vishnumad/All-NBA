@@ -7,6 +7,7 @@ public class StatLine {
     private int ast;
     private int reb;
     private int blk;
+    private int blka;
     private int stl;
     private int tov;
     private int pf;
@@ -95,6 +96,14 @@ public class StatLine {
 
     public void setBlk(int blk) {
         this.blk = blk;
+    }
+
+    public int getBlka() {
+        return blka;
+    }
+
+    public void setBlka(int blka) {
+        this.blka = blka;
     }
 
     public int getStl() {
