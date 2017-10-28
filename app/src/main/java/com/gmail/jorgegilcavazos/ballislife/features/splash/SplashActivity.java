@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, MainNoActionBarActivity.class));
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 finish();
             }
         }, 1000);

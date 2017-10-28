@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -174,9 +174,9 @@ public class ProfileActivity extends AppCompatActivity
 
     @Override
     public void openSubmission(String submissionId) {
-        Intent intent = new Intent(ProfileActivity.this, SubmissionNoActionBarActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, SubmittionActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(SubmissionNoActionBarActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(SubmittionActivity.KEY_TITLE, getString(R.string.profile));
         extras.putString(Constants.THREAD_ID, submissionId);
         intent.putExtras(extras);
         startActivity(intent);
@@ -184,11 +184,11 @@ public class ProfileActivity extends AppCompatActivity
 
     @Override
     public void openSubmissionAndScrollToComment(String submissionId, String commentId) {
-        Intent intent = new Intent(ProfileActivity.this, SubmissionNoActionBarActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, SubmittionActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(SubmissionNoActionBarActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(SubmittionActivity.KEY_TITLE, getString(R.string.profile));
         extras.putString(Constants.THREAD_ID, submissionId);
-        extras.putString(SubmissionNoActionBarActivity.KEY_COMMENT_TO_SCROLL_ID, commentId);
+        extras.putString(SubmittionActivity.KEY_COMMENT_TO_SCROLL_ID, commentId);
         intent.putExtras(extras);
         startActivity(intent);
     }

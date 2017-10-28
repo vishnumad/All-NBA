@@ -62,9 +62,9 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
-public class MainNoActionBarActivity extends BaseNoActionBarActivity implements BillingProcessor
+public class MainActivity extends BaseNoActionBarActivity implements BillingProcessor
         .IBillingHandler {
-    private static final String TAG = "MainNoActionBarActivity";
+    private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
     private static final String SUBSCRIBE_TO_TOPICS = "subscribeToTopics";
@@ -588,8 +588,7 @@ public class MainNoActionBarActivity extends BaseNoActionBarActivity implements 
                 ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, TEAM_SUB_SHORTCUT_ID)
                         .setShortLabel(teamSub)
                         .setLongLabel(teamSub)
-                        .setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r))
-                        .setIntent(new Intent(this, MainNoActionBarActivity.class)
+                        .setIcon(Icon.createWithResource(this, R.drawable.ic_shortcut_r)).setIntent(new Intent(this, MainActivity.class)
                                 .setAction(Intent.ACTION_VIEW)
                                 .putExtra(SHORTCUT_KEY, SHORTCUT_TEAM_SUB))
                         .build();

@@ -30,7 +30,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
-import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -95,15 +95,15 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ReplyNoActionBarActivity.POST_COMMENT_REPLY_REQUEST && resultCode ==
+        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
-            String parentId = data.getStringExtra(ReplyNoActionBarActivity.KEY_COMMENT_ID);
-            String response = data.getStringExtra(ReplyNoActionBarActivity.KEY_POSTED_COMMENT);
+            String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
             presenter.replyToComment(parentId, response);
-        } else if (requestCode == ReplyNoActionBarActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
+        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
-            String response = data.getStringExtra(ReplyNoActionBarActivity.KEY_POSTED_COMMENT);
-            String submissionId = data.getStringExtra(ReplyNoActionBarActivity.KEY_SUBMISSION_ID);
+            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
+            String submissionId = data.getStringExtra(ReplyActivity.KEY_SUBMISSION_ID);
             presenter.replyToSubmission(submissionId, response);
         }
     }
@@ -306,22 +306,22 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void openReplyToCommentActivity(@NonNull Comment parentComment) {
-        Intent intent = new Intent(getActivity(), ReplyNoActionBarActivity.class);
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyNoActionBarActivity.KEY_COMMENT_ID, parentComment.getId());
-        extras.putCharSequence(ReplyNoActionBarActivity.KEY_COMMENT,
+        extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
                                RedditUtils.bindSnuDown(parentComment.data("body_html")));
         intent.putExtras(extras);
-        startActivityForResult(intent, ReplyNoActionBarActivity.POST_COMMENT_REPLY_REQUEST);
+        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }
 
     @Override
     public void openReplyToSubmissionActivity(@NonNull String submissionId) {
-        Intent intent = new Intent(getActivity(), ReplyNoActionBarActivity.class);
+        Intent intent = new Intent(getActivity(), ReplyActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyNoActionBarActivity.KEY_SUBMISSION_ID, submissionId);
+        extras.putString(ReplyActivity.KEY_SUBMISSION_ID, submissionId);
         intent.putExtras(extras);
-        startActivityForResult(intent, ReplyNoActionBarActivity.POST_SUBMISSION_REPLY_REQUEST);
+        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
     @Override

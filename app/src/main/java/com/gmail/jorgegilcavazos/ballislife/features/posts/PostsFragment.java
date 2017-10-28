@@ -37,7 +37,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickLis
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
@@ -413,10 +413,10 @@ public class PostsFragment extends Fragment implements PostsView,
 
     @Override
     public void onSubmissionClick(SubmissionWrapper submissionWrapper) {
-        Intent intent = new Intent(getActivity(), SubmissionNoActionBarActivity.class);
+        Intent intent = new Intent(getActivity(), SubmittionActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, submissionWrapper.getId());
-        bundle.putString(SubmissionNoActionBarActivity.KEY_TITLE, subreddit);
+        bundle.putString(SubmittionActivity.KEY_TITLE, subreddit);
         intent.putExtras(bundle);
         startActivity(intent);
     }

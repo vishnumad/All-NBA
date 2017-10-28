@@ -23,7 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
@@ -55,7 +55,7 @@ import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType
  * Currently used to display comments only in the
  * {@link com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment} and to
  * display comments AND a the card for a full submission in the
- * {@link SubmissionNoActionBarActivity}.
+ * {@link SubmittionActivity}.
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

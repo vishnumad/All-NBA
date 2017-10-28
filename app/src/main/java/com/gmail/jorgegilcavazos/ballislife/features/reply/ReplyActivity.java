@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /** Activity used for adding a comment with formatting tools */
-public class ReplyNoActionBarActivity extends BaseActionBarActivity implements
+public class ReplyActivity extends BaseActionBarActivity implements
         AddLinkDialogFragment.OnFragmentInteractionListener {
     public static final int POST_COMMENT_REPLY_REQUEST = 1;
     public static final int POST_SUBMISSION_REPLY_REQUEST = 2;
