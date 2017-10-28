@@ -9,6 +9,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
@@ -34,13 +35,12 @@ public class SettingsFragment extends PreferenceFragment
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
-    private static final String TAG = "SettingsFragment";
 
-    @Inject
-    RedditAuthentication redditAuthentication;
+    @Inject RedditAuthentication redditAuthentication;
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
+
+    @Inject LocalRepository localRepository;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,10 +173,9 @@ public class SettingsFragment extends PreferenceFragment
 
     private void initLogInStatusText() {
         Preference logInStatusPref = findPreference("log_in_status_pref");
-        if (redditAuthentication.isUserLoggedIn()) {
+        if (localRepository.getUsername() != null) {
             logInStatusPref.setTitle(R.string.log_out);
-            logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user),
-                    redditAuthentication.getRedditClient().getAuthenticatedUser()));
+            logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user), localRepository.getUsername()));
 
         } else {
             logInStatusPref.setTitle(R.string.log_in);
@@ -186,32 +185,27 @@ public class SettingsFragment extends PreferenceFragment
 
     private void initListeners() {
         Preference logInStatusPref = findPreference("log_in_status_pref");
-        logInStatusPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                if (redditAuthentication.isUserLoggedIn()) {
-                    redditAuthentication.deAuthenticateUser()
-                            .andThen(redditAuthentication.authenticate())
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.ui())
-                            .subscribeWith(new DisposableCompletableObserver() {
-                                @Override
-                                public void onComplete() {
-                                    initLogInStatusText();
-                                    // TODO check view is attached
-                                }
+        logInStatusPref.setOnPreferenceClickListener(preference -> {
+            if (localRepository.getUsername() != null) {
+                localRepository.saveUsername(null);
+                redditAuthentication.deAuthenticateUser().andThen(redditAuthentication
+                        .authenticate()).subscribeOn(schedulerProvider.io()).observeOn
+                        (schedulerProvider.ui()).subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        initLogInStatusText();
+                    }
 
-                                @Override
-                                public void onError(Throwable e) {
+                    @Override
+                    public void onError(Throwable e) {
 
-                                }
-                            });
-                } else {
-                    Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
-                    startActivity(loginIntent);
-                }
-                return false;
+                    }
+                });
+            } else {
+                Intent loginIntent = new Intent(getActivity(), LoginActivity.class);
+                startActivity(loginIntent);
             }
+            return false;
         });
     }
 }

@@ -1,18 +1,18 @@
 package com.gmail.jorgegilcavazos.ballislife.features.settings;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActionBarActivity;
 
-public class SettingsActivity extends AppCompatActivity {
-    private static final String TAG = "SettingsActivity";
+public class SettingsActivity extends BaseActionBarActivity {
 
-    private Toolbar toolbar;
-    private ActionBar actionBar;
+    @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

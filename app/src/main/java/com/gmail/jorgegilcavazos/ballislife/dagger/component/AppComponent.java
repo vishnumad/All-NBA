@@ -13,6 +13,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
@@ -52,4 +53,6 @@ public interface AppComponent {
     void inject(ReplyActivity replyActivity);
 
     void inject(CommentsActivity commentsActivity);
+
+    void inject(SettingsActivity settingsActivity);
 }
