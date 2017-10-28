@@ -13,6 +13,7 @@
         <item name="commentBackgroundLight">@color/commentBgLight</item>
         <item name="commentBackgroundDark">@color/commentBgDark</item>
         <item name="iconTint">@color/active_icon</item>
+        <item name="separator">@color/dividerLight</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
@@ -27,6 +28,7 @@
         <item name="commentBackgroundLight">@color/nightColorPrimaryLight</item>
         <item name="commentBackgroundDark">@color/nightColorPrimaryDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
+        <item name="separator">@color/dividerDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

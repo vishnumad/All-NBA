@@ -5,5 +5,6 @@
         <attr name="commentBackgroundDark" format="color"/>
         <attr name="iconTint" format="color"/>
         <attr name="colorPrimaryLight" format="color"/>
+        <attr name="separator" format="color" />
     </declare-styleable>
 </resources>

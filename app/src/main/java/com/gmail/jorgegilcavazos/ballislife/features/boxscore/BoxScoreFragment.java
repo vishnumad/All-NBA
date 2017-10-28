@@ -170,14 +170,24 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             }
         }
 
+        int i = 1;
         addRowToPlayersTable2("PLAYER");
         for (String player : players) {
             addRowToPlayersTable2(player);
+            if (i == 5) {
+                addSeparatorRowToPlayers();
+            }
+            i++;
         }
 
+        i = 1;
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getVls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
+            if (i == 5) {
+                addSeparatorRowToStats(19);
+            }
+            i++;
         }
 
         scrollView.setVisibility(View.VISIBLE);
@@ -200,13 +210,23 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         }
 
         addRowToPlayersTable2("PLAYER");
+        int i = 1;
         for (String player : players) {
             addRowToPlayersTable2(player);
+            if (i == 5) {
+                addSeparatorRowToPlayers();
+            }
+            i++;
         }
 
+        i = 1;
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getHls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
+            if (i == 5) {
+                addSeparatorRowToStats(19);
+            }
+            i++;
         }
 
         scrollView.setVisibility(View.VISIBLE);
@@ -311,6 +331,27 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addHeaderItem(row, "+/-"));
         }
 
+        statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+    }
+
+    private void addSeparatorRowToPlayers() {
+        TableRow row = new TableRow(getActivity());
+        row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        View view = LayoutInflater.from(getActivity())
+                .inflate(R.layout.box_score_separator, row, false);
+        row.addView(view);
+        playersTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+    }
+
+    private void addSeparatorRowToStats(int columns) {
+        TableRow row = new TableRow(getActivity());
+        row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+
+        for (int i = 0; i < columns; i++) {
+            View view = LayoutInflater.from(getActivity())
+                    .inflate(R.layout.box_score_separator, row, false);
+            row.addView(view);
+        }
         statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
     }
 
