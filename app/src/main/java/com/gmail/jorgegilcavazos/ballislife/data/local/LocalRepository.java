@@ -24,4 +24,8 @@ public interface LocalRepository {
     void saveAppTheme(SwishTheme theme);
 
     SwishTheme getAppTheme();
+
+    boolean shouldShowWhatsNew();
+
+    void setShouldShowWhatsNew(boolean showWhatsNew);
 }

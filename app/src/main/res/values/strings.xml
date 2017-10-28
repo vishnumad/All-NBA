@@ -412,8 +412,6 @@
     <!-- DO NOT TRANSLATE -->
     <string-array name="pref_start_values_def"/>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="would_you_like_to_sign_in">Would you like to sign in to your Reddit account? \n\n Signing in with reddit allows you to vote submissions and comments, reply to other users and save your favorite posts.</string>
     <string name="log_in_caps">LOG IN</string>
     <string name="skip">SKIP</string>
@@ -437,4 +435,18 @@
     <string name="submitting_comment">Submitting comment</string>
     <string name="highlights">Highlights</string>
 
+    <string name="whats_new">WHAT\'S NEW</string>
+    <string name="got_it">GOT IT</string>
+    <string name="dont_show_again">DON\'T SHOW AGAIN</string>
+    <string name="whats_new_content">
+        v1.1.0\n•
+        New dark theme!\n•
+        Hide/expand a comment\'s children by long-pressing it\n•
+        View a highlight\'s comment thread\n•
+        View highlights in portrait mode\n•
+        New setting to open youtube videos in native app\n•
+        Replies are now shown immediately after posting\n•
+        Fixed "load more comments" button\n•
+        Fixed issue where standing could appear unsorted
+    </string>
 </resources>

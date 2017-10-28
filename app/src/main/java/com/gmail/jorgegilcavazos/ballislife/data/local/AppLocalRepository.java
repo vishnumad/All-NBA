@@ -83,13 +83,13 @@ public class AppLocalRepository implements LocalRepository {
     @Override
     public void saveAppTheme(SwishTheme theme) {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
-        editor.putInt(LocalSharedPreferences.SwishTheme, theme.getValue());
+        editor.putInt(LocalSharedPreferences.SWISH_THEME, theme.getValue());
         editor.apply();
     }
 
     @Override
     public SwishTheme getAppTheme() {
-        int value = localSharedPreferences.getInt(LocalSharedPreferences.SwishTheme, -1);
+        int value = localSharedPreferences.getInt(LocalSharedPreferences.SWISH_THEME, -1);
 
         if (SwishTheme.LIGHT.getValue() == value) {
             return SwishTheme.LIGHT;
@@ -98,5 +98,17 @@ public class AppLocalRepository implements LocalRepository {
         } else {
             return SwishTheme.LIGHT;
         }
+    }
+
+    @Override
+    public boolean shouldShowWhatsNew() {
+        return localSharedPreferences.getBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, true);
+    }
+
+    @Override
+    public void setShouldShowWhatsNew(boolean showWhatsNew) {
+        SharedPreferences.Editor editor = localSharedPreferences.edit();
+        editor.putBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, showWhatsNew);
+        editor.apply();
     }
 }

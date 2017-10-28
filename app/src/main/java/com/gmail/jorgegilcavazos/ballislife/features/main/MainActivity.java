@@ -25,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -67,7 +68,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
-    private static final String SUBSCRIBE_TO_TOPICS = "subscribeToTopics";
+    private static final String SHOW_WHATS_NEW = "showWhatsNew";
 
     private static final String SELECTED_FRAGMENT_KEY = "selectedFragment";
     private static final String SELECTED_SUBREDDIT_KEY = "selectedSubreddit";
@@ -135,7 +136,17 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
             Intent intent = new Intent(this, TourLoginActivity.class);
             startActivity(intent);
             Once.markDone(SHOW_TOUR);
+        } else {
+            if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW) && localRepository
+                    .shouldShowWhatsNew()) {
+                new MaterialDialog.Builder(this).title(R.string.whats_new).content(R.string
+                        .whats_new_content).positiveText(R.string.got_it).negativeText(R.string
+                        .dont_show_again).onNegative((d, w) -> localRepository
+                        .setShouldShowWhatsNew(false)).show();
+                Once.markDone(SHOW_WHATS_NEW);
+            }
         }
+
 
         String billingLicense = getString(R.string.play_billing_license_key);
         billingProcessor = new BillingProcessor(this, billingLicense, this);
