@@ -188,7 +188,7 @@ public class ProfilePresenterTest {
         when(mockComment2.getSubmissionId()).thenReturn("t3_sub_id_2");
         when(mockComment.getId()).thenReturn("t1_comment_id_2");
         Submission mockSubmission = mock(Submission.class);
-        when(mockSubmission.getId()).thenReturn("t3_sub_id_3");
+        when(mockSubmission.getId()).thenReturn("sub_id_3");
 
 
         Observable<PublicContribution> contributionObservable
