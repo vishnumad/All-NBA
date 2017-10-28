@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,14 +17,16 @@ import android.widget.Toast;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.google.firebase.crash.FirebaseCrash;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class CommentsActivity extends AppCompatActivity implements TabLayout
+public class CommentsActivity extends BaseNoActionBarActivity implements TabLayout
         .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener,
         BillingProcessor.IBillingHandler {
     public static final String GAME_ID_KEY = "gameId";
@@ -39,6 +40,11 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
 
     private PagerAdapter pagerAdapter;
     public BillingProcessor billingProcessor;
+
+    @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +81,7 @@ public class CommentsActivity extends AppCompatActivity implements TabLayout
         tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
         fab.hide();
 
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(),
-                tabLayout.getTabCount(), bundle);
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(this);
         tabLayout.addOnTabSelectedListener(this);

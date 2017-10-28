@@ -2,8 +2,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,10 +34,10 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewS
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
@@ -118,16 +116,8 @@ public class PostsFragment extends Fragment implements PostsView,
             viewType = Constants.POSTS_VIEW_WIDE_CARD;
         }
 
-        int[] attrs = {android.R.attr.textColorPrimary};
-        TypedArray typedArray;
-        if (localRepository.getAppTheme() == SwishTheme.DARK) {
-            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme_Dark, attrs);
-        } else {
-            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme, attrs);
-        }
-        int textColor = typedArray.getColor(0, Color.BLACK);
-        typedArray.recycle();
-
+        int textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository
+                .getAppTheme());
         linearLayoutManager = new LinearLayoutManager(getActivity());
         postsAdapter = new PostsAdapter(getActivity(), redditAuthentication, null, viewType,
                 this, subreddit, textColor);

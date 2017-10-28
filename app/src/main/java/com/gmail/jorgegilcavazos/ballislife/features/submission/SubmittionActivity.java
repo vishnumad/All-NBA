@@ -1,8 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.submission;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,12 +23,12 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 
 import net.dean.jraw.models.Comment;
@@ -98,16 +96,7 @@ public class SubmittionActivity extends BaseNoActionBarActivity implements
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        int[] attrs = {android.R.attr.textColorPrimary};
-        TypedArray typedArray;
-        if (localRepository.getAppTheme() == SwishTheme.DARK) {
-            typedArray = obtainStyledAttributes(R.style.AppTheme_Dark, attrs);
-        } else {
-            typedArray = obtainStyledAttributes(R.style.AppTheme, attrs);
-        }
-        int textColor = typedArray.getColor(0, Color.BLACK);
-        typedArray.recycle();
-
+        int textColor = ThemeUtils.Companion.getTextColor(this, localRepository.getAppTheme());
         threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true,
                 textColor);
 

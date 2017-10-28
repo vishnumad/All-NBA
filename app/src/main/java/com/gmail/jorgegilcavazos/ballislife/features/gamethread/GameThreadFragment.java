@@ -1,8 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,11 +26,11 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
-import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.dean.jraw.models.Comment;
@@ -56,10 +54,8 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity
         .HOME_TEAM_KEY;
 
-public class GameThreadFragment extends Fragment
-        implements GameThreadView,
-        SwipeRefreshLayout.OnRefreshListener,
-        CompoundButton.OnCheckedChangeListener {
+public class GameThreadFragment extends Fragment implements GameThreadView, SwipeRefreshLayout
+        .OnRefreshListener, CompoundButton.OnCheckedChangeListener {
 
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
@@ -95,8 +91,7 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode ==
-                RESULT_OK) {
+        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
             String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
             String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
             presenter.replyToComment(parentId, response);
@@ -124,21 +119,24 @@ public class GameThreadFragment extends Fragment
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
+            Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_game_thread, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(), false, getTextColor());
-        
+        int textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository
+                .getAppTheme());
+        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
+                false, textColor);
+
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
         rvComments.setAdapter(threadAdapter);
-        rvComments.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        rvComments.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) {
                     ((CommentsActivity) getActivity()).fab.hide();
                 } else if (dy < 0) {
@@ -164,8 +162,8 @@ public class GameThreadFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (threadType == GameThreadType.LIVE) {
             inflater.inflate(R.menu.menu_game_thread, menu);
-            streamSwitch = menu.findItem(R.id.action_stream).getActionView()
-                    .findViewById(R.id.switch_stream);
+            streamSwitch = menu.findItem(R.id.action_stream).getActionView().findViewById(R.id
+                    .switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
             streamSwitch.setChecked(false);
         }
@@ -309,8 +307,8 @@ public class GameThreadFragment extends Fragment
         Intent intent = new Intent(getActivity(), ReplyActivity.class);
         Bundle extras = new Bundle();
         extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
-        extras.putCharSequence(ReplyActivity.KEY_COMMENT,
-                               RedditUtils.bindSnuDown(parentComment.data("body_html")));
+        extras.putCharSequence(ReplyActivity.KEY_COMMENT, RedditUtils.bindSnuDown(parentComment
+                .data("body_html")));
         intent.putExtras(extras);
         startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
     }
@@ -356,24 +354,20 @@ public class GameThreadFragment extends Fragment
 
     @Override
     public void showMissingParentToast() {
-        Toast.makeText(getActivity(), "Couldn't save comment, missing parent", Toast.LENGTH_SHORT)
-                .show();
+        Toast.makeText(getActivity(), "Couldn't save comment, missing parent", Toast
+                .LENGTH_SHORT).show();
     }
 
     @Override
     public void showMissingSubmissionToast() {
-        Toast.makeText(
-                getActivity(),
-                "Couldn't save comment, missing submission",
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Couldn't save comment, missing submission", Toast
+                .LENGTH_SHORT).show();
     }
 
     @Override
     public void showErrorSavingCommentToast(int code) {
-        Toast.makeText(getActivity(),
-                       getString(R.string.something_went_wrong, code),
-                       Toast.LENGTH_SHORT)
-                .show();
+        Toast.makeText(getActivity(), getString(R.string.something_went_wrong, code), Toast
+                .LENGTH_SHORT).show();
     }
 
     @Override
@@ -451,18 +445,5 @@ public class GameThreadFragment extends Fragment
     @Override
     public void uncollapseComments(@NotNull String id) {
         threadAdapter.unCollapseComments(id);
-    }
-
-    private int getTextColor() {
-        int[] attrs = {android.R.attr.textColorPrimary};
-        TypedArray typedArray;
-        if (localRepository.getAppTheme() == SwishTheme.DARK) {
-            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme_Dark, attrs);
-        } else {
-            typedArray = getActivity().obtainStyledAttributes(R.style.AppTheme, attrs);
-        }
-        int textColor = typedArray.getColor(0, Color.BLACK);
-        typedArray.recycle();
-        return textColor;
     }
 }

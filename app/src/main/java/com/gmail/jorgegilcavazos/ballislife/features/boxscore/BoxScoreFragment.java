@@ -17,11 +17,13 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
+import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.common.base.Optional;
@@ -51,8 +53,9 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     private static final String TAG = "BoxScoreFragment";
     public static final int LOAD_AWAY = 0;
     public static final int LOAD_HOME = 2;
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+
+    @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject LocalRepository localRepository;
 
     @BindView(R.id.button_home) Button btnHome;
     @BindView(R.id.button_away) Button btnAway;
@@ -69,6 +72,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     private String awayTeam;
     private String gameId;
     private int teamSelected;
+    private int textColor;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,6 +97,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
         btnAway.setText(awayTeam);
         btnHome.setText(homeTeam);
+
+        textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository.getAppTheme());
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://nba-app-ca681.firebaseio.com/")
@@ -131,7 +137,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         btnAway.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_black));
         btnAway.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnHome.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_white));
-        btnHome.setTextColor(ContextCompat.getColor(getActivity(), R.color.black));
+        btnHome.setTextColor(textColor);
 
         teamSelected = LOAD_AWAY;
         presenter.loadBoxScore(gameId, teamSelected);
@@ -142,7 +148,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         btnHome.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_black));
         btnHome.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnAway.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_white));
-        btnAway.setTextColor(ContextCompat.getColor(getActivity(), R.color.black));
+        btnAway.setTextColor(textColor);
 
         teamSelected = LOAD_HOME;
         presenter.loadBoxScore(gameId, teamSelected);

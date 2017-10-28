@@ -5,6 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryLight">@color/colorPrimaryLight</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/primaryText</item>
         <item name="android:textColorSecondary">@color/secondaryText</item>
@@ -18,11 +19,12 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/nightColorPrimary</item>
         <item name="colorPrimaryDark">@color/nightColorPrimaryDark</item>
+        <item name="colorPrimaryLight">@color/nightColorPrimaryLight</item>
         <item name="colorAccent">@color/nightColorAccent</item>
         <item name="android:textColorPrimary">@color/nightPrimaryText</item>
         <item name="android:textColorSecondary">@color/nightSecondaryText</item>
         <item name="android:windowBackground">@color/nightColorBackground</item>
-        <item name="commentBackgroundLight">#424242</item>
+        <item name="commentBackgroundLight">@color/nightColorPrimaryLight</item>
         <item name="commentBackgroundDark">@color/nightColorPrimaryDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
     </style>
@@ -35,14 +37,6 @@
     <style name="AppTheme.Dark.NoActionBar" parent="AppTheme.Dark">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-    </style>
-
-
-    <style name="ToolBarStyle" parent="Theme.AppCompat">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/accentText</item>
-        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="ToolbarSubtitleAppearance" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">

@@ -53,7 +53,7 @@ public class BoxScorePresenter {
                     @Override
                     public void onError(Throwable e) {
                         if (isViewAttached()) {
-                            view.showLoadingBoxScoreErrorMessage();
+                            view.showBoxScoreNotAvailableMessage();
                             view.setLoadingIndicator(false);
                         }
                     }

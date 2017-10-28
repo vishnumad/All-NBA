@@ -62,7 +62,7 @@
     <string name="failed_to_save_comment">Could not save comment</string>
     <string name="reply_to_sub_saved">Reply saved</string>
     <string name="reply_to_sub_failed">Could not save reply</string>
-    <string name="box_score_not_available">Box Score not available</string>
+    <string name="box_score_not_available">Box score not available</string>
     <string name="failed_to_load_box_score">Failed to load box score</string>
 
     <!-- Standings -->

@@ -5,6 +5,7 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.module.BindModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
@@ -49,4 +50,6 @@ public interface AppComponent {
     void inject(VideoPlayerActivity videoPlayerActivity);
 
     void inject(ReplyActivity replyActivity);
+
+    void inject(CommentsActivity commentsActivity);
 }

@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#F44336</color>
     <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorPrimaryLight">#E57373</color>
+    <color name="colorPrimaryLight">#E5E5E5</color>
     <color name="colorAccent">#FF9800</color>
     <color name="primaryText">#DE000000</color>
     <color name="secondaryText">#8A000000</color>
@@ -11,7 +11,7 @@
 
     <color name="nightColorPrimary">#212121</color>
     <color name="nightColorPrimaryDark">#000000</color>
-    <color name="nightColorPrimaryLight">#303030</color>
+    <color name="nightColorPrimaryLight">#424242</color>
     <color name="nightColorAccent">#FF9800</color>
     <color name="nightPrimaryText">#FFFFFF</color>
     <color name="nightSecondaryText">#B3FFFFFF</color>
