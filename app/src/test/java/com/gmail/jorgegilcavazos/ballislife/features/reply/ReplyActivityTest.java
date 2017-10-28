@@ -34,19 +34,20 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 25,
         packageName = "com.gmail.jorgegilcavazos.ballislife")
-/** Tests for the {@link ReplyActivity} */
+/** Tests for the {@link ReplyNoActionBarActivity} */
 public class ReplyActivityTest {
     private static final String COMMENT_TEXT = "Comment text";
     private static final String POSTED_COMMENT_TEXT = "Posted comment text";
 
     private Resources resources;
-    private ReplyActivity activity;
+    private ReplyNoActionBarActivity activity;
 
     @Before
     public void setUp() throws Exception {
         resources = RuntimeEnvironment.application.getResources();
 
-        activity = Robolectric.buildActivity(ReplyActivity.class).create().start().resume().get();
+        activity = Robolectric.buildActivity(ReplyNoActionBarActivity.class).create().start()
+                .resume().get();
     }
 
     @Test
@@ -57,8 +58,8 @@ public class ReplyActivityTest {
     @Test
     public void testOnCreate_withCommentExtra() {
         Bundle extras = new Bundle();
-        extras.putCharSequence(ReplyActivity.KEY_COMMENT, COMMENT_TEXT);
-        ReplyActivity activity = Robolectric.buildActivity(ReplyActivity.class)
+        extras.putCharSequence(ReplyNoActionBarActivity.KEY_COMMENT, COMMENT_TEXT);
+        ReplyNoActionBarActivity activity = Robolectric.buildActivity(ReplyNoActionBarActivity.class)
                 .withIntent(new Intent().putExtras(extras))
                 .create()
                 .get();
@@ -114,8 +115,8 @@ public class ReplyActivityTest {
         editText.setText(POSTED_COMMENT_TEXT);
         activity.onOptionsItemSelected(roboMenuItem);
 
-        assertEquals(shadowActivity.getResultIntent()
-                .getStringExtra(ReplyActivity.KEY_POSTED_COMMENT), POSTED_COMMENT_TEXT);
+        assertEquals(shadowActivity.getResultIntent().getStringExtra(ReplyNoActionBarActivity
+                .KEY_POSTED_COMMENT), POSTED_COMMENT_TEXT);
         assertEquals(shadowActivity.getResultCode(), RESULT_OK);
         assertTrue(shadowActivity.isFinishing());
     }

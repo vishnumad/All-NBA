@@ -35,7 +35,7 @@
             android:name=".features.splash.SplashActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name=".features.main.MainActivity"
+            android:name=".features.main.MainNoActionBarActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Dark.NoActionBar">
             <intent-filter>
@@ -51,7 +51,7 @@
         <activity
             android:name=".features.gamethread.CommentsActivity"
             android:label="Comments"
-            android:parentActivityName=".features.main.MainActivity"
+            android:parentActivityName=".features.main.MainNoActionBarActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
@@ -59,7 +59,7 @@
             android:label="@string/title_activity_settings"/>
         <activity android:name=".features.login.LoginActivity"/>
         <activity
-            android:name=".features.submission.SubmissionActivity"
+            android:name=".features.submission.SubmissionNoActionBarActivity"
             android:label="@string/title_activity_submission"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
@@ -80,7 +80,7 @@
         </service>
         <service android:name=".data.firebase.MuteGameService"/>
 
-        <activity android:name=".features.reply.ReplyActivity">
+        <activity android:name=".features.reply.ReplyNoActionBarActivity">
         </activity>
     </application>
 

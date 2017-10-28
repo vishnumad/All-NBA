@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity"
+    tools:context="com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyNoActionBarActivity"
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="81dp">
 
@@ -34,6 +34,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_remove_red_eye_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="1.0"/>
 
@@ -44,6 +45,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_format_bold_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_preview"
         app:layout_constraintVertical_bias="1.0"/>
@@ -55,6 +57,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_format_italic_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_bold"
         app:layout_constraintVertical_bias="1.0"/>
@@ -66,6 +69,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_format_strikethrough_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_italic"
         app:layout_constraintVertical_bias="1.0"/>
@@ -77,6 +81,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_expand_less_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_strikethrough"
         app:layout_constraintVertical_bias="1.0"/>
@@ -88,6 +93,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_format_quote_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_superscript"
         app:layout_constraintVertical_bias="1.0"/>
@@ -99,6 +105,7 @@
         android:background="?selectableItemBackground"
         android:padding="10dp"
         app:srcCompat="@drawable/ic_insert_link_black_24dp"
+        android:tint="?attr/iconTint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/button_quotes"
         app:layout_constraintVertical_bias="1.0"/>
@@ -132,7 +139,7 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingTop="10dp"
-        android:textColor="@color/primaryText"
+        android:text="Some text"
         android:textSize="14sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>

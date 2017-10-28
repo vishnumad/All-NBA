@@ -9,10 +9,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -85,7 +84,7 @@ public class MyMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainNoActionBarActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,

@@ -3,7 +3,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.reply;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActionBarActivity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +23,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /** Activity used for adding a comment with formatting tools */
-public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFragment
-        .OnFragmentInteractionListener {
+public class ReplyNoActionBarActivity extends BaseActionBarActivity implements
+        AddLinkDialogFragment.OnFragmentInteractionListener {
     public static final int POST_COMMENT_REPLY_REQUEST = 1;
     public static final int POST_SUBMISSION_REPLY_REQUEST = 2;
     public static final String KEY_COMMENT = "Comment";
@@ -37,6 +38,11 @@ public class ReplyActivity extends AppCompatActivity implements AddLinkDialogFra
 
     private String parentId;
     private String submissionId;
+
+    @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

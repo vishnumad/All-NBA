@@ -22,12 +22,12 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
-import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
-import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -49,7 +49,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
-public class SubmissionActivity extends BaseActivity implements SubmissionView,
+public class SubmissionNoActionBarActivity extends BaseNoActionBarActivity implements
+        SubmissionView,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
@@ -178,14 +179,15 @@ public class SubmissionActivity extends BaseActivity implements SubmissionView,
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ReplyActivity.POST_COMMENT_REPLY_REQUEST && resultCode == RESULT_OK) {
-            String parentId = data.getStringExtra(ReplyActivity.KEY_COMMENT_ID);
-            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
-            presenter.replyToComment(parentId, response);
-        } else if (requestCode == ReplyActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
+        if (requestCode == ReplyNoActionBarActivity.POST_COMMENT_REPLY_REQUEST && resultCode ==
                 RESULT_OK) {
-            String response = data.getStringExtra(ReplyActivity.KEY_POSTED_COMMENT);
-            String submissionId = data.getStringExtra(ReplyActivity.KEY_SUBMISSION_ID);
+            String parentId = data.getStringExtra(ReplyNoActionBarActivity.KEY_COMMENT_ID);
+            String response = data.getStringExtra(ReplyNoActionBarActivity.KEY_POSTED_COMMENT);
+            presenter.replyToComment(parentId, response);
+        } else if (requestCode == ReplyNoActionBarActivity.POST_SUBMISSION_REPLY_REQUEST && resultCode ==
+                RESULT_OK) {
+            String response = data.getStringExtra(ReplyNoActionBarActivity.KEY_POSTED_COMMENT);
+            String submissionId = data.getStringExtra(ReplyNoActionBarActivity.KEY_SUBMISSION_ID);
             presenter.replyToSubmission(submissionId, response);
         }
     }
@@ -337,22 +339,22 @@ public class SubmissionActivity extends BaseActivity implements SubmissionView,
 
     @Override
     public void openReplyToCommentActivity(@NonNull final Comment parentComment) {
-        Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
+        Intent intent = new Intent(SubmissionNoActionBarActivity.this, ReplyNoActionBarActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyActivity.KEY_COMMENT_ID, parentComment.getId());
-        extras.putCharSequence(ReplyActivity.KEY_COMMENT, RedditUtils.bindSnuDown(parentComment
+        extras.putString(ReplyNoActionBarActivity.KEY_COMMENT_ID, parentComment.getId());
+        extras.putCharSequence(ReplyNoActionBarActivity.KEY_COMMENT, RedditUtils.bindSnuDown(parentComment
                 .data("body_html")));
         intent.putExtras(extras);
-        startActivityForResult(intent, ReplyActivity.POST_COMMENT_REPLY_REQUEST);
+        startActivityForResult(intent, ReplyNoActionBarActivity.POST_COMMENT_REPLY_REQUEST);
     }
 
     @Override
     public void openReplyToSubmissionActivity(@NonNull String submissionId) {
-        Intent intent = new Intent(SubmissionActivity.this, ReplyActivity.class);
+        Intent intent = new Intent(SubmissionNoActionBarActivity.this, ReplyNoActionBarActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(ReplyActivity.KEY_SUBMISSION_ID, submissionId);
+        extras.putString(ReplyNoActionBarActivity.KEY_SUBMISSION_ID, submissionId);
         intent.putExtras(extras);
-        startActivityForResult(intent, ReplyActivity.POST_SUBMISSION_REPLY_REQUEST);
+        startActivityForResult(intent, ReplyNoActionBarActivity.POST_SUBMISSION_REPLY_REQUEST);
     }
 
     @Override
@@ -365,7 +367,7 @@ public class SubmissionActivity extends BaseActivity implements SubmissionView,
 
     @Override
     public void openStreamable(String shortcode) {
-        Intent intent = new Intent(SubmissionActivity.this, VideoPlayerActivity.class);
+        Intent intent = new Intent(SubmissionNoActionBarActivity.this, VideoPlayerActivity.class);
         intent.putExtra(VideoPlayerActivity.SHORTCODE, shortcode);
         startActivity(intent);
     }

@@ -29,7 +29,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -300,10 +300,10 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void onSubmissionClick(Highlight highlight) {
-        Intent intent = new Intent(getActivity(), SubmissionActivity.class);
+        Intent intent = new Intent(getActivity(), SubmissionNoActionBarActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, highlight.getId());
-        bundle.putString(SubmissionActivity.KEY_TITLE, getString(R.string.highlights));
+        bundle.putString(SubmissionNoActionBarActivity.KEY_TITLE, getString(R.string.highlights));
         intent.putExtras(bundle);
         startActivity(intent);
     }

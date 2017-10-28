@@ -8,12 +8,13 @@ import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 
 import javax.inject.Singleton;
@@ -23,7 +24,7 @@ import dagger.Component;
 @Singleton
 @Component(modules = {AppModule.class, DataModule.class, BindModule.class})
 public interface AppComponent {
-    void inject(MainActivity activity);
+    void inject(MainNoActionBarActivity activity);
 
     void inject(HighlightsFragment fragment);
 
@@ -41,9 +42,11 @@ public interface AppComponent {
 
     void inject(SettingsFragment settingsFragment);
 
-    void inject(SubmissionActivity submissionActivity);
+    void inject(SubmissionNoActionBarActivity submissionActivity);
 
     void inject(BoxScoreFragment boxScoreFragment);
 
     void inject(VideoPlayerActivity videoPlayerActivity);
+
+    void inject(ReplyNoActionBarActivity replyActivity);
 }

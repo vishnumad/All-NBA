@@ -28,12 +28,12 @@ import org.robolectric.shadows.ShadowAlertDialog
  */
 class AddLinkDialogFragmentTest {
 
-    lateinit var activity: ReplyActivity
+    lateinit var activity: ReplyNoActionBarActivity
     lateinit var resources: Resources
 
     @Before
     fun setup() {
-        activity = Robolectric.buildActivity(ReplyActivity::class.java)
+        activity = Robolectric.buildActivity(ReplyNoActionBarActivity::class.java)
                 .create()
                 .start()
                 .resume()

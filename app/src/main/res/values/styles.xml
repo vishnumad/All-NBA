@@ -11,6 +11,7 @@
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="commentBackgroundLight">@color/commentBgLight</item>
         <item name="commentBackgroundDark">@color/commentBgDark</item>
+        <item name="iconTint">@color/active_icon</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
@@ -23,6 +24,7 @@
         <item name="android:windowBackground">@color/nightColorBackground</item>
         <item name="commentBackgroundLight">#424242</item>
         <item name="commentBackgroundDark">@color/nightColorPrimaryDark</item>
+        <item name="iconTint">@color/active_icon_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

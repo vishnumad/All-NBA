@@ -1,14 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.tour;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

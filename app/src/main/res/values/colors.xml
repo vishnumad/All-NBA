@@ -24,8 +24,10 @@
     <color name="colorDivider">#1A000000</color>
     <color name="background">#F9F9F9</color>
     <color name="icon">#8D8D8D</color>
-    <color name="active_icon">#8A000000</color>
-    <color name="inactive_icon">#61000000</color>
+    <color name="active_icon">#8C000000</color>
+    <color name="inactive_icon">#66000000</color>
+    <color name="active_icon_dark">#FFFFFF</color>
+    <color name="inactive_icon_dark">#80FFFFFF</color>
 
     <color name="blackLight">#212121</color>
     <color name="white">#FFFFFF</color>
