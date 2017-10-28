@@ -43,6 +43,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
     private String subreddit;
+    private int textColor;
 
     private PublishSubject<Submission> sharePublishSubject = PublishSubject.create();
 
@@ -50,14 +51,15 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         RedditAuthentication redditAuthentication, List<SubmissionWrapper>
                                 postsList,
                         int contentViewType,
-                        OnSubmissionClickListener submissionClickListener,
-                        String subreddit) {
+                        OnSubmissionClickListener submissionClickListener, String subreddit, int
+                                textColor) {
         this.context = context;
         this.redditAuthentication = redditAuthentication;
         this.postsList = postsList;
         this.contentViewType = contentViewType;
         this.submissionClickListener = submissionClickListener;
         this.subreddit = subreddit;
+        this.textColor = textColor;
     }
 
     @Override
@@ -73,10 +75,10 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         switch (viewType) {
             case POSTS_VIEW_LIST:
                 view = inflater.inflate(R.layout.post_layout_list, parent, false);
-                return new PostListViewHolder(view);
+                return new PostListViewHolder(view, textColor);
             case POSTS_VIEW_WIDE_CARD:
                 view = inflater.inflate(R.layout.post_layout_card_wide, parent, false);
-                return new WideCardViewHolder(view);
+                return new WideCardViewHolder(view, textColor);
             default:
                 throw new IllegalStateException("Posts view type is not valid: " + contentViewType);
         }

@@ -39,9 +39,12 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.button_downvote) ImageButton btnDownvote;
     public @BindView(R.id.text_comments) TextView tvComments;
 
-    public PostListViewHolder(View itemView) {
+    private int textColor;
+
+    public PostListViewHolder(View itemView, int textColor) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.textColor = textColor;
     }
 
     public void bindData(final Context context,
@@ -105,7 +108,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
             tvTitle.setTextColor(ContextCompat.getColor(context, R.color.stickiedColor));
             tvTitle.setTypeface(null, Typeface.BOLD);
         } else {
-            tvTitle.setTextColor(ContextCompat.getColor(context, R.color.primaryText));
+            tvTitle.setTextColor(textColor);
             tvTitle.setTypeface(null, Typeface.NORMAL);
         }
 
@@ -115,7 +118,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
         } else if (vote == VoteDirection.DOWNVOTE) {
             setDownvotedColors(itemView.getContext());
         } else {
-            setNoVoteColors(itemView.getContext());
+            setNoVoteColors();
         }
 
         btnUpvote.setOnClickListener(v -> {
@@ -123,7 +126,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(itemView.getContext());
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
@@ -145,7 +148,7 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(itemView.getContext());
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);
@@ -182,25 +185,27 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
         tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
     }
 
-    private void setNoVoteColors(Context context) {
+    private void setNoVoteColors() {
         setUpvoteIcon(false);
         setDownvoteIcon(false);
-        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+        tvPoints.setTextColor(textColor);
     }
 
     private void setUpvoteIcon(boolean active) {
         if (active) {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_orange_18dp);
+            btnUpvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentUpvoted));
         } else {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_black_18dp);
+            btnUpvote.setColorFilter(textColor);
         }
     }
 
     private void setDownvoteIcon(boolean active) {
         if (active) {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_purple_18dp);
+            btnDownvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentDownvoted));
         } else {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_black_18dp);
+            btnDownvote.setColorFilter(textColor);
         }
     }
 }

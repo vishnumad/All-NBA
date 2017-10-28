@@ -4,9 +4,7 @@
               android:layout_height="160dp"
               android:background="?attr/colorPrimaryDark"
               android:gravity="bottom"
-              android:orientation="vertical"
-              android:padding="16dp"
-              android:theme="@style/ThemeOverlay.AppCompat.Light">
+              android:orientation="vertical">
 
     <ImageView
         android:id="@+id/favTeamLogo"
@@ -14,11 +12,31 @@
         android:layout_height="80dp"
         android:layout_marginBottom="10dp"/>
 
-    <TextView
-        android:id="@+id/redditUsername"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/white"/>
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/themeToggle"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/ic_moon_outline"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:scaleX="1"
+            android:layout_alignParentEnd="true"/>
+
+        <TextView
+            android:id="@+id/redditUsername"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:text="Obi-Wan_Ginobili"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
 
 </LinearLayout>

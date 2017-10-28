@@ -30,8 +30,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="15dp"
             android:text="Don't let /r/nba fool you. This is the greatest in-game dunk of all time"
-            android:textColor="@color/primaryText"
-            android:textSize="14sp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
         <RelativeLayout
             android:id="@+id/layout_small_image_title"
@@ -62,8 +61,7 @@
                 android:layout_marginRight="15dp"
                 android:layout_toLeftOf="@id/image_thumbnail_small"
                 android:text="Don't let /r"
-                android:textColor="@color/primaryText"
-                android:textSize="14sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
         </RelativeLayout>
 
@@ -77,8 +75,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:text="Lorem impsum doloret sit amet"
-            android:textColor="@color/secondaryText"
-            android:textSize="12sp"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -119,16 +116,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="582 points"
-                        android:textColor="@color/primaryText"
-                        android:textSize="12sp"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
                     <TextView
                         android:id="@+id/text_comments"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="3219 comments"
-                        android:textColor="@color/secondaryText"
-                        android:textSize="10sp"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
                 </LinearLayout>
 
@@ -147,7 +142,8 @@
                     android:layout_marginRight="10dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:padding="5dp"
-                    app:srcCompat="@drawable/ic_bookmark_border_black_18dp"/>
+                    app:srcCompat="@drawable/ic_bookmark_border_black_18dp"
+                    android:tint="?android:attr/textColorPrimary"/>
 
                 <ImageButton
                     android:id="@+id/button_share"
@@ -156,7 +152,8 @@
                     android:layout_marginRight="10dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:padding="5dp"
-                    app:srcCompat="@drawable/ic_share_black_24dp_og"/>
+                    app:srcCompat="@drawable/ic_share_black_24dp_og"
+                    android:tint="?android:attr/textColorPrimary"/>
 
                 <ImageButton
                     android:id="@+id/button_more"
@@ -164,7 +161,8 @@
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
                     android:padding="5dp"
-                    app:srcCompat="@drawable/ic_more_vert_black_18dp"/>
+                    app:srcCompat="@drawable/ic_more_vert_black_18dp"
+                    android:tint="?android:attr/textColorPrimary"/>
 
             </LinearLayout>
 
@@ -178,7 +176,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light_text_bg"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
             android:paddingTop="5dp">

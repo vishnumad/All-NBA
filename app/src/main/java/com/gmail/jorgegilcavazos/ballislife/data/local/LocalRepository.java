@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.local;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 
 public interface LocalRepository {
 
@@ -19,4 +20,8 @@ public interface LocalRepository {
     String getStartupFragment();
 
     boolean getOpenYouTubeInApp();
+
+    void saveAppTheme(SwishTheme theme);
+
+    SwishTheme getAppTheme();
 }

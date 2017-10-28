@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.profile.ProfileActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
@@ -118,8 +120,9 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         BallIsLifeApplication.getAppComponent().inject(this);
+        setAppTheme();
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -139,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
         setUpNavigationView();
         setUpDrawerContent();
         loadRedditUsername();
+        loadThemeToggleIcon();
         setupDynamicShortcut();
 
         // TODO: Move this out of here, either to application start or a presenter.
@@ -244,6 +248,12 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
                 // Show menu icon
                 actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu_white);
                 actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+
+            if (localRepository.getAppTheme() == SwishTheme.DARK) {
+                toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Dark);
+            } else {
+                toolbar.setPopupTheme(R.style.AppTheme_PopupOverlay_Light);
             }
         }
     }
@@ -688,5 +698,48 @@ public class MainActivity extends AppCompatActivity implements BillingProcessor.
         } else {
             billingProcessor.purchase(this, Constants.PREMIUM_PRODUCT_ID);
         }
+    }
+
+    private void setAppTheme() {
+        SwishTheme theme = localRepository.getAppTheme();
+        switch (theme) {
+            case LIGHT:
+                setTheme(R.style.AppTheme_NoActionBar);
+                break;
+            case DARK:
+                setTheme(R.style.AppTheme_Dark_NoActionBar);
+                break;
+        }
+    }
+
+    private void loadThemeToggleIcon() {
+        if (navigationView == null) {
+            return;
+        }
+
+        View headerView = navigationView.getHeaderView(0);
+        ImageButton toggleBtn = headerView.findViewById(R.id.themeToggle);
+
+        SwishTheme theme = localRepository.getAppTheme();
+        switch (theme) {
+            case LIGHT:
+                toggleBtn.setImageResource(R.drawable.ic_moon_outline);
+                break;
+            case DARK:
+                toggleBtn.setImageResource(R.drawable.ic_moon_filled);
+                break;
+        }
+
+        toggleBtn.setOnClickListener(v -> onThemeToggle());
+    }
+
+    public void onThemeToggle() {
+        SwishTheme swishTheme = localRepository.getAppTheme();
+        if (swishTheme == SwishTheme.LIGHT) {
+            localRepository.saveAppTheme(SwishTheme.DARK);
+        } else {
+            localRepository.saveAppTheme(SwishTheme.LIGHT);
+        }
+        recreate();
     }
 }

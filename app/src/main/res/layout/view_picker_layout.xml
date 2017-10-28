@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/ic_image_black_24dp"
+            android:tint="?android:attr/textColorPrimary"
             android:layout_marginEnd="10dp"/>
 
         <LinearLayout
@@ -30,15 +31,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/card_view"
-                android:textColor="@color/primaryText"
-                android:textSize="16sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/card_view_description"
-                android:textColor="@color/primaryText"
-                android:textSize="12sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
         </LinearLayout>
 
@@ -55,6 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/ic_view_list_black_24dp"
+            android:tint="?android:attr/textColorPrimary"
             android:layout_marginEnd="10dp"/>
 
         <LinearLayout
@@ -68,15 +68,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/list_view"
-                android:textColor="@color/primaryText"
-                android:textSize="16sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/list_view_description"
-                android:textColor="@color/primaryText"
-                android:textSize="12sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
         </LinearLayout>
 

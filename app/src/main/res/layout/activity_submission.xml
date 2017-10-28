@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:popupTheme="@style/AppTheme.PopupOverlay.Light"
             app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance"/>
 
     </android.support.design.widget.AppBarLayout>

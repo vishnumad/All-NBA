@@ -3,7 +3,6 @@
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="@color/white"
               android:orientation="vertical">
 
     <RelativeLayout
@@ -59,8 +58,7 @@
                 android:layout_marginStart="5dp"
                 android:gravity="center"
                 android:text="3.2 k"
-                android:textColor="@color/secondaryText"
-                android:textSize="13sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
             <ImageButton
                 android:id="@+id/button_downvote"
@@ -87,8 +85,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:text="Dirk Nowitzki's favorite trash talk fwei dwej dwejde"
-                android:textColor="@color/primaryText"
-                android:textSize="15sp"/>
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -116,7 +113,7 @@
                     android:layout_marginStart="5dp"
                     android:gravity="center"
                     android:text="4 m"
-                    android:textColor="@color/secondaryText"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textSize="10sp"/>
 
 
@@ -127,7 +124,7 @@
                     android:layout_marginStart="5dp"
                     android:gravity="center"
                     android:text="streamable.com"
-                    android:textColor="@color/secondaryText"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                     android:textSize="10sp"/>
 
             </LinearLayout>
@@ -140,6 +137,7 @@
                 android:layout_marginStart="5dp"
                 android:gravity="center"
                 android:text="528 comments"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                 android:textSize="10sp"/>
 
         </LinearLayout>
@@ -149,7 +147,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_below="@id/thumbnail_container"
         android:background="@drawable/border"/>
 
 </LinearLayout>

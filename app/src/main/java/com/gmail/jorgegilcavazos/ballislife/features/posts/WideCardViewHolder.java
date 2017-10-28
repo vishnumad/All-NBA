@@ -53,9 +53,12 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.button_share) ImageButton btnShare;
     public @BindView(R.id.text_posted_details) TextView tvPostedDetails;
 
-    public WideCardViewHolder(View itemView) {
+    private int textColor;
+
+    public WideCardViewHolder(View itemView, int textColor) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+        this.textColor = textColor;
     }
 
     private static String getUsableRedditDate(Context context, Date timestamp) {
@@ -142,9 +145,13 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
         if (isStickied) {
             tvTitle.setTextColor(ContextCompat.getColor(context, R.color.stickiedColor));
             tvTitle.setTypeface(null, Typeface.BOLD);
+            tvTitleSmall.setTextColor(ContextCompat.getColor(context, R.color.stickiedColor));
+            tvTitleSmall.setTypeface(null, Typeface.BOLD);
         } else {
-            tvTitle.setTextColor(ContextCompat.getColor(context, R.color.primaryText));
+            tvTitle.setTextColor(textColor);
             tvTitle.setTypeface(null, Typeface.NORMAL);
+            tvTitleSmall.setTextColor(textColor);
+            tvTitleSmall.setTypeface(null, Typeface.NORMAL);
         }
 
         if (isSelf && selfTextHtml != null && !selfTextHtml.isEmpty()) {
@@ -160,7 +167,7 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
         } else if (vote == VoteDirection.DOWNVOTE) {
             setDownvotedColors(context);
         } else {
-            setNoVoteColors(context);
+            setNoVoteColors();
         }
 
         // Set saved button color depending on whether the submission has been saved.
@@ -192,34 +199,38 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
         tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
     }
 
-    private void setNoVoteColors(Context context) {
+    private void setNoVoteColors() {
         setUpvoteIcon(false);
         setDownvoteIcon(false);
-        tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentNeutral));
+        tvPoints.setTextColor(textColor);
     }
 
     private void setUpvoteIcon(boolean active) {
         if (active) {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_orange_18dp);
+            btnUpvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentUpvoted));
         } else {
-            btnUpvote.setImageResource(R.drawable.ic_arrow_upward_black_18dp);
+            btnUpvote.setColorFilter(textColor);
         }
     }
 
     private void setDownvoteIcon(boolean active) {
         if (active) {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_purple_18dp);
+            btnDownvote.setColorFilter(ContextCompat.getColor(itemView.getContext(), R.color
+                    .commentDownvoted));
         } else {
-            btnDownvote.setImageResource(R.drawable.ic_arrow_downward_black_18dp);
+            btnDownvote.setColorFilter(textColor);
         }
     }
 
     private void setSavedIcon() {
         btnSave.setImageResource(R.drawable.ic_bookmark_black_18dp);
+        btnSave.setColorFilter(textColor);
     }
 
     private void setUnsavedIcon() {
         btnSave.setImageResource(R.drawable.ic_bookmark_border_black_18dp);
+        btnSave.setColorFilter(textColor);
     }
 
     private void initSaveBtnListener(final RedditAuthentication redditAuthentication, final
@@ -249,7 +260,7 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(context);
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.UPVOTE);
@@ -275,7 +286,7 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.NO_VOTE);
                 if (redditAuthentication.isUserLoggedIn()) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(context);
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
                 submissionClickListener.onVoteSubmission(submissionWrapper, VoteDirection.DOWNVOTE);

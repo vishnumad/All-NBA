@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.local;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
@@ -77,5 +78,25 @@ public class AppLocalRepository implements LocalRepository {
     @Override
     public boolean getOpenYouTubeInApp() {
         return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_YOUTUBE_IN_APP, true);
+    }
+
+    @Override
+    public void saveAppTheme(SwishTheme theme) {
+        SharedPreferences.Editor editor = localSharedPreferences.edit();
+        editor.putInt(LocalSharedPreferences.SwishTheme, theme.getValue());
+        editor.apply();
+    }
+
+    @Override
+    public SwishTheme getAppTheme() {
+        int value = localSharedPreferences.getInt(LocalSharedPreferences.SwishTheme, -1);
+
+        if (SwishTheme.LIGHT.getValue() == value) {
+            return SwishTheme.LIGHT;
+        } else if (SwishTheme.DARK.getValue() == value) {
+            return SwishTheme.DARK;
+        } else {
+            return SwishTheme.LIGHT;
+        }
     }
 }
