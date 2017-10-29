@@ -49,6 +49,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     public final static String GAME_THREAD_AWAY = "GAME_THREAD_AWAY";
     public final static String GAME_ID = "GAME_ID";
     public final static String GAME_DATE = "GAME_DATE";
+    public final static String GAME_STATUS = "GAME_STATUS";
 
     @Inject GamesPresenter presenter;
 
@@ -185,6 +186,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         intent.putExtra(GAME_THREAD_AWAY, game.getAwayTeamAbbr());
         intent.putExtra(GAME_ID, game.getId());
         intent.putExtra(GAME_DATE, game.getTimeUtc());
+        intent.putExtra(GAME_STATUS, game.getGameStatus());
         startActivity(intent);
     }
 
