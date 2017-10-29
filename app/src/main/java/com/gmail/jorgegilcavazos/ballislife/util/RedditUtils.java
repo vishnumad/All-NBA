@@ -115,7 +115,9 @@ public final class RedditUtils {
                 .replace("&apos;", "'").replace("&amp;", "&").replace("<li><p>", "<p>• ")
                 .replace("</li>", "<br>").replaceAll("<li.*?>", "•").replace("<p>", "<div>")
                 .replace("</p>","</div>");
-        rawHtml = rawHtml.substring(0, rawHtml.lastIndexOf("\n") );
+        if (rawHtml.lastIndexOf("\n") != -1) {
+            rawHtml = rawHtml.substring(0, rawHtml.lastIndexOf("\n"));
+        }
 
         return trim(Html.fromHtml(noTrailingwhiteLines(rawHtml)));
     }
