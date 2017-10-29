@@ -9,6 +9,10 @@ class CrashReporterImpl @Inject constructor() : CrashReporter {
     FirebaseCrash.log(message)
   }
 
+  override fun logcat(level: Int, tag: String, message: String) {
+    FirebaseCrash.logcat(level, tag, message)
+  }
+
   override fun report(e: Throwable) {
     FirebaseCrash.report(e)
   }
