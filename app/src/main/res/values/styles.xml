@@ -25,8 +25,8 @@
         <item name="android:textColorPrimary">@color/nightPrimaryText</item>
         <item name="android:textColorSecondary">@color/nightSecondaryText</item>
         <item name="android:windowBackground">@color/nightColorBackground</item>
-        <item name="commentBackgroundLight">@color/nightColorPrimaryLight</item>
-        <item name="commentBackgroundDark">@color/nightColorPrimaryDark</item>
+        <item name="commentBackgroundLight">@color/nightCommentBgLight</item>
+        <item name="commentBackgroundDark">@color/nightCommentBgDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
         <item name="separator">@color/dividerDark</item>
     </style>

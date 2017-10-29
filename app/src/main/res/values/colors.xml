@@ -61,6 +61,8 @@
 
     <color name="commentBgLight">#FFFFFF</color>
     <color name="commentBgDark">#E5E5E5</color>
+    <color name="nightCommentBgLight">#2b2b2b</color>
+    <color name="nightCommentBgDark">#000000</color>
     <color name="commentUpvoted">#FF9800</color>
     <color name="commentDownvoted">#3F51B5</color>
     <color name="commentNeutral">#000000</color>
