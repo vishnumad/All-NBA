@@ -1,7 +1,9 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.profile;
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Contribution;
@@ -28,22 +30,29 @@ public class ProfileRepositoryImpl implements ProfileRepository {
     public static final String OVERVIEW = "overview";
 
     private RedditService redditService;
-
+    private LocalRepository localRepository;
     private UserContributionPaginator contributionPaginator;
     private List<Contribution> cachedContributions;
 
     @Inject
     public ProfileRepositoryImpl(
             RedditService redditService,
+            LocalRepository localRepository,
             RedditAuthentication redditAuthentication) {
         this.redditService = redditService;
+        this.localRepository = localRepository;
+
+        if (StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
+            throw new IllegalStateException("Username should not be null or empty: "
+                    + localRepository.getUsername());
+        }
 
         cachedContributions = new ArrayList<>();
         RedditClient redditClient = redditAuthentication.getRedditClient();
         contributionPaginator = new UserContributionPaginator(
                 redditClient,
                 OVERVIEW,
-                redditClient.getAuthenticatedUser());
+                localRepository.getUsername());
     }
 
     @Override
