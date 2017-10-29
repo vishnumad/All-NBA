@@ -73,10 +73,12 @@ public class UtilitiesTest {
         String url2 = "https://streamable.com/jcb6p";
         String url3 = "https://www.youtube.com/watch?v=cwlx4QyCTBU";
         String url4 = "https://www.youtube.com/watch?v=cwlx4QyCTBU&index=5&ts=23455";
+        String url5 = "https://www.youtube.com/watch?v=Jxrn2CO092w#t=0m20s";
 
         assertEquals("LEOODbUCge", Utilities.getYoutubeVideoIdFromUrl(url1));
         assertEquals(null, Utilities.getYoutubeVideoIdFromUrl(url2));
         assertEquals("cwlx4QyCTBU", Utilities.getYoutubeVideoIdFromUrl(url3));
         assertEquals("cwlx4QyCTBU", Utilities.getYoutubeVideoIdFromUrl(url4));
+        assertEquals("Jxrn2CO092w", Utilities.getYoutubeVideoIdFromUrl(url5));
     }
 }

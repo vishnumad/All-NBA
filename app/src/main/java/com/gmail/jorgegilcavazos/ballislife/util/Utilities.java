@@ -39,6 +39,8 @@ public final class Utilities {
             String a = url.substring(url.lastIndexOf("v=") + 2);
             if (a.contains("&")) {
                 return a.substring(0, a.indexOf("&"));
+            } else if (a.contains("#")) {
+                return a.substring(0, a.indexOf("#"));
             } else {
                 return a;
             }
