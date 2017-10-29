@@ -47,6 +47,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.ActivityUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -303,18 +304,6 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
                     setHighlightsFragment();
                     drawerLayout.closeDrawer(GravityCompat.START);
                     return true;
-                case R.id.navigation_item_7:
-                    // Start LoginActivity if no user is already logged in.
-                    if (!redditAuthentication.isUserLoggedIn()) {
-                        Intent loginIntent = new Intent(getApplicationContext(), LoginActivity
-                                .class);
-                        startActivity(loginIntent);
-                    } else {
-                        Intent profileIntent = new Intent(getApplicationContext(),
-                                ProfileActivity.class);
-                        startActivity(profileIntent);
-                    }
-                    return true;
                 case R.id.navigation_item_9:
                     drawerLayout.closeDrawer(GravityCompat.START);
                     Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity
@@ -555,11 +544,24 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
         TextView redditUsername = headerView.findViewById(R.id.redditUsername);
 
         String username = localRepository.getUsername();
-        if (username != null) {
-            redditUsername.setText(localRepository.getUsername());
+        if (StringUtils.Companion.isNullOrEmpty(username)) {
+            redditUsername.setText(R.string.log_in);
         } else {
-            redditUsername.setText(R.string.not_logged);
+            redditUsername.setText(localRepository.getUsername());
         }
+
+        redditUsername.setOnClickListener(v -> {
+            // Start LoginActivity if no user is currently logged in.
+            if (StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
+                Intent loginIntent = new Intent(getApplicationContext(), LoginActivity
+                        .class);
+                startActivity(loginIntent);
+            } else {
+                Intent profileIntent = new Intent(getApplicationContext(),
+                        ProfileActivity.class);
+                startActivity(profileIntent);
+            }
+        });
     }
 
     private void resubscribeToTopics() {
