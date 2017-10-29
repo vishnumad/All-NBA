@@ -1,7 +1,14 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
+import android.support.annotation.NonNull;
+
 import com.google.common.base.Optional;
 import com.google.firebase.crash.FirebaseCrash;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -161,20 +168,25 @@ public final class DateFormatUtil {
     }
 
     /**
-     * Returns localized date from game time String (e.g. 9:00 pm ET) -> 7:00 pm of timeZone
+     * Returns localized date from game time String (e.g. 9:00 pm ET) -> 7:00 PM of timeZone
      */
-    public static String localizeGameTime(String dateETString, TimeZone timeZone) {
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-
+    public static String localizeGameTime(@NonNull String dateETString, TimeZone timeZone) {
         try {
-            Date date = sdf.parse(dateETString);
-            sdf.setTimeZone(timeZone);
-            return sdf.format(date);
-        } catch (ParseException e) {
-            FirebaseCrash.report(new RuntimeException("Unlocalizable date string: " +
-                    dateETString + " to timezone: " + timeZone));
-            return dateETString;
+            String formattedDate = dateETString.replace(" ET", "");
+
+            LocalTime timeWithoutTZ = LocalTime.parse(formattedDate,
+                    DateTimeFormat.forPattern("hh:mm aa"));
+
+            DateTime timeET = DateTime.now(DateTimeZone
+                    .forTimeZone(TimeZone.getTimeZone("America/New_York")))
+                    .withTime(timeWithoutTZ);
+
+            DateTime localized = timeET.toDateTime(DateTimeZone.forTimeZone(timeZone));
+            return localized.toString(DateTimeFormat.forPattern("h:mm aa"));
+        } catch (Exception e) {
+            FirebaseCrash.report(new RuntimeException("Error localizing date " + dateETString
+                    + " to timezone " + timeZone.toString()));
+            return "";
         }
     }
 
