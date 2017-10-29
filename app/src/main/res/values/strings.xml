@@ -439,15 +439,16 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        v1.1.0\n•
-        New dark theme!\n•
+        • New dark theme!\n•
         Hide/expand a comment\'s children by long-pressing it\n•
         View a highlight\'s comment thread\n•
+        Added FG%, 3PT%, FT%, BA and scores to the box score\n•
         View highlights in portrait mode\n•
         New setting to open youtube videos in native app\n•
         Replies are now shown immediately after posting\n•
         Fixed "load more comments" button\n•
-        Fixed issue where standings could appear unsorted
+        Fixed issue where standings could appear unsorted\n•
+        Improved box score UI
     </string>
     <string name="submitted_comment">Submitted comment</string>
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
