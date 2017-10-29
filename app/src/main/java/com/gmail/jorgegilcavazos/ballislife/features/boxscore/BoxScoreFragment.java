@@ -169,6 +169,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 players.add(statLine.getLn());
             }
         }
+        players.add("TOTAL");
 
         int i = 1;
         addRowToPlayersTable2("PLAYER");
@@ -180,16 +181,18 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             i++;
         }
 
+        StatLine total = new StatLine(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"0","0");
         i = 1;
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getVls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
+            addToTotal(statLine, total);
             if (i == 5) {
                 addSeparatorRowToStats(19);
             }
             i++;
         }
-
+        displayTotal(total);
         scrollView.setVisibility(View.VISIBLE);
     }
 
