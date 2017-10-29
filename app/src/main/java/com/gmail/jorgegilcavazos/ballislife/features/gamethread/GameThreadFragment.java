@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
@@ -61,7 +60,6 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     public static final String GAME_DATE_KEY = "GAME_DATE";
 
     @Inject GameThreadPresenterV2 presenter;
-    @Inject RedditAuthentication redditAuthentication;
     @Inject LocalRepository localRepository;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
@@ -128,7 +126,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
         int textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository
                 .getAppTheme());
-        threadAdapter = new ThreadAdapter(getActivity(), redditAuthentication, new ArrayList<>(),
+        threadAdapter = new ThreadAdapter(getActivity(), localRepository, new ArrayList<>(),
                 false, textColor);
 
         lmComments = new LinearLayoutManager(getActivity());

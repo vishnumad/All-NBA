@@ -4,6 +4,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
@@ -56,6 +57,7 @@ class GameThreadPresenterV2Test {
   @Mock private lateinit var mockRedditActions: RedditActions
   @Mock private lateinit var mockContributionsRepository: ContributionRepository
   @Mock private lateinit var threadsDisposable: CompositeDisposable
+  @Mock private lateinit var localRepository: LocalRepository
   @Mock private lateinit var disposable: CompositeDisposable
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
@@ -87,6 +89,7 @@ class GameThreadPresenterV2Test {
         mockContributionsRepository,
         TrampolineSchedulerProvider(),
         threadsDisposable,
+        localRepository,
         disposable,
         mockNetworkUtils,
         mockErrorHandler)
@@ -191,8 +194,42 @@ class GameThreadPresenterV2Test {
   }
 
   @Test
+  fun doNotUpvoteIfNotLoggedIn() {
+    val mockComment = Mockito.mock(Comment::class.java)
+    `when`(mockRedditActions.voteComment(mockComment, VoteDirection.UPVOTE))
+        .thenReturn(Observable.just(VoteUIModel.notLoggedIn()))
+
+    upvotes.onNext(CommentWrapper(mockComment))
+
+    verify(mockView).showNotLoggedInToast()
+  }
+
+  @Test
+  fun doNotDownvoteIfNotLoggedIn() {
+    val mockComment = Mockito.mock(Comment::class.java)
+    `when`(mockRedditActions.voteComment(mockComment, VoteDirection.DOWNVOTE))
+        .thenReturn(Observable.just(VoteUIModel.notLoggedIn()))
+
+    downvotes.onNext(CommentWrapper(mockComment))
+
+    verify(mockView).showNotLoggedInToast()
+  }
+
+  @Test
+  fun doNotNovoteIfNotLoggedIn() {
+    val mockComment = Mockito.mock(Comment::class.java)
+    `when`(mockRedditActions.voteComment(mockComment, VoteDirection.NO_VOTE))
+        .thenReturn(Observable.just(VoteUIModel.notLoggedIn()))
+
+    novotes.onNext(CommentWrapper(mockComment))
+
+    verify(mockView).showNotLoggedInToast()
+  }
+
+  @Test
   fun openReplyActivityOnCommentReply() {
     val mockComment = Mockito.mock(Comment::class.java)
+    `when`(localRepository.username).thenReturn("username")
 
     replies.onNext(CommentWrapper(mockComment))
 
@@ -201,15 +238,38 @@ class GameThreadPresenterV2Test {
   }
 
   @Test
+  fun dontOpenReplyActivityOnCommentReplyIfNotLoggedIn() {
+    val mockComment = Mockito.mock(Comment::class.java)
+    `when`(localRepository.username).thenReturn(null)
+
+    replies.onNext(CommentWrapper(mockComment))
+
+    verify(mockView).showNotLoggedInToast()
+  }
+
+  @Test
   fun openReplyActivityOnSubmissionReply() {
     val mockSubmission = Mockito.mock(Submission::class.java)
     `when`(mockSubmission.id).thenReturn(SUBMISSION_ID)
+    `when`(localRepository.username).thenReturn("username")
 
     presenter.setCurrentSubmission(mockSubmission)
     submissionReplies.onNext(Any())
 
     verify(mockContributionsRepository).saveSubmission(mockSubmission)
     verify(mockView).openReplyToSubmissionActivity(SUBMISSION_ID)
+  }
+
+  @Test
+  fun dontOpenReplyActivityOnSubmissionReply() {
+    val mockSubmission = Mockito.mock(Submission::class.java)
+    `when`(mockSubmission.id).thenReturn(SUBMISSION_ID)
+    `when`(localRepository.username).thenReturn("")
+
+    presenter.setCurrentSubmission(mockSubmission)
+    submissionReplies.onNext(Any())
+
+    verify(mockView).showNotLoggedInToast()
   }
 
   @Test

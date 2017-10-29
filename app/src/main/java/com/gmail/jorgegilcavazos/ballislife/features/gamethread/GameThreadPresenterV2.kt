@@ -5,6 +5,7 @@ import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
@@ -30,6 +31,7 @@ class GameThreadPresenterV2 @Inject constructor(
     private val contributionRepository: ContributionRepository,
     private val schedulerProvider: BaseSchedulerProvider,
     private val threadsDisposable: CompositeDisposable,
+    private val localRepository: LocalRepository,
     private val disposable: CompositeDisposable,
     private val networkUtils: NetworkUtils,
     private val errorHandler: ErrorHandler) : BasePresenter<GameThreadView>() {
@@ -57,34 +59,60 @@ class GameThreadPresenterV2 @Inject constructor(
         .addTo(disposable)
 
     view.upvotes()
-        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.UPVOTE).subscribe() }
-        .addTo(disposable)
+        .subscribe {
+          redditActions.voteComment(it.comment!!, VoteDirection.UPVOTE)
+              .subscribe({
+                if (it.notLoggedIn) {
+                  view.showNotLoggedInToast()
+                }
+              })
+              .addTo(disposable)
+        }.addTo(disposable)
 
     view.downvotes()
-        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.DOWNVOTE).subscribe() }
-        .addTo(disposable)
+        .subscribe {
+          redditActions.voteComment(it.comment!!, VoteDirection.DOWNVOTE)
+              .subscribe({
+                if (it.notLoggedIn) {
+                  view.showNotLoggedInToast()
+                }
+              })
+              .addTo(disposable)
+        }.addTo(disposable)
 
     view.novotes()
-        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.NO_VOTE).subscribe() }
-        .addTo(disposable)
+        .subscribe { redditActions.voteComment(it.comment!!, VoteDirection.NO_VOTE)
+            .subscribe({
+              if (it.notLoggedIn) {
+                view.showNotLoggedInToast()
+              }
+            })
+            .addTo(disposable)
+        }.addTo(disposable)
 
     view.replies()
         .subscribe {
-          contributionRepository.saveComment(it.comment!!)
-          view.openReplyToCommentActivity(it.comment)
-        }
-        .addTo(disposable)
+          if (!localRepository.username.isNullOrEmpty()) {
+            contributionRepository.saveComment(it.comment!!)
+            view.openReplyToCommentActivity(it.comment)
+          } else {
+            view.showNotLoggedInToast()
+          }
+        }.addTo(disposable)
 
     view.submissionReplies()
         .subscribe {
-          contributionRepository.saveSubmission(
-              currentSubmission
-                  ?: throw IllegalStateException("Current submission should not be null"))
-          view.openReplyToSubmissionActivity(
-              currentSubmission?.id
-                  ?: throw IllegalStateException("Current submission should not be null"))
-        }
-        .addTo(disposable)
+          if (!localRepository.username.isNullOrEmpty()) {
+            contributionRepository.saveSubmission(
+                currentSubmission
+                    ?: throw IllegalStateException("Current submission should not be null"))
+            view.openReplyToSubmissionActivity(
+                currentSubmission?.id
+                    ?: throw IllegalStateException("Current submission should not be null"))
+          } else {
+            view.showNotLoggedInToast()
+          }
+        }.addTo(disposable)
 
     view.streamChanges()
         .subscribe {
@@ -100,8 +128,7 @@ class GameThreadPresenterV2 @Inject constructor(
             shouldStream = false
             loadGameThread()
           }
-        }
-        .addTo(disposable)
+        }.addTo(disposable)
 
     view.commentCollapses()
         .subscribe { view.collapseComments(it) }

@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
@@ -52,8 +51,6 @@ public class SubmittionActivity extends BaseNoActionBarActivity implements
         SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_COMMENT_TO_SCROLL_ID = "CommentToScroll";
-
-    @Inject RedditAuthentication redditAuthentication;
 
     @Inject SubmissionPresenter presenter;
 
@@ -97,7 +94,7 @@ public class SubmittionActivity extends BaseNoActionBarActivity implements
         swipeRefreshLayout.setOnRefreshListener(this);
 
         int textColor = ThemeUtils.Companion.getTextColor(this, localRepository.getAppTheme());
-        threadAdapter = new ThreadAdapter(this, redditAuthentication, new ArrayList<>(), true,
+        threadAdapter = new ThreadAdapter(this, localRepository, new ArrayList<>(), true,
                 textColor);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);

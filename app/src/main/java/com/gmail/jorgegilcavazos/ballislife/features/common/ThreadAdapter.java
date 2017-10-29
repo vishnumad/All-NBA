@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
-import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.LoadMoreCommentsViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
@@ -59,7 +59,7 @@ import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private RedditAuthentication redditAuthentication;
+    private LocalRepository localRepository;
     private Context context;
     private List<ThreadItem> commentsList;
     private Map<String, List<ThreadItem>> collapsedItems = new HashMap<>();
@@ -83,12 +83,15 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private PublishSubject<String> commentUnCollapses = PublishSubject.create();
     private PublishSubject<CommentItem> loadMoreComments = PublishSubject.create();
 
-    public ThreadAdapter(Context context, RedditAuthentication redditAuthentication, List
-            <ThreadItem> commentsList, boolean hasHeader, int textColor) {
+    public ThreadAdapter(Context context,
+                         LocalRepository localRepository,
+                         List<ThreadItem> commentsList,
+                         boolean hasHeader,
+                         int textColor) {
         this.context = context;
+        this.localRepository = localRepository;
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
-        this.redditAuthentication = redditAuthentication;
         this.textColor = textColor;
     }
 
@@ -123,7 +126,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FullCardViewHolder) {
-            ((FullCardViewHolder) holder).bindData(context, redditAuthentication,
+            ((FullCardViewHolder) holder).bindData(context, localRepository,
                     submissionWrapper, submissionSaves, submissionUnsaves, submissionUpvotes,
                     submissionDownvotes, submissionNovotes, submissionContentClicks);
         } else if (holder instanceof CommentViewHolder) {
@@ -135,7 +138,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             } else {
                 item = commentsList.get(position);
             }
-            commentHolder.bindData(context, item, redditAuthentication, commentSaves,
+            commentHolder.bindData(context, item, localRepository, commentSaves,
                     commentUnsaves, upvotes, downvotes, novotes, replies, commentCollapses,
                     commentUnCollapses);
         } else if (holder instanceof LoadMoreCommentsViewHolder) {
@@ -186,8 +189,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
             if (item.getType() == COMMENT) {
-                if (item.getCommentItem() != null && item.getCommentItem().getCommentWrapper()
-                        .getId().equals(parentId)) {
+                if (item.getCommentItem() != null && item.getCommentItem()
+                        .getCommentWrapper()
+                        .getId()
+                        .equals(parentId)) {
                     commentItem.setDepth(item.getCommentItem().getDepth() + 1);
                     commentsList.add(i + 1, new ThreadItem(COMMENT, commentItem, commentItem
                             .getDepth(), false));
@@ -269,8 +274,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (itemsToUnCollapse != null && !itemsToUnCollapse.isEmpty()) {
             for (int i = 0; i < commentsList.size(); i++) {
                 ThreadItem item = commentsList.get(i);
-                if (item.getType() == COMMENT && item.getCommentItem().getCommentWrapper()
-                        .getId().equals(commentId)) {
+                if (item.getType() == COMMENT && item.getCommentItem()
+                        .getCommentWrapper()
+                        .getId()
+                        .equals(commentId)) {
                     commentsList.addAll(i + 1, itemsToUnCollapse);
                     if (hasHeader) {
                         notifyItemRangeInserted(i + 2, itemsToUnCollapse.size());
@@ -287,8 +294,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void insertItemsBelowParent(List<ThreadItem> items, CommentNode parent) {
         for (int i = 0; i < commentsList.size(); i++) {
             ThreadItem item = commentsList.get(i);
-            if (item.getType() == LOAD_MORE_COMMENTS && item.getCommentItem().getCommentWrapper()
-                    .getId().equals(parent.getComment().getId())) {
+            if (item.getType() == LOAD_MORE_COMMENTS && item.getCommentItem()
+                    .getCommentWrapper()
+                    .getId()
+                    .equals(parent.getComment().getId())) {
                 commentsList.remove(i);
                 if (hasHeader) {
                     notifyItemRemoved(i + 1);
@@ -391,8 +400,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             this.textColor = textColor;
         }
 
-        public void bindData(final Context context, final ThreadItem threadItem, final
-        RedditAuthentication redditAuthentication, PublishSubject<CommentWrapper> commentSaves,
+        public void bindData(final Context context,
+                             final ThreadItem threadItem,
+                             final LocalRepository localRepository,
+                             PublishSubject<CommentWrapper> commentSaves,
                              PublishSubject<CommentWrapper> commentUnsaves,
                              PublishSubject<CommentWrapper> upvotes,
                              PublishSubject<CommentWrapper> downvotes,
@@ -513,12 +524,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             btnUpvote.setOnClickListener(v -> {
                 if (scoreTextView.getCurrentTextColor() == colorUpvoted) {
-                    if (redditAuthentication.isUserLoggedIn()) {
+                    if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                         scoreTextView.setTextColor(textColor);
                     }
                     novotes.onNext(comment);
                 } else {
-                    if (redditAuthentication.isUserLoggedIn()) {
+                    if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                         scoreTextView.setTextColor(colorUpvoted);
                     }
                     upvotes.onNext(comment);
@@ -527,12 +538,12 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             });
             btnDownvote.setOnClickListener(v -> {
                 if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
-                    if (redditAuthentication.isUserLoggedIn()) {
+                    if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                         scoreTextView.setTextColor(textColor);
                     }
                     novotes.onNext(comment);
                 } else {
-                    if (redditAuthentication.isUserLoggedIn()) {
+                    if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                         scoreTextView.setTextColor(colorDownvoted);
                     }
                     downvotes.onNext(comment);
