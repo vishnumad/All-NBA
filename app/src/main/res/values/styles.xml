@@ -14,6 +14,7 @@
         <item name="commentBackgroundDark">@color/commentBgDark</item>
         <item name="iconTint">@color/active_icon</item>
         <item name="separator">@color/dividerLight</item>
+        <item name="cardsDialog">#FFFFFF</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
@@ -29,6 +30,7 @@
         <item name="commentBackgroundDark">@color/nightCommentBgDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
         <item name="separator">@color/dividerDark</item>
+        <item name="cardsDialog">#424242</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

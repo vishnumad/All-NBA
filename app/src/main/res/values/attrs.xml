@@ -6,5 +6,6 @@
         <attr name="iconTint" format="color"/>
         <attr name="colorPrimaryLight" format="color"/>
         <attr name="separator" format="color" />
+        <attr name="cardsDialog" format="color" />
     </declare-styleable>
 </resources>
