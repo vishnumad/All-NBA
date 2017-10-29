@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository;
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.profile.ProfileRepositoryImpl;
@@ -44,34 +45,25 @@ public class ProfileRepositoryImplTest {
             mock(Contribution.class),
             mock(Contribution.class));
 
-    @Mock
-    RedditService mockRedditService;
-
-    @Mock
-    RedditAuthentication mockRedditAuthentication;
-
-    @Mock
-    RedditClient redditClient;
+    @Mock RedditService mockRedditService;
+    @Mock RedditAuthentication mockRedditAuthentication;
+    @Mock RedditClient redditClient;
+    @Mock LocalRepository mockLocalRepository;
 
     private ProfileRepository profileRepository;
 
     @Before
     public void setup() {
-        when(redditClient.getAuthenticatedUser()).thenReturn("Juanito");
         when(mockRedditAuthentication.getRedditClient()).thenReturn(redditClient);
-        profileRepository = new ProfileRepositoryImpl(
-                mockRedditService,
-                mockRedditAuthentication);
-        profileRepository.setLimit(5);
-        profileRepository.setSorting(Sorting.NEW);
-        profileRepository.setTimePeriod(TimePeriod.ALL);
     }
 
     @Test
     public void testNext() {
+        when(mockLocalRepository.getUsername()).thenReturn("Username");
         when(mockRedditService.getUserContributions(any(UserContributionPaginator.class)))
                 .thenReturn(Single.just(contributions));
 
+        setupRepository();
         List<Contribution> actualContributions = profileRepository.next().blockingGet();
 
         verify(mockRedditService).getUserContributions(any(UserContributionPaginator.class));
@@ -83,12 +75,14 @@ public class ProfileRepositoryImplTest {
 
     @Test
     public void testNext_calledTwice_cachedContributionsHaveAll() {
+        when(mockLocalRepository.getUsername()).thenReturn("Username");
         when(mockRedditService.getUserContributions(any(UserContributionPaginator.class)))
                 .thenReturn(Single.just(contributions));
         List<Contribution> expectedCachedContributions = new ArrayList<>();
         expectedCachedContributions.addAll(contributions);
         expectedCachedContributions.addAll(contributions);
 
+        setupRepository();
         List<Contribution> actualContributions = profileRepository.next().blockingGet();
         List<Contribution> actualContributions2 = profileRepository.next().blockingGet();
 
@@ -105,9 +99,11 @@ public class ProfileRepositoryImplTest {
 
     @Test
     public void testClearCache() {
+        when(mockLocalRepository.getUsername()).thenReturn("Username");
         when(mockRedditService.getUserContributions(any(UserContributionPaginator.class)))
                 .thenReturn(Single.just(contributions));
 
+        setupRepository();
         profileRepository.next().blockingGet();
 
         assertEquals(contributions.size(), profileRepository.getCachedContributions().size());
@@ -119,9 +115,11 @@ public class ProfileRepositoryImplTest {
 
     @Test
     public void testReset() {
+        when(mockLocalRepository.getUsername()).thenReturn("Username");
         when(mockRedditService.getUserContributions(any(UserContributionPaginator.class)))
                 .thenReturn(Single.just(contributions));
 
+        setupRepository();
         profileRepository.next().blockingGet();
 
         assertEquals(contributions.size(), profileRepository.getCachedContributions().size());
@@ -129,5 +127,22 @@ public class ProfileRepositoryImplTest {
         profileRepository.reset();
 
         assertTrue(profileRepository.getCachedContributions().isEmpty());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwIfNotLoggedIn() {
+        when(mockLocalRepository.getUsername()).thenReturn(null);
+
+        setupRepository();
+    }
+
+    private void setupRepository() {
+        profileRepository = new ProfileRepositoryImpl(
+                mockRedditService,
+                mockLocalRepository,
+                mockRedditAuthentication);
+        profileRepository.setLimit(5);
+        profileRepository.setSorting(Sorting.NEW);
+        profileRepository.setTimePeriod(TimePeriod.ALL);
     }
 }
