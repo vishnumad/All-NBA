@@ -18,3 +18,4 @@
 *.apk
 /app/src/main/res/values/secrets.xml
 /app/release
+/app/fabric.properties
