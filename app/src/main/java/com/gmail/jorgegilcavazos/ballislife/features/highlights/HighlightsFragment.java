@@ -33,6 +33,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivi
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.android.youtube.player.YouTubeApiServiceUtil;
+import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -248,17 +250,23 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void openYoutubeVideo(String videoId) {
         Intent intent;
-        if (localRepository.getOpenYouTubeInApp()) {
-            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in app: " + videoId);
+        // Verify that the API is available in the device.
+        if (localRepository.getOpenYouTubeInApp()
+                && YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(getActivity())
+                .equals(YouTubeInitializationResult.SUCCESS)) {
+            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in " +
+                    "app: " + videoId);
             intent = YouTubeStandalonePlayer.createVideoIntent(getActivity(),
                     "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
                     videoId, 0, /* Start millisecond */
                     true /* Autoplay */, true /* Lightbox */);
+            startActivity(intent);
         } else {
-            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in YouTube: " + videoId);
+            FirebaseCrash.logcat(Log.INFO, "HighlightsFragment", "Opening youtube video in " +
+                    "YouTube: " + videoId);
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId));
+            startActivity(intent);
         }
-        startActivity(intent);
     }
 
     @Override
