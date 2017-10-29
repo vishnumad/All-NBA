@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
+import com.crashlytics.android.Crashlytics;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -59,6 +60,7 @@ import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.fabric.sdk.android.Fabric;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
@@ -124,6 +126,7 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Fabric.with(this, new Crashlytics());
 
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {

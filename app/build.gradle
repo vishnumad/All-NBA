@@ -1,4 +1,15 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.24.4'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 apply plugin: 'jacoco-android'
 
 android {
@@ -80,6 +91,7 @@ repositories {
     maven {
         url 'https://dl.bintray.com/drummer-aidan/maven'
     }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
@@ -133,6 +145,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.5.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation files('libs/YouTubeAndroidPlayerApi.jar')
+    implementation('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
 }
 
 task jacocoTestReport2(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
