@@ -175,7 +175,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         addRowToPlayersTable2("PLAYER");
         for (String player : players) {
             addRowToPlayersTable2(player);
-            if (i == 5) {
+            if (i == 5 || i == players.size()-1) {
                 addSeparatorRowToPlayers();
             }
             i++;
@@ -187,7 +187,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         for (StatLine statLine : values.getVls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
             addToTeamTotalStats(statLine, total);
-            if (i == 5) {
+            if (i == 5 || i == players.size()-1) {
                 addSeparatorRowToStats(19);
             }
             i++;
@@ -217,7 +217,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         int i = 1;
         for (String player : players) {
             addRowToPlayersTable2(player);
-            if (i == 5) {
+            if (i == 5 || i == players.size()-1) {
                 addSeparatorRowToPlayers();
             }
             i++;
@@ -229,7 +229,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         for (StatLine statLine : values.getHls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
             addToTeamTotalStats(statLine, total);
-            if (i == 5) {
+            if (i == 5 || i == players.size()-1) {
                 addSeparatorRowToStats(19);
             }
             i++;
@@ -315,7 +315,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         row.addView(addNormalItem(row, String.valueOf(statLine.getPm())));
 
         statsTable.addView(row, new TableLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-
     }
 
     public void addToTeamTotalStats(StatLine curr, StatLine total){
@@ -343,7 +342,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
         if (statLineOptional.isPresent()) {
             StatLine statLine = statLineOptional.get();
-//
+
             row.addView(addNormalItem(row, String.valueOf(statLine.getMin())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getPts())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getReb())));
