@@ -19,7 +19,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/square_white"
+                android:background="?attr/boxScoreSquareWhite"
                 android:text="SAS - 81"/>
 
             <Button
@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:background="@drawable/square_black"
+                android:background="?attr/boxScoreSquareBlack"
                 android:text="ATL (67)"
                 android:textColor="@color/white"/>
 

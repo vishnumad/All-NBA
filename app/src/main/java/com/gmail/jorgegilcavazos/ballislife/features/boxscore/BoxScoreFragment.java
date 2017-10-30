@@ -23,6 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeAppli
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
 import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -134,9 +135,18 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @OnClick(R.id.button_away)
     public void onButtonAwayClick() {
-        btnAway.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_black));
+        if (localRepository.getAppTheme() == SwishTheme.DARK) {
+            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_black_dark));
+            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_white_dark));
+        } else {
+            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_black));
+            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_white));
+        }
         btnAway.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
-        btnHome.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_white));
         btnHome.setTextColor(textColor);
 
         teamSelected = LOAD_AWAY;
@@ -145,9 +155,18 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @OnClick(R.id.button_home)
     public void onButtonHomeClick() {
-        btnHome.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_black));
+        if (localRepository.getAppTheme() == SwishTheme.DARK) {
+            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_white_dark));
+            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_black_dark));
+        } else {
+            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_white));
+            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
+                    R.drawable.square_black));
+        }
         btnHome.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
-        btnAway.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.square_white));
         btnAway.setTextColor(textColor);
 
         teamSelected = LOAD_HOME;

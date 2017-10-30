@@ -15,6 +15,10 @@
         <item name="iconTint">@color/active_icon</item>
         <item name="separator">@color/dividerLight</item>
         <item name="cardsDialog">#FFFFFF</item>
+
+        <!-- Box score drawables -->
+        <item name="boxScoreSquareWhite">@drawable/square_white</item>
+        <item name="boxScoreSquareBlack">@drawable/square_black</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
@@ -31,6 +35,10 @@
         <item name="iconTint">@color/active_icon_dark</item>
         <item name="separator">@color/dividerDark</item>
         <item name="cardsDialog">#424242</item>
+
+        <!-- Box score drawables -->
+        <item name="boxScoreSquareWhite">@drawable/square_white_dark</item>
+        <item name="boxScoreSquareBlack">@drawable/square_black_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
