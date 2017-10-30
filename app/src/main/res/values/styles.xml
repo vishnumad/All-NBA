@@ -19,6 +19,7 @@
         <!-- Box score drawables -->
         <item name="boxScoreSquareWhite">@drawable/square_white</item>
         <item name="boxScoreSquareBlack">@drawable/square_black</item>
+        <item name="boxScoreBackground">@color/white</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat">
@@ -39,6 +40,7 @@
         <!-- Box score drawables -->
         <item name="boxScoreSquareWhite">@drawable/square_white_dark</item>
         <item name="boxScoreSquareBlack">@drawable/square_black_dark</item>
+        <item name="boxScoreBackground">#303030</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

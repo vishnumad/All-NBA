@@ -10,5 +10,6 @@
 
         <attr name="boxScoreSquareWhite" format="reference" />
         <attr name="boxScoreSquareBlack" format="reference" />
+        <attr name="boxScoreBackground" format="color" />
     </declare-styleable>
 </resources>
