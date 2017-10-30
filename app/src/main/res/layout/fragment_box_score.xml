@@ -37,21 +37,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
-
-            <TextView
-                android:id="@+id/text_load_message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/box_score_not_available"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:visibility="gone"/>
-
             <ScrollView
                 android:id="@+id/scrollView"
                 android:layout_width="match_parent"
@@ -108,6 +93,21 @@
                 </RelativeLayout>
 
             </ScrollView>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:id="@+id/text_load_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/box_score_not_available"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 

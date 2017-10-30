@@ -6,6 +6,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticationImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.boxscore.BoxScoreRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.boxscore.BoxScoreRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository;
@@ -83,4 +85,8 @@ public abstract class BindModule {
 
     @Binds
     public abstract ErrorHandler bindErrorHandler(ErrorHandlerImpl errorHandlerImpl);
+
+    @Binds
+    public abstract BoxScoreRepository bindBoxScoreRepository(
+            BoxScoreRepositoryImpl boxScoreRepositoryImpl);
 }

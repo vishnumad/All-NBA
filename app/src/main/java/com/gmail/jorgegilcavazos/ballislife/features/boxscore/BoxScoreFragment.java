@@ -2,10 +2,13 @@ package com.gmail.jorgegilcavazos.ballislife.features.boxscore;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,10 @@ import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
-import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
@@ -26,9 +29,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.common.base.Optional;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -51,11 +50,8 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
 
 
 public class BoxScoreFragment extends Fragment implements BoxScoreView {
-    private static final String TAG = "BoxScoreFragment";
-    public static final int LOAD_AWAY = 0;
-    public static final int LOAD_HOME = 2;
 
-    @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject BoxScorePresenter presenter;
     @Inject LocalRepository localRepository;
 
     @BindView(R.id.button_home) Button btnHome;
@@ -66,13 +62,12 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     @BindView(R.id.statsTable) TableLayout statsTable;
     @BindView(R.id.scrollView) ScrollView scrollView;
 
-    private BoxScorePresenter presenter;
     private Unbinder unbinder;
 
     private String homeTeam;
     private String awayTeam;
     private String gameId;
-    private int teamSelected;
+    private BoxScoreSelectedTeam teamSelected;
     private int textColor;
 
     @Override
@@ -94,7 +89,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         View view = inflater.inflate(R.layout.fragment_box_score, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        teamSelected = LOAD_HOME;
+        teamSelected = BoxScoreSelectedTeam.HOME;
         setHomeAwayBackground();
 
         btnAway.setText(awayTeam);
@@ -102,33 +97,30 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
         textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository.getAppTheme());
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://nba-app-ca681.firebaseio.com/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        NbaGamesService gamesService = retrofit.create(NbaGamesService.class);
-
-        presenter = new BoxScorePresenter(this, gamesService, schedulerProvider);
-        presenter.start();
-        presenter.loadBoxScore(gameId, teamSelected);
+        presenter.attachView(this);
+        presenter.loadBoxScore(gameId, teamSelected, true /* forceNetwork */);
 
         return view;
     }
 
     @Override
     public void onDestroyView() {
+        presenter.detachView();
         unbinder.unbind();
-        presenter.stop();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_box_score, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                presenter.loadBoxScore(gameId, teamSelected);
+                presenter.loadBoxScore(gameId, teamSelected, true /* forceNetwork */);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -139,10 +131,10 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         btnAway.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnHome.setTextColor(textColor);
 
-        teamSelected = LOAD_AWAY;
+        teamSelected = BoxScoreSelectedTeam.VISITOR;
         setHomeAwayBackground();
-        
-        presenter.loadBoxScore(gameId, teamSelected);
+
+        presenter.loadBoxScore(gameId, teamSelected, false /* forceNetwork */);
     }
 
     @OnClick(R.id.button_home)
@@ -150,21 +142,18 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         btnHome.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnAway.setTextColor(textColor);
 
-        teamSelected = LOAD_HOME;
+        teamSelected = BoxScoreSelectedTeam.HOME;
         setHomeAwayBackground();
 
-        presenter.loadBoxScore(gameId, teamSelected);
+        presenter.loadBoxScore(gameId, teamSelected, false /* forceNetwork */);
     }
 
     @Override
-    public void showVisitorBoxScore(BoxScoreValues values) {
+    public void showVisitorBoxScore(@NonNull BoxScoreValues values) {
         btnHome.setText(getString(R.string.box_score_team_score, homeTeam,
                 values.getHls().getScore()));
         btnAway.setText(getString(R.string.box_score_team_score, awayTeam,
                 values.getVls().getScore()));
-
-        playersTable.removeAllViews();
-        statsTable.removeAllViews();
 
         List<String> players = new ArrayList<>();
 
@@ -206,9 +195,6 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 values.getHls().getScore()));
         btnAway.setText(getString(R.string.box_score_team_score, awayTeam,
                 values.getVls().getScore()));
-
-        playersTable.removeAllViews();
-        statsTable.removeAllViews();
 
         List<String> players = new ArrayList<>();
 
@@ -256,17 +242,18 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     @Override
     public void hideBoxScore() {
         scrollView.setVisibility(View.GONE);
+        playersTable.removeAllViews();
+        statsTable.removeAllViews();
     }
 
     @Override
-    public void showBoxScoreNotAvailableMessage() {
-        tvLoadMessage.setText(R.string.box_score_not_available);
-        tvLoadMessage.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void hideLoadMessage() {
-        tvLoadMessage.setVisibility(View.GONE);
+    public void showBoxScoreNotAvailableMessage(boolean active) {
+        if (active) {
+            tvLoadMessage.setText(R.string.box_score_not_available);
+            tvLoadMessage.setVisibility(View.VISIBLE);
+        } else {
+            tvLoadMessage.setVisibility(View.GONE);
+        }
     }
 
     public void addRowToPlayersTable2(String content) {
@@ -389,7 +376,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     }
 
     private void setHomeAwayBackground() {
-        if (teamSelected == LOAD_AWAY) {
+        if (teamSelected == BoxScoreSelectedTeam.VISITOR) {
             if (localRepository.getAppTheme() == SwishTheme.DARK) {
                 btnAway.setBackgroundResource(R.drawable.square_black_dark);
                 btnHome.setBackgroundResource(R.drawable.square_white_dark);
@@ -406,5 +393,11 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
                 btnAway.setBackgroundResource(R.drawable.square_white);
             }
         }
+    }
+
+    @Override
+    public void showUnknownErrorToast(int code) {
+        Toast.makeText(getActivity(), getString(R.string.something_went_wrong, code),
+                Toast.LENGTH_SHORT).show();
     }
 }
