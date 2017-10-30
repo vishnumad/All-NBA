@@ -5,11 +5,14 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.layout_load_more_comments.view.*
 
-class LoadMoreCommentsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class LoadMoreCommentsViewHolder(
+		itemView: View,
+		val theme: SwishTheme) : RecyclerView.ViewHolder(itemView) {
 
 	fun bindData(threadItem: ThreadItem,
 							 loadMoreComments: PublishSubject<CommentItem>) = with(itemView) {
@@ -41,15 +44,50 @@ class LoadMoreCommentsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
 			val depthFromZero = depth - 2
 			val res = depthFromZero % 5
 			when (res) {
-				0 -> innerLayout.setBackgroundResource(R.drawable.borderblue)
-				1 -> innerLayout.setBackgroundResource(R.drawable.bordergreen)
-				2 -> innerLayout.setBackgroundResource(R.drawable.borderbrown)
-				3 -> innerLayout.setBackgroundResource(R.drawable.borderorange)
-				4 -> innerLayout.setBackgroundResource(R.drawable.borderred)
+				0 -> {
+					if (theme == SwishTheme.DARK) {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_blue_normal_dark)
+					} else {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_blue_normal_light)
+					}
+				}
+				1 -> {
+					if (theme == SwishTheme.DARK) {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_green_normal_dark)
+					} else {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_green_normal_light)
+					}
+				}
+				2 -> {
+					if (theme == SwishTheme.DARK) {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_brown_normal_dark)
+					} else {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_brown_normal_light)
+					}
+				}
+				3 -> {
+					if (theme == SwishTheme.DARK) {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_orange_normal_dark)
+					} else {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_orange_normal_light)
+					}
+				}
+				4 -> {
+					if (theme == SwishTheme.DARK) {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_red_normal_dark)
+					} else {
+						innerLayout.setBackgroundResource(R.drawable.comment_border_red_normal_light)
+					}
+				}
 			}
 		} else {
-			innerLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R
-					.color.commentBgLight))
+			if (theme == SwishTheme.DARK) {
+				innerLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R
+						.color.commentBgNormalLight))
+			} else {
+				innerLayout.setBackgroundColor(ContextCompat.getColor(itemView.context, R
+						.color.commentBgNormalDark))
+			}
 		}
 		// Add padding depending on level.
 		itemView.setPadding(paddingPx * (depth - 2), 0, 0, 0)

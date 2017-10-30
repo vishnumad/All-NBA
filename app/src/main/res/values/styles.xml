@@ -10,8 +10,8 @@
         <item name="android:textColorPrimary">@color/primaryText</item>
         <item name="android:textColorSecondary">@color/secondaryText</item>
         <item name="android:windowBackground">@color/colorBackground</item>
-        <item name="commentBackgroundLight">@color/commentBgLight</item>
-        <item name="commentBackgroundDark">@color/commentBgDark</item>
+        <item name="commentBackgroundLight">@color/commentBgNormalLight</item>
+        <item name="commentBackgroundDark">@color/commentBgSelectedLight</item>
         <item name="iconTint">@color/active_icon</item>
         <item name="separator">@color/dividerLight</item>
         <item name="cardsDialog">#FFFFFF</item>
@@ -30,8 +30,8 @@
         <item name="android:textColorPrimary">@color/nightPrimaryText</item>
         <item name="android:textColorSecondary">@color/nightSecondaryText</item>
         <item name="android:windowBackground">@color/nightColorBackground</item>
-        <item name="commentBackgroundLight">@color/nightCommentBgLight</item>
-        <item name="commentBackgroundDark">@color/nightCommentBgDark</item>
+        <item name="commentBackgroundLight">@color/commentBgNormalDark</item>
+        <item name="commentBackgroundDark">@color/commentBgSelectedDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
         <item name="separator">@color/dividerDark</item>
         <item name="cardsDialog">#424242</item>

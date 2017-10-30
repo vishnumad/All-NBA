@@ -95,6 +95,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         unbinder = ButterKnife.bind(this, view);
 
         teamSelected = LOAD_HOME;
+        setHomeAwayBackground();
 
         btnAway.setText(awayTeam);
         btnHome.setText(homeTeam);
@@ -135,41 +136,23 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @OnClick(R.id.button_away)
     public void onButtonAwayClick() {
-        if (localRepository.getAppTheme() == SwishTheme.DARK) {
-            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_black_dark));
-            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_white_dark));
-        } else {
-            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_black));
-            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_white));
-        }
         btnAway.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnHome.setTextColor(textColor);
 
         teamSelected = LOAD_AWAY;
+        setHomeAwayBackground();
+        
         presenter.loadBoxScore(gameId, teamSelected);
     }
 
     @OnClick(R.id.button_home)
     public void onButtonHomeClick() {
-        if (localRepository.getAppTheme() == SwishTheme.DARK) {
-            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_white_dark));
-            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_black_dark));
-        } else {
-            btnAway.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_white));
-            btnHome.setBackground(ContextCompat.getDrawable(getActivity(),
-                    R.drawable.square_black));
-        }
         btnHome.setTextColor(ContextCompat.getColor(getActivity(), R.color.white));
         btnAway.setTextColor(textColor);
 
         teamSelected = LOAD_HOME;
+        setHomeAwayBackground();
+
         presenter.loadBoxScore(gameId, teamSelected);
     }
 
@@ -403,5 +386,25 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
         int pct = (int) ((makes / attempts) * 100);
         return pct + "%";
+    }
+
+    private void setHomeAwayBackground() {
+        if (teamSelected == LOAD_AWAY) {
+            if (localRepository.getAppTheme() == SwishTheme.DARK) {
+                btnAway.setBackgroundResource(R.drawable.square_black_dark);
+                btnHome.setBackgroundResource(R.drawable.square_white_dark);
+            } else {
+                btnAway.setBackgroundResource(R.drawable.square_black);
+                btnHome.setBackgroundResource(R.drawable.square_white);
+            }
+        } else {
+            if (localRepository.getAppTheme() == SwishTheme.DARK) {
+                btnHome.setBackgroundResource(R.drawable.square_black_dark);
+                btnAway.setBackgroundResource(R.drawable.square_white_dark);
+            } else {
+                btnHome.setBackgroundResource(R.drawable.square_black);
+                btnAway.setBackgroundResource(R.drawable.square_white);
+            }
+        }
     }
 }

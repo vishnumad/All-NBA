@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.application;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.dagger.component.AppComponent;
@@ -31,6 +32,7 @@ public class BallIsLifeApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.

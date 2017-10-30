@@ -21,12 +21,14 @@ import com.gmail.jorgegilcavazos.ballislife.features.gamethread.LoadMoreComments
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Submission;
@@ -117,7 +119,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return new CommentViewHolder(view, textColor);
         } else if (viewType == LOAD_MORE_COMMENTS.getValue()) {
             view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
-            return new LoadMoreCommentsViewHolder(view);
+            return new LoadMoreCommentsViewHolder(view, localRepository.getAppTheme());
         } else {
             throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
@@ -474,7 +476,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             rlCommentActions.setVisibility(View.GONE);
 
-            setBackgroundAndPadding(context, depth, this, false /* dark */);
+            setBackgroundAndPadding(context, depth, this, false /* dark */,
+                    localRepository.getAppTheme());
 
             if (commentItem.getChildrenCollapsed()) {
                 collapseIndicator.setVisibility(View.VISIBLE);
@@ -487,9 +490,9 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             // On comment click hide/show actions (upvote, downvote, save, etc...).
             commentContentLayout.setOnClickListener(v -> {
                 if (rlCommentActions.getVisibility() == View.VISIBLE) {
-                    hideActions(context, commentHolder, depth);
+                    hideActions(context, commentHolder, depth, localRepository.getAppTheme());
                 } else {
-                    showActions(context, commentHolder, depth);
+                    showActions(context, commentHolder, depth, localRepository.getAppTheme());
                 }
             });
             commentContentLayout.setOnLongClickListener(v -> {
@@ -534,7 +537,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     }
                     upvotes.onNext(comment);
                 }
-                hideActions(context, commentHolder, depth);
+                hideActions(context, commentHolder, depth, localRepository.getAppTheme());
             });
             btnDownvote.setOnClickListener(v -> {
                 if (scoreTextView.getCurrentTextColor() == colorDownvoted) {
@@ -548,7 +551,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     }
                     downvotes.onNext(comment);
                 }
-                hideActions(context, commentHolder, depth);
+                hideActions(context, commentHolder, depth, localRepository.getAppTheme());
             });
             btnSave.setOnClickListener(v -> {
                 if (comment.getSaved()) {
@@ -558,30 +561,31 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     commentSaves.onNext(comment);
                     comment.setSaved(true);
                 }
-                hideActions(context, commentHolder, depth);
+                hideActions(context, commentHolder, depth, localRepository.getAppTheme());
             });
             btnReply.setOnClickListener(v -> {
                 replies.onNext(comment);
-                hideActions(context, commentHolder, depth);
+                hideActions(context, commentHolder, depth, localRepository.getAppTheme());
             });
         }
 
-        private void hideActions(Context context, CommentViewHolder holder, int depth) {
+        private void hideActions(Context context, CommentViewHolder holder, int depth,
+                                 SwishTheme theme) {
             holder.commentInnerContentLayout.setBackgroundColor(ContextCompat.getColor(context, R
                     .color.white));
             holder.rlCommentActions.setVisibility(View.GONE);
-            setBackgroundAndPadding(context, depth, holder, false /* dark */);
+            setBackgroundAndPadding(context, depth, holder, false /* dark */, theme);
         }
 
-        private void showActions(Context context, CommentViewHolder holder, int depth) {
+        private void showActions(Context context, CommentViewHolder holder, int depth,
+                                 SwishTheme theme) {
             holder.rlCommentActions.setVisibility(View.VISIBLE);
-            holder.commentInnerContentLayout.setBackgroundColor(ContextCompat.getColor(context, R
-                    .color.lightGray));
-            setBackgroundAndPadding(context, depth, holder, true /* dark */);
+            setBackgroundAndPadding(context, depth, holder, true /* dark */, theme);
         }
 
-        private void setBackgroundAndPadding(Context context, int depth, CommentViewHolder
-                holder, boolean dark) {
+        private void setBackgroundAndPadding(Context context, int depth,
+                                             CommentViewHolder holder, boolean selected,
+                                             SwishTheme theme) {
             int padding_in_dp = 5;
             final float scale = context.getResources().getDisplayMetrics().density;
             int padding_in_px = (int) (padding_in_dp * scale + 0.5F);
@@ -592,62 +596,126 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 int res = (depthFromZero) % 5;
                 switch (res) {
                     case 0:
-                        if (dark) {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderbluedark);
+                        if (selected) {
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_blue_selected_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_blue_selected_light);
+                            }
                         } else {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderblue);
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_blue_normal_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_blue_normal_light);
+                            }
                         }
                         break;
                     case 1:
-                        if (dark) {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .bordergreendark);
+                        if (selected) {
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_green_selected_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_green_selected_light);
+                            }
                         } else {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .bordergreen);
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_green_normal_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_green_normal_light);
+                            }
                         }
                         break;
                     case 2:
-                        if (dark) {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderbrowndark);
+                        if (selected) {
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_brown_selected_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_brown_selected_light);
+                            }
                         } else {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderbrown);
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_brown_normal_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_brown_normal_light);
+                            }
                         }
                         break;
                     case 3:
-                        if (dark) {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderorangedark);
+                        if (selected) {
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_orange_selected_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_orange_selected_light);
+                            }
                         } else {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderorange);
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_orange_normal_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_orange_normal_light);
+                            }
                         }
                         break;
                     case 4:
-                        if (dark) {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderreddark);
+                        if (selected) {
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_red_selected_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_red_selected_light);
+                            }
                         } else {
-                            holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                                    .borderred);
+                            if (theme == SwishTheme.DARK) {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_red_normal_dark);
+                            } else {
+                                holder.commentInnerContentLayout.setBackgroundResource(
+                                        R.drawable.comment_border_red_normal_light);
+                            }
                         }
                         break;
                 }
             } else {
-                if (dark) {
-                    holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                            .border_no_comment_dark);
+                if (selected) {
+                    if (theme == SwishTheme.DARK) {
+                        holder.commentInnerContentLayout.setBackgroundResource(
+                                R.drawable.comment_no_border_selected_dark);
+                    } else {
+                        holder.commentInnerContentLayout.setBackgroundResource(
+                                R.drawable.comment_no_border_selected_light);
+                    }
                 } else {
-                    holder.commentInnerContentLayout.setBackgroundResource(R.drawable
-                            .border_no_comment);
+                    if (theme == SwishTheme.DARK) {
+                        holder.commentInnerContentLayout.setBackgroundResource(
+                                R.drawable.comment_no_border_normal_dark);
+                    } else {
+                        holder.commentInnerContentLayout.setBackgroundResource(
+                                R.drawable.comment_no_border_normal_light);
+                    }
                 }
             }
             // Add padding depending on level.
             holder.commentContentLayout.setPadding(padding_in_px * (depth - 2), 0, 0, 0);
+
+            int innerPadding = (int) UnitUtils.convertDpToPixel(10, itemView.getContext());
+            holder.commentInnerContentLayout.setPadding(innerPadding, innerPadding, innerPadding,
+                    innerPadding);
         }
     }
 }
