@@ -10,6 +10,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,7 +22,7 @@ class GamesRepositoryImpl @Inject constructor(
     private val gamesService: NbaGamesService,
     private val schedulerProvider: BaseSchedulerProvider) : GamesRepository {
 
-  private val gamesMap = HashMap<String, GameV2>()
+  private val gamesMap = ConcurrentHashMap<String, GameV2>()
 
   override fun games(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
     val network = networkSource(date).toObservable()
