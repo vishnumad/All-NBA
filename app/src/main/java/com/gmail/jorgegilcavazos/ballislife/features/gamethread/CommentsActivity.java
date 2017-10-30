@@ -20,6 +20,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.google.firebase.crash.FirebaseCrash;
 
 import butterknife.BindView;
@@ -74,6 +75,7 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         bundle.putString(GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
+        String gameStatus = intent.getStringExtra(GamesFragment.GAME_STATUS);
         // Initialize tab layout and add three tabs.
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
@@ -84,6 +86,9 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(this);
+        if (gameStatus.equals(NbaGame.POST_GAME)) {
+            viewPager.setCurrentItem(2);
+        }
         tabLayout.addOnTabSelectedListener(this);
 
         fab.setOnClickListener(this);
