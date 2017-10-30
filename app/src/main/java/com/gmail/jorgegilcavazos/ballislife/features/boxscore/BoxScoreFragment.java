@@ -186,13 +186,13 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getVls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
-            addToTotal(statLine, total);
+            addToTeamTotalStats(statLine, total);
             if (i == 5) {
                 addSeparatorRowToStats(19);
             }
             i++;
         }
-        displayTotal(total);
+        displayTeamTotalStats(total);
         scrollView.setVisibility(View.VISIBLE);
     }
 
@@ -228,13 +228,13 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getHls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
-            addToTotal(statLine, total);
+            addToTeamTotalStats(statLine, total);
             if (i == 5) {
                 addSeparatorRowToStats(19);
             }
             i++;
         }
-        displayTotal(total);
+        displayTeamTotalStats(total);
         scrollView.setVisibility(View.VISIBLE);
     }
 
@@ -290,7 +290,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     }
 
 
-    public void displayTotal(StatLine statLine){
+    public void displayTeamTotalStats(StatLine statLine){
         TableRow row = new TableRow(getActivity());
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
 
@@ -318,7 +318,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     }
 
-    public void addToTotal(StatLine curr, StatLine total){
+    public void addToTeamTotalStats(StatLine curr, StatLine total){
         total.setMin(curr.getMin()+total.getMin());
         total.setPts(curr.getPts()+total.getPts());
         total.setReb(curr.getReb()+total.getReb());
@@ -335,27 +335,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         total.setPf(curr.getPf()+total.getPf());
         total.setTov(curr.getTov()+total.getTov());
         total.setPm(curr.getPm()+total.getPm());
-
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getMin())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getPts())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getReb())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getAst())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getBlka())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getFgm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getFga())));
-//        row.addView(addNormalItem(row, getShootingPct(statLine.getFga(), statLine.getFgm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getTpm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getTpa())));
-//        row.addView(addNormalItem(row, getShootingPct(statLine.getTpa(), statLine.getTpm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getFtm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getFta())));
-//        row.addView(addNormalItem(row, getShootingPct(statLine.getFta(), statLine.getFtm())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getPf())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getTov())));
-//        row.addView(addNormalItem(row, String.valueOf(statLine.getPm())));
     }
+    
     public void addRowToStatsTable2(Optional<StatLine> statLineOptional) {
         TableRow row = new TableRow(getActivity());
         row.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
