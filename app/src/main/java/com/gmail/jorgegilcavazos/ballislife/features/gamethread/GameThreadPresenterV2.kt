@@ -146,11 +146,9 @@ class GameThreadPresenterV2 @Inject constructor(
   }
 
 	fun onResume() {
-		if(null == currentSubmission) {
-			view.hideFab()
-		} else {
-			view.showFab()
-		}
+		if(null != currentSubmission) {
+      view.showFab()
+    }
 	}
 
 	fun loadGameThread() {
