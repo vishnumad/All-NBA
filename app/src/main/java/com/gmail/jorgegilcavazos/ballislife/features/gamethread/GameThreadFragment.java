@@ -150,6 +150,13 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser && null != presenter)
+            presenter.onResume();
+    }
+
+    @Override
     public void onDestroyView() {
         unbinder.unbind();
         presenter.detachView();
