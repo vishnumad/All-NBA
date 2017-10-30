@@ -145,7 +145,7 @@ class GameThreadPresenterV2 @Inject constructor(
     super.detachView()
   }
 
-	fun onResume() {
+	fun onVisible() {
 		if(null != currentSubmission) {
       view.showFab()
     }

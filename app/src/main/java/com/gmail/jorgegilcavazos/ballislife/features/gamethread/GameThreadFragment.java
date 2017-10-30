@@ -153,7 +153,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser && null != presenter)
-            presenter.onResume();
+            presenter.onVisible();
     }
 
     @Override
