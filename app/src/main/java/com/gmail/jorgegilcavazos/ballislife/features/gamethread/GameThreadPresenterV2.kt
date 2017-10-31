@@ -146,7 +146,7 @@ class GameThreadPresenterV2 @Inject constructor(
   }
 
   fun onVisible() {
-    if (null != currentSubmission) {
+    if (null != currentSubmission && view != null) {
       view.showFab()
     }
   }

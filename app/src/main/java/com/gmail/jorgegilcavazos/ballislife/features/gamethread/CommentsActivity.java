@@ -86,10 +86,8 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(this);
-        if (gameStatus.equals(NbaGame.POST_GAME)) {
-            viewPager.setCurrentItem(2);
-        }
         tabLayout.addOnTabSelectedListener(this);
+        setSelectedTab(gameStatus);
 
         fab.setOnClickListener(this);
     }
@@ -216,5 +214,16 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    private void setSelectedTab(String gameStatus){
+        if (gameStatus.equals(NbaGame.POST_GAME)) {
+            TabLayout.Tab postGameTab = tabLayout.getTabAt(2);
+            if(postGameTab != null) {
+                postGameTab.select();
+            } else {
+                viewPager.setCurrentItem(2);
+            }
+        }
     }
 }
