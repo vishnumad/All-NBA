@@ -16,6 +16,7 @@ class GamesPresenter @Inject constructor(
     private val gamesRepository: GamesRepository,
     private val schedulerProvider: BaseSchedulerProvider,
     private val disposables: CompositeDisposable,
+    private val gamesDisposable: CompositeDisposable,
     private val networkUtils: NetworkUtils,
     private val errorHandler: ErrorHandler) : BasePresenter<GamesView>() {
 
@@ -49,6 +50,7 @@ class GamesPresenter @Inject constructor(
     view.dismissSnackbar()
     loadDateNavigatorText(calendar)
 
+    gamesDisposable.clear()
     gamesRepository.games(calendar, forceNetwork)
         .observeOn(schedulerProvider.ui(), true)
         .subscribeWith(object : DisposableObserver<GamesUiModel>() {
@@ -81,7 +83,7 @@ class GamesPresenter @Inject constructor(
 
           }
         })
-        .addTo(disposables)
+        .addTo(gamesDisposable)
   }
 
   private fun loadDateNavigatorText(selectedDate: Calendar) {
