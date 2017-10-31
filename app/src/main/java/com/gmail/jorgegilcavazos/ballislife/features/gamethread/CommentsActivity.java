@@ -225,20 +225,20 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
 
     }
 
-    public void setSelectedTab(String gameStatus){
-        if (gameStatus.equals(NbaGame.POST_GAME)) {
-            TabLayout.Tab postGameTab = tabLayout.getTabAt(POST_GAME_TAB);
-            if(postGameTab != null) {
-                postGameTab.select();
-            } else {
-                viewPager.setCurrentItem(POST_GAME_TAB);
-            }
-        } else if (localRepository.getOpenBoxScoreByDefault()){
+    private void setSelectedTab(String gameStatus) {
+        if(localRepository.getOpenBoxScoreByDefault()) {
             TabLayout.Tab boxScoreTab = tabLayout.getTabAt(BOX_SCORE_TAB);
             if(boxScoreTab != null) {
                 boxScoreTab.select();
             } else {
                 viewPager.setCurrentItem(BOX_SCORE_TAB);
+            }
+        } else if (gameStatus.equals(NbaGame.POST_GAME)) {
+            TabLayout.Tab postGameTab = tabLayout.getTabAt(POST_GAME_TAB);
+            if(postGameTab != null) {
+                postGameTab.select();
+            } else {
+                viewPager.setCurrentItem(POST_GAME_TAB);
             }
         }
     }
