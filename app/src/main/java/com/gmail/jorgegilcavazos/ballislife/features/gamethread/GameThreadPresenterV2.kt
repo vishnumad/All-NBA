@@ -146,10 +146,11 @@ class GameThreadPresenterV2 @Inject constructor(
   }
 
   fun onVisible() {
-    if(null != currentSubmission) {
+    if (null != currentSubmission) {
       view.showFab()
     }
   }
+
   fun loadGameThread() {
     val gameThreadsObs = if (shouldStream) {
       gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
