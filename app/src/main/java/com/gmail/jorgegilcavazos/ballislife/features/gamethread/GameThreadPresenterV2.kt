@@ -145,6 +145,11 @@ class GameThreadPresenterV2 @Inject constructor(
     super.detachView()
   }
 
+  fun onVisible() {
+    if(null != currentSubmission) {
+      view.showFab()
+    }
+  }
   fun loadGameThread() {
     val gameThreadsObs = if (shouldStream) {
       gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
