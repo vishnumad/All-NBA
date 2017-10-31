@@ -439,16 +439,14 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        • New dark theme!\n•
-        Hide/expand a comment\'s children by long-pressing it\n•
-        View a highlight\'s comment thread\n•
-        Added FG%, 3PT%, FT%, BA and scores to the box score\n•
-        View highlights in portrait mode\n•
-        New setting to open youtube videos in native app\n•
-        Replies are now shown immediately after posting\n•
-        Fixed "load more comments" button\n•
-        Fixed issue where standings could appear unsorted\n•
-        Improved box score UI
+        • Added logos in standings\n•
+        Added team totals to the box score\n•
+        Box score now uses cached data\n•
+        Opening a game\'s detail screen shows the post game thread if the game is over\n•
+        Fixed wrong game times in some timezones\n•
+        Fixed loading errors for some videos\n•
+        Fixed crashes on KitKat devices\n•
+        Minor bug fixes and UI improvements
     </string>
     <string name="submitted_comment">Submitted comment</string>
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
