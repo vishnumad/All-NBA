@@ -138,16 +138,18 @@
     <string name="logged_as_user">Logged in as %1$s</string>
 
     <string name="pref_enable_alerts">Enable Alerts</string>
-    <string name="key_enable_alerts">pref_enable_alerts</string>
 
-    <string name="key_enable_youtube_in_app">in_app_youtube</string>
     <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
+    <string name="pref_open_box_score_default">Open Box Score by Default</string>
 
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
     <string name="summary_settings_cga">Receive an alert for close games</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_cga">pref_cga_topics</string>
+    <string name="key_enable_youtube_in_app">in_app_youtube</string>
+    <string name="key_open_box_score_default">open_box_score_default</string>
+    <string name="key_enable_alerts">pref_enable_alerts</string>
 
     <string name="title_settings_start">Game Starting</string>
     <string name="dialog_settings_start">Pick teams to receive alerts</string>

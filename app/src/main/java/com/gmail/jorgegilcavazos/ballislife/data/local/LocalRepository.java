@@ -21,6 +21,8 @@ public interface LocalRepository {
 
     boolean getOpenYouTubeInApp();
 
+    boolean getOpenBoxScoreByDefault();
+
     void saveAppTheme(SwishTheme theme);
 
     SwishTheme getAppTheme();

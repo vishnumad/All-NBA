@@ -17,14 +17,20 @@ import android.widget.Toast;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.google.firebase.crash.FirebaseCrash;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.PagerAdapter.BOX_SCORE_TAB;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.PagerAdapter.POST_GAME_TAB;
 
 
 public class CommentsActivity extends BaseNoActionBarActivity implements TabLayout
@@ -38,6 +44,9 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     @BindView(R.id.tabLayout) TabLayout tabLayout;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
+
+    @Inject
+    LocalRepository localRepository;
 
     private PagerAdapter pagerAdapter;
     public BillingProcessor billingProcessor;
@@ -75,7 +84,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         bundle.putString(GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
-        String gameStatus = intent.getStringExtra(GamesFragment.GAME_STATUS);
         // Initialize tab layout and add three tabs.
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
@@ -86,10 +94,9 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(this);
-        if (gameStatus.equals(NbaGame.POST_GAME)) {
-            viewPager.setCurrentItem(2);
-        }
         tabLayout.addOnTabSelectedListener(this);
+
+        setSelectedTab(intent.getStringExtra(GamesFragment.GAME_STATUS));
 
         fab.setOnClickListener(this);
     }
@@ -216,5 +223,23 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    private void setSelectedTab(String gameStatus) {
+        if(localRepository.getOpenBoxScoreByDefault()) {
+            TabLayout.Tab boxScoreTab = tabLayout.getTabAt(BOX_SCORE_TAB);
+            if(boxScoreTab != null) {
+                boxScoreTab.select();
+            } else {
+                viewPager.setCurrentItem(BOX_SCORE_TAB);
+            }
+        } else if (gameStatus.equals(NbaGame.POST_GAME)) {
+            TabLayout.Tab postGameTab = tabLayout.getTabAt(POST_GAME_TAB);
+            if(postGameTab != null) {
+                postGameTab.select();
+            } else {
+                viewPager.setCurrentItem(POST_GAME_TAB);
+            }
+        }
     }
 }

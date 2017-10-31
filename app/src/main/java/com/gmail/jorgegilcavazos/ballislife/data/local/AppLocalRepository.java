@@ -81,6 +81,11 @@ public class AppLocalRepository implements LocalRepository {
     }
 
     @Override
+    public boolean getOpenBoxScoreByDefault() {
+        return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_OPEN_BOX_SCORE_DEFAULT, false);
+    }
+
+    @Override
     public void saveAppTheme(SwishTheme theme) {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
         editor.putInt(LocalSharedPreferences.SWISH_THEME, theme.getValue());
