@@ -24,6 +24,11 @@
             android:key="@string/key_enable_youtube_in_app"
             android:title="@string/pref_enable_youtube_in_app"/>
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_open_box_score_default"
+            android:title="@string/pref_open_box_score_default"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

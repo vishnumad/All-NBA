@@ -143,6 +143,9 @@
     <string name="key_enable_youtube_in_app">in_app_youtube</string>
     <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
 
+    <string name="key_open_box_score_default">open_box_score_default</string>
+    <string name="pref_open_box_score_default">Open Box Score By Default</string>
+
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
     <string name="summary_settings_cga">Receive an alert for close games</string>

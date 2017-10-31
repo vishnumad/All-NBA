@@ -20,6 +20,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     private Bundle bundle;
     private Map<Integer, Fragment> fragmentMap;
 
+    public static final int GAME_THREAD_TAB = 0;
+    public static final int BOX_SCORE_TAB = 1;
+    public static final int POST_GAME_TAB = 2;
+
     public PagerAdapter(FragmentManager fragmentManager, int numOfTabs, Bundle bundle) {
         super(fragmentManager);
         this.numOfTabs = numOfTabs;
@@ -31,7 +35,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0: // GAME THREAD
+            case GAME_THREAD_TAB:
                 bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.LIVE);
                 if (fragmentMap.get(0) != null) {
                     return fragmentMap.get(position);
@@ -41,12 +45,12 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                     fragmentMap.put(0, tab1);
                     return tab1;
                 }
-            case 1: // BOX SCORE
+            case BOX_SCORE_TAB:
                 BoxScoreFragment tab2 = new BoxScoreFragment();
                 tab2.setArguments(bundle);
                 fragmentMap.put(1, tab2);
                 return tab2;
-            case 2: // POST GAME THREAD
+            case POST_GAME_TAB:
                 bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.POST);
                 if (fragmentMap.get(2) != null) {
                     return fragmentMap.get(2);
