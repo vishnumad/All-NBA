@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
+import com.gmail.jorgegilcavazos.ballislife.util.TeamUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
@@ -193,6 +195,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
             TextView tvLosses = teamRow.findViewById(R.id.text_losses);
             TextView tvPct = teamRow.findViewById(R.id.text_pct);
             TextView tvGB = teamRow.findViewById(R.id.text_gb);
+            ImageView logo = teamRow.findViewById(R.id.logo);
 
             String wins = "", losses = "", pct = "", gb = "";
             for (Standings.StandingStat stat : teamStanding.getStats()) {
@@ -208,6 +211,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
             tvLosses.setText(losses);
             tvPct.setText(pct);
             tvGB.setText(gb);
+            logo.setImageResource(TeamUtils.Companion.getTeamLogo(teamStanding.getAbbreviation()));
 
             layoutContent.addView(teamRow);
         }
