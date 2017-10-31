@@ -40,7 +40,7 @@ class GamesPresenterTest {
     `when`(mockRepository.games(anyObject(), anyBoolean())).thenReturn(Observable.empty())
 
     presenter = GamesPresenter(mockRepository, TrampolineSchedulerProvider(), CompositeDisposable(),
-        mockNetworkUtils, mockErrorHandler)
+        CompositeDisposable(), mockNetworkUtils, mockErrorHandler)
     presenter.attachView(mockView)
   }
 
