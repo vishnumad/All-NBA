@@ -145,19 +145,18 @@ class GameThreadPresenterV2 @Inject constructor(
     super.detachView()
   }
 
-	fun onVisible() {
-		if(null != currentSubmission) {
+  fun onVisible() {
+    if(null != currentSubmission) {
       view.showFab()
     }
-	}
-
-	fun loadGameThread() {
-		val gameThreadsObs = if (shouldStream) {
-			gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
-					.repeatWhen({ o -> o.delay(10, TimeUnit.SECONDS) })
-		} else {
-			gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
-		}
+  }
+  fun loadGameThread() {
+    val gameThreadsObs = if (shouldStream) {
+      gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
+          .repeatWhen({ o -> o.delay(10, TimeUnit.SECONDS) })
+    } else {
+      gameThreadsRepository.gameThreads(home, visitor, gameTimeUtc, type)
+    }
 
     threadsDisposable.clear()
     gameThreadsObs
