@@ -68,6 +68,12 @@
     <color name="commentNeutral">#000000</color>
     <color name="commentSaved">#FFC107</color>
 
+    <!-- /r/NBA classic topics -->
+    <color name="daily_locker_room">#228822</color>
+    <color name="free_talk_friday">#1ca68c</color>
+    <color name="trash_talk">#E0161B</color>
+    <color name="power_rankings">#2D518F</color>
+
     <!-- Team colors -->
     <color name="atl">#FF0000</color>
     <color name="bkn">#000000</color>
