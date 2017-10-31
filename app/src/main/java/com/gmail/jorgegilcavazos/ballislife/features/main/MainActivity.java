@@ -449,10 +449,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
             appBarLayout.setElevation(0);
         }
 
-        GamesFragment gamesFragment = null;
+        Fragment gamesFragment = null;
         if (selectedFragment == GAMES_FRAGMENT_ID) {
-            gamesFragment = (GamesFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.fragment);
+            gamesFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(!(gamesFragment instanceof GamesFragment)) {
+                gamesFragment = null;
+            }
         }
 
         if (gamesFragment == null) {
@@ -472,10 +474,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
             appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
         }
 
-        StandingsFragment standingsFragment = null;
+        Fragment standingsFragment = null;
         if (selectedFragment == STANDINGS_FRAGMENT_ID) {
-            standingsFragment = (StandingsFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.fragment);
+            standingsFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(!(standingsFragment instanceof StandingsFragment)) {
+                standingsFragment = null;
+            }
         }
 
         if (standingsFragment == null) {
@@ -522,10 +526,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
             appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
         }
 
-        HighlightsFragment highlightsFragment = null;
+        Fragment highlightsFragment = null;
         if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
-            highlightsFragment = (HighlightsFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.fragment);
+            highlightsFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(!(highlightsFragment instanceof HighlightsFragment)) {
+                highlightsFragment = null;
+            }
         }
 
         if (highlightsFragment == null) {
