@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.common.base.Optional;
 import com.google.firebase.crash.FirebaseCrash;
@@ -184,9 +185,13 @@ public final class DateFormatUtil {
             DateTime localized = timeET.toDateTime(DateTimeZone.forTimeZone(timeZone));
             return localized.toString(DateTimeFormat.forPattern("h:mm aa"));
         } catch (Exception e) {
-            FirebaseCrash.report(new RuntimeException("Error localizing date " + dateETString
-                    + " to timezone " + timeZone.toString()));
-            return "";
+            FirebaseCrash.logcat(
+                    Log.ERROR,
+                    DateFormatUtil.class.getSimpleName(),
+                    "Error localizing date " + dateETString
+                            + " to timezone " + timeZone.toString());
+            FirebaseCrash.report(e);
+            return dateETString;
         }
     }
 
