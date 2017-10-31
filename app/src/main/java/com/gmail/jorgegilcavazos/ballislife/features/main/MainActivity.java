@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -494,10 +495,12 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
             appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
         }
 
-        PostsFragment postsFragment = null;
+        Fragment postsFragment = null;
         if (selectedFragment == POSTS_FRAGMENT_ID) {
-            postsFragment = (PostsFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.fragment);
+            postsFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(!(postsFragment instanceof PostsFragment)) {
+                postsFragment = null;
+            }
         }
 
         if (postsFragment == null || !this.subreddit.equals(subreddit)) {
