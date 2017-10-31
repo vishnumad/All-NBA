@@ -141,7 +141,7 @@
     <string name="key_enable_alerts">pref_enable_alerts</string>
 
     <string name="key_enable_youtube_in_app">in_app_youtube</string>
-    <string name="pref_enable_youtube_in_app">In-app player for YouTube</string>
+    <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
 
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
@@ -154,7 +154,7 @@
     <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
-    <string name="pref_startup_fragment_title">Startup page</string>
+    <string name="pref_startup_fragment_title">Startup Page</string>
     <string-array name="pref_startup_fragment_entries">
         <item>Games</item>
         <item>r/NBA</item>
