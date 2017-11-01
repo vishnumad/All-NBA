@@ -136,7 +136,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postsList = new ArrayList<>();
         }
 
-        addNotHiddenPosts(submissions);
+        addVisiblePosts(submissions);
         preFetchImages(submissions);
         notifyDataSetChanged();
     }
@@ -146,7 +146,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postsList = new ArrayList<>();
         }
 
-        addNotHiddenPosts(submissions);
+        addVisiblePosts(submissions);
         preFetchImages(submissions);
         notifyDataSetChanged();
     }
@@ -207,7 +207,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    private void addNotHiddenPosts(List<SubmissionWrapper> submissions) {
+    private void addVisiblePosts(List<SubmissionWrapper> submissions) {
         for (SubmissionWrapper submissionWrapper: submissions) {
             if (!submissionWrapper.isHidden()) {
                 postsList.add(submissionWrapper);
