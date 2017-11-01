@@ -136,12 +136,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             postsList = new ArrayList<>();
         }
 
-        for (SubmissionWrapper submissionWrapper: submissions) {
-            if (!submissionWrapper.isHidden()) {
-                postsList.add(submissionWrapper);
-            }
-        }
-
+        addNotHiddenPosts(submissions);
         preFetchImages(submissions);
         notifyDataSetChanged();
     }
@@ -150,11 +145,9 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (postsList == null) {
             postsList = new ArrayList<>();
         }
-        for (SubmissionWrapper submissionWrapper: submissions) {
-            if (!submissionWrapper.isHidden()) {
-                postsList.add(submissionWrapper);
-            }
-        }        preFetchImages(submissions);
+
+        addNotHiddenPosts(submissions);
+        preFetchImages(submissions);
         notifyDataSetChanged();
     }
 
@@ -210,6 +203,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 tvSubscribers.setVisibility(View.INVISIBLE);
                 tvSubscribers.setText(context.getString(R.string.subscriber_count,
                         String.valueOf(0), String.valueOf(0)));
+            }
+        }
+    }
+
+    private void addNotHiddenPosts(List<SubmissionWrapper> submissions) {
+        for (SubmissionWrapper submissionWrapper: submissions) {
+            if (!submissionWrapper.isHidden()) {
+                postsList.add(submissionWrapper);
             }
         }
     }
