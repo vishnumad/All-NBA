@@ -98,6 +98,7 @@ class GamesPresenter @Inject constructor(
   }
 
   override fun detachView() {
+    gamesDisposable.clear()
     disposables.clear()
     view.dismissSnackbar()
     super.detachView()
