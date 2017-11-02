@@ -20,6 +20,7 @@ import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.TimePeriod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -95,7 +96,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             resetLoaderFromStartWithParams(sorting, timePeriod);
             loadPosts(true /* reset */);
         } else {
-            view.showPosts(submissions, true /* clear */);
+            view.showPosts(filterHiddenPosts(submissions), true /* clear */);
         }
     }
 
@@ -116,6 +117,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         disposables.add(redditAuthentication.authenticate()
                 .andThen(postsRepository.next())
+                .map(this::filterHiddenPosts)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<SubmissionWrapper>>() {
                     @Override
@@ -269,5 +271,17 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         if (disposables != null) {
             disposables.clear();
         }
+    }
+
+    private List<SubmissionWrapper> filterHiddenPosts(List<SubmissionWrapper> allPosts) {
+        List<SubmissionWrapper> filteredPosts = new ArrayList<>();
+
+        for (SubmissionWrapper submissionWrapper: allPosts) {
+            if(!submissionWrapper.isHidden()) {
+                filteredPosts.add(submissionWrapper);
+            }
+        }
+
+        return filteredPosts;
     }
 }

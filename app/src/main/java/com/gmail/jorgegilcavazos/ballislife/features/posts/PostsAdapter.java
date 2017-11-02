@@ -135,6 +135,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else {
             postsList = new ArrayList<>();
         }
+
         postsList.addAll(submissions);
         preFetchImages(submissions);
         notifyDataSetChanged();
@@ -144,6 +145,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (postsList == null) {
             postsList = new ArrayList<>();
         }
+
         postsList.addAll(submissions);
         preFetchImages(submissions);
         notifyDataSetChanged();
