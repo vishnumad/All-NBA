@@ -175,8 +175,8 @@ public final class DateFormatUtil {
         try {
             String formattedDate = dateETString.replace(" ET", "");
 
-            LocalTime timeWithoutTZ = LocalTime.parse(formattedDate,
-                    DateTimeFormat.forPattern("hh:mm aa"));
+            LocalTime timeWithoutTZ = DateTimeFormat.forPattern("hh:mm aa")
+                    .withLocale(Locale.US).parseLocalTime(formattedDate);
 
             DateTime timeET = DateTime.now(DateTimeZone
                     .forTimeZone(TimeZone.getTimeZone("America/New_York")))
