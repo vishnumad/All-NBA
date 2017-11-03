@@ -32,6 +32,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositor
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NBASubChips;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
@@ -120,7 +121,7 @@ public class PostsFragment extends Fragment implements PostsView,
                 .getAppTheme());
         linearLayoutManager = new LinearLayoutManager(getActivity());
         postsAdapter = new PostsAdapter(getActivity(), redditAuthentication, null, viewType,
-                this, subreddit, textColor);
+                this, subreddit, textColor, localRepository.getAppTheme());
 
         setHasOptionsMenu(true);
     }
@@ -402,10 +403,10 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
-    public void onSubmissionClick(SubmissionWrapper submissionWrapper) {
+    public void onSubmissionClick(String submissionId) {
         Intent intent = new Intent(getActivity(), SubmittionActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.THREAD_ID, submissionWrapper.getId());
+        bundle.putString(Constants.THREAD_ID, submissionId);
         bundle.putString(SubmittionActivity.KEY_TITLE, subreddit);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -424,6 +425,11 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onContentClick(String url) {
         presenter.onContentClick(url);
+    }
+
+    @Override
+    public void setNbaSubChips(NBASubChips nbaSubChips) {
+        postsAdapter.setNBASubChips(nbaSubChips);
     }
 
     private void openViewPickerDialog() {

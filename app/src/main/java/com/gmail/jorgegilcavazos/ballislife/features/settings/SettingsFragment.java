@@ -33,6 +33,7 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
     public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
     public static final String KEY_OPEN_BOX_SCORE_DEFAULT = "open_box_score_default";
+    public static final String KEY_CHIPS_FOR_RNBA_ORIGINALS = "chips_for_rnba_originals";
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";

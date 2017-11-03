@@ -19,7 +19,7 @@
     <color name="nightColorBackground">#303030</color>
     <color name="nightIconTint">#fff</color>
     <color name="dividerDark">#424242</color>
-
+    <color name="chipBackgroundDark">#424242</color>
 
     <color name="hintText">#42000000</color>
     <color name="accentText">#BABABA</color>

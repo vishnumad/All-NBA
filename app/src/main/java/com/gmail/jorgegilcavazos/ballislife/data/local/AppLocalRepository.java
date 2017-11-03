@@ -13,8 +13,8 @@ import javax.inject.Singleton;
 
 @Singleton
 public class AppLocalRepository implements LocalRepository {
-    SharedPreferences localSharedPreferences;
-    SharedPreferences defaultSharedPreferences;
+    private SharedPreferences localSharedPreferences;
+    private SharedPreferences defaultSharedPreferences;
 
     @Inject
     public AppLocalRepository(
@@ -115,5 +115,11 @@ public class AppLocalRepository implements LocalRepository {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
         editor.putBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, showWhatsNew);
         editor.apply();
+    }
+
+    @Override
+    public boolean stickyChipsEnabled() {
+        return defaultSharedPreferences.getBoolean(
+                SettingsFragment.KEY_CHIPS_FOR_RNBA_ORIGINALS, false);
     }
 }

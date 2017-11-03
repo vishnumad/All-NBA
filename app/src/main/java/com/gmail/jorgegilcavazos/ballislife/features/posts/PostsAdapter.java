@@ -5,17 +5,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickListener;
 import com.gmail.jorgegilcavazos.ballislife.features.common.PostListViewHolder;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NBASubChips;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
-import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.google.common.base.Optional;
 import com.google.firebase.crash.FirebaseCrash;
@@ -26,8 +25,6 @@ import net.dean.jraw.models.Submission;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
@@ -39,20 +36,24 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context context;
     private RedditAuthentication redditAuthentication;
     private List<SubmissionWrapper> postsList;
+    private NBASubChips nbaSubChips;
     private int contentViewType;
     private OnSubmissionClickListener submissionClickListener;
     private SubscriberCount subscriberCount;
     private String subreddit;
     private int textColor;
+    private SwishTheme theme;
 
     private PublishSubject<Submission> sharePublishSubject = PublishSubject.create();
 
     public PostsAdapter(Context context,
-                        RedditAuthentication redditAuthentication, List<SubmissionWrapper>
-                                postsList,
+                        RedditAuthentication redditAuthentication,
+                        List<SubmissionWrapper> postsList,
                         int contentViewType,
-                        OnSubmissionClickListener submissionClickListener, String subreddit, int
-                                textColor) {
+                        OnSubmissionClickListener submissionClickListener,
+                        String subreddit,
+                        int textColor,
+                        SwishTheme theme) {
         this.context = context;
         this.redditAuthentication = redditAuthentication;
         this.postsList = postsList;
@@ -60,6 +61,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.submissionClickListener = submissionClickListener;
         this.subreddit = subreddit;
         this.textColor = textColor;
+        this.theme = theme;
     }
 
     @Override
@@ -69,7 +71,7 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         View view;
         if (viewType == VIEW_HEADER) {
             view = inflater.inflate(R.layout.rnba_header_layout, parent, false);
-            return new HeaderViewHolder(view);
+            return new HeaderViewHolder(view, theme);
         }
 
         switch (viewType) {
@@ -87,7 +89,8 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).bindData(context, subscriberCount, subreddit);
+            ((HeaderViewHolder) holder).bindData(subscriberCount, subreddit, nbaSubChips,
+                    submissionClickListener);
         } else {
             SubmissionWrapper submissionWrapper = postsList.get(position - 1);
             switch (contentViewType) {
@@ -159,6 +162,11 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public void setNBASubChips(NBASubChips nbaSubChips) {
+        this.nbaSubChips = nbaSubChips;
+        notifyItemChanged(0);
+    }
+
     public Observable<Submission> getShareObservable() {
         return sharePublishSubject;
     }
@@ -171,36 +179,6 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Picasso.with(context)
                         .load(thumbnailTypeUrl.get().second)
                         .fetch();
-            }
-        }
-    }
-
-    static class HeaderViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.image_logo) ImageView ivLogo;
-        @BindView(R.id.text_subreddit) TextView tvSubreddit;
-        @BindView(R.id.text_subscribers) TextView tvSubscribers;
-
-        public HeaderViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        void bindData(Context context, SubscriberCount subscriberCount, String subreddit) {
-            ivLogo.setImageResource(RedditUtils.getTeamSnoo(subreddit));
-            tvSubreddit.setText("r/" + subreddit);
-
-            if (subscriberCount != null) {
-                String subscribers = String.valueOf(subscriberCount.getSubscribers());
-                String activeUsers = String.valueOf(subscriberCount.getActiveUsers());
-
-                tvSubscribers.setVisibility(View.VISIBLE);
-                tvSubscribers.setText(context.getString(R.string.subscriber_count,
-                        subscribers, activeUsers));
-            } else {
-                tvSubscribers.setVisibility(View.INVISIBLE);
-                tvSubscribers.setText(context.getString(R.string.subscriber_count,
-                        String.valueOf(0), String.valueOf(0)));
             }
         }
     }

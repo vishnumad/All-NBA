@@ -30,4 +30,6 @@ public interface LocalRepository {
     boolean shouldShowWhatsNew();
 
     void setShouldShowWhatsNew(boolean showWhatsNew);
+
+    boolean stickyChipsEnabled();
 }

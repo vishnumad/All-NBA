@@ -6,7 +6,7 @@ import net.dean.jraw.models.VoteDirection;
 
 public interface OnSubmissionClickListener {
 
-    void onSubmissionClick(SubmissionWrapper submissionWrapper);
+    void onSubmissionClick(String submissionId);
 
     void onVoteSubmission(SubmissionWrapper submission, VoteDirection voteDirection);
 

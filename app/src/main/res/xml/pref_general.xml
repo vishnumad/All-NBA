@@ -68,6 +68,12 @@
             android:key="log_in_status_pref"
             android:title="@string/log_out"/>
 
+        <SwitchPreference
+            android:key="@string/key_chips_for_rnba_originals"
+            android:defaultValue="false"
+            android:title="Replace /r/NBA originals with chips"
+            android:summary="Declutter your feed with smaller chips for /r/NBA originals such as Daily Locker Room threads" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

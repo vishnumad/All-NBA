@@ -150,6 +150,8 @@
     <string name="key_enable_youtube_in_app">in_app_youtube</string>
     <string name="key_open_box_score_default">open_box_score_default</string>
     <string name="key_enable_alerts">pref_enable_alerts</string>
+    <string name="key_chips_for_rnba_originals">chips_for_rnba_originals</string>
+
 
     <string name="title_settings_start">Game Starting</string>
     <string name="dialog_settings_start">Pick teams to receive alerts</string>
@@ -454,5 +456,9 @@
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
     <string name="could_not_save_comment_missing_submmission">Couldn\'t save comment, missing submission</string>
 
-    <string name="box_score_team_score">%1$s (%2$d)</string> <!-- SAS (90) -->
+    <string name="box_score_team_score">%1$s (%2$d)</string>
+    <string name="daily_locker_room">DAILY LOCKER ROOM</string>
+    <string name="power_rankings">POWER RANKINGS</string>
+    <string name="trash_talk_thread">TRASH TALK THREAD</string>
+    <string name="free_talk_friday">FREE TALK FRIDAY</string> <!-- SAS (90) -->
 </resources>

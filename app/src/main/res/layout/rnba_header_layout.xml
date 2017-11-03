@@ -24,7 +24,7 @@
                 android:src="@drawable/rnbabg"/>
 
             <ImageView
-                android:id="@+id/image_logo"
+                android:id="@+id/ivLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
@@ -32,10 +32,10 @@
                 android:src="@drawable/rnbasnoo"/>
 
             <TextView
-                android:id="@+id/text_subreddit"
+                android:id="@+id/tvSubreddit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/image_logo"
+                android:layout_below="@id/ivLogo"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="5dp"
                 android:text="r/NBA"
@@ -43,10 +43,10 @@
                 android:textSize="18sp"/>
 
             <TextView
-                android:id="@+id/text_subscribers"
+                android:id="@+id/tvSubscribers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text_subreddit"
+                android:layout_below="@id/tvSubreddit"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="5dp"
                 android:text="554843 subscribers • 8133 fans online"
@@ -56,6 +56,7 @@
     </android.support.v7.widget.CardView>
 
     <HorizontalScrollView
+        android:id="@+id/scrollView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="4dp"
@@ -68,36 +69,40 @@
             android:orientation="horizontal">
 
             <com.pchmn.materialchips.ChipView
+                android:id="@+id/chipDailyLocker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="DAILY LOCKER ROOM"
+                app:label="@string/daily_locker_room"
                 app:labelColor="@color/white"
                 app:backgroundColor="#424242"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp"/>
 
             <com.pchmn.materialchips.ChipView
+                android:id="@+id/chipPowerRankings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="POWER RANKINGS"
+                app:label="@string/power_rankings"
                 app:labelColor="@color/white"
                 app:backgroundColor="#424242"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp" />
 
             <com.pchmn.materialchips.ChipView
+                android:id="@+id/chipTrashTalk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="TRASH TALK THREAD"
+                app:label="@string/trash_talk_thread"
                 app:labelColor="@color/white"
                 app:backgroundColor="#424242"
                 android:layout_marginStart="6dp"
                 android:layout_marginEnd="6dp" />
 
             <com.pchmn.materialchips.ChipView
+                android:id="@+id/chipFreeTalkFriday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:label="FREE TALK FRIDAY"
+                app:label="@string/free_talk_friday"
                 app:labelColor="@color/white"
                 app:backgroundColor="#424242"
                 android:layout_marginStart="6dp"

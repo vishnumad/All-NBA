@@ -17,4 +17,6 @@ public interface PostsRepository {
     List<SubmissionWrapper> getCachedSubmissions();
 
     void clearCache();
+
+    Sorting getCurrentSorting();
 }
