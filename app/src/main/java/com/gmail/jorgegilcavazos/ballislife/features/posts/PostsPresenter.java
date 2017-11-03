@@ -1,12 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
-import android.content.SharedPreferences;
-
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
+import com.gmail.jorgegilcavazos.ballislife.features.model.NBASubChips;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -34,11 +32,8 @@ import io.reactivex.observers.DisposableSingleObserver;
 
 public class PostsPresenter extends BasePresenter<PostsView> {
 
-    private static final String TAG = "PostsPresenter";
-
     private RedditAuthentication redditAuthentication;
     private LocalRepository localRepository;
-    private SharedPreferences redditPrefs;
     private PostsRepository postsRepository;
     private RedditService service;
     private BaseSchedulerProvider schedulerProvider;
@@ -50,13 +45,11 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public PostsPresenter(
             RedditAuthentication redditAuthentication,
             LocalRepository localRepository,
-            @Named("redditSharedPreferences") SharedPreferences redditPrefs,
             PostsRepository postsRepository,
             RedditService redditService,
             BaseSchedulerProvider schedulerProvider) {
         this.redditAuthentication = redditAuthentication;
         this.localRepository = localRepository;
-        this.redditPrefs = redditPrefs;
         this.postsRepository = postsRepository;
         this.service = redditService;
         this.schedulerProvider = schedulerProvider;
@@ -96,6 +89,20 @@ public class PostsPresenter extends BasePresenter<PostsView> {
             resetLoaderFromStartWithParams(sorting, timePeriod);
             loadPosts(true /* reset */);
         } else {
+            if (localRepository.stickyChipsEnabled() && sorting == Sorting.HOT) {
+                NBASubChips chips = removeCommonStickiedSubmissions(submissions);
+                if (chips != null) {
+                    // Chips != null means that we have at least 1 chip to show (in this batch).
+                    // If so, then show them in our view. If there aren't any available then leave
+                    // the view as is WITHOUT setting the chips to null.
+                    // We don't want to remove existing shown chips even if this batch of
+                    // submissions doesn't contain any, because the 1st page of loaded
+                    // submissions may have contained chips and we don't want to remove those.
+                    view.setNbaSubChips(chips);
+                }
+            } else {
+                view.setNbaSubChips(null);
+            }
             view.showPosts(filterHiddenPosts(submissions), true /* clear */);
         }
     }
@@ -125,6 +132,24 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                         if (submissions.isEmpty()) {
                             view.showNothingToShowToast();
                             return;
+                        }
+
+                        if (localRepository.stickyChipsEnabled()
+                                && postsRepository.getCurrentSorting() == Sorting.HOT) {
+                            NBASubChips chips = removeCommonStickiedSubmissions(submissions);
+                            if (chips != null) {
+                                // Chips != null means that we have at least 1 chip to show
+                                // (in this batch). If so, then show them in our view. If there
+                                // aren't any available then leave the view as is WITHOUT setting
+                                // the chips to null. We don't want to remove existing shown chips
+                                // even if this batch of submissions doesn't contain any, because
+                                // the 1st page of loaded submissions may have contained chips and
+                                // we don't want to remove those.
+                                view.setNbaSubChips(chips);
+                            }
+                        }
+                        else {
+                            view.setNbaSubChips(null);
                         }
 
                         view.showPosts(submissions, reset);
@@ -273,6 +298,80 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         }
     }
 
+    private NBASubChips removeCommonStickiedSubmissions(List<SubmissionWrapper> submissions) {
+        SubmissionWrapper sub1 = submissions.get(0);
+        SubmissionWrapper sub2 = submissions.get(1);
+
+        String dailyLockerId = null;
+        String powerRankingsId = null;
+        String trashTalkId = null;
+        String freeTalkFridayId = null;
+
+        boolean shouldRemoveSub1 = true;
+        if (isDailyRockerRoomThread(sub1)) {
+            dailyLockerId = sub1.getId();
+        } else if (isFreeTalkFridayThread(sub1)) {
+            freeTalkFridayId = sub1.getId();
+        } else if (isPowerRankingsThread(sub1)) {
+            powerRankingsId = sub1.getId();
+        } else if (isTrashTalkThread(sub1)) {
+            trashTalkId = sub1.getId();
+        } else {
+            shouldRemoveSub1 = false;
+        }
+
+        boolean shouldRemoveSub2 = true;
+        if (isDailyRockerRoomThread(sub2)) {
+            dailyLockerId = sub2.getId();
+        } else if (isFreeTalkFridayThread(sub2)) {
+            freeTalkFridayId = sub2.getId();
+        } else if (isPowerRankingsThread(sub2)) {
+            powerRankingsId = sub2.getId();
+        } else if (isTrashTalkThread(sub2)) {
+            trashTalkId = sub2.getId();
+        } else {
+            shouldRemoveSub2 = false;
+        }
+
+        if (shouldRemoveSub2) {
+            submissions.remove(1);
+        }
+        if (shouldRemoveSub1) {
+            submissions.remove(0);
+        }
+
+        if (shouldRemoveSub1 || shouldRemoveSub2) {
+            return new NBASubChips(dailyLockerId, powerRankingsId, trashTalkId, freeTalkFridayId);
+        } else {
+            return null;
+        }
+    }
+
+    private boolean isDailyRockerRoomThread(SubmissionWrapper submission) {
+        String DAILY_LOCKER_ROOM = "DAILY LOCKER ROOM";
+        return submission.isStickied()
+                && submission.getTitle().toUpperCase().contains(DAILY_LOCKER_ROOM);
+    }
+
+    private boolean isPowerRankingsThread(SubmissionWrapper submission) {
+        String POWER_RANKINGS = "OFFICIAL /R/NBA POWER RANKINGS";
+        return submission.isStickied()
+                && submission.getTitle().toUpperCase().contains(POWER_RANKINGS);
+    }
+
+    private boolean isTrashTalkThread(SubmissionWrapper submission) {
+        String TRASH_TALK = "TRASH TALK";
+        return submission.isStickied()
+                && submission.getTitle().toUpperCase().contains(TRASH_TALK);
+
+    }
+
+    private boolean isFreeTalkFridayThread(SubmissionWrapper submission) {
+        String FREE_TALK_FRIDAY = "FREE TALK FRIDAY";
+        return submission.isStickied()
+                && submission.getTitle().toUpperCase().contains(FREE_TALK_FRIDAY);
+    }
+
     private List<SubmissionWrapper> filterHiddenPosts(List<SubmissionWrapper> allPosts) {
         List<SubmissionWrapper> filteredPosts = new ArrayList<>();
 
@@ -284,4 +383,5 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
         return filteredPosts;
     }
+}
 }

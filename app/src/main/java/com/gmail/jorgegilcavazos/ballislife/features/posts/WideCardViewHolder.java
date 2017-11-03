@@ -318,6 +318,6 @@ public class WideCardViewHolder extends RecyclerView.ViewHolder {
     private void initContainerListener(final SubmissionWrapper submissionWrapper,
                                        final OnSubmissionClickListener submissionClickListener) {
         layoutContainer.setOnClickListener(v -> submissionClickListener.onSubmissionClick
-                (submissionWrapper));
+                (submissionWrapper.getId()));
     }
 }

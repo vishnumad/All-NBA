@@ -19,7 +19,7 @@
     <color name="nightColorBackground">#303030</color>
     <color name="nightIconTint">#fff</color>
     <color name="dividerDark">#424242</color>
-
+    <color name="chipBackgroundDark">#424242</color>
 
     <color name="hintText">#42000000</color>
     <color name="accentText">#BABABA</color>
@@ -67,6 +67,12 @@
     <color name="commentDownvoted">#3F51B5</color>
     <color name="commentNeutral">#000000</color>
     <color name="commentSaved">#FFC107</color>
+
+    <!-- /r/NBA classic topics -->
+    <color name="daily_locker_room">#228822</color>
+    <color name="free_talk_friday">#1ca68c</color>
+    <color name="trash_talk">#E0161B</color>
+    <color name="power_rankings">#2D518F</color>
 
     <!-- Team colors -->
     <color name="atl">#FF0000</color>
