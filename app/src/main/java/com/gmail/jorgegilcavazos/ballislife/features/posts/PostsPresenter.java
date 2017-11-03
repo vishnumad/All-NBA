@@ -384,4 +384,3 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         return filteredPosts;
     }
 }
-}
