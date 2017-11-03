@@ -8,10 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
-import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
-import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
-import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
-import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.*
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.COMMENT
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
@@ -125,6 +122,7 @@ class GameThreadPresenterV2 @Inject constructor(
               view.purchasePremium()
             }
           } else {
+            view.setCommentDelay(CommentDelay.NONE)
             shouldStream = false
             loadGameThread()
           }
@@ -180,7 +178,13 @@ class GameThreadPresenterV2 @Inject constructor(
                 val iterator = submission.comments?.walkTree()
 
                 val threadItems = mutableListOf<ThreadItem>()
-                iterator?.forEach {
+
+                val delay = view.getCommentDelay()
+
+                iterator?.filter {
+                  // Filter out comments that are older than now minus delay.
+                  System.currentTimeMillis() - delay.seconds * 1000 > it!!.comment.created.time
+                }?.forEach {
                   threadItems.add(
                       ThreadItem(
                           COMMENT,

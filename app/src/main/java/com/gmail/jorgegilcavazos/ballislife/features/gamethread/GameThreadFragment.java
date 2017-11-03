@@ -19,10 +19,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentDelay;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
@@ -78,6 +80,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     private GameThreadType threadType;
     private long gameDate;
     private Switch streamSwitch;
+    private CommentDelay selectedCommentDelay = CommentDelay.NONE;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -168,8 +171,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (threadType == GameThreadType.LIVE) {
             inflater.inflate(R.menu.menu_game_thread, menu);
-            streamSwitch = menu.findItem(R.id.action_stream).getActionView().findViewById(R.id
-                    .switch_stream);
+            streamSwitch = menu.findItem(R.id.action_stream).getActionView()
+                    .findViewById(R.id.switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
             streamSwitch.setChecked(false);
         }
@@ -181,6 +184,9 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadGameThread();
+                return true;
+            case R.id.action_add_delay:
+                showAddDelayDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -456,5 +462,87 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     @Override
     public void uncollapseComments(@NotNull String id) {
         threadAdapter.unCollapseComments(id);
+    }
+
+    @NotNull
+    @Override
+    public CommentDelay getCommentDelay() {
+        return selectedCommentDelay;
+    }
+
+    @Override
+    public void setCommentDelay(@NotNull CommentDelay delay) {
+        selectedCommentDelay = delay;
+    }
+
+    private void showAddDelayDialog() {
+        new MaterialDialog.Builder(getActivity())
+                .title(R.string.worried_about_spoilers)
+                .content(getString(R.string.add_a_delay_to_these_comments))
+                .items(R.array.add_delay_options)
+                .itemsCallbackSingleChoice(getIndexOfCommentDelay(selectedCommentDelay),
+                        (dialog, itemView, which, text) -> {
+                            if (!isPremiumPurchased()) {
+                                purchasePremium();
+                                selectedCommentDelay = CommentDelay.NONE;
+                                return true;
+                            }
+
+                            switch (which) {
+                                case 1:
+                                    selectedCommentDelay = CommentDelay.FIVE;
+                                    break;
+                                case 2:
+                                    selectedCommentDelay = CommentDelay.TEN;
+                                    break;
+                                case 3:
+                                    selectedCommentDelay = CommentDelay.TWENTY;
+                                    break;
+                                case 4:
+                                    selectedCommentDelay = CommentDelay.THIRTY;
+                                    break;
+                                case 5:
+                                    selectedCommentDelay = CommentDelay.MINUTE;
+                                    break;
+                                case 6:
+                                    selectedCommentDelay = CommentDelay.TWO_MINUTES;
+                                    break;
+                                case 7:
+                                    selectedCommentDelay = CommentDelay.FIVE_MINUTES;
+                                    break;
+                                default:
+                                    selectedCommentDelay = CommentDelay.NONE;
+                                    break;
+                            }
+                            streamSwitch.setChecked(true);
+                            return true;
+                })
+                .positiveText(getString(R.string.add_delay))
+                .negativeText(getString(R.string.cancel))
+                .show();
+    }
+
+    private int getIndexOfCommentDelay(CommentDelay commentDelay) {
+        if (!isPremiumPurchased()) {
+            return 0;
+        }
+        switch (commentDelay) {
+            case FIVE:
+                return 1;
+            case TEN:
+                return 2;
+            case TWENTY:
+                return 3;
+            case THIRTY:
+                return 4;
+            case MINUTE:
+                return 5;
+            case TWO_MINUTES:
+                return 6;
+            case FIVE_MINUTES:
+                return 7;
+            default:
+                return 0;
+        }
     }
 }

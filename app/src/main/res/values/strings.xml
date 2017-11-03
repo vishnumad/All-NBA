@@ -460,5 +460,20 @@
     <string name="daily_locker_room">DAILY LOCKER ROOM</string>
     <string name="power_rankings">POWER RANKINGS</string>
     <string name="trash_talk_thread">TRASH TALK THREAD</string>
-    <string name="free_talk_friday">FREE TALK FRIDAY</string> <!-- SAS (90) -->
+    <string name="free_talk_friday">FREE TALK FRIDAY</string>
+    <string name="stream">stream</string>
+    <string name="add_delay">Add delay</string>
+    <string name="worried_about_spoilers">Worried about spoilers?</string>
+    <string name="add_a_delay_to_these_comments">Add a delay to these comments</string> <!-- SAS (90) -->
+
+    <string-array name="add_delay_options">
+        <item>None</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>2 minute</item>
+        <item>5 minute</item>
+    </string-array>
 </resources>

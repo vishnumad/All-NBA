@@ -7,6 +7,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.VoteUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentDelay
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
@@ -303,6 +304,7 @@ class GameThreadPresenterV2Test {
 
   @Test
   fun loadGameThreadFoundWithComments() {
+    `when`(mockView.getCommentDelay()).thenReturn(CommentDelay.NONE)
     val mockCommentNode1 = Mockito.mock(CommentNode::class.java)
     setupMocksForNode(mockCommentNode1)
     `when`(mockCommentNode1.depth).thenReturn(0)
