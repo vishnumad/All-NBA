@@ -278,7 +278,8 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
                 }
 
                 // Hide "Go Premium!" if premium.
-                if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+                if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)
+                        || localRepository.isUserWhitelisted()) {
                     hideGoPremiumMenuItem();
                 }
             }

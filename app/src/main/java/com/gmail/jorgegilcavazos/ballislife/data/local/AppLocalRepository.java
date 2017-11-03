@@ -7,6 +7,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -121,5 +124,15 @@ public class AppLocalRepository implements LocalRepository {
     public boolean stickyChipsEnabled() {
         return defaultSharedPreferences.getBoolean(
                 SettingsFragment.KEY_CHIPS_FOR_RNBA_ORIGINALS, false);
+    }
+
+    @Override
+    public boolean isUserWhitelisted() {
+        String username = getUsername();
+        if (username == null) return false;
+
+        List<String> whitelist = new ArrayList<>();
+        whitelist.add("Obi-Wan_Ginobili");
+        return whitelist.contains(username);
     }
 }

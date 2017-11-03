@@ -222,7 +222,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Override
     public boolean isPremiumPurchased() {
-        return ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium");
+        return ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium")
+                || localRepository.isUserWhitelisted();
     }
 
     @Override

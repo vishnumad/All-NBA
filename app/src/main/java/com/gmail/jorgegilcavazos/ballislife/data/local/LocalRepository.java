@@ -32,4 +32,6 @@ public interface LocalRepository {
     void setShouldShowWhatsNew(boolean showWhatsNew);
 
     boolean stickyChipsEnabled();
+
+    boolean isUserWhitelisted();
 }
