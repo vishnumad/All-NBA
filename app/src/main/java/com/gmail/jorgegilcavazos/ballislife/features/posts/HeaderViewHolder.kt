@@ -17,13 +17,13 @@ class HeaderViewHolder(itemView: View, theme: SwishTheme) : RecyclerView.ViewHol
     when (theme) {
       SwishTheme.DARK -> {
         itemView.chipDailyLocker.setChipBackgroundColor(
-            ContextCompat.getColor(itemView.context, R.color.chipBackgroundDark))
+            ContextCompat.getColor(itemView.context, R.color.cardBackgroundDark))
         itemView.chipFreeTalkFriday.setChipBackgroundColor(
-            ContextCompat.getColor(itemView.context, R.color.chipBackgroundDark))
+            ContextCompat.getColor(itemView.context, R.color.cardBackgroundDark))
         itemView.chipTrashTalk.setChipBackgroundColor(
-            ContextCompat.getColor(itemView.context, R.color.chipBackgroundDark))
+            ContextCompat.getColor(itemView.context, R.color.cardBackgroundDark))
         itemView.chipPowerRankings.setChipBackgroundColor(
-            ContextCompat.getColor(itemView.context, R.color.chipBackgroundDark))
+            ContextCompat.getColor(itemView.context, R.color.cardBackgroundDark))
       }
       SwishTheme.LIGHT -> {
         itemView.chipDailyLocker.setChipBackgroundColor(

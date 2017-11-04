@@ -6,9 +6,10 @@
     <color name="colorAccent">#FF9800</color>
     <color name="primaryText">#DE000000</color>
     <color name="secondaryText">#8A000000</color>
-    <color name="colorBackground">#E5E5E5</color>
+    <color name="colorBackground">#f5f5f5</color>
     <color name="iconTint">#333</color>
     <color name="dividerLight">#d4d4d4</color>
+    <color name="cardBackgroundLight">#FFFFFF</color>
 
     <color name="nightColorPrimary">#212121</color>
     <color name="nightColorPrimaryDark">#000000</color>
@@ -16,10 +17,10 @@
     <color name="nightColorAccent">#FF9800</color>
     <color name="nightPrimaryText">#FFFFFF</color>
     <color name="nightSecondaryText">#B3FFFFFF</color>
-    <color name="nightColorBackground">#303030</color>
+    <color name="nightColorBackground">#1d1d1d</color>
     <color name="nightIconTint">#fff</color>
     <color name="dividerDark">#424242</color>
-    <color name="chipBackgroundDark">#424242</color>
+    <color name="cardBackgroundDark">#2b2b2b</color>
 
     <color name="hintText">#42000000</color>
     <color name="accentText">#BABABA</color>
