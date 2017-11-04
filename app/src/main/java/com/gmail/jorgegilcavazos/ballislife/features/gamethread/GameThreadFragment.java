@@ -174,7 +174,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
             streamSwitch = menu.findItem(R.id.action_stream).getActionView()
                     .findViewById(R.id.switch_stream);
             streamSwitch.setOnCheckedChangeListener(this);
-            streamSwitch.setChecked(false);
+            presenter.onSwitchCreated();
         }
         super.onCreateOptionsMenu(menu, inflater);
     }

@@ -331,6 +331,10 @@ class GameThreadPresenterV2 @Inject constructor(
         .addTo(disposable)
   }
 
+  fun onSwitchCreated() {
+    view.setStreamSwitch(shouldStream)
+  }
+
   @VisibleForTesting
   fun setCurrentSubmission(submission: Submission) {
     currentSubmission = submission

@@ -93,6 +93,7 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(this);
         tabLayout.addOnTabSelectedListener(this);
 

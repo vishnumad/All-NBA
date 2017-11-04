@@ -36,12 +36,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case GAME_THREAD_TAB:
-                bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.LIVE);
+                Bundle liveBundle = (Bundle) bundle.clone();
+                liveBundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.LIVE);
                 if (fragmentMap.get(0) != null) {
                     return fragmentMap.get(position);
                 } else {
                     GameThreadFragment tab1 = GameThreadFragment.newInstance();
-                    tab1.setArguments(bundle);
+                    tab1.setArguments(liveBundle);
                     fragmentMap.put(0, tab1);
                     return tab1;
                 }
@@ -51,12 +52,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 fragmentMap.put(1, tab2);
                 return tab2;
             case POST_GAME_TAB:
-                bundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.POST);
+                Bundle postBundle = (Bundle) bundle.clone();
+                postBundle.putSerializable(GameThreadFragment.THREAD_TYPE_KEY, GameThreadType.POST);
                 if (fragmentMap.get(2) != null) {
                     return fragmentMap.get(2);
                 } else {
                     GameThreadFragment tab3 = GameThreadFragment.newInstance();
-                    tab3.setArguments(bundle);
+                    tab3.setArguments(postBundle);
                     fragmentMap.put(2, tab3);
                     return tab3;
                 }
