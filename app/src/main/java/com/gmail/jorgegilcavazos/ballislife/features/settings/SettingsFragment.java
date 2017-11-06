@@ -7,6 +7,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
@@ -33,15 +34,14 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
     public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
     public static final String KEY_OPEN_BOX_SCORE_DEFAULT = "open_box_score_default";
+    public static final String KEY_NO_SPOILERS_MODE = "no_spoilers_mode";
     public static final String KEY_CHIPS_FOR_RNBA_ORIGINALS = "chips_for_rnba_originals";
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
 
     @Inject RedditAuthentication redditAuthentication;
-
     @Inject BaseSchedulerProvider schedulerProvider;
-
     @Inject LocalRepository localRepository;
 
     @Override
@@ -96,6 +96,14 @@ public class SettingsFragment extends PreferenceFragment
                         .getStringArray(R.array.pref_start_values);
 
                 updateTopicSubscriptions(newStartTopics, availableStartTopics);
+                break;
+            case KEY_NO_SPOILERS_MODE:
+                SwitchPreference noSpoilers = (SwitchPreference) preference;
+                SettingsActivity settingsActivity = (SettingsActivity) getActivity();
+                if (!settingsActivity.isPremium() && noSpoilers.isChecked()) {
+                    settingsActivity.purchasePremium();
+                    noSpoilers.setChecked(false);
+                }
                 break;
         }
     }

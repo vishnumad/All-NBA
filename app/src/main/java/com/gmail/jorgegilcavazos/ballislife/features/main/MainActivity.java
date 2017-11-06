@@ -67,8 +67,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
-public class MainActivity extends BaseNoActionBarActivity implements BillingProcessor
-        .IBillingHandler {
+public class MainActivity extends BaseNoActionBarActivity
+        implements BillingProcessor.IBillingHandler {
     private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
@@ -95,16 +95,13 @@ public class MainActivity extends BaseNoActionBarActivity implements BillingProc
     private static final String NO_FAV_TEAM_VAL = "noteam";
 
     @Inject LocalRepository localRepository;
-
     @Inject @Named("redditSharedPreferences") SharedPreferences redditSharedPrefs;
-
     @Inject PostsRepository postsRepository;
-
     @Inject RedditAuthentication redditAuthentication;
-
     @Inject BaseSchedulerProvider schedulerProvider;
 
     @BindView(R.id.mainAppBarLayout) AppBarLayout appBarLayout;
+
     Toolbar toolbar;
     ActionBar actionBar;
     DrawerLayout drawerLayout;

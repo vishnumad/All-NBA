@@ -13,6 +13,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Broadcaster;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.MediaSource;
@@ -38,10 +39,12 @@ import io.reactivex.subjects.PublishSubject;
 public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<GameV2> nbaGameList;
+    private final LocalRepository localRepository;
     private PublishSubject<GameV2> gameClicks = PublishSubject.create();
 
-    public GameAdapter(List<GameV2> nbaGames) {
+    public GameAdapter(List<GameV2> nbaGames, LocalRepository localRepository) {
         nbaGameList = nbaGames;
+        this.localRepository = localRepository;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (Constants.NBA_MATERIAL_ENABLED) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_logos,
                     parent, false);
-            return new GameViewHolder(view);
+            return new GameViewHolder(view, localRepository);
         } else {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game_bars,
                     parent, false);
@@ -79,12 +82,6 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void updateScores(List<GameV2> data) {
-        nbaGameList.clear();
-        nbaGameList.addAll(data);
-        notifyDataSetChanged();
-    }
-
     public Observable<GameV2> getGameClicks() {
         return gameClicks;
     }
@@ -105,8 +102,11 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.awayicon) ImageView ivAwayLogo;
         @BindView(R.id.broadcaster) TextView tvBroadcaster;
 
-        public GameViewHolder(View view) {
+        private final LocalRepository localRepository;
+
+        public GameViewHolder(View view, LocalRepository localRepository) {
             super(view);
+            this.localRepository = localRepository;
             ButterKnife.bind(this, view);
         }
 
@@ -124,11 +124,17 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ivAwayLogo.setImageResource(resKeyAway);
             tvHomeTeam.setText(nbaGame.getHomeTeamAbbr());
             tvAwayTeam.setText(nbaGame.getAwayTeamAbbr());
-            tvHomeScore.setText(nbaGame.getHomeTeamScore());
-            tvAwayScore.setText(nbaGame.getAwayTeamScore());
             tvClock.setText(nbaGame.getGameClock());
             tvPeriod.setText(Utilities.getPeriodString(nbaGame.getPeriodValue(), nbaGame
                     .getPeriodName()));
+
+            if (localRepository.noSpoilersModeEnabled()) {
+                tvHomeScore.setText("-");
+                tvAwayScore.setText("-");
+            } else {
+                tvHomeScore.setText(nbaGame.getHomeTeamScore());
+                tvAwayScore.setText(nbaGame.getAwayTeamScore());
+            }
 
             tvHomeScore.setVisibility(View.GONE);
             tvAwayScore.setVisibility(View.GONE);

@@ -135,4 +135,9 @@ public class AppLocalRepository implements LocalRepository {
         whitelist.add("Obi-Wan_Ginobili");
         return whitelist.contains(username);
     }
+
+    @Override
+    public boolean noSpoilersModeEnabled() {
+        return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_NO_SPOILERS_MODE, false);
+    }
 }

@@ -34,4 +34,6 @@ public interface LocalRepository {
     boolean stickyChipsEnabled();
 
     boolean isUserWhitelisted();
+
+    boolean noSpoilersModeEnabled();
 }
