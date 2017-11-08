@@ -17,6 +17,7 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.component.DaggerAppComponent;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.google.firebase.crash.FirebaseCrash;
 import com.squareup.leakcanary.LeakCanary;
 
 import jonathanfinerty.once.Once;
@@ -85,7 +86,7 @@ public class BallIsLifeApplication extends Application implements BillingProcess
 
     @Override
     public void onBillingError(int errorCode, @Nullable Throwable error) {
-
+        FirebaseCrash.report(error);
     }
 
     @Override
