@@ -24,6 +24,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentDelay;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
@@ -222,8 +223,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Override
     public boolean isPremiumPurchased() {
-        return ((CommentsActivity) getActivity()).billingProcessor.isPurchased("premium")
-                || localRepository.isUserWhitelisted();
+        return ((CommentsActivity) getActivity()).billingProcessor
+                .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted();
     }
 
     @Override
@@ -433,7 +434,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_GAME_THREAD_SWITCH);
         FirebaseAnalytics.getInstance(getActivity()).logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
                 bundle);
-        ((CommentsActivity) getActivity()).billingProcessor.purchase(getActivity(), "premium");
+        Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+        startActivity(intent);
     }
 
     @Override

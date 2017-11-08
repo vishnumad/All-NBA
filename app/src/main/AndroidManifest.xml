@@ -82,6 +82,8 @@
 
         <activity android:name=".features.reply.ReplyActivity">
         </activity>
+        <activity android:name=".features.gopremium.GoPremiumActivity">
+        </activity>
     </application>
 
 </manifest>

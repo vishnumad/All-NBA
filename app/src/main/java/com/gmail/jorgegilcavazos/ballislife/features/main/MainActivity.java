@@ -8,8 +8,6 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -27,8 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
 import com.crashlytics.android.Crashlytics;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
@@ -36,6 +32,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
@@ -67,8 +64,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
-public class MainActivity extends BaseNoActionBarActivity
-        implements BillingProcessor.IBillingHandler {
+public class MainActivity extends BaseNoActionBarActivity {
     private static final String TAG = "MainActivity";
 
     private static final String SHOW_TOUR = "showTourTag";
@@ -112,7 +108,6 @@ public class MainActivity extends BaseNoActionBarActivity
 
     private FirebaseAnalytics firebaseAnalytics;
     private CompositeDisposable disposables;
-    private BillingProcessor billingProcessor;
 
     @Override
     public void injectAppComponent() {
@@ -144,10 +139,6 @@ public class MainActivity extends BaseNoActionBarActivity
                 Once.markDone(SHOW_WHATS_NEW);
             }
         }
-
-
-        String billingLicense = getString(R.string.play_billing_license_key);
-        billingProcessor = new BillingProcessor(this, billingLicense, this);
 
         resubscribeToTopics();
         setUpToolbar();
@@ -274,11 +265,7 @@ public class MainActivity extends BaseNoActionBarActivity
                     navMenuView.setVerticalScrollBarEnabled(false);
                 }
 
-                // Hide "Go Premium!" if premium.
-                if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)
-                        || localRepository.isUserWhitelisted()) {
-                    hideGoPremiumMenuItem();
-                }
+                hideGoPremiumIfPremium();
             }
         }
     }
@@ -667,30 +654,7 @@ public class MainActivity extends BaseNoActionBarActivity
     protected void onResume() {
         super.onResume();
         loadRedditUsername();
-    }
-
-    @Override
-    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails
-            details) {
-        if (productId.equals(Constants.PREMIUM_PRODUCT_ID)) {
-            hideGoPremiumMenuItem();
-            Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-
-    }
-
-    @Override
-    public void onBillingError(int errorCode, @Nullable Throwable error) {
-
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
+        hideGoPremiumIfPremium();
     }
 
     private void hideGoPremiumMenuItem() {
@@ -706,12 +670,14 @@ public class MainActivity extends BaseNoActionBarActivity
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
         bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_NAV_DRAWER);
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
-        if (billingProcessor.isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
+                .isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
             Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
                     .show();
             hideGoPremiumMenuItem();
         } else {
-            billingProcessor.purchase(this, Constants.PREMIUM_PRODUCT_ID);
+            Intent intent = new Intent(this, GoPremiumActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -744,5 +710,12 @@ public class MainActivity extends BaseNoActionBarActivity
             localRepository.saveAppTheme(SwishTheme.LIGHT);
         }
         recreate();
+    }
+
+    private void hideGoPremiumIfPremium() {
+        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
+                .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted()) {
+            hideGoPremiumMenuItem();
+        }
     }
 }

@@ -2,7 +2,6 @@ package com.gmail.jorgegilcavazos.ballislife.features.login;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -10,6 +9,7 @@ import android.webkit.WebViewClient;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.net.URL;
@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import io.reactivex.observers.DisposableCompletableObserver;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActionBarActivity {
 
     private static final String TAG = "LoginActivity";
 
@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        BallIsLifeApplication.getAppComponent().inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -73,6 +72,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         webView.loadUrl(authURL.toExternalForm());
+    }
+
+    @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
     }
 
     @Override

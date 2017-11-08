@@ -13,6 +13,7 @@ import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
@@ -101,8 +102,9 @@ public class SettingsFragment extends PreferenceFragment
                 SwitchPreference noSpoilers = (SwitchPreference) preference;
                 SettingsActivity settingsActivity = (SettingsActivity) getActivity();
                 if (!settingsActivity.isPremium() && noSpoilers.isChecked()) {
-                    settingsActivity.purchasePremium();
                     noSpoilers.setChecked(false);
+                    Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+                    startActivity(intent);
                 }
                 break;
         }

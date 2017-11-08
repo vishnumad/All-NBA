@@ -12,17 +12,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
-import com.google.firebase.crash.FirebaseCrash;
 
 import javax.inject.Inject;
 
@@ -34,8 +31,7 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.PagerAdap
 
 
 public class CommentsActivity extends BaseNoActionBarActivity implements TabLayout
-        .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener,
-        BillingProcessor.IBillingHandler {
+        .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener {
     public static final String GAME_ID_KEY = "gameId";
     public static final String HOME_TEAM_KEY = "homeTeamKey";
     public static final String AWAY_TEAM_KEY = "awayTeamKey";
@@ -62,13 +58,12 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         setContentView(R.layout.comments_activity);
         ButterKnife.bind(this);
 
-        String billingLicense = getString(R.string.play_billing_license_key);
-        billingProcessor = new BillingProcessor(this, billingLicense, this);
-
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        billingProcessor = ((BallIsLifeApplication) getApplication()).getBillingProcessor();
 
         Intent intent = getIntent();
         String homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);
@@ -100,13 +95,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         setSelectedTab(intent.getStringExtra(GamesFragment.GAME_STATUS));
 
         fab.setOnClickListener(this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -166,27 +154,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
             GameThreadFragment gameThreadFragment = ((GameThreadFragment) fragment);
             gameThreadFragment.fabClicked();
         }
-    }
-
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-
-    }
-
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        FirebaseCrash.log("Billing error code: " + errorCode);
-        FirebaseCrash.report(error);
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
     }
 
     private void expandToolbar() {
