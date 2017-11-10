@@ -5,9 +5,13 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+
 public interface HighlightsView {
 
     void setLoadingIndicator(boolean active);
+
+    void hideHighlights();
 
     void showHighlights(List<Highlight> highlights, boolean clear);
 
@@ -38,4 +42,12 @@ public interface HighlightsView {
     void onSubmissionClick(Highlight highlight);
 
     Sorting getSorting();
+
+    Observable<Object> explorePremiumClicks();
+
+    Observable<Object> gotItClicks();
+
+    void openPremiumActivity();
+
+    void dismissSwishCard();
 }

@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.local;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -139,5 +140,17 @@ public class AppLocalRepository implements LocalRepository {
     @Override
     public boolean noSpoilersModeEnabled() {
         return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_NO_SPOILERS_MODE, false);
+    }
+
+    @Override
+    public boolean swishCardSeen(SwishCard swishCard) {
+        return localSharedPreferences.getBoolean(swishCard.getKey(), false);
+    }
+
+    @Override
+    public void markSwishCardSeen(SwishCard swishCard) {
+        SharedPreferences.Editor editor = localSharedPreferences.edit();
+        editor.putBoolean(swishCard.getKey(), true /* seen */);
+        editor.apply();
     }
 }

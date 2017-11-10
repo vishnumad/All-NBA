@@ -461,7 +461,7 @@
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
     <string name="could_not_save_comment_missing_submmission">Couldn\'t save comment, missing submission</string>
 
-    <string name="box_score_team_score">%1$s (%2$d)</string>
+    <string name="box_score_team_score">%1$s (%2$d)</string> <!-- SAS (90) -->
     <string name="daily_locker_room">DAILY LOCKER ROOM</string>
     <string name="power_rankings">POWER RANKINGS</string>
     <string name="trash_talk_thread">TRASH TALK THREAD</string>
@@ -471,7 +471,10 @@
     <string name="worried_about_spoilers">Worried about spoilers?</string>
     <string name="add_a_delay_to_these_comments">Add a delay to these comments</string>
     <string name="help_support_swish">Help support Swish</string>
-    <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>, and as the app grows, the server costs continue to rise. Help support Swish and get these awesome benefits:</string> <!-- SAS (90) -->
+    <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>, and as the app grows, the server costs continue to rise. Help support Swish and get these awesome benefits:</string>
+    <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
+    <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
+    <string name="swish_card_highlight_sorting_action">Explore premium</string>
 
     <string-array name="add_delay_options">
         <item>None</item>

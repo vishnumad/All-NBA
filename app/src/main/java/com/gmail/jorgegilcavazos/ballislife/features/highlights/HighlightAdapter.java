@@ -10,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.common.SwishCardViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.squareup.picasso.Picasso;
 
@@ -25,50 +27,88 @@ import io.reactivex.subjects.PublishSubject;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.HighlightHolder> {
+public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     private Context context;
     private List<Highlight> highlights;
     private HighlightViewType highlightViewType;
+    private boolean showSwishSortingCard;
+
     private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> shareClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> submissionClickSubject = PublishSubject.create();
+    private PublishSubject<Object> exploreClicks = PublishSubject.create();
+    private PublishSubject<Object> gotItClicks = PublishSubject.create();
 
     public HighlightAdapter(
             Context context,
             List<Highlight> highlights,
-            HighlightViewType highlightViewType) {
+            HighlightViewType highlightViewType,
+            boolean showSwishSortingCard) {
         this.context = context;
         this.highlights = highlights;
         this.highlightViewType = highlightViewType;
+        this.showSwishSortingCard = showSwishSortingCard;
     }
 
     @Override
-    public HighlightHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View view;
         if (viewType == HighlightViewType.LARGE.getValue()) {
             view = inflater.inflate(R.layout.row_highlight, parent, false);
+            return new HighlightHolder(view);
+        } else if (viewType == HighlightViewType.EDU_CARD.getValue()) {
+            view = inflater.inflate(R.layout.swish_edu_card, parent, false);
+            return new SwishCardViewHolder(view);
         } else {
             view = inflater.inflate(R.layout.row_highlight_small, parent, false);
+            return new HighlightHolder(view);
         }
-        return new HighlightHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(HighlightHolder holder, int position) {
-        holder.bindData(context, highlightViewType, highlights.get(position), viewClickSubject,
-                        shareClickSubject, submissionClickSubject);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HighlightHolder) {
+            if (showSwishSortingCard) {
+                position--;
+            }
+            ((HighlightHolder) holder).bindData(
+                    context,
+                    highlightViewType,
+                    highlights.get(position),
+                    viewClickSubject,
+                    shareClickSubject,
+                    submissionClickSubject);
+        } else if (holder instanceof SwishCardViewHolder) {
+            ((SwishCardViewHolder) holder).bindData(
+                    SwishCard.HIGHLIGHT_SORTING, exploreClicks, gotItClicks);
+        } else {
+            throw new IllegalStateException("Invalid holder type: " + holder.toString()
+                    + " at position " + position);
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
+        if (showSwishSortingCard && position == 0) {
+            return HighlightViewType.EDU_CARD.getValue();
+        }
         return highlightViewType.getValue();
     }
 
     @Override
     public int getItemCount() {
+        if (showSwishSortingCard) {
+            return null != highlights ? highlights.size() + 1 : 1;
+        }
         return null != highlights ? highlights.size() : 0;
+    }
+
+    public void removeSortingCard() {
+        showSwishSortingCard = false;
+        notifyItemRemoved(0);
     }
 
     public void setData(List<Highlight> highlights) {
@@ -111,6 +151,14 @@ public class HighlightAdapter extends RecyclerView.Adapter<HighlightAdapter.High
 
     public Observable<Highlight> getSubmissionClickObservable() {
         return submissionClickSubject;
+    }
+
+    public Observable<Object> getExplorePremiumClicks() {
+        return exploreClicks;
+    }
+
+    public Observable<Object> getGotItClicks() {
+        return gotItClicks;
     }
 
     static class HighlightHolder extends RecyclerView.ViewHolder {

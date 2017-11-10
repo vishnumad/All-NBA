@@ -3,6 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.subjects.PublishSubject;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -29,20 +31,24 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class HighlightsPresenterTest {
 
-    @Mock
-    HighlightsView mockView;
-    @Mock
-    HighlightsRepositoryImpl mockHighlightsRepository;
-    @Mock
-    LocalRepository mockLocalRepository;
-    @Mock NetworkUtils mockNetworkUtils;
-    @Mock ErrorHandler mockErrorHandler;
+    @Mock private HighlightsView mockView;
+    @Mock private HighlightsRepositoryImpl mockHighlightsRepository;
+    @Mock private LocalRepository mockLocalRepository;
+    @Mock private NetworkUtils mockNetworkUtils;
+    @Mock private ErrorHandler mockErrorHandler;
 
-    HighlightsPresenter presenter;
+    private PublishSubject<Object> explorePremiumClicks = PublishSubject.create();
+    private PublishSubject<Object> gotItClicks = PublishSubject.create();
+
+    private HighlightsPresenter presenter;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+
+        when(mockView.explorePremiumClicks()).thenReturn(explorePremiumClicks);
+        when(mockView.gotItClicks()).thenReturn(gotItClicks);
+
         presenter = new HighlightsPresenter(mockHighlightsRepository, mockLocalRepository,
                                             new TrampolineSchedulerProvider(),
                                             mockNetworkUtils,
@@ -61,6 +67,9 @@ public class HighlightsPresenterTest {
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).hideHighlights();
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
@@ -82,6 +91,9 @@ public class HighlightsPresenterTest {
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).hideHighlights();
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
@@ -104,6 +116,9 @@ public class HighlightsPresenterTest {
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).hideHighlights();
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
@@ -124,6 +139,9 @@ public class HighlightsPresenterTest {
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).hideHighlights();
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
@@ -145,6 +163,8 @@ public class HighlightsPresenterTest {
 
         presenter.loadHighlights(false);
 
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockHighlightsRepository).next();
         verify(mockView).showHighlights(highlightList, false);
         verify(mockView).hideSnackbar();
@@ -164,6 +184,8 @@ public class HighlightsPresenterTest {
 
         presenter.subscribeToHighlightsClick(highlightObservable);
 
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).openStreamable("abcde");
         verify(mockView).showUnknownSourceError();
         verify(mockView).openStreamable("fghi");
@@ -180,14 +202,33 @@ public class HighlightsPresenterTest {
 
         presenter.subscribeToSubmissionClick(highlightObservable);
 
+        verify(mockView).explorePremiumClicks();
+        verify(mockView).gotItClicks();
         verify(mockView).onSubmissionClick(hl1);
         verifyNoMoreInteractions(mockView);
     }
 
     @Test
     public void onDestroyHideSnackbar() {
-        presenter.stop();
+        presenter.detachView();
 
         verify(mockView).hideSnackbar();
+    }
+
+    @Test
+    public void explorePremiumOnClick() {
+        explorePremiumClicks.onNext(new Object());
+
+        verify(mockView).dismissSwishCard();
+        verify(mockView).openPremiumActivity();
+        verify(mockLocalRepository).markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
+    }
+
+    @Test
+    public void gotItFlowOnClick() {
+        gotItClicks.onNext(new Object());
+
+        verify(mockView).dismissSwishCard();
+        verify(mockLocalRepository).markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
     }
 }
