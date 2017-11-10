@@ -63,6 +63,21 @@
             android:summary="@string/summary_settings_start"
             android:title="@string/title_settings_start"/>
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_triple_double_alert"
+            android:title="@string/triple_doubles" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_quadruple_double_alert"
+            android:title="@string/quadruple_doubles" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_5x5_alert"
+            android:title="@string/five_x_fives" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

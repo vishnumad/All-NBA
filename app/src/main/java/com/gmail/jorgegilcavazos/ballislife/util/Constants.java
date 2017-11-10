@@ -61,4 +61,9 @@ public class Constants {
 
     public static final String ORIGIN_NAV_DRAWER = "Nav Drawer";
     public static final String ORIGIN_GAME_THREAD_SWITCH = "Game Thread Switch";
+
+    // Firebase Topics
+    public static final String TOPIC_TRIPLE_DOUBLES = "TRIPLE_DOUBLES";
+    public static final String TOPIC_QUADRUPLE_DOUBLES = "QUADRUPLE_DOUBLES";
+    public static final String TOPIC_5_X_5 = "FIVE_X_FIVE";
 }

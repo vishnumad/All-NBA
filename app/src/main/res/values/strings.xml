@@ -156,6 +156,9 @@
     <string name="key_no_spoilers_mode">no_spoilers_mode</string>
     <string name="key_enable_alerts">pref_enable_alerts</string>
     <string name="key_chips_for_rnba_originals">chips_for_rnba_originals</string>
+    <string name="key_triple_double_alert">triple_double_alert</string>
+    <string name="key_quadruple_double_alert">quadruple_double_alert</string>
+    <string name="key_5x5_alert">five_x_five_alert</string>
 
 
     <string name="title_settings_start">Game Starting</string>
@@ -475,6 +478,9 @@
     <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
     <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
     <string name="swish_card_highlight_sorting_action">Explore premium</string>
+    <string name="triple_doubles">Triple Doubles</string>
+    <string name="quadruple_doubles">Quadruple Doubles</string>
+    <string name="five_x_fives">5x5\'s</string>
 
     <string-array name="add_delay_options">
         <item>None</item>
