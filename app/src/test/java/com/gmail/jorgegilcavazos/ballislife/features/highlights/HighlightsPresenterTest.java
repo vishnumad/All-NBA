@@ -53,16 +53,18 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_hlsAvailable_shouldShowHighlights() {
         List<Highlight> highlightList = new ArrayList<>();
-        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0));
-        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0));
-        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0));
-        Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0, 0));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0, 0));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0, 0));
+        when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
+        when(mockView.getSorting()).thenReturn(Sorting.NEW);
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
-        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).reset(Sorting.NEW);
         verify(mockHighlightsRepository).next();
         verify(mockView).showHighlights(highlightList, true);
         verify(mockView).setLoadingIndicator(false);
@@ -75,13 +77,15 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_hlsEmpty_shouldShowNoHighlightsMessage() {
         List<Highlight> highlightList = new ArrayList<>();
-        Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
+        when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
+        when(mockView.getSorting()).thenReturn(Sorting.NEW);
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
-        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).reset(Sorting.NEW);
         verify(mockHighlightsRepository).next();
         verify(mockView).showNoHighlightsAvailable();
         verify(mockView).setLoadingIndicator(false);
@@ -96,12 +100,14 @@ public class HighlightsPresenterTest {
         when(mockHighlightsRepository.next()).thenReturn(errorSingle);
         when(mockNetworkUtils.isNetworkAvailable()).thenReturn(true);
         when(mockErrorHandler.handleError(any())).thenReturn(404);
+        when(mockView.getSorting()).thenReturn(Sorting.NEW);
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
-        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).reset(Sorting.NEW);
         verify(mockHighlightsRepository).next();
         verify(mockView).showErrorLoadingHighlights(404);
         verify(mockView).setLoadingIndicator(false);
@@ -114,12 +120,14 @@ public class HighlightsPresenterTest {
         Single<List<Highlight>> errorSingle = Single.error(new Exception());
         when(mockHighlightsRepository.next()).thenReturn(errorSingle);
         when(mockNetworkUtils.isNetworkAvailable()).thenReturn(false);
+        when(mockView.getSorting()).thenReturn(Sorting.NEW);
 
         presenter.loadHighlights(true); // reset to get first batch.
 
+        verify(mockView).getSorting();
         verify(mockView).setLoadingIndicator(true);
         verify(mockView).resetScrollState();
-        verify(mockHighlightsRepository).reset();
+        verify(mockHighlightsRepository).reset(Sorting.NEW);
         verify(mockHighlightsRepository).next();
         verify(mockView).showNoNetAvailable();
         verify(mockView).setLoadingIndicator(false);
@@ -130,9 +138,9 @@ public class HighlightsPresenterTest {
     @Test
     public void testLoadHighlights_loadSecondPage_showShowHighlights() {
         List<Highlight> highlightList = new ArrayList<>();
-        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0));
-        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0));
-        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0));
+        highlightList.add(new Highlight("1", "Title 1", "url1", "url1", "", 0, 0));
+        highlightList.add(new Highlight("2", "Title 2", "url2", "url2", "", 0, 0));
+        highlightList.add(new Highlight("3", "Title 3", "url3", "url3", "", 0, 0));
         Mockito.when(mockHighlightsRepository.next()).thenReturn(Single.just(highlightList));
 
         presenter.loadHighlights(false);
@@ -146,11 +154,11 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testSubscribeToHighlightsClick() {
-        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0);
-        Highlight hl2 = new Highlight("2", "Title 2", "", "", "twitter.com/rkeyr", 0);
-        Highlight hl3 = new Highlight("3", "Title 3", "", "", "streamable.com/fghi", 0);
-        Highlight hl4 = new Highlight("3", "Title 3", "", "", "youtube.com?v=poiuy", 0);
-        Highlight hl5 = new Highlight("3", "Title 3", "", "", "youtu.be/xyz", 0);
+        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0, 0);
+        Highlight hl2 = new Highlight("2", "Title 2", "", "", "twitter.com/rkeyr", 0, 0);
+        Highlight hl3 = new Highlight("3", "Title 3", "", "", "streamable.com/fghi", 0, 0);
+        Highlight hl4 = new Highlight("3", "Title 3", "", "", "youtube.com?v=poiuy", 0, 0);
+        Highlight hl5 = new Highlight("3", "Title 3", "", "", "youtu.be/xyz", 0, 0);
 
         Observable<Highlight> highlightObservable = Observable.just(hl1, hl2, hl3, hl4, hl5);
 
@@ -166,7 +174,7 @@ public class HighlightsPresenterTest {
 
     @Test
     public void testSubscribeToSubmissionClick() {
-        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0);
+        Highlight hl1 = new Highlight("1", "Title 1", "", "", "streamable.com/abcde", 0, 0);
 
         Observable<Highlight> highlightObservable = Observable.just(hl1);
 

@@ -223,4 +223,22 @@ public final class DateFormatUtil {
         calendar.add(Calendar.HOUR, hours);
         return calendar.getTimeInMillis() / 1000;
     }
+
+    /**
+     * Returns today's date formatted as "YYYY-MM-DD".
+     */
+    public static String getTodayForHighlights() {
+        DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(
+                TimeZone.getTimeZone("America/New_York")));
+        return DateTimeFormat.forPattern("yyyy-MM-dd").print(dateTime);
+    }
+
+    /**
+     * Returns the current week of the year (1-52).
+     */
+    public static String getWeekForHighlights() {
+        DateTime dateTime = new DateTime(DateTimeZone.forTimeZone(
+                TimeZone.getTimeZone("America/New_York")));
+        return String.valueOf(dateTime.getWeekOfWeekyear());
+    }
 }

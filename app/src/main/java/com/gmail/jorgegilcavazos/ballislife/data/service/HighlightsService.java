@@ -6,13 +6,34 @@ import java.util.Map;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface HighlightsService {
 
-    @GET("highlights/2017-18/.json")
-    Single<Map<String, Highlight>> getHighlights(@Query("orderBy") String orderBy,
-                                                 @Query("startAt") String startAt,
-                                                 @Query("endAt") String endAt,
-                                                 @Query("limitToLast") String limitToLast);
+    @GET("v2/highlights/2017-18/all.json")
+    Single<Map<String, Highlight>> getAllHighlights(@Query("orderBy") String orderBy,
+                                                    @Query("startAt") long startAt,
+                                                    @Query("endAt") long endAt,
+                                                    @Query("limitToLast") int limitToLast);
+
+    @GET("v2/highlights/2017-18/{date}.json")
+    Single<Map<String, Highlight>> getDailyHighlights(@Path("date") String date,
+                                                      @Query("orderBy") String orderBy,
+                                                      @Query("startAt") int startAt,
+                                                      @Query("endAt") int endAt,
+                                                      @Query("limitToLast") int limitToLast);
+
+    @GET("v2/highlights/2017-18/{week}.json")
+    Single<Map<String, Highlight>> getWeeklyHighlights(@Path("week") String week,
+                                                       @Query("orderBy") String orderBy,
+                                                       @Query("startAt") int startAt,
+                                                       @Query("endAt") int endAt,
+                                                       @Query("limitToLast") int limitToLast);
+
+    @GET("v2/highlights/2017-18/all.json")
+    Single<Map<String, Highlight>> getSeasonHighlights(@Query("orderBy") String orderBy,
+                                                       @Query("startAt") int startAt,
+                                                       @Query("endAt") int endAt,
+                                                       @Query("limitToLast") int limitToLast);
 }

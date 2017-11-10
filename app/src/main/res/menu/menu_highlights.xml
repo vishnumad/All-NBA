@@ -9,4 +9,39 @@
         android:icon="@drawable/ic_view_stream_white_24dp"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/action_sort"
+        android:orderInCategory="101"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort_white_24dp"
+        app:showAsAction="ifRoom" >
+
+        <menu>
+            <item
+                android:id="@+id/action_sort_new"
+                android:orderInCategory="11"
+                android:title="@string/sort_new"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_top_day"
+                android:orderInCategory="12"
+                android:title="@string/sort_top_day"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_top_week"
+                android:orderInCategory="13"
+                android:title="@string/sort_top_week"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_sort_top_season"
+                android:orderInCategory="13"
+                android:title="@string/sort_top_season"
+                app:showAsAction="never" />
+
+        </menu>
+    </item>
+
 </menu>

@@ -36,4 +36,6 @@ public interface HighlightsView {
     void hideSnackbar();
 
     void onSubmissionClick(Highlight highlight);
+
+    Sorting getSorting();
 }

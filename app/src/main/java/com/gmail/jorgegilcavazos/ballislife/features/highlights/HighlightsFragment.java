@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +28,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
@@ -49,8 +51,6 @@ import butterknife.Unbinder;
 
 public class HighlightsFragment extends Fragment implements HighlightsView,
         SwipeRefreshLayout.OnRefreshListener {
-
-    private static final String TAG = "HighlightsFragment";
 
     private static final String LIST_STATE = "listState";
 
@@ -77,6 +77,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
     private Snackbar snackbar;
+    private Sorting sorting = Sorting.NEW;
 
     public HighlightsFragment() {
         // Required empty public constructor.
@@ -105,6 +106,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_highlights, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        setSubtitle();
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -176,6 +179,26 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 return true;
             case R.id.action_change_view:
                 openViewPickerDialog();
+                return true;
+            case R.id.action_sort_new:
+                sorting = Sorting.NEW;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_day:
+                sorting = Sorting.TOP_DAY;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_week:
+                sorting = Sorting.TOP_WEEK;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_season:
+                sorting = Sorting.TOP_SEASON;
+                presenter.loadHighlights(true);
+                setSubtitle();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -316,6 +339,11 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         startActivity(intent);
     }
 
+    @Override
+    public Sorting getSorting() {
+        return sorting;
+    }
+
     private void openViewPickerDialog() {
         final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.change_view)
@@ -358,5 +386,25 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 throw new IllegalArgumentException("Invalid viewtype: " + viewType);
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);
+    }
+
+    private void setSubtitle() {
+        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            switch (sorting) {
+                case NEW:
+                    actionBar.setSubtitle("NEW");
+                    break;
+                case TOP_DAY:
+                    actionBar.setSubtitle("TOP - DAY");
+                    break;
+                case TOP_WEEK:
+                    actionBar.setSubtitle("TOP - WEEK");
+                    break;
+                case TOP_SEASON:
+                    actionBar.setSubtitle("TOP - MONTH");
+                    break;
+            }
+        }
     }
 }

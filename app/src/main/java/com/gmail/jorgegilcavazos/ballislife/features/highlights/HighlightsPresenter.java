@@ -63,7 +63,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         if (reset) {
             view.resetScrollState();
             view.setLoadingIndicator(true);
-            highlightsRepository.reset();
+            highlightsRepository.reset(view.getSorting());
         }
         disposables.add(highlightsRepository.next()
                 .subscribeOn(schedulerProvider.io())

@@ -76,6 +76,10 @@
 
     <!-- Highlights -->
     <string name="share_video">Share video</string>
+    <string name="sort_new">New</string>
+    <string name="sort_top_day">Top - Day</string>
+    <string name="sort_top_week">Top - Week</string>
+    <string name="sort_top_season">Top - Season</string>
 
     <!-- Posts -->
     <string name="not_authenticated">Not authenticated</string>
