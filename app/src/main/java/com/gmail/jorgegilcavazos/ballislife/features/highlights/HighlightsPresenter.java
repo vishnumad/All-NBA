@@ -79,7 +79,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
 
     public void loadFirstAvailable() {
         List<Highlight> highlights = highlightsRepository.getCachedHighlights();
-        if (highlights.isEmpty()) {
+        if (highlights.isEmpty() || highlightsRepository.getSorting() != view.getSorting()) {
             loadHighlights(true);
         } else {
             view.showHighlights(highlights, true);

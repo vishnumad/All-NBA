@@ -147,6 +147,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         super.onResume();
         // Load cached data if available, or from network if not.
         presenter.loadFirstAvailable();
+        setSubtitle();
     }
 
     @Override

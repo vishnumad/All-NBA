@@ -16,4 +16,6 @@ public interface HighlightsRepository {
     Single<List<Highlight>> next();
 
     List<Highlight> getCachedHighlights();
+
+    Sorting getSorting();
 }

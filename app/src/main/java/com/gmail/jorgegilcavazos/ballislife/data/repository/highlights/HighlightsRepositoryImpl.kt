@@ -121,6 +121,10 @@ class HighlightsRepositoryImpl @Inject constructor(
     return cachedHighlights
   }
 
+  override fun getSorting(): Sorting {
+    return sorting
+  }
+
   @VisibleForTesting
   fun getLastHighlightTimestamp(): Long = lastHighlightTimestamp
 
