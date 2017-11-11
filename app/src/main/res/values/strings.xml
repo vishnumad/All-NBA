@@ -474,7 +474,7 @@
     <string name="worried_about_spoilers">Worried about spoilers?</string>
     <string name="add_a_delay_to_these_comments">Add a delay to these comments</string>
     <string name="help_support_swish">Help support Swish</string>
-    <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>, and as the app grows, the server costs continue to rise. Help support Swish and get these awesome benefits:</string>
+    <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>. Help support the app and get these awesome benefits:</string>
     <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
     <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
     <string name="swish_card_highlight_sorting_action">Explore premium</string>

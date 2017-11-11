@@ -26,7 +26,6 @@ class GoPremiumActivity : BaseActionBarActivity() {
         "• Add a delay to game threads to avoid spoilers",
         "• Sort highlights by popularity",
         "• Hide scores (No spoilers)",
-        "• Subscribe to your favorite players and get an alert with their stat line after a game",
         "• Subscribe to triple-double, quadruple-double, and 5x5 alerts",
         "• 100% ad free. Forever.",
         "• More coming soon!")

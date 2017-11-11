@@ -41,4 +41,6 @@ public interface LocalRepository {
     boolean swishCardSeen(SwishCard swishCard);
 
     void markSwishCardSeen(SwishCard swishCard);
+
+    String getFavoriteTeam();
 }

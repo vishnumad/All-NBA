@@ -153,4 +153,13 @@ public class AppLocalRepository implements LocalRepository {
         editor.putBoolean(swishCard.getKey(), true /* seen */);
         editor.apply();
     }
+
+    @Override
+    public String getFavoriteTeam() {
+        String team =  defaultSharedPreferences.getString("teams_list", null);
+        if (team == null || team.equals("noteam")) {
+            return null;
+        }
+        return team;
+    }
 }

@@ -49,122 +49,152 @@
         android:checkableBehavior="single">
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_atl"
             android:title="@string/r_atl"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_bkn"
             android:title="@string/r_bkn"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_bos"
             android:title="@string/r_bos"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_cha"
             android:title="@string/r_cha"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_chi"
             android:title="@string/r_chi"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_cle"
             android:title="@string/r_cle"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_dal"
             android:title="@string/r_dal"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_den"
             android:title="@string/r_den"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_det"
             android:title="@string/r_det"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_gsw"
             android:title="@string/r_gsw"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_hou"
             android:title="@string/r_hou"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_ind"
             android:title="@string/r_ind"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_lac"
             android:title="@string/r_lac"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_lal"
             android:title="@string/r_lal"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_mem"
             android:title="@string/r_mem"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_mia"
             android:title="@string/r_mia"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_mil"
             android:title="@string/r_mil"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_min"
             android:title="@string/r_min"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_nop"
             android:title="@string/r_nop"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_nyk"
             android:title="@string/r_nyk"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_okc"
             android:title="@string/r_okc"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_orl"
             android:title="@string/r_orl"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_phi"
             android:title="@string/r_phi"/>
 
         <item
-            android:id="@+id/nav_pho"
+            android:orderInCategory="30"
+            android:id="@+id/nav_phx"
             android:title="@string/r_pho"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_por"
             android:title="@string/r_por"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_sac"
             android:title="@string/r_sac"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_sas"
             android:title="@string/r_sas"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_tor"
             android:title="@string/r_tor"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_uta"
             android:title="@string/r_uta"/>
 
         <item
+            android:orderInCategory="30"
             android:id="@+id/nav_was"
             android:title="@string/r_was"/>
     </group>

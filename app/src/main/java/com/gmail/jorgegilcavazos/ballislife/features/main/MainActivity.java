@@ -264,7 +264,7 @@ public class MainActivity extends BaseNoActionBarActivity {
                 if (navMenuView != null) {
                     navMenuView.setVerticalScrollBarEnabled(false);
                 }
-
+                updateNavViewFavoriteTeam();
                 hideGoPremiumIfPremium();
             }
         }
@@ -388,7 +388,7 @@ public class MainActivity extends BaseNoActionBarActivity {
                     setPostsFragment(Constants.SUB_PHI);
                     drawerLayout.closeDrawer(GravityCompat.START);
                     return true;
-                case R.id.nav_pho:
+                case R.id.nav_phx:
                     setPostsFragment(Constants.SUB_PHO);
                     drawerLayout.closeDrawer(GravityCompat.START);
                     return true;
@@ -654,6 +654,7 @@ public class MainActivity extends BaseNoActionBarActivity {
     protected void onResume() {
         super.onResume();
         loadRedditUsername();
+        updateNavViewFavoriteTeam();
         hideGoPremiumIfPremium();
     }
 
@@ -716,6 +717,26 @@ public class MainActivity extends BaseNoActionBarActivity {
         if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
                 .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted()) {
             hideGoPremiumMenuItem();
+        }
+    }
+
+    private void updateNavViewFavoriteTeam() {
+        if (navigationView != null) {
+            String favTeam = localRepository.getFavoriteTeam();
+            if (favTeam != null) {
+                Menu navMenu = navigationView.getMenu();
+                int resId;
+                try {
+                    resId = getResources().getIdentifier("nav_" + favTeam, "id", getPackageName());
+                } catch (Exception e) {
+                    resId = -1;
+                }
+                if (resId != -1) {
+                    String itemTitle = navMenu.findItem(resId).getTitle().toString();
+                    navMenu.removeItem(resId);
+                    navMenu.add(R.id.group_team_subreddits, resId, 0, itemTitle);
+                }
+            }
         }
     }
 }
