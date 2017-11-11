@@ -18,6 +18,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 
 import javax.inject.Singleton;
@@ -58,4 +59,6 @@ public interface AppComponent {
     void inject(SettingsActivity settingsActivity);
 
     void inject(GoPremiumActivity goPremiumActivity);
+
+    void inject(TourLoginActivity tourLoginActivity);
 }

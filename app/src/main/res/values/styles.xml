@@ -63,9 +63,4 @@
 
     <style name="AppTheme.PopupOverlay.Dark" parent="ThemeOverlay.AppCompat.Dark"/>
 
-    <style name="AppTheme.NoActionBar.Dark" parent="AppTheme.NoActionBar">
-        <item name="colorPrimary">@color/tricornBlack</item>
-        <item name="colorPrimaryDark">@color/tricornBlackDark</item>
-    </style>
-
 </resources>

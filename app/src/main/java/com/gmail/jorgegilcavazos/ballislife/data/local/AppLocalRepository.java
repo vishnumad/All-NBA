@@ -105,7 +105,7 @@ public class AppLocalRepository implements LocalRepository {
         } else if (SwishTheme.DARK.getValue() == value) {
             return SwishTheme.DARK;
         } else {
-            return SwishTheme.LIGHT;
+            return SwishTheme.DARK;
         }
     }
 
