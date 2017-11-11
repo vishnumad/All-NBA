@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentDelay
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
@@ -95,4 +96,8 @@ interface GameThreadView {
   fun collapseComments(id: String)
 
   fun uncollapseComments(id: String)
+
+  fun getCommentDelay(): CommentDelay
+
+  fun setCommentDelay(delay: CommentDelay)
 }

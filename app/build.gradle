@@ -20,8 +20,8 @@ android {
         applicationId "com.gmail.jorgegilcavazos.ballislife"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 56
-        versionName "1.1.1.4"
+        versionCode 57
+        versionName "1.2.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
     }
@@ -133,6 +133,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     implementation 'com.squareup.okhttp3:okhttp:3.8.0'
     implementation 'joda-time:joda-time:2.9.9'
+    implementation 'com.github.pchmn:MaterialChipsInput:1.0.8'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.8.9'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'

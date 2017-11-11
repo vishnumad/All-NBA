@@ -1,10 +1,13 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights;
 
+import android.support.annotation.NonNull;
+
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
@@ -20,8 +23,6 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class HighlightsPresenter extends BasePresenter<HighlightsView> {
-
-    private static final String TAG = "HighlightsPresenter";
 
     private HighlightsRepository highlightsRepository;
     private LocalRepository localRepository;
@@ -46,6 +47,31 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         disposables = new CompositeDisposable();
     }
 
+    @Override
+    public void attachView(@NonNull HighlightsView view) {
+        super.attachView(view);
+
+        disposables.add(view.explorePremiumClicks()
+                .subscribe(o -> {
+                    localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
+                    view.dismissSwishCard();
+                    view.openPremiumActivity();
+                }));
+
+        disposables.add(view.gotItClicks()
+                .subscribe(o -> {
+                    localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
+                    view.dismissSwishCard();
+                }));
+    }
+
+    @Override
+    public void detachView() {
+        disposables.clear();
+        view.hideSnackbar();
+        super.detachView();
+    }
+
     public void setItemsToLoad(int itemsToLoad) {
         highlightsRepository.setItemsToLoad(itemsToLoad);
     }
@@ -63,7 +89,8 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         if (reset) {
             view.resetScrollState();
             view.setLoadingIndicator(true);
-            highlightsRepository.reset();
+            view.hideHighlights();
+            highlightsRepository.reset(view.getSorting());
         }
         disposables.add(highlightsRepository.next()
                 .subscribeOn(schedulerProvider.io())
@@ -186,13 +213,6 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     public void onViewTypeSelected(HighlightViewType viewType) {
         localRepository.saveFavoriteHighlightViewType(viewType);
         view.changeViewType(viewType);
-    }
-
-    public void stop() {
-        if (disposables != null) {
-            disposables.clear();
-        }
-        view.hideSnackbar();
     }
 
 }

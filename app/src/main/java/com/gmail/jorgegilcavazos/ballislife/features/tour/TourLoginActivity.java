@@ -2,17 +2,17 @@ package com.gmail.jorgegilcavazos.ballislife.features.tour;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TourLoginActivity extends AppCompatActivity {
+public class TourLoginActivity extends BaseNoActionBarActivity {
 
     @BindView(R.id.text_positive) TextView tvPositive;
     @BindView(R.id.text_negative) TextView tvNegative;
@@ -23,21 +23,18 @@ public class TourLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tour_login);
         ButterKnife.bind(this);
 
-        tvNegative.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        tvNegative.setOnClickListener(v -> finish());
 
-        tvPositive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TourLoginActivity.this, LoginActivity.class);
-                startActivity(intent);
+        tvPositive.setOnClickListener(v -> {
+            Intent intent = new Intent(TourLoginActivity.this, LoginActivity.class);
+            startActivity(intent);
 
-                finish();
-            }
+            finish();
         });
+    }
+
+    @Override
+    public void injectAppComponent() {
+        BallIsLifeApplication.getAppComponent().inject(this);
     }
 }

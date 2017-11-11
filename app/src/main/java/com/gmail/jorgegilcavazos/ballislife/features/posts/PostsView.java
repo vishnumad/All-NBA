@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.posts;
 
+import com.gmail.jorgegilcavazos.ballislife.features.model.NBASubChips;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
 
@@ -38,4 +39,6 @@ public interface PostsView {
     void share(String url);
 
     void showUnknownErrorToast();
+
+    void setNbaSubChips(NBASubChips nbaSubChips);
 }

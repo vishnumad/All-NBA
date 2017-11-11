@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,13 +23,17 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.anjlab.android.iab.v3.BillingProcessor;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
@@ -46,25 +51,17 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
 
 public class HighlightsFragment extends Fragment implements HighlightsView,
         SwipeRefreshLayout.OnRefreshListener {
 
-    private static final String TAG = "HighlightsFragment";
-
     private static final String LIST_STATE = "listState";
 
-    @Inject
-    LocalRepository localRepository;
-
-    @Inject
-    HighlightsRepository highlightsRepository;
-
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
-
-    @Inject
-    HighlightsPresenter presenter;
+    @Inject LocalRepository localRepository;
+    @Inject HighlightsRepository highlightsRepository;
+    @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject HighlightsPresenter presenter;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
@@ -77,6 +74,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
     private Snackbar snackbar;
+    private Sorting sorting = Sorting.NEW;
 
     public HighlightsFragment() {
         // Required empty public constructor.
@@ -95,7 +93,12 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         viewType = localRepository.getFavoriteHighlightViewType();
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
-        highlightAdapter = new HighlightAdapter(getActivity(), new ArrayList<>(25), viewType);
+
+        highlightAdapter = new HighlightAdapter(
+                getActivity(),
+                new ArrayList<>(25),
+                viewType,
+                shouldShowSortingCard());
 
         setHasOptionsMenu(true);
     }
@@ -105,6 +108,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_highlights, container, false);
         unbinder = ButterKnife.bind(this, view);
+
+        setSubtitle();
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -155,7 +160,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void onDestroyView() {
         unbinder.unbind();
-        presenter.stop();
         presenter.detachView();
         super.onDestroyView();
     }
@@ -177,6 +181,38 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
             case R.id.action_change_view:
                 openViewPickerDialog();
                 return true;
+            case R.id.action_sort_new:
+                sorting = Sorting.NEW;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_day:
+                if (!isPremium()) {
+                    openPremiumActivity();
+                    return true;
+                }
+                sorting = Sorting.TOP_DAY;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_week:
+                if (!isPremium()) {
+                    openPremiumActivity();
+                    return true;
+                }
+                sorting = Sorting.TOP_WEEK;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
+            case R.id.action_sort_top_season:
+                if (!isPremium()) {
+                    openPremiumActivity();
+                    return true;
+                }
+                sorting = Sorting.TOP_SEASON;
+                presenter.loadHighlights(true);
+                setSubtitle();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -192,7 +228,13 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
+    public void hideHighlights() {
+        rvHighlights.setVisibility(View.GONE);
+    }
+
+    @Override
     public void showHighlights(List<Highlight> highlights, boolean clear) {
+        rvHighlights.setVisibility(View.VISIBLE);
         if (clear) {
             highlightAdapter.setData(highlights);
         } else {
@@ -316,6 +358,32 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         startActivity(intent);
     }
 
+    @Override
+    public Sorting getSorting() {
+        return sorting;
+    }
+
+    @Override
+    public Observable<Object> explorePremiumClicks() {
+        return highlightAdapter.getExplorePremiumClicks();
+    }
+
+    @Override
+    public Observable<Object> gotItClicks() {
+        return highlightAdapter.getGotItClicks();
+    }
+
+    @Override
+    public void openPremiumActivity() {
+        Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void dismissSwishCard() {
+        highlightAdapter.removeSortingCard();
+    }
+
     private void openViewPickerDialog() {
         final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.change_view)
@@ -355,8 +423,39 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                                                        null);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid viewtype: " + viewType);
+                throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);
+    }
+
+    private void setSubtitle() {
+        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            switch (sorting) {
+                case NEW:
+                    actionBar.setSubtitle("NEW");
+                    break;
+                case TOP_DAY:
+                    actionBar.setSubtitle("TOP - DAY");
+                    break;
+                case TOP_WEEK:
+                    actionBar.setSubtitle("TOP - WEEK");
+                    break;
+                case TOP_SEASON:
+                    actionBar.setSubtitle("TOP - SEASON");
+                    break;
+            }
+        }
+    }
+
+    private boolean isPremium() {
+        BillingProcessor bp = ((BallIsLifeApplication) getActivity().getApplication())
+                .getBillingProcessor();
+        return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted();
+    }
+
+    private boolean shouldShowSortingCard() {
+        boolean sortingCardSeen = localRepository.swishCardSeen(SwishCard.HIGHLIGHT_SORTING);
+        return !sortingCardSeen && !isPremium();
     }
 }

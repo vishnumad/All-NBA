@@ -12,24 +12,26 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
-import com.google.firebase.crash.FirebaseCrash;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.PagerAdapter.BOX_SCORE_TAB;
+import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.PagerAdapter.POST_GAME_TAB;
+
 
 public class CommentsActivity extends BaseNoActionBarActivity implements TabLayout
-        .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener,
-        BillingProcessor.IBillingHandler {
+        .OnTabSelectedListener, ViewPager.OnPageChangeListener, View.OnClickListener {
     public static final String GAME_ID_KEY = "gameId";
     public static final String HOME_TEAM_KEY = "homeTeamKey";
     public static final String AWAY_TEAM_KEY = "awayTeamKey";
@@ -38,6 +40,9 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     @BindView(R.id.tabLayout) TabLayout tabLayout;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
+
+    @Inject
+    LocalRepository localRepository;
 
     private PagerAdapter pagerAdapter;
     public BillingProcessor billingProcessor;
@@ -53,13 +58,12 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         setContentView(R.layout.comments_activity);
         ButterKnife.bind(this);
 
-        String billingLicense = getString(R.string.play_billing_license_key);
-        billingProcessor = new BillingProcessor(this, billingLicense, this);
-
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+
+        billingProcessor = ((BallIsLifeApplication) getApplication()).getBillingProcessor();
 
         Intent intent = getIntent();
         String homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);
@@ -75,7 +79,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         bundle.putString(GAME_ID_KEY, gameId);
         bundle.putLong(GameThreadFragment.GAME_DATE_KEY, date);
 
-        String gameStatus = intent.getStringExtra(GamesFragment.GAME_STATUS);
         // Initialize tab layout and add three tabs.
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addTab(tabLayout.newTab().setText(R.string.game_thread));
@@ -85,18 +88,13 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(this);
         tabLayout.addOnTabSelectedListener(this);
-        setSelectedTab(gameStatus);
+
+        setSelectedTab(intent.getStringExtra(GamesFragment.GAME_STATUS));
 
         fab.setOnClickListener(this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -158,27 +156,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         }
     }
 
-    @Override
-    public void onProductPurchased(String productId, TransactionDetails details) {
-        Toast.makeText(this, R.string.purchase_complete, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-
-    }
-
-    @Override
-    public void onBillingError(int errorCode, Throwable error) {
-        FirebaseCrash.log("Billing error code: " + errorCode);
-        FirebaseCrash.report(error);
-    }
-
-    @Override
-    public void onBillingInitialized() {
-
-    }
-
     private void expandToolbar() {
         if (toolbar.getParent() instanceof AppBarLayout) {
             ((AppBarLayout) toolbar.getParent()).setExpanded(true, true);
@@ -216,13 +193,20 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
 
     }
 
-    private void setSelectedTab(String gameStatus){
-        if (gameStatus.equals(NbaGame.POST_GAME)) {
-            TabLayout.Tab postGameTab = tabLayout.getTabAt(2);
-            if(postGameTab != null) {
+    private void setSelectedTab(String gameStatus) {
+        if (localRepository.getOpenBoxScoreByDefault()) {
+            TabLayout.Tab boxScoreTab = tabLayout.getTabAt(BOX_SCORE_TAB);
+            if (boxScoreTab != null) {
+                boxScoreTab.select();
+            } else {
+                viewPager.setCurrentItem(BOX_SCORE_TAB);
+            }
+        } else if (gameStatus.equals(NbaGame.POST_GAME)) {
+            TabLayout.Tab postGameTab = tabLayout.getTabAt(POST_GAME_TAB);
+            if (postGameTab != null) {
                 postGameTab.select();
             } else {
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(POST_GAME_TAB);
             }
         }
     }

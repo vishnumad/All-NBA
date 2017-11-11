@@ -7,11 +7,13 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
@@ -32,14 +34,18 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_ENABLE_ALERTS = "pref_enable_alerts";
     public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
     public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
+    public static final String KEY_OPEN_BOX_SCORE_DEFAULT = "open_box_score_default";
+    public static final String KEY_NO_SPOILERS_MODE = "no_spoilers_mode";
+    public static final String KEY_CHIPS_FOR_RNBA_ORIGINALS = "chips_for_rnba_originals";
+    public static final String KEY_TRIPLE_DOUBLES = "triple_double_alert";
+    public static final String KEY_QUADRUPLE_DOUBLES = "quadruple_double_alert";
+    public static final String KEY_5_X_5 = "five_x_five_alert";
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
 
     @Inject RedditAuthentication redditAuthentication;
-
     @Inject BaseSchedulerProvider schedulerProvider;
-
     @Inject LocalRepository localRepository;
 
     @Override
@@ -68,6 +74,7 @@ public class SettingsFragment extends PreferenceFragment
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        SettingsActivity settingsActivity = (SettingsActivity) getActivity();
         Preference preference = findPreference(key);
         switch (key) {
             case "teams_list":
@@ -94,6 +101,62 @@ public class SettingsFragment extends PreferenceFragment
                         .getStringArray(R.array.pref_start_values);
 
                 updateTopicSubscriptions(newStartTopics, availableStartTopics);
+                break;
+            case KEY_NO_SPOILERS_MODE:
+                SwitchPreference noSpoilers = (SwitchPreference) preference;
+                if (!settingsActivity.isPremium() && noSpoilers.isChecked()) {
+                    noSpoilers.setChecked(false);
+                    Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+                    startActivity(intent);
+                }
+                break;
+            case KEY_TRIPLE_DOUBLES:
+                SwitchPreference tripDouble = (SwitchPreference) preference;
+                if (!settingsActivity.isPremium() && tripDouble.isChecked()) {
+                    tripDouble.setChecked(false);
+                    Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                if (tripDouble.isChecked()) {
+                    FirebaseMessaging.getInstance()
+                            .subscribeToTopic(Constants.TOPIC_TRIPLE_DOUBLES);
+                } else {
+                    FirebaseMessaging.getInstance()
+                            .unsubscribeFromTopic(Constants.TOPIC_TRIPLE_DOUBLES);
+                }
+                break;
+            case KEY_QUADRUPLE_DOUBLES:
+                SwitchPreference quadDoubles = (SwitchPreference) preference;
+                if (!settingsActivity.isPremium() && quadDoubles.isChecked()) {
+                    quadDoubles.setChecked(false);
+                    Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                if (quadDoubles.isChecked()) {
+                    FirebaseMessaging.getInstance()
+                            .subscribeToTopic(Constants.TOPIC_QUADRUPLE_DOUBLES);
+                } else {
+                    FirebaseMessaging.getInstance()
+                            .unsubscribeFromTopic(Constants.TOPIC_QUADRUPLE_DOUBLES);
+                }
+                break;
+            case KEY_5_X_5:
+                SwitchPreference fiveXFive = (SwitchPreference) preference;
+                if (!settingsActivity.isPremium() && fiveXFive.isChecked()) {
+                    fiveXFive.setChecked(false);
+                    Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                if (fiveXFive.isChecked()) {
+                    FirebaseMessaging.getInstance()
+                            .subscribeToTopic(Constants.TOPIC_5_X_5);
+                } else {
+                    FirebaseMessaging.getInstance()
+                            .unsubscribeFromTopic(Constants.TOPIC_5_X_5);
+                }
                 break;
         }
     }

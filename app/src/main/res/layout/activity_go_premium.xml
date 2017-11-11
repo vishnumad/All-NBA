@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/help_support_swish"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textSize="26sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/go_premium_body"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:layout_below="@id/title"/>
+
+    <Button
+        android:id="@+id/goPremiumBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Go Premium"
+        android:background="@color/colorAccent"
+        android:textColor="@color/white"
+        android:layout_marginTop="16dp"
+        android:layout_alignParentBottom="true"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/body"
+        android:layout_above="@id/goPremiumBtn">
+
+        <LinearLayout
+            android:id="@+id/benefitContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
+</RelativeLayout>

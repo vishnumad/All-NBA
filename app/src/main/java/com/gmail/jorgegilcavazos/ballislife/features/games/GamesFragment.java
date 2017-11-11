@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
@@ -35,7 +36,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 
 /**
  * Displays a list of {@link NbaGame}s for the selected date.
@@ -52,6 +52,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     public final static String GAME_STATUS = "GAME_STATUS";
 
     @Inject GamesPresenter presenter;
+    @Inject LocalRepository localRepository;
 
     @BindView(R.id.navigator_button_left) ImageButton btnPrevDay;
     @BindView(R.id.navigator_button_right) ImageButton btnNextDay;
@@ -59,8 +60,6 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     @BindView(R.id.no_games_text) TextView tvNoGames;
     @BindView(R.id.games_rv) RecyclerView rvGames;
     @BindView(R.id.swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
-
-    private PublishSubject<Integer> prevDays = PublishSubject.create();
 
     private Parcelable listState;
     private RecyclerView.LayoutManager layoutManager;
@@ -83,7 +82,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         setHasOptionsMenu(true);
 
         layoutManager = new LinearLayoutManager(getActivity());
-        gameAdapter = new GameAdapter(new ArrayList<>(0));
+        gameAdapter = new GameAdapter(new ArrayList<>(0), localRepository);
     }
 
     @Override
@@ -226,9 +225,5 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         if (snackbar != null) {
             snackbar.dismiss();
         }
-    }
-
-    public interface GameItemListener {
-        void onGameClick(GameV2 clickedGame);
     }
 }

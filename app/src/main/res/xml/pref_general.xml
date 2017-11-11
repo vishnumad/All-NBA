@@ -24,6 +24,16 @@
             android:key="@string/key_enable_youtube_in_app"
             android:title="@string/pref_enable_youtube_in_app"/>
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_open_box_score_default"
+            android:title="@string/pref_open_box_score_default"/>
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_no_spoilers_mode"
+            android:title="@string/pref_no_spoilers_mode" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -53,6 +63,21 @@
             android:summary="@string/summary_settings_start"
             android:title="@string/title_settings_start"/>
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_triple_double_alert"
+            android:title="@string/triple_doubles" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_quadruple_double_alert"
+            android:title="@string/quadruple_doubles" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="@string/key_5x5_alert"
+            android:title="@string/five_x_fives" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -62,6 +87,12 @@
         <Preference
             android:key="log_in_status_pref"
             android:title="@string/log_out"/>
+
+        <SwitchPreference
+            android:key="@string/key_chips_for_rnba_originals"
+            android:defaultValue="false"
+            android:title="Replace /r/NBA originals with chips"
+            android:summary="Declutter your feed with smaller chips for /r/NBA originals such as Daily Locker Room threads" />
 
     </PreferenceCategory>
 

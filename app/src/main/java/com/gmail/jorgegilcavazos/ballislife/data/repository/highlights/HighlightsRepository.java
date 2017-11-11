@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights;
 
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.Sorting;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface HighlightsRepository {
 
     void setItemsToLoad(int itemsToLoad);
 
-    void reset();
+    void reset(Sorting sorting);
 
     Single<List<Highlight>> next();
 

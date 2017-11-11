@@ -3,9 +3,13 @@ package com.gmail.jorgegilcavazos.ballislife.data.local;
 import android.content.SharedPreferences;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,8 +17,8 @@ import javax.inject.Singleton;
 
 @Singleton
 public class AppLocalRepository implements LocalRepository {
-    SharedPreferences localSharedPreferences;
-    SharedPreferences defaultSharedPreferences;
+    private SharedPreferences localSharedPreferences;
+    private SharedPreferences defaultSharedPreferences;
 
     @Inject
     public AppLocalRepository(
@@ -81,6 +85,11 @@ public class AppLocalRepository implements LocalRepository {
     }
 
     @Override
+    public boolean getOpenBoxScoreByDefault() {
+        return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_OPEN_BOX_SCORE_DEFAULT, false);
+    }
+
+    @Override
     public void saveAppTheme(SwishTheme theme) {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
         editor.putInt(LocalSharedPreferences.SWISH_THEME, theme.getValue());
@@ -96,7 +105,7 @@ public class AppLocalRepository implements LocalRepository {
         } else if (SwishTheme.DARK.getValue() == value) {
             return SwishTheme.DARK;
         } else {
-            return SwishTheme.LIGHT;
+            return SwishTheme.DARK;
         }
     }
 
@@ -110,5 +119,47 @@ public class AppLocalRepository implements LocalRepository {
         SharedPreferences.Editor editor = localSharedPreferences.edit();
         editor.putBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, showWhatsNew);
         editor.apply();
+    }
+
+    @Override
+    public boolean stickyChipsEnabled() {
+        return defaultSharedPreferences.getBoolean(
+                SettingsFragment.KEY_CHIPS_FOR_RNBA_ORIGINALS, false);
+    }
+
+    @Override
+    public boolean isUserWhitelisted() {
+        String username = getUsername();
+        if (username == null) return false;
+
+        List<String> whitelist = new ArrayList<>();
+        whitelist.add("Obi-Wan_Ginobili");
+        return whitelist.contains(username);
+    }
+
+    @Override
+    public boolean noSpoilersModeEnabled() {
+        return defaultSharedPreferences.getBoolean(SettingsFragment.KEY_NO_SPOILERS_MODE, false);
+    }
+
+    @Override
+    public boolean swishCardSeen(SwishCard swishCard) {
+        return localSharedPreferences.getBoolean(swishCard.getKey(), false);
+    }
+
+    @Override
+    public void markSwishCardSeen(SwishCard swishCard) {
+        SharedPreferences.Editor editor = localSharedPreferences.edit();
+        editor.putBoolean(swishCard.getKey(), true /* seen */);
+        editor.apply();
+    }
+
+    @Override
+    public String getFavoriteTeam() {
+        String team =  defaultSharedPreferences.getString("teams_list", null);
+        if (team == null || team.equals("noteam")) {
+            return null;
+        }
+        return team;
     }
 }

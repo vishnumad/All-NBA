@@ -76,6 +76,10 @@
 
     <!-- Highlights -->
     <string name="share_video">Share video</string>
+    <string name="sort_new">New</string>
+    <string name="sort_top_day">Top - Day</string>
+    <string name="sort_top_week">Top - Week</string>
+    <string name="sort_top_season">Top - Season</string>
 
     <!-- Posts -->
     <string name="not_authenticated">Not authenticated</string>
@@ -138,16 +142,24 @@
     <string name="logged_as_user">Logged in as %1$s</string>
 
     <string name="pref_enable_alerts">Enable Alerts</string>
-    <string name="key_enable_alerts">pref_enable_alerts</string>
-
-    <string name="key_enable_youtube_in_app">in_app_youtube</string>
     <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
+    <string name="pref_no_spoilers_mode">Hide Scores</string>
+    <string name="pref_open_box_score_default">Open Box Score by Default</string>
 
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
     <string name="summary_settings_cga">Receive an alert for close games</string>
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_cga">pref_cga_topics</string>
+    <string name="key_enable_youtube_in_app">in_app_youtube</string>
+    <string name="key_open_box_score_default">open_box_score_default</string>
+    <string name="key_no_spoilers_mode">no_spoilers_mode</string>
+    <string name="key_enable_alerts">pref_enable_alerts</string>
+    <string name="key_chips_for_rnba_originals">chips_for_rnba_originals</string>
+    <string name="key_triple_double_alert">triple_double_alert</string>
+    <string name="key_quadruple_double_alert">quadruple_double_alert</string>
+    <string name="key_5x5_alert">five_x_five_alert</string>
+
 
     <string name="title_settings_start">Game Starting</string>
     <string name="dialog_settings_start">Pick teams to receive alerts</string>
@@ -439,13 +451,13 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        • Added logos in standings\n•
-        Added team totals to the box score\n•
-        Box score now uses cached data\n•
-        Opening a game\'s detail screen shows the post game thread if the game is over\n•
-        Fixed wrong game times in some timezones\n•
-        Fixed loading errors for some videos\n•
-        Fixed crashes on KitKat devices\n•
+        • New setting to hide scores\n•
+        Delay live game thread comments\n•
+        New setting to open box score by default\n•
+        Added sorting options for highlights\n•
+        Added alerts for triple/quadruple doubles and 5x5s\n•
+        Favorite team\'s subreddit is now pinned at the top\n•
+        New setting to replace /r/NBA originals with chips\n•
         Minor bug fixes and UI improvements
     </string>
     <string name="submitted_comment">Submitted comment</string>
@@ -453,4 +465,31 @@
     <string name="could_not_save_comment_missing_submmission">Couldn\'t save comment, missing submission</string>
 
     <string name="box_score_team_score">%1$s (%2$d)</string> <!-- SAS (90) -->
+    <string name="daily_locker_room">DAILY LOCKER ROOM</string>
+    <string name="power_rankings">POWER RANKINGS</string>
+    <string name="trash_talk_thread">TRASH TALK THREAD</string>
+    <string name="free_talk_friday">FREE TALK FRIDAY</string>
+    <string name="stream">stream</string>
+    <string name="add_delay">Add delay</string>
+    <string name="worried_about_spoilers">Worried about spoilers?</string>
+    <string name="add_a_delay_to_these_comments">Add a delay to these comments</string>
+    <string name="help_support_swish">Help support Swish</string>
+    <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>. Help support the app and get these awesome benefits:</string>
+    <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
+    <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
+    <string name="swish_card_highlight_sorting_action">Explore premium</string>
+    <string name="triple_doubles">Triple Doubles</string>
+    <string name="quadruple_doubles">Quadruple Doubles</string>
+    <string name="five_x_fives">5x5\'s</string>
+
+    <string-array name="add_delay_options">
+        <item>None</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>2 minute</item>
+        <item>5 minute</item>
+    </string-array>
 </resources>

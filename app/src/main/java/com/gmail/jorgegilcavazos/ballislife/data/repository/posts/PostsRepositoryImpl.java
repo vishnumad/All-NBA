@@ -74,4 +74,13 @@ public class PostsRepositoryImpl implements PostsRepository {
     public void clearCache() {
         cachedSubmissionWrappers.clear();
     }
+
+    @Override
+    public Sorting getCurrentSorting() {
+        if (paginator != null) {
+            return paginator.getSorting();
+        } else {
+            return null;
+        }
+    }
 }

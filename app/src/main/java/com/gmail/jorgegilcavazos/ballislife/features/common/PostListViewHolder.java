@@ -169,7 +169,8 @@ public class PostListViewHolder extends RecyclerView.ViewHolder {
 
         if (isDisplayedInList) {
             // Enable buttons to navigate to SubmissionActivity.
-            contentContainer.setOnClickListener(v -> submissionClickListener.onSubmissionClick(submissionWrapper));
+            contentContainer.setOnClickListener(v ->
+                    submissionClickListener.onSubmissionClick(submissionWrapper.getId()));
         }
     }
 

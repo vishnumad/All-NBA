@@ -14,7 +14,7 @@
         <item name="commentBackgroundDark">@color/commentBgSelectedLight</item>
         <item name="iconTint">@color/active_icon</item>
         <item name="separator">@color/dividerLight</item>
-        <item name="cardsDialog">#FFFFFF</item>
+        <item name="cardsDialog">@color/cardBackgroundLight</item>
 
         <!-- Box score drawables -->
         <item name="boxScoreSquareWhite">@drawable/square_white</item>
@@ -35,7 +35,7 @@
         <item name="commentBackgroundDark">@color/commentBgSelectedDark</item>
         <item name="iconTint">@color/active_icon_dark</item>
         <item name="separator">@color/dividerDark</item>
-        <item name="cardsDialog">#424242</item>
+        <item name="cardsDialog">@color/cardBackgroundDark</item>
 
         <!-- Box score drawables -->
         <item name="boxScoreSquareWhite">@drawable/square_white_dark</item>
@@ -62,10 +62,5 @@
     <style name="AppTheme.PopupOverlay.Light" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="AppTheme.PopupOverlay.Dark" parent="ThemeOverlay.AppCompat.Dark"/>
-
-    <style name="AppTheme.NoActionBar.Dark" parent="AppTheme.NoActionBar">
-        <item name="colorPrimary">@color/tricornBlack</item>
-        <item name="colorPrimaryDark">@color/tricornBlackDark</item>
-    </style>
 
 </resources>

@@ -17,6 +17,7 @@ data class SubmissionWrapper(val id: String,
   var domain: String? = null
   var isSelfPost: Boolean = false
   var isStickied: Boolean = false
+  var isHidden: Boolean = false
   var score: Int = 0
   var commentCount: Int = 0
   var thumbnail: String? = null
@@ -32,6 +33,7 @@ data class SubmissionWrapper(val id: String,
     domain = submission?.domain
     isSelfPost = submission?.isSelfPost == true
     isStickied = submission?.isStickied == true
+    isHidden = submission?.isHidden == true
     score = submission?.score ?: 0
     commentCount = submission?.commentCount ?: 0
     thumbnail = submission?.thumbnail
