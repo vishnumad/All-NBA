@@ -37,6 +37,10 @@ class HighlightsRepositoryImpl @Inject constructor(
   }
 
   override fun next(): Single<List<Highlight>> {
+    if (lastHighlightScore < 0 || lastHighlightTimestamp < 0) {
+      return Single.just(emptyList())
+    }
+
     val source = when (sorting) {
       Sorting.NEW -> {
         highlightsService.getAllHighlights(
