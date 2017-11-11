@@ -14,6 +14,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 
@@ -114,6 +115,8 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
                     public void onError(Throwable e) {
                         if (!networkUtils.isNetworkAvailable()) {
                             view.showNoNetAvailable();
+                        } else if (e instanceof NoSuchElementException) {
+                            view.showNoHighlightsAvailable();
                         } else {
                             view.showErrorLoadingHighlights(errorHandler.handleError(e));
                         }
