@@ -1,6 +1,5 @@
 package com.gmail.jorgegilcavazos.ballislife.util
 
-import android.util.Log
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -17,8 +16,6 @@ class ErrorHandlerImpl @Inject constructor(
       is HttpException -> t.code()
       is SocketTimeoutException -> SOCKET_TIMEOUT
       else -> {
-        crashReporter.logcat(Log.ERROR, "ErrorHandlerImpl", "Non-fatal error")
-        crashReporter.report(t)
         -1
       }
     }
