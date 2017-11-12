@@ -140,9 +140,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             } else {
                 item = commentsList.get(position);
             }
+            String submissionAuthor = null;
+            if (submissionWrapper != null) {
+                submissionAuthor = submissionWrapper.getAuthor();
+            }
             commentHolder.bindData(context, item, localRepository, commentSaves,
                     commentUnsaves, upvotes, downvotes, novotes, replies, commentCollapses,
-                    commentUnCollapses);
+                    commentUnCollapses, submissionAuthor);
         } else if (holder instanceof LoadMoreCommentsViewHolder) {
             if (hasHeader) {
                 ((LoadMoreCommentsViewHolder) holder).bindData(commentsList.get(position - 1),
@@ -410,8 +414,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                              PublishSubject<CommentWrapper> upvotes,
                              PublishSubject<CommentWrapper> downvotes,
                              PublishSubject<CommentWrapper> novotes,
-                             PublishSubject<CommentWrapper> replies, PublishSubject<String>
-                                     commentCollapses, PublishSubject<String> commentUncollapses) {
+                             PublishSubject<CommentWrapper> replies,
+                             PublishSubject<String> commentCollapses,
+                             PublishSubject<String> commentUncollapses,
+                             String submissionAuthor) {
             final CommentItem commentItem = threadItem.getCommentItem();
             final CommentWrapper comment = commentItem.getCommentWrapper();
             int depth = commentItem.getDepth();
@@ -430,6 +436,16 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             int flairRes = RedditUtils.getFlairFromCss(cssClass);
 
             authorTextView.setText(author);
+            if (comment.getAuthor().equals(submissionAuthor)) {
+                authorTextView.setTextColor(
+                        ContextCompat.getColor(itemView.getContext(), R.color.redditAuthor));
+            } else if (comment.getAuthor().equals(localRepository.getUsername())) {
+                authorTextView.setTextColor(
+                        ContextCompat.getColor(itemView.getContext(), R.color.redditMe));
+            } else {
+                authorTextView.setTextColor(textColor);
+            }
+
             bodyTextView.setOnTouchListener((v, event) -> {
                 boolean ret = false;
                 CharSequence text = ((TextView) v).getText();

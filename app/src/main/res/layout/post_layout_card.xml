@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:text="jorgegil96"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="@color/blue"
+                    android:textColor="@color/redditAuthor"
                     android:textSize="10sp"
                     android:textStyle="bold"/>
 
