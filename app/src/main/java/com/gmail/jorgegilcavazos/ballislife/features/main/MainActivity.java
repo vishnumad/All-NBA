@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
+import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -50,6 +51,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -65,8 +68,6 @@ import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
 public class MainActivity extends BaseNoActionBarActivity {
-    private static final String TAG = "MainActivity";
-
     private static final String SHOW_TOUR = "showTourTag";
     private static final String SHOW_WHATS_NEW = "showWhatsNew";
 
@@ -121,6 +122,8 @@ public class MainActivity extends BaseNoActionBarActivity {
         ButterKnife.bind(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Fabric.with(this, new Crashlytics());
+
+        setupRemoteConfig();
 
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {
@@ -738,5 +741,25 @@ public class MainActivity extends BaseNoActionBarActivity {
                 }
             }
         }
+    }
+
+    private void setupRemoteConfig() {
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        FirebaseRemoteConfig.getInstance().setConfigSettings(configSettings);
+        FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
+
+        int cacheExpiration = 3600 * 12; // 12 hours.
+        if (FirebaseRemoteConfig.getInstance().getInfo().getConfigSettings()
+                .isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        FirebaseRemoteConfig.getInstance().fetch(cacheExpiration)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseRemoteConfig.getInstance().activateFetched();
+                    }
+                });
     }
 }

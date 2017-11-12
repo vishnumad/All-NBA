@@ -2,21 +2,26 @@ package com.gmail.jorgegilcavazos.ballislife.data.repository.boxscore
 
 import android.support.annotation.VisibleForTesting
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaService
 import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreUIModel
-import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues
+import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreResponse
+import com.gmail.jorgegilcavazos.ballislife.util.Constants
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import com.google.common.base.Optional
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 @Singleton
 class BoxScoreRepositoryImpl @Inject constructor(
 		private val nbaGamesService: NbaGamesService,
+		private val nbaService: NbaService,
 		private val schedulerProvider: BaseSchedulerProvider) : BoxScoreRepository {
 
-	private val boxScoreMap = HashMap<String, BoxScoreValues>()
+	private val boxScoreMap = HashMap<String, BoxScoreResponse>()
 
 	override fun boxScore(gameId: String, forceNetwork: Boolean): Observable<BoxScoreUIModel> {
 		val network = networkSource(gameId)
@@ -52,19 +57,26 @@ class BoxScoreRepositoryImpl @Inject constructor(
 		}
 	}
 
-	private fun memorySource(gameId: String): Single<Optional<BoxScoreValues>> {
+	private fun memorySource(gameId: String): Single<Optional<BoxScoreResponse>> {
 		return Single.just(Optional.fromNullable(boxScoreMap[gameId]))
 	}
 
-	private fun networkSource(gameId: String): Single<Optional<BoxScoreValues>> {
-		return nbaGamesService.boxScore(gameId)
+	private fun networkSource(gameId: String): Single<Optional<BoxScoreResponse>> {
+    val source = if (FirebaseRemoteConfig.getInstance()
+        .getBoolean(Constants.USE_SWISH_BACKEND_BOX_SCORE)) {
+      nbaGamesService.boxScore(gameId)
+    } else {
+      nbaService.boxScoreNba(gameId)
+    }
+
+		return source
 				.doOnSuccess { boxScoreMap[gameId] = it }
 				.map { Optional.of(it) }
-				.onErrorReturn { Optional.absent<BoxScoreValues>() }
+				.onErrorReturn { Optional.absent<BoxScoreResponse>() }
 	}
 
 	@VisibleForTesting
-	fun saveBoxScoreInCache(gameId: String, boxScore: BoxScoreValues) {
+	fun saveBoxScoreInCache(gameId: String, boxScore: BoxScoreResponse) {
 		boxScoreMap[gameId] = boxScore
 	}
 }

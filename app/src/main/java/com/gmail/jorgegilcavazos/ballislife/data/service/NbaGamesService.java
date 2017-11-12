@@ -1,6 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.service;
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
+import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreResponse;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 
 import java.util.Map;
@@ -17,7 +17,6 @@ public interface NbaGamesService {
             @Query("orderBy") String orderBy,
             @Query("startAt") long startAt, @Query("endAt") long endAt);
 
-    @GET("boxscore/{gameId}/g.json")
-    Single<BoxScoreValues> boxScore(@Path("gameId") String gameId);
-
+    @GET("boxscore/{gameId}/.json")
+    Single<BoxScoreResponse> boxScore(@Path("gameId") String gameId);
 }
