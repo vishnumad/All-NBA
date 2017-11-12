@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.boxscore
 
 import android.support.annotation.VisibleForTesting
+import com.gmail.jorgegilcavazos.ballislife.data.firebase.remoteconfig.RemoteConfig
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaService
 import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreUIModel
@@ -8,7 +9,6 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreResponse
 import com.gmail.jorgegilcavazos.ballislife.util.Constants
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import com.google.common.base.Optional
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -19,7 +19,8 @@ import javax.inject.Singleton
 class BoxScoreRepositoryImpl @Inject constructor(
 		private val nbaGamesService: NbaGamesService,
 		private val nbaService: NbaService,
-		private val schedulerProvider: BaseSchedulerProvider) : BoxScoreRepository {
+		private val schedulerProvider: BaseSchedulerProvider,
+    private val remoteConfig: RemoteConfig) : BoxScoreRepository {
 
 	private val boxScoreMap = HashMap<String, BoxScoreResponse>()
 
@@ -62,8 +63,7 @@ class BoxScoreRepositoryImpl @Inject constructor(
 	}
 
 	private fun networkSource(gameId: String): Single<Optional<BoxScoreResponse>> {
-    val source = if (FirebaseRemoteConfig.getInstance()
-        .getBoolean(Constants.USE_SWISH_BACKEND_BOX_SCORE)) {
+    val source = if (remoteConfig.getBoolean(Constants.USE_SWISH_BACKEND_BOX_SCORE)) {
       nbaGamesService.boxScore(gameId)
     } else {
       nbaService.boxScoreNba(gameId)

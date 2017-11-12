@@ -2,6 +2,8 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.module;
 
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions;
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActionsImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.firebase.remoteconfig.RemoteConfig;
+import com.gmail.jorgegilcavazos.ballislife.data.firebase.remoteconfig.RemoteConfigImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -89,4 +91,7 @@ public abstract class BindModule {
     @Binds
     public abstract BoxScoreRepository bindBoxScoreRepository(
             BoxScoreRepositoryImpl boxScoreRepositoryImpl);
+
+    @Binds
+    public abstract RemoteConfig bindRemoteConfig(RemoteConfigImpl remoteConfigImpl);
 }
