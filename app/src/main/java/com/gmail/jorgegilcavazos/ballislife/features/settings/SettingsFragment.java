@@ -1,5 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.settings;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,6 +18,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -36,6 +41,7 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
     public static final String KEY_OPEN_BOX_SCORE_DEFAULT = "open_box_score_default";
     public static final String KEY_NO_SPOILERS_MODE = "no_spoilers_mode";
+    public static final String KEY_DARK_THEME = "dark_theme";
     public static final String KEY_CHIPS_FOR_RNBA_ORIGINALS = "chips_for_rnba_originals";
     public static final String KEY_TRIPLE_DOUBLES = "triple_double_alert";
     public static final String KEY_QUADRUPLE_DOUBLES = "quadruple_double_alert";
@@ -110,6 +116,15 @@ public class SettingsFragment extends PreferenceFragment
                     startActivity(intent);
                 }
                 break;
+            case KEY_DARK_THEME:
+                SwitchPreference darkTheme = (SwitchPreference) preference;
+                if (darkTheme.isChecked()) {
+                    localRepository.saveAppTheme(SwishTheme.DARK);
+                } else {
+                    localRepository.saveAppTheme(SwishTheme.LIGHT);
+                }
+                restartApp();
+                break;
             case KEY_TRIPLE_DOUBLES:
                 SwitchPreference tripDouble = (SwitchPreference) preference;
                 if (!settingsActivity.isPremium() && tripDouble.isChecked()) {
@@ -159,6 +174,17 @@ public class SettingsFragment extends PreferenceFragment
                 }
                 break;
         }
+    }
+
+    private void restartApp() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 12345,
+                intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        if (mgr != null) {
+            mgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 100, pendingIntent);
+        }
+        getActivity().finishAffinity();
     }
 
     @Override
@@ -230,6 +256,14 @@ public class SettingsFragment extends PreferenceFragment
                 preference.setSummary(getTeamName(listPreference.getValue()));
             } else if (listPreference.getKey().equals(KEY_STARTUP_FRAGMENT)) {
                 preference.setSummary(getStartupFragmentTextRes(listPreference.getValue()));
+            }
+        }
+        if (preference.getKey().equals(KEY_DARK_THEME) && preference instanceof SwitchPreference) {
+            SwitchPreference darkTheme = (SwitchPreference) preference;
+            if (localRepository.getAppTheme() == SwishTheme.DARK) {
+                darkTheme.setChecked(true);
+            } else {
+                darkTheme.setChecked(false);
             }
         }
     }

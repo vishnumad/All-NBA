@@ -145,6 +145,7 @@
     <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
     <string name="pref_no_spoilers_mode">Hide Scores</string>
     <string name="pref_open_box_score_default">Open Box Score by Default</string>
+    <string name="pref_dark_theme">Dark Theme</string>
 
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
@@ -159,6 +160,7 @@
     <string name="key_triple_double_alert">triple_double_alert</string>
     <string name="key_quadruple_double_alert">quadruple_double_alert</string>
     <string name="key_5x5_alert">five_x_five_alert</string>
+    <string name="key_dark_theme">dark_theme</string>
 
 
     <string name="title_settings_start">Game Starting</string>

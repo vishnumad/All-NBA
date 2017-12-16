@@ -34,6 +34,11 @@
             android:key="@string/key_no_spoilers_mode"
             android:title="@string/pref_no_spoilers_mode" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_dark_theme"
+            android:title="@string/pref_dark_theme"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
