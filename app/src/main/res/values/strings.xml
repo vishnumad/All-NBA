@@ -481,6 +481,7 @@
     <string name="triple_doubles">Triple Doubles</string>
     <string name="quadruple_doubles">Quadruple Doubles</string>
     <string name="five_x_fives">5x5\'s</string>
+    <string name="click_to_view_table">Click to view table</string>
 
     <string-array name="add_delay_options">
         <item>None</item>

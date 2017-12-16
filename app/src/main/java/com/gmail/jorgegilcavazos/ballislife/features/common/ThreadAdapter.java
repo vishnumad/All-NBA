@@ -3,11 +3,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.common;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.text.Spannable;
-import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -113,10 +109,10 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         if (viewType == SUBMISSION_HEADER.getValue()) {
             view = inflater.inflate(R.layout.post_layout_card, parent, false);
-            return new FullCardViewHolder(view, textColor);
+            return new FullCardViewHolder(view, textColor, localRepository.getAppTheme());
         } else if (viewType == COMMENT.getValue()) {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
-            return new CommentViewHolder(view, textColor);
+            return new CommentViewHolder(view, textColor, localRepository.getAppTheme());
         } else if (viewType == LOAD_MORE_COMMENTS.getValue()) {
             view = inflater.inflate(R.layout.layout_load_more_comments, parent, false);
             return new LoadMoreCommentsViewHolder(view, localRepository.getAppTheme());
@@ -388,7 +384,7 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.comment_author) TextView authorTextView;
         @BindView(R.id.comment_score) TextView scoreTextView;
         @BindView(R.id.comment_timestamp) TextView timestampTextView;
-        @BindView(R.id.comment_body) TextView bodyTextView;
+        @BindView(R.id.bodyTextContainer) LinearLayout bodyTextContainer;
         @BindView(R.id.comment_flair) TextView flairTextView;
         @BindView(R.id.image_flair) ImageView ivFlair;
         @BindView(R.id.layout_comment_actions) LinearLayout rlCommentActions;
@@ -399,11 +395,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @BindView(R.id.collapsedIndicator) TextView collapseIndicator;
 
         private int textColor;
+        private SwishTheme swishTheme;
 
-        public CommentViewHolder(View view, int textColor) {
+        public CommentViewHolder(View view, int textColor, SwishTheme swishTheme) {
             super(view);
             ButterKnife.bind(this, view);
             this.textColor = textColor;
+            this.swishTheme = swishTheme;
         }
 
         public void bindData(final Context context,
@@ -422,12 +420,6 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             final CommentWrapper comment = commentItem.getCommentWrapper();
             int depth = commentItem.getDepth();
             String author = comment.getAuthor();
-            CharSequence body;
-            if (StringUtils.Companion.isNullOrEmpty(comment.getBodyHtml())) {
-                body = comment.getBody();
-            } else {
-                body = RedditUtils.bindSnuDown(comment.getBodyHtml());
-            }
             String timestamp = DateFormatUtil.formatRedditDate(comment.getCreated());
             String score = String.valueOf(comment.getScore());
             String flair = RedditUtils.parseNbaFlair(String.valueOf(comment.getAuthorFlair()));
@@ -446,39 +438,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 authorTextView.setTextColor(textColor);
             }
 
-            bodyTextView.setOnTouchListener((v, event) -> {
-                boolean ret = false;
-                CharSequence text = ((TextView) v).getText();
-                Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
-                TextView widget = (TextView) v;
-                int action = event.getAction();
-
-                if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
-                    int x = (int) event.getX();
-                    int y = (int) event.getY();
-
-                    x -= widget.getTotalPaddingLeft();
-                    y -= widget.getTotalPaddingTop();
-
-                    x += widget.getScrollX();
-                    y += widget.getScrollY();
-
-                    Layout layout = widget.getLayout();
-                    int line = layout.getLineForVertical(y);
-                    int off = layout.getOffsetForHorizontal(line, x);
-
-                    ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
-
-                    if (link.length != 0) {
-                        if (action == MotionEvent.ACTION_UP) {
-                            link[0].onClick(widget);
-                        }
-                        ret = true;
-                    }
-                }
-                return ret;
-            });
-            bodyTextView.setText(body);
+            RedditUtils.renderBody(itemView.getContext(), swishTheme, bodyTextContainer,
+                    comment.getBodyHtml(), RedditUtils.BodyType.COMMENT);
             timestampTextView.setText(timestamp);
             scoreTextView.setText(context.getString(R.string.points, score));
             if (flairRes != -1) {

@@ -6,10 +6,6 @@ import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Layout;
-import android.text.Spannable;
-import android.text.style.ClickableSpan;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,6 +15,7 @@ import android.widget.TextView;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
@@ -47,18 +44,20 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.text_points) TextView tvPoints;
     public @BindView(R.id.button_downvote) ImageButton btnDownvote;
     public @BindView(R.id.button_save) ImageButton btnSave;
-    public @BindView(R.id.text_body) TextView tvBody;
     public @BindView(R.id.content_link) LinearLayout containerLink;
     public @BindView(R.id.text_domain_link) TextView tvDomainLink;
     public @BindView(R.id.text_link) TextView tvLink;
-    public @BindView(R.id.header_layout) View  headerLayout;
+    public @BindView(R.id.header_layout) View headerLayout;
+    public @BindView(R.id.bodyTextContainer) LinearLayout bodyTextContainer;
 
     private int textColor;
+    private SwishTheme swishTheme;
 
-    public FullCardViewHolder(View itemView, int textColor) {
+    public FullCardViewHolder(View itemView, int textColor, SwishTheme swishTheme) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         this.textColor = textColor;
+        this.swishTheme = swishTheme;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -90,7 +89,8 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         isSaved = submissionWrapper.isSaved();
         vote = submissionWrapper.getVoteDirection();
 
-        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl = Utilities.getThumbnailToShowFromCustomSubmission(submissionWrapper);
+        Optional<Pair<Utilities.ThumbnailType, String>> thumbnailTypeUrl =
+                Utilities.getThumbnailToShowFromCustomSubmission(submissionWrapper);
         thumbnailToShow = thumbnailTypeUrl.isPresent() ? thumbnailTypeUrl.get().second : null;
 
         // Bind data to views.
@@ -104,51 +104,20 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         tvTimestamp.setText(DateFormatUtil.formatRedditDate(new Date(timestamp)));
         tvPoints.setText(score);
 
-        tvBody.setOnTouchListener((v, event) -> {
-            boolean ret = false;
-            CharSequence text = ((TextView) v).getText();
-            Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
-            TextView widget = (TextView) v;
-            int action = event.getAction();
-
-            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
-                int x = (int) event.getX();
-                int y = (int) event.getY();
-
-                x -= widget.getTotalPaddingLeft();
-                y -= widget.getTotalPaddingTop();
-
-                x += widget.getScrollX();
-                y += widget.getScrollY();
-
-                Layout layout = widget.getLayout();
-                int line = layout.getLineForVertical(y);
-                int off = layout.getOffsetForHorizontal(line, x);
-
-                ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
-
-                if (link.length != 0) {
-                    if (action == MotionEvent.ACTION_UP) {
-                        link[0].onClick(widget);
-                    }
-                    ret = true;
-                }
-            }
-            return ret;
-        });
-
         if (isSelf) {
             if (!StringUtils.Companion.isNullOrEmpty(selfTextHtml)) {
-                tvBody.setVisibility(View.VISIBLE);
-                tvBody.setText(RedditUtils.bindSnuDown(selfTextHtml));
+                bodyTextContainer.setVisibility(View.VISIBLE);
+                RedditUtils.renderBody(itemView.getContext(), swishTheme, bodyTextContainer,
+                        selfTextHtml, RedditUtils.BodyType.SUBMISSION);
+
             } else {
-                tvBody.setVisibility(View.GONE);
+                bodyTextContainer.setVisibility(View.GONE);
             }
             tvDomain.setText(R.string.self);
             ivThumbnail.setVisibility(View.GONE);
             containerLink.setVisibility(View.GONE);
         } else {
-            tvBody.setVisibility(View.GONE);
+            bodyTextContainer.setVisibility(View.GONE);
             tvDomain.setText(domain);
             if (thumbnailToShow != null) {
                 ivThumbnail.setVisibility(View.VISIBLE);
@@ -177,7 +146,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         } else if (vote == VoteDirection.DOWNVOTE) {
             setDownvotedColors(context);
         } else {
-            setNoVoteColors(context);
+            setNoVoteColors();
         }
 
         // Set saved button color depending on whether the submission has been saved.
@@ -192,7 +161,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
                 submissionNovotes.onNext(submissionWrapper.getSubmission());
                 if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(context);
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.DOWNVOTE) {
                 submissionUpvotes.onNext(submissionWrapper.getSubmission());
@@ -214,7 +183,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
                 submissionNovotes.onNext(submissionWrapper.getSubmission());
                 if (!StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
                     submissionWrapper.setVoteDirection(VoteDirection.NO_VOTE);
-                    setNoVoteColors(context);
+                    setNoVoteColors();
                 }
             } else if (submissionWrapper.getVoteDirection() == VoteDirection.UPVOTE) {
                 submissionDownvotes.onNext(submissionWrapper.getSubmission());
@@ -264,7 +233,7 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
         tvPoints.setTextColor(ContextCompat.getColor(context, R.color.commentDownvoted));
     }
 
-    private void setNoVoteColors(Context context) {
+    private void setNoVoteColors() {
         setUpvoteIcon(false);
         setDownvoteIcon(false);
         tvPoints.setTextColor(textColor);

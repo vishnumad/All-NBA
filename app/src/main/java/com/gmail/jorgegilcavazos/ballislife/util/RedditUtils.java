@@ -1,9 +1,22 @@
 package com.gmail.jorgegilcavazos.ballislife.util;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.text.Html;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.style.ClickableSpan;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadSummary;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 
 import net.dean.jraw.models.Submission;
 
@@ -11,6 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class RedditUtils {
+
+    public enum BodyType {
+        SUBMISSION, COMMENT
+    }
+
     public final static String LIVE_GT_TYPE = "LIVE_GAME_THREAD";
     public final static String POST_GT_TYPE = "POST_GAME_THREAD";
 
@@ -119,7 +137,7 @@ public final class RedditUtils {
             rawHtml = rawHtml.substring(0, rawHtml.lastIndexOf("\n"));
         }
 
-        return trim(Html.fromHtml(noTrailingwhiteLines(rawHtml)));
+        return trim(Html.fromHtml(noTrailingWhiteLines(rawHtml)));
     }
 
     public static CharSequence trim(CharSequence s) {
@@ -136,8 +154,11 @@ public final class RedditUtils {
         return s.subSequence(start, end);
     }
 
-    public static String noTrailingwhiteLines(String text) {
-        while (text.charAt(text.length() - 1) == '\n') {
+    public static String noTrailingWhiteLines(String text) {
+        if (text == null || text.isEmpty() || text.equals("") || text.length() == 0) {
+            return text;
+        }
+        while (text.length() > 0 && text.charAt(text.length() - 1) == '\n') {
             text = text.substring(0, text.length() - 1);
         }
         return text;
@@ -156,6 +177,124 @@ public final class RedditUtils {
         String capsTeam = fullTeamName.toUpperCase(); // Ex. "SAN ANTONIO SPURS".
         String capsName = capsTeam.substring(capsTeam.lastIndexOf(" ") + 1); // Ex. "SPURS".
         return capsTitle.contains(capsName);
+    }
+
+    /**
+     * Renders the reddit html body into a linear layout using the appropriate theme styles.
+     * The html body is decomposed into blocks and rendered based on the block type, e.g. if its
+     * a table, a custom "click to view" layout is shown.
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    public static void renderBody(
+            Context context,
+            SwishTheme swishTheme,
+            LinearLayout container,
+            String textHtml,
+            BodyType bodyType) {
+        container.removeAllViews();
+
+        List<String> blocks = SubmissionParser.getBlocks(textHtml);
+
+        for (String block: blocks) {
+            if (block.startsWith("<table")) {
+                // Define style options based on theme.
+                int viewTableLayoutBorder;
+                String textColorHex;
+                String backgroundColorHex;
+                if (swishTheme == SwishTheme.LIGHT) {
+                    viewTableLayoutBorder = R.drawable.square_border_light;
+                    textColorHex = "#000000";
+                    backgroundColorHex = "#FFFFFF";
+                } else {
+                    viewTableLayoutBorder = R.drawable.square_border_night;
+                    textColorHex = "#FFFFFF";
+                    backgroundColorHex = "#424242";
+                }
+
+                // Add CSS to HTML table.
+                String styledTable = "<html><head>" +
+                        "<style type=\"text/css\">" +
+                        "body{color: " + textColorHex + "; background-color: "
+                        + backgroundColorHex + "; font-size: small} " +
+                        "table{table-layout:fixed; border-collapse: collapse; font-size: small;} " +
+                        "td{white-space: nowrap; max-width: 100%} " +
+                        "table, th, td {border: 1px solid gray;}" +
+                        "th, td {padding: 5px; text-align: left;}" +
+                        "</style></head><body>" + block + "</body></html>";
+
+                // "Click to view table" layout.
+                View tableBlock = LayoutInflater.from(context)
+                        .inflate(R.layout.submission_body_table_layout, null, false);
+                if (tableBlock != null) {
+                    tableBlock.setBackgroundResource(viewTableLayoutBorder);
+
+                    // Open dialog that renders html on click.
+                    tableBlock.setOnClickListener(v -> {
+                        MaterialDialog dialog = new MaterialDialog.Builder(context)
+                                .customView(R.layout.submission_body_table_dialog, true)
+                                .build();
+
+                        WebView webView = (WebView) dialog.getCustomView();
+                        if (webView != null) {
+                            webView.loadData(styledTable, "text/html", "UTF-8");
+                        }
+
+                        dialog.show();
+                    });
+                }
+
+                container.addView(tableBlock);
+            } else {
+                int layoutRes;
+                switch (bodyType) {
+                    case SUBMISSION:
+                        layoutRes = R.layout.submission_body_block_layout;
+                        break;
+                    case COMMENT:
+                        layoutRes = R.layout.comment_body_block_layout;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid body type:" + bodyType);
+                }
+
+                TextView textBlock = (TextView) LayoutInflater.from(context)
+                        .inflate(layoutRes, null, false);
+                textBlock.setOnTouchListener((v, event) -> {
+                    boolean ret = false;
+                    CharSequence text = ((TextView) v).getText();
+                    Spannable stext = Spannable.Factory.getInstance().newSpannable(text);
+                    TextView widget = (TextView) v;
+                    int action = event.getAction();
+
+                    if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+                        int x = (int) event.getX();
+                        int y = (int) event.getY();
+
+                        x -= widget.getTotalPaddingLeft();
+                        y -= widget.getTotalPaddingTop();
+
+                        x += widget.getScrollX();
+                        y += widget.getScrollY();
+
+                        Layout layout = widget.getLayout();
+                        int line = layout.getLineForVertical(y);
+                        int off = layout.getOffsetForHorizontal(line, x);
+
+                        ClickableSpan[] link = stext.getSpans(off, off, ClickableSpan.class);
+
+                        if (link.length != 0) {
+                            if (action == MotionEvent.ACTION_UP) {
+                                link[0].onClick(widget);
+                            }
+                            ret = true;
+                        }
+                    }
+                    return ret;
+                });
+                textBlock.setText(bindSnuDown(block));
+                container.addView(textBlock);
+            }
+        }
     }
 
     public static int getTeamLogo(String subreddit) {
