@@ -41,6 +41,14 @@ class GamesPresenter @Inject constructor(
         }
         .addTo(disposables)
 
+    view.dateSelectedUiEvents()
+        .subscribe { event ->
+          calendar.time = event.date.time
+          view.hideGames()
+          loadGames()
+        }
+        .addTo(disposables)
+
     view.gameClicks()
         .subscribe { view.showGameDetails(it, calendar.time.time) }
         .addTo(disposables)

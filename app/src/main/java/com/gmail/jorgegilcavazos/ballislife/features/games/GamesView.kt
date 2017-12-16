@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.DateSelectedEvent
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import io.reactivex.Observable
 
@@ -10,6 +11,8 @@ interface GamesView {
   fun nextDayClicks(): Observable<Any>
 
   fun gameClicks(): Observable<GameV2>
+
+  fun dateSelectedUiEvents(): Observable<DateSelectedEvent>
 
   fun setLoadingIndicator(active: Boolean)
 

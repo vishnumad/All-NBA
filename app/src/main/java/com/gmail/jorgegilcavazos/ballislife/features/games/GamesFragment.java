@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -13,21 +14,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.DateSelectedEvent;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxrelay2.PublishRelay;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,7 +46,7 @@ import io.reactivex.Observable;
  * Displays a list of {@link NbaGame}s for the selected date.
  */
 public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLayout
-        .OnRefreshListener {
+        .OnRefreshListener, DatePickerDialog.OnDateSetListener {
     private static final String SELECTED_TIME = "SelectedTime";
     private static final String LIST_STATE = "ListState";
     public final static String TAG = "GamesFragment";
@@ -56,7 +61,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
 
     @BindView(R.id.navigator_button_left) ImageButton btnPrevDay;
     @BindView(R.id.navigator_button_right) ImageButton btnNextDay;
-    @BindView(R.id.navigator_text) TextView tvNavigatorDate;
+    @BindView(R.id.navigatorText) TextView navigatorText;
     @BindView(R.id.no_games_text) TextView tvNoGames;
     @BindView(R.id.games_rv) RecyclerView rvGames;
     @BindView(R.id.swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
@@ -66,6 +71,8 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     private GameAdapter gameAdapter;
     private Snackbar snackbar;
     private Unbinder unbinder;
+
+    private PublishRelay<DateSelectedEvent> dateSelectedUiEvent = PublishRelay.create();
 
     public GamesFragment() {
         // Required empty public constructor.
@@ -102,6 +109,19 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
             presenter.setSelectedDate(savedInstanceState.getLong(SELECTED_TIME));
         }
 
+        navigatorText.setOnClickListener(v -> {
+            Calendar today = Calendar.getInstance();
+            DatePickerDialog datePicker = new DatePickerDialog(
+                    getActivity(),
+                    this,
+                    today.get(Calendar.YEAR),
+                    today.get(Calendar.MONTH),
+                    today.get(Calendar.DAY_OF_MONTH));
+            // First available game in backend.
+            datePicker.getDatePicker().setMinDate(1507204822000L);
+            datePicker.show();
+        });
+
         presenter.attachView(this);
 
         return view;
@@ -137,6 +157,15 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     }
 
     @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        dateSelectedUiEvent.accept(new DateSelectedEvent(calendar));
+    }
+
+    @Override
     public void onRefresh() {
         presenter.loadGames(true);
     }
@@ -157,6 +186,12 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         return gameAdapter.getGameClicks();
     }
 
+    @NotNull
+    @Override
+    public Observable<DateSelectedEvent> dateSelectedUiEvents() {
+        return dateSelectedUiEvent;
+    }
+
     @Override
     public void setLoadingIndicator(boolean active) {
         swipeRefreshLayout.setRefreshing(active);
@@ -164,7 +199,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
 
     @Override
     public void setDateNavigatorText(String dateText) {
-        tvNavigatorDate.setText(dateText);
+        navigatorText.setText(dateText);
     }
 
     @Override
