@@ -1,17 +1,14 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
-import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
-import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
+import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
@@ -22,150 +19,162 @@ import java.util.*
 class GamesPresenterTest {
 
   @Mock private lateinit var mockView: GamesView
-  @Mock private lateinit var mockRepository: GamesRepository
+  @Mock private lateinit var mockGamesModelTransformer: GamesModelTransformer
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
 
-  private val prevDayClicks = PublishSubject.create<Any>()
-  private val nextDayClicks = PublishSubject.create<Any>()
-  private val gameClicks = PublishSubject.create<GameV2>()
+  private val dateSelectionEvents = PublishRelay.create<GamesUiEvent.DateSelectedEvent>()
+  private val loadGamesEvents = PublishRelay.create<GamesUiEvent.LoadGamesEvent>()
+  private val refreshGamesEvents = PublishRelay.create<GamesUiEvent.RefreshGamesEvent>()
+  private val openGameEvents = PublishRelay.create<GamesUiEvent.OpenGameEvent>()
 
   private lateinit var presenter: GamesPresenter
 
   @Before
   fun setup() {
-    `when`(mockView.prevDayClicks()).thenReturn(prevDayClicks)
-    `when`(mockView.nextDayClicks()).thenReturn(nextDayClicks)
-    `when`(mockView.gameClicks()).thenReturn(gameClicks)
-    `when`(mockRepository.games(anyObject(), anyBoolean())).thenReturn(Observable.empty())
+    `when`(mockView.dateSelectionEvents()).thenReturn(dateSelectionEvents)
+    `when`(mockView.loadGamesEvents()).thenReturn(loadGamesEvents)
+    `when`(mockView.refreshGamesEvents()).thenReturn(refreshGamesEvents)
+    `when`(mockView.openGameEvents()).thenReturn(openGameEvents)
 
-    presenter = GamesPresenter(mockRepository, TrampolineSchedulerProvider(), CompositeDisposable(),
-        CompositeDisposable(), mockNetworkUtils, mockErrorHandler)
+    presenter = GamesPresenter(
+        mockGamesModelTransformer,
+        CompositeDisposable(),
+        mockNetworkUtils,
+        mockErrorHandler
+    )
+  }
+
+  @Test
+  fun idleUiModel() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.Idle))
+
     presenter.attachView(mockView)
-  }
 
-  @Test
-  fun hideGamesOnDayNavigation() {
-    prevDayClicks.onNext(Object())
-    nextDayClicks.onNext(Object())
-
-    verify(mockView, times(2)).hideGames()
-  }
-
-  @Test
-  fun setNavigatorDateOnPreviousNav() {
-    val calendar = Calendar.getInstance()
-    calendar.set(Calendar.YEAR, 2017)
-    calendar.set(Calendar.MONTH, Calendar.OCTOBER)
-    calendar.set(Calendar.DAY_OF_MONTH, 11)
-    presenter.setSelectedDate(calendar.timeInMillis)
-
-    prevDayClicks.onNext(Object())
-
-    verify(mockView).setDateNavigatorText("Tuesday, October 10")
-  }
-
-  @Test
-  fun setNavigatorDateOnNextNav() {
-    val calendar = Calendar.getInstance()
-    calendar.set(Calendar.YEAR, 2017)
-    calendar.set(Calendar.MONTH, Calendar.OCTOBER)
-    calendar.set(Calendar.DAY_OF_MONTH, 11)
-    presenter.setSelectedDate(calendar.timeInMillis)
-
-    nextDayClicks.onNext(Object())
-
-    verify(mockView).setDateNavigatorText("Thursday, October 12")
-  }
-
-  @Test
-  fun openGameDetailOnClick() {
-    val game = createGameV2()
-
-    gameClicks.onNext(game)
-
-    verify(mockView).showGameDetails(game, presenter.getSelectedDate())
-  }
-
-  @Test
-  fun showLoadingIndicatorIfEmptyMemoryResult() {
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.just(GamesUiModel.memorySuccess(listOf())))
-
-    presenter.loadGames(false)
-
-    verify(mockView).setLoadingIndicator(true)
     verify(mockView).setNoGamesIndicator(false)
   }
 
   @Test
-  fun hideLoadingIndicatorIfNetworkResult() {
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.just(GamesUiModel.networkSuccess(listOf(createGameV2()))))
+  fun memoryInProgressUiModel() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.MemoryInProgress))
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
+    verify(mockView).setNoGamesIndicator(false)
+    verify(mockView).setDateNavigatorText()
+    verify(mockView).hideGames()
     verify(mockView).setLoadingIndicator(false)
-    verify(mockView).setNoGamesIndicator(false)
+    verify(mockView).dismissSnackbar()
   }
 
   @Test
-  fun showGamesIfResultContainsGames() {
-    val games = listOf(createGameV2())
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.just(GamesUiModel.networkSuccess(games)))
+  fun networkInProgressUiModel() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.NetworkInProgress))
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
     verify(mockView).setNoGamesIndicator(false)
+    verify(mockView).setDateNavigatorText()
+    verify(mockView).dismissSnackbar()
+  }
+
+  @Test
+  fun successUiModel() {
+    val games = listOf(createGameV2(), createGameV2())
+    val date = Calendar.getInstance()
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.Success(games, date)))
+    `when`(mockView.getCurrentDateShown()).thenReturn(date)
+
+    presenter.attachView(mockView)
+
+    verify(mockView).setNoGamesIndicator(false)
+    verify(mockView).setLoadingIndicator(false)
     verify(mockView).showGames(games)
   }
 
   @Test
-  fun showNoGamesIndicatorIfNetworkResultEmpty() {
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.just(GamesUiModel.networkSuccess(listOf())))
+  fun successUiModelButDateChanged() {
+    val games = listOf(createGameV2(), createGameV2())
+    val date = Calendar.getInstance()
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.Success(games, date)))
+    `when`(mockView.getCurrentDateShown()).thenReturn(Calendar.getInstance())
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
-    verify(mockView).setNoGamesIndicator(true)
+    verify(mockView, times(0)).setNoGamesIndicator(false)
+    verify(mockView, times(0)).setLoadingIndicator(false)
+    verify(mockView, times(0)).showGames(games)
   }
 
   @Test
-  fun hideLoadingIndicatorOnError() {
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.error(Exception()))
+  fun noCachedGamesUiModel() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.NoCachedGames))
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
+    verify(mockView).setNoGamesIndicator(false)
+    verify(mockView).setLoadingIndicator(true)
+  }
+
+  @Test
+  fun noGamesUiModel() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.NoGames))
+
+    presenter.attachView(mockView)
+
+    verify(mockView).setNoGamesIndicator(true)
     verify(mockView).setLoadingIndicator(false)
   }
 
   @Test
-  fun showNoNetworkSnackbarIfNetUnavailable() {
-    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(false)
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.error(Exception()))
+  fun failureUiModelWithNetworkAvailable() {
+    val error = Exception()
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.Failure(error)))
+    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(true)
+    `when`(mockErrorHandler.handleError(error)).thenReturn(404)
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
-    verify(mockView).showNoNetSnackbar()
+    verify(mockView).showErrorSnackbar(404)
+    verify(mockView).setNoGamesIndicator(false)
   }
 
   @Test
-  fun showErrorSnackbarIfErrorAndNetAvailable() {
-    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(true)
-    `when`(mockRepository.games(anyObject(), ArgumentMatchers.anyBoolean()))
-        .thenReturn(Observable.error(Exception()))
-    `when`(mockErrorHandler.handleError(anyObject())).thenReturn(404)
+  fun failureUiModelWithNoNetworkAvailable() {
+    val error = Exception()
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.Failure(error)))
+    `when`(mockNetworkUtils.isNetworkAvailable()).thenReturn(false)
 
-    presenter.loadGames(false)
+    presenter.attachView(mockView)
 
-    verify(mockView).showErrorSnackbar(404)
+    verify(mockView).showNoNetSnackbar()
+    verify(mockView).setNoGamesIndicator(false)
+  }
+
+  @Test
+  fun openGameScreenUiModel() {
+    val game = createGameV2()
+    `when`(mockGamesModelTransformer.uiModels(anyObject()))
+        .thenReturn(Observable.just(GamesUiModelV2.OpenGameScreen(game)))
+
+    presenter.attachView(mockView)
+
+    verify(mockView).showGameDetails(game)
   }
 
   @Test
   fun dismissSnackbarOnDetach() {
+    `when`(mockGamesModelTransformer.uiModels(anyObject())).thenReturn(Observable.empty())
+    presenter.attachView(mockView)
     presenter.detachView()
 
     verify(mockView).dismissSnackbar()
@@ -200,7 +209,5 @@ class GamesPresenterTest {
         broadcasters = mapOf())
   }
 
-  private fun <T> anyObject(): T {
-    return Mockito.anyObject<T>()
-  }
+  private fun <T> anyObject(): T = Mockito.anyObject<T>()
 }

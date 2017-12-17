@@ -1,28 +1,29 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
-import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.DateSelectedEvent
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.*
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import io.reactivex.Observable
+import java.util.*
 
 interface GamesView {
 
-  fun prevDayClicks(): Observable<Any>
+  fun openGameEvents(): Observable<OpenGameEvent>
 
-  fun nextDayClicks(): Observable<Any>
+  fun dateSelectionEvents(): Observable<DateSelectedEvent>
 
-  fun gameClicks(): Observable<GameV2>
+  fun loadGamesEvents(): Observable<LoadGamesEvent>
 
-  fun dateSelectedUiEvents(): Observable<DateSelectedEvent>
+  fun refreshGamesEvents(): Observable<RefreshGamesEvent>
 
   fun setLoadingIndicator(active: Boolean)
 
-  fun setDateNavigatorText(dateText: String)
+  fun setDateNavigatorText()
 
   fun hideGames()
 
   fun showGames(games: List<GameV2>)
 
-  fun showGameDetails(game: GameV2, selectedDate: Long)
+  fun showGameDetails(game: GameV2)
 
   fun setNoGamesIndicator(active: Boolean)
 
@@ -31,4 +32,6 @@ interface GamesView {
   fun showErrorSnackbar(code: Int)
 
   fun dismissSnackbar()
+
+  fun getCurrentDateShown(): Calendar
 }
