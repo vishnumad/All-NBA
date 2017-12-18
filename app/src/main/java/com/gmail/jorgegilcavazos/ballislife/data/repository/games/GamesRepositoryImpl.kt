@@ -108,7 +108,7 @@ class GamesRepositoryImpl @Inject constructor(
   private fun memorySource(date: Calendar): Single<Map<String, GameV2>> {
     return Single.just(gamesMap
         .filterValues {
-          it.timeUtc > DateFormatUtil.getDateStartUtc(date)
+          it.timeUtc >= DateFormatUtil.getDateStartUtc(date)
               && it.timeUtc < DateFormatUtil.getDateEndUtc(date)
         })
         .doOnSuccess { saveGamesInCache(it) }
