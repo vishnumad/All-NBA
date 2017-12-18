@@ -80,6 +80,8 @@
     <string name="sort_top_day">Top - Day</string>
     <string name="sort_top_week">Top - Week</string>
     <string name="sort_top_season">Top - Season</string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
 
     <!-- Posts -->
     <string name="not_authenticated">Not authenticated</string>
@@ -495,4 +497,7 @@
         <item>2 minute</item>
         <item>5 minute</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

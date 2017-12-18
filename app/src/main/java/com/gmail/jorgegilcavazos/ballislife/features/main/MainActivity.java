@@ -34,7 +34,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositor
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsMenuFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
@@ -511,19 +511,19 @@ public class MainActivity extends BaseNoActionBarActivity {
         setTitle("Highlights");
         getSupportActionBar().setSubtitle(null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
+            appBarLayout.setElevation(0);
         }
 
         Fragment highlightsFragment = null;
         if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
             highlightsFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
-            if(!(highlightsFragment instanceof HighlightsFragment)) {
+            if(!(highlightsFragment instanceof HighlightsMenuFragment)) {
                 highlightsFragment = null;
             }
         }
 
         if (highlightsFragment == null) {
-            highlightsFragment = HighlightsFragment.newInstance();
+            highlightsFragment = HighlightsMenuFragment.Companion.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     highlightsFragment, R.id.fragment);
         }
