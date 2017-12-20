@@ -50,4 +50,10 @@ public interface HighlightsView {
     void openPremiumActivity();
 
     void dismissSwishCard();
+
+    void showAddingToFavoritesMsg();
+
+    void showAddedToFavoritesMsg();
+
+    void showAddToFavoritesFailed();
 }

@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,7 +29,6 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
@@ -81,8 +79,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     public static HighlightsFragment newInstance() {
-        HighlightsFragment fragment = new HighlightsFragment();
-        return fragment;
+        return new HighlightsFragment();
     }
 
     @Override
@@ -98,7 +95,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 getActivity(),
                 new ArrayList<>(25),
                 viewType,
-                shouldShowSortingCard());
+                shouldShowSortingCard(),
+                isPremium());
 
         setHasOptionsMenu(true);
     }
@@ -108,8 +106,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_highlights, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        setSubtitle();
 
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -129,6 +125,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         presenter.attachView(this);
         presenter.subscribeToHighlightsClick(highlightAdapter.getViewClickObservable());
         presenter.subscribeToHighlightsShare(highlightAdapter.getShareClickObservable());
+        presenter.subscribeToFavoriteClick(highlightAdapter.getFavoriteClicks());
         presenter.subscribeToSubmissionClick(highlightAdapter.getSubmissionClickObservable());
 
         return view;
@@ -147,7 +144,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         super.onResume();
         // Load cached data if available, or from network if not.
         presenter.loadFirstAvailable();
-        setSubtitle();
     }
 
     @Override
@@ -185,7 +181,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
             case R.id.action_sort_new:
                 sorting = Sorting.NEW;
                 presenter.loadHighlights(true);
-                setSubtitle();
                 return true;
             case R.id.action_sort_top_day:
                 if (!isPremium()) {
@@ -194,7 +189,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 }
                 sorting = Sorting.TOP_DAY;
                 presenter.loadHighlights(true);
-                setSubtitle();
                 return true;
             case R.id.action_sort_top_week:
                 if (!isPremium()) {
@@ -203,7 +197,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 }
                 sorting = Sorting.TOP_WEEK;
                 presenter.loadHighlights(true);
-                setSubtitle();
                 return true;
             case R.id.action_sort_top_season:
                 if (!isPremium()) {
@@ -212,7 +205,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 }
                 sorting = Sorting.TOP_SEASON;
                 presenter.loadHighlights(true);
-                setSubtitle();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -385,6 +377,21 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         highlightAdapter.removeSortingCard();
     }
 
+    @Override
+    public void showAddingToFavoritesMsg() {
+        Toast.makeText(getActivity(), R.string.add_fav_progress, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showAddedToFavoritesMsg() {
+        Toast.makeText(getActivity(), R.string.add_fav_success, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showAddToFavoritesFailed() {
+        Toast.makeText(getActivity(), R.string.add_fav_failed, Toast.LENGTH_SHORT).show();
+    }
+
     private void openViewPickerDialog() {
         final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.change_view)
@@ -427,26 +434,6 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 throw new IllegalArgumentException("Invalid view type: " + viewType);
         }
         menu.findItem(R.id.action_change_view).setIcon(drawable);
-    }
-
-    private void setSubtitle() {
-        ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            switch (sorting) {
-                case NEW:
-                    actionBar.setSubtitle("NEW");
-                    break;
-                case TOP_DAY:
-                    actionBar.setSubtitle("TOP - DAY");
-                    break;
-                case TOP_WEEK:
-                    actionBar.setSubtitle("TOP - WEEK");
-                    break;
-                case TOP_SEASON:
-                    actionBar.setSubtitle("TOP - SEASON");
-                    break;
-            }
-        }
     }
 
     private boolean isPremium() {

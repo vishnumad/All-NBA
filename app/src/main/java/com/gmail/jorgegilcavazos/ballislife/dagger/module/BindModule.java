@@ -16,6 +16,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositor
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
@@ -66,6 +68,10 @@ public abstract class BindModule {
     @Binds
     public abstract HighlightsRepository bindHighlightsRepository(
             HighlightsRepositoryImpl highlightsRepositoryImpl);
+
+    @Binds
+    public abstract FavoritesRepository bindFavoritesRepository(
+            FavoritesRepositoryImpl favoritesRepositoryImpl);
 
     @Binds
     public abstract SubmissionRepository bindSubmissionRepository(

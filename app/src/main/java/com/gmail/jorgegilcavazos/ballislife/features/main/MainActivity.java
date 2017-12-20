@@ -16,6 +16,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,6 +51,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -124,6 +126,15 @@ public class MainActivity extends BaseNoActionBarActivity {
         Fabric.with(this, new Crashlytics());
 
         setupRemoteConfig();
+
+        FirebaseAuth.getInstance().signInAnonymously()
+            .addOnCompleteListener(task -> {
+               if (task.isSuccessful()) {
+                   Log.d(MainActivity.class.getSimpleName(), "FirebaseAuth sign in successful");
+               } else {
+                   Log.d(MainActivity.class.getSimpleName(), "FirebaseAuth sign in unsuccessful");
+               }
+            });
 
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {

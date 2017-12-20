@@ -15,6 +15,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
+import com.jakewharton.rxrelay2.PublishRelay;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -33,9 +34,11 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private List<Highlight> highlights;
     private HighlightViewType highlightViewType;
     private boolean showSwishSortingCard;
+    private boolean isPremium;
 
     private PublishSubject<Highlight> viewClickSubject = PublishSubject.create();
     private PublishSubject<Highlight> shareClickSubject = PublishSubject.create();
+    private PublishRelay<Highlight> favoriteClicks = PublishRelay.create();
     private PublishSubject<Highlight> submissionClickSubject = PublishSubject.create();
     private PublishSubject<Object> exploreClicks = PublishSubject.create();
     private PublishSubject<Object> gotItClicks = PublishSubject.create();
@@ -44,11 +47,13 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             Context context,
             List<Highlight> highlights,
             HighlightViewType highlightViewType,
-            boolean showSwishSortingCard) {
+            boolean showSwishSortingCard,
+            boolean isPremium) {
         this.context = context;
         this.highlights = highlights;
         this.highlightViewType = highlightViewType;
         this.showSwishSortingCard = showSwishSortingCard;
+        this.isPremium = isPremium;
     }
 
     @Override
@@ -76,10 +81,12 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             }
             ((HighlightHolder) holder).bindData(
                     context,
+                    isPremium,
                     highlightViewType,
                     highlights.get(position),
                     viewClickSubject,
                     shareClickSubject,
+                    favoriteClicks,
                     submissionClickSubject);
         } else if (holder instanceof SwishCardViewHolder) {
             ((SwishCardViewHolder) holder).bindData(
@@ -124,6 +131,26 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyDataSetChanged();
     }
 
+    public void addHighlight(Highlight highlight) {
+        highlights.add(highlight);
+        notifyDataSetChanged();
+    }
+
+    public void addHighlightToTop(Highlight highlight) {
+        highlights.add(0, highlight);
+        notifyItemInserted(0);
+    }
+
+    public void removeHighlight(Highlight highlight) {
+        for (int i = 0; i < highlights.size(); i++) {
+            if (highlights.get(i).getId().equals(highlight.getId())) {
+                highlights.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
     public void setContentViewType(HighlightViewType viewType) {
         this.highlightViewType = viewType;
         notifyDataSetChanged();
@@ -149,6 +176,10 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return shareClickSubject;
     }
 
+    public Observable<Highlight> getFavoriteClicks() {
+        return favoriteClicks;
+    }
+
     public Observable<Highlight> getSubmissionClickObservable() {
         return submissionClickSubject;
     }
@@ -163,28 +194,25 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     static class HighlightHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.container)
-        View container;
-        @BindView(R.id.image_thumbnail)
-        ImageView ivThumbnail;
-        @BindView(R.id.image_thumbnail_unavailable)
-        ImageView ivThumbnailUnavailable;
-        @BindView(R.id.text_title)
-        TextView tvTitle;
-        @BindView(R.id.text_view_thread)
-        TextView tvViewThread;
-        @BindView(R.id.button_share)
-        ImageButton ibShare;
+        @BindView(R.id.container) View container;
+        @BindView(R.id.image_thumbnail) ImageView ivThumbnail;
+        @BindView(R.id.image_thumbnail_unavailable) ImageView ivThumbnailUnavailable;
+        @BindView(R.id.text_title) TextView tvTitle;
+        @BindView(R.id.text_view_thread) TextView tvViewThread;
+        @BindView(R.id.button_share) ImageButton ibShare;
 
         public HighlightHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        void bindData(Context context, HighlightViewType contentViewType,
+        void bindData(Context context,
+                      boolean isPremium,
+                      HighlightViewType contentViewType,
                       final Highlight highlight,
                       final PublishSubject<Highlight> viewClickSubject,
                       final PublishSubject<Highlight> shareClickSubject,
+                      final PublishRelay<Highlight> favoriteClicks,
                       final PublishSubject<Highlight> submissionClickSubject) {
             tvTitle.setText(highlight.getTitle());
 
@@ -209,6 +237,14 @@ public class HighlightAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             tvViewThread.setOnClickListener(v -> submissionClickSubject.onNext(highlight));
 
             ibShare.setOnClickListener(v -> shareClickSubject.onNext(highlight));
+
+            // Send favorite click events only if user is premium.
+            container.setOnLongClickListener(v -> {
+                if (isPremium) {
+                    favoriteClicks.accept(highlight);
+                }
+                return isPremium;
+            });
         }
     }
 }

@@ -22,7 +22,7 @@ class HighlightsPagerAdapter(
 
   override fun getItem(position: Int): Fragment = when (position) {
     ALL_HIGHLIGHTS -> HighlightsFragment.newInstance()
-    FAVORITE_HIGHLIGHTS -> HighlightsFragment.newInstance()
+    FAVORITE_HIGHLIGHTS -> FavoritesFragment.newInstance()
     else -> throw IllegalArgumentException("Unsupported position: " + position)
   }
 
