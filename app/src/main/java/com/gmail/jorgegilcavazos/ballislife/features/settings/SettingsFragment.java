@@ -5,13 +5,17 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -46,6 +50,8 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_TRIPLE_DOUBLES = "triple_double_alert";
     public static final String KEY_QUADRUPLE_DOUBLES = "quadruple_double_alert";
     public static final String KEY_5_X_5 = "five_x_five_alert";
+    public static final String KEY_APP_VERSION = "app_version";
+    public static final String KEY_FEEDBACK = "feedback";
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
@@ -63,6 +69,22 @@ public class SettingsFragment extends PreferenceFragment
         for (int i = 0; i < getPreferenceScreen().getPreferenceCount(); i++) {
             pickPreferenceObject(getPreferenceScreen().getPreference(i));
         }
+
+        Preference appVersion = findPreference(KEY_APP_VERSION);
+        try {
+            appVersion.setSummary(appVersion());
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Preference feedback = findPreference(KEY_FEEDBACK);
+        feedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                feedbackDialog();
+                return true;
+            }
+        });
 
         initListeners();
     }
@@ -304,5 +326,24 @@ public class SettingsFragment extends PreferenceFragment
             }
             return false;
         });
+    }
+
+    public String appVersion() throws PackageManager.NameNotFoundException {
+        PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+        String version = pInfo.versionName;
+        return version;
+    }
+
+    public void feedbackDialog() {
+        MaterialDialog feedbackDialog = new MaterialDialog.Builder(getActivity())
+                .title(R.string.report_bug_or_suggest)
+                .customView(R.layout.feedback_form_layout, false)
+                .positiveText(R.string.send)
+                .build();
+
+        View view = feedbackDialog.getCustomView();
+        if (view == null) return;
+
+        feedbackDialog.show();
     }
 }
