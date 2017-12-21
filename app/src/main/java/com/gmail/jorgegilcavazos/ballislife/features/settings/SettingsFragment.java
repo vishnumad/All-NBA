@@ -70,6 +70,7 @@ public class SettingsFragment extends PreferenceFragment
             pickPreferenceObject(getPreferenceScreen().getPreference(i));
         }
 
+        // Set AppVersion number to Preference view
         Preference appVersion = findPreference(KEY_APP_VERSION);
         try {
             appVersion.setSummary(appVersion());
@@ -77,6 +78,7 @@ public class SettingsFragment extends PreferenceFragment
             e.printStackTrace();
         }
 
+        // Feedback button listener to show dialog
         Preference feedback = findPreference(KEY_FEEDBACK);
         feedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
