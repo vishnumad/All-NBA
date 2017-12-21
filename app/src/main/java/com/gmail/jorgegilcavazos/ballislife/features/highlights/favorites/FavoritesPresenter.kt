@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository
+import com.gmail.jorgegilcavazos.ballislife.util.Utilities
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
@@ -35,6 +36,38 @@ class FavoritesPresenter @Inject constructor(
                 // Save unsuccessful
               }).addTo(disposables)
         }
+        .addTo(disposables)
+
+    view.openHighlightEvents()
+        .subscribe { highlight ->
+          when {
+            highlight.url.contains("streamable") -> {
+              val shortCode = Utilities.getStreamableShortcodeFromUrl(highlight.url)
+              if (shortCode != null) {
+                view.openStreamable(shortCode)
+              } else {
+                view.showErrorOpeningStreamable()
+              }
+            }
+            highlight.url.contains("youtube") || highlight.url.contains("youtu.be") -> {
+              val videoId = Utilities.getYoutubeVideoIdFromUrl(highlight.url)
+              if (videoId != null) {
+                view.openYoutubeVideo(videoId)
+              } else {
+                view.showErrorOpeningYoutube()
+              }
+            }
+            else -> view.showUnknownSourceError()
+          }
+        }
+        .addTo(disposables)
+
+    view.openSubmissionEvents()
+        .subscribe { view.showSubmission(it) }
+        .addTo(disposables)
+
+    view.shareHighlightEvents()
+        .subscribe { view.showShareDialog(it) }
         .addTo(disposables)
 
     favoritesRepository.favorites()

@@ -1,14 +1,18 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
@@ -18,7 +22,13 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewS
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity
+import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity
 import com.gmail.jorgegilcavazos.ballislife.util.Constants
+import com.google.android.youtube.player.YouTubeApiServiceUtil
+import com.google.android.youtube.player.YouTubeInitializationResult
+import com.google.android.youtube.player.YouTubeStandalonePlayer
+import com.google.firebase.crash.FirebaseCrash
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_favorites.*
@@ -125,5 +135,68 @@ class FavoritesFragment : Fragment(), FavoritesView {
   override fun isPremium(): Boolean {
     val bp = (activity.application as BallIsLifeApplication).billingProcessor
     return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted
+  }
+
+  override fun openHighlightEvents(): Observable<Highlight> = highlightAdapter.viewClickObservable
+
+  override fun shareHighlightEvents(): Observable<Highlight> = highlightAdapter.shareClickObservable
+
+  override fun openSubmissionEvents(): Observable<Highlight> {
+   return highlightAdapter.submissionClickObservable
+  }
+
+  override fun openStreamable(shortCode: String) {
+    val intent = Intent(activity, VideoPlayerActivity::class.java)
+    intent.putExtra(VideoPlayerActivity.SHORTCODE, shortCode)
+    startActivity(intent)
+  }
+
+  override fun showErrorOpeningStreamable() {
+    Toast.makeText(activity, R.string.error_loading_streamable, Toast.LENGTH_SHORT).show()
+  }
+
+  override fun openYoutubeVideo(videoId: String) {
+    // Verify that the API is available in the device.
+    val intent = if (localRepository.openYouTubeInApp
+        && YouTubeApiServiceUtil.isYouTubeApiServiceAvailable(activity)
+        == YouTubeInitializationResult.SUCCESS) {
+      FirebaseCrash.logcat(Log.INFO, "FavoritesFrag", "Opening youtube video in app: " + videoId)
+      YouTubeStandalonePlayer.createVideoIntent(
+          activity,
+          "AIzaSyA3jvG_4EIhAH_l3criaJx7-E_XWixOe78", /* API KEY */
+          videoId,
+          0, /* Start millisecond */
+          true /* Autoplay */,
+          true /* Lightbox */
+      )
+    } else {
+      FirebaseCrash.logcat(Log.INFO, "HighlightsFrag", "Opening native youtube video" + videoId)
+      Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + videoId))
+    }
+    startActivity(intent)
+  }
+
+  override fun showErrorOpeningYoutube() {
+    Toast.makeText(activity, R.string.error_loading_youtube, Toast.LENGTH_SHORT).show()
+  }
+
+  override fun showUnknownSourceError() {
+    Toast.makeText(activity, R.string.unknown_source, Toast.LENGTH_SHORT).show()
+  }
+
+  override fun showSubmission(highlight: Highlight) {
+    val intent = Intent(activity, SubmittionActivity::class.java)
+    val bundle = Bundle()
+    bundle.putString(Constants.THREAD_ID, highlight.id)
+    bundle.putString(SubmittionActivity.KEY_TITLE, getString(R.string.highlights))
+    intent.putExtras(bundle)
+    startActivity(intent)
+  }
+
+  override fun showShareDialog(highlight: Highlight) {
+    val shareIntent = Intent(Intent.ACTION_SEND)
+    shareIntent.type = "text/plain"
+    shareIntent.putExtra(Intent.EXTRA_TEXT, highlight.url)
+    startActivity(Intent.createChooser(shareIntent, resources.getString(R.string.share_video)))
   }
 }

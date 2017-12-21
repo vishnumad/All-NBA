@@ -16,4 +16,24 @@ interface FavoritesView {
   fun favoriteDeletions(): Observable<Highlight>
 
   fun isPremium(): Boolean
+
+  fun openHighlightEvents(): Observable<Highlight>
+
+  fun shareHighlightEvents(): Observable<Highlight>
+
+  fun openSubmissionEvents(): Observable<Highlight>
+
+  fun openStreamable(shortCode: String)
+
+  fun showErrorOpeningStreamable()
+
+  fun openYoutubeVideo(videoId: String)
+
+  fun showErrorOpeningYoutube()
+
+  fun showUnknownSourceError()
+
+  fun showSubmission(highlight: Highlight)
+
+  fun showShareDialog(highlight: Highlight)
 }
