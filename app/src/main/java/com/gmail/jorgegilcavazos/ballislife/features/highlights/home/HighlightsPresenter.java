@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights;
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.home;
 
 import android.support.annotation.NonNull;
 

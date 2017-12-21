@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import com.gmail.jorgegilcavazos.ballislife.R
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites.FavoritesFragment
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.home.HighlightsFragment
 
 /**
  * Pager adapter for the highlights section. Hosts the regular highlights feed and the favorites

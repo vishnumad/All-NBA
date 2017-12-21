@@ -1,7 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights
 
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.Sorting
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.home.Sorting
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import io.reactivex.Single
 import junit.framework.Assert

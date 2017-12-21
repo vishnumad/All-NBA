@@ -2,7 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.data.repository.highlights
 
 import android.support.annotation.VisibleForTesting
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.Sorting
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.home.Sorting
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
 import io.reactivex.Single

@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights;
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.home;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -29,6 +29,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;

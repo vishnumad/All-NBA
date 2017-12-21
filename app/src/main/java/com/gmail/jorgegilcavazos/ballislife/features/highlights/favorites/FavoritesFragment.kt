@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 
 import android.os.Bundle
@@ -15,6 +15,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType
 import com.gmail.jorgegilcavazos.ballislife.util.Constants

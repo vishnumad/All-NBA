@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository

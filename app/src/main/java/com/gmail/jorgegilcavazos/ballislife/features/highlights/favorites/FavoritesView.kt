@@ -1,4 +1,4 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import io.reactivex.Observable
