@@ -484,6 +484,12 @@
     <string name="quadruple_doubles">Quadruple Doubles</string>
     <string name="five_x_fives">5x5\'s</string>
     <string name="click_to_view_table">Click to view table</string>
+    <string name="about">About</string>
+    <string name="key_app_version">app_version</string>
+    <string name="key_feedback">feedback</string>
+    <string name="report_bug_or_suggest">Report bugs or suggest a new feature</string>
+    <string name="send">Send</string>
+    <string name="hint_feedback_form">Tell us what went wrong or what feature you\'d like to see next</string>
 
     <string-array name="add_delay_options">
         <item>None</item>
