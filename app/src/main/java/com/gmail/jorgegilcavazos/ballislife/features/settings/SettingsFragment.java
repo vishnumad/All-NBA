@@ -343,9 +343,6 @@ public class SettingsFragment extends PreferenceFragment
                 .positiveText(R.string.send)
                 .build();
 
-        View view = feedbackDialog.getCustomView();
-        if (view == null) return;
-
         feedbackDialog.show();
     }
 }
