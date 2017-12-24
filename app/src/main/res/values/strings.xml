@@ -605,13 +605,12 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        • New setting to hide scores\n•
-        Delay live game thread comments\n•
-        New setting to open box score by default\n•
-        Added sorting options for highlights\n•
-        Added alerts for triple/quadruple doubles and 5x5s\n•
-        Favorite team\'s subreddit is now pinned at the top\n•
-        New setting to replace /r/NBA originals with chips\n•
+        • New favorite highlights section\n•
+        Tables in reddit posts/comments are now properly formatted\n•
+        New halftime and end of game notifications\n•
+        New date picker for games schedule\n•
+        Added theme toggle in settings screen\n•
+        UI improvements and bug fixes
         Minor bug fixes and UI improvements
     </string>
     <string name="submitted_comment">Submitted comment</string>

@@ -24,6 +24,7 @@ class GoPremiumActivity : BaseActionBarActivity() {
     val benefits = arrayOf(
         "• Stream live game threads",
         "• Add a delay to game threads to avoid spoilers",
+        "• Save your favorite highlights",
         "• Sort highlights by popularity",
         "• Hide scores (No spoilers)",
         "• Subscribe to triple-double, quadruple-double, and 5x5 alerts",
