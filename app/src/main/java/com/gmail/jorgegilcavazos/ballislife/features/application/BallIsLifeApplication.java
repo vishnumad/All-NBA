@@ -59,7 +59,8 @@ public class BallIsLifeApplication extends Application implements BillingProcess
 
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
-                .dataModule(new DataModule("https://nba-app-ca681.firebaseio.com/"))
+                .dataModule(new DataModule("https://nba-app-ca681.firebaseio.com/",
+                        "http://data.nba.com/"))
                 .build();
 
         String billingLicense = getString(R.string.play_billing_license_key);

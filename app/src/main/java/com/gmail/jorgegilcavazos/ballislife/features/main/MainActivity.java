@@ -16,6 +16,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
+import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -33,7 +35,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepositor
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsMenuFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
@@ -49,10 +51,12 @@ import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,8 +69,6 @@ import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
 public class MainActivity extends BaseNoActionBarActivity {
-    private static final String TAG = "MainActivity";
-
     private static final String SHOW_TOUR = "showTourTag";
     private static final String SHOW_WHATS_NEW = "showWhatsNew";
 
@@ -122,6 +124,17 @@ public class MainActivity extends BaseNoActionBarActivity {
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Fabric.with(this, new Crashlytics());
 
+        setupRemoteConfig();
+
+        FirebaseAuth.getInstance().signInAnonymously()
+            .addOnCompleteListener(task -> {
+               if (task.isSuccessful()) {
+                   Log.d(MainActivity.class.getSimpleName(), "FirebaseAuth sign in successful");
+               } else {
+                   Log.d(MainActivity.class.getSimpleName(), "FirebaseAuth sign in unsuccessful");
+               }
+            });
+
         // Show app tour if first install.
         if (!Once.beenDone(Once.THIS_APP_INSTALL, SHOW_TOUR)) {
             Intent intent = new Intent(this, TourLoginActivity.class);
@@ -138,9 +151,13 @@ public class MainActivity extends BaseNoActionBarActivity {
                         .show();
                 Once.markDone(SHOW_WHATS_NEW);
             }
+
+            // Monitor launch times and interval from installation
+            RateThisApp.onCreate(this);
+            // If the condition is satisfied, "Rate this app" dialog will be shown
+            RateThisApp.showRateDialogIfNeeded(this);
         }
 
-        resubscribeToTopics();
         setUpToolbar();
         setUpNavigationView();
         setUpDrawerContent();
@@ -508,19 +525,19 @@ public class MainActivity extends BaseNoActionBarActivity {
         setTitle("Highlights");
         getSupportActionBar().setSubtitle(null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            appBarLayout.setElevation(UnitUtils.convertDpToPixel(4, this));
+            appBarLayout.setElevation(0);
         }
 
         Fragment highlightsFragment = null;
         if (selectedFragment == HIGHLIGHTS_FRAGMENT_ID) {
             highlightsFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
-            if(!(highlightsFragment instanceof HighlightsFragment)) {
+            if(!(highlightsFragment instanceof HighlightsMenuFragment)) {
                 highlightsFragment = null;
             }
         }
 
         if (highlightsFragment == null) {
-            highlightsFragment = HighlightsFragment.newInstance();
+            highlightsFragment = HighlightsMenuFragment.Companion.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     highlightsFragment, R.id.fragment);
         }
@@ -556,31 +573,6 @@ public class MainActivity extends BaseNoActionBarActivity {
                 startActivity(profileIntent);
             }
         });
-    }
-
-    private void resubscribeToTopics() {
-        // Subscribe to all CGA topics
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> cgaTopics = preferences.getStringSet(SettingsFragment.KEY_PREF_CGA_TOPICS,
-                null);
-        String[] availableGameTopics = getResources().getStringArray(R.array.pref_cga_values);
-        updateTopicSubscriptions(cgaTopics, availableGameTopics);
-    }
-
-    private void updateTopicSubscriptions(Set<String> newTopics, String[] availableTopics) {
-        if (newTopics != null) {
-            for (String availableTopic : availableTopics) {
-                if (newTopics.contains(availableTopic)) {
-                    FirebaseMessaging.getInstance().subscribeToTopic(availableTopic);
-                } else {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
-                }
-            }
-        } else {
-            for (String availableTopic : availableTopics) {
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
-            }
-        }
     }
 
     private void setupDynamicShortcut() {
@@ -738,5 +730,25 @@ public class MainActivity extends BaseNoActionBarActivity {
                 }
             }
         }
+    }
+
+    private void setupRemoteConfig() {
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        FirebaseRemoteConfig.getInstance().setConfigSettings(configSettings);
+        FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
+
+        int cacheExpiration = 3600 * 12; // 12 hours.
+        if (FirebaseRemoteConfig.getInstance().getInfo().getConfigSettings()
+                .isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        FirebaseRemoteConfig.getInstance().fetch(cacheExpiration)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseRemoteConfig.getInstance().activateFetched();
+                    }
+                });
     }
 }

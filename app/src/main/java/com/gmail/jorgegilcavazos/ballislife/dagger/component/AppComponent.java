@@ -8,7 +8,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites.FavoritesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.home.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.posts.PostsFragment;
@@ -61,4 +62,6 @@ public interface AppComponent {
     void inject(GoPremiumActivity goPremiumActivity);
 
     void inject(TourLoginActivity tourLoginActivity);
+
+    void inject(FavoritesFragment favoritesFragment);
 }

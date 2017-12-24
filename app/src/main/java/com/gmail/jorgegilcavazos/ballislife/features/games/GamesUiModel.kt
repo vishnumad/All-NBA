@@ -2,6 +2,9 @@ package com.gmail.jorgegilcavazos.ballislife.features.games
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 
+/**
+ * Deprecated. Use [GamesUiModelV2] instead.
+ */
 class GamesUiModel(
     val isMemoryInProgress: Boolean,
     val isMemorySuccess: Boolean,

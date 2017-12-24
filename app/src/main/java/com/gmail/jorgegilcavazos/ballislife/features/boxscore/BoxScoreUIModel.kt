@@ -1,18 +1,18 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore
 
-import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues
+import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreResponse
 
 class BoxScoreUIModel(
 		val inProgress: Boolean = false,
 		val success: Boolean = false,
 		val notAvailable: Boolean = false,
-		val boxScoreValues: BoxScoreValues? = null) {
+		val boxScore: BoxScoreResponse? = null) {
 
 	companion object {
 		fun inProgress() = BoxScoreUIModel(inProgress = true)
 
-		fun success(boxScoreValues: BoxScoreValues) = BoxScoreUIModel(success = true,
-				boxScoreValues = boxScoreValues)
+		fun success(boxScoreResponse: BoxScoreResponse) = BoxScoreUIModel(success = true,
+				boxScore = boxScoreResponse)
 
 		fun notAvailable() = BoxScoreUIModel(notAvailable = true)
 	}

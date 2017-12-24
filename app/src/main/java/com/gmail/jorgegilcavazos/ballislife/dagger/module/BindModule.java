@@ -2,6 +2,8 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.module;
 
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions;
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActionsImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.firebase.remoteconfig.RemoteConfig;
+import com.gmail.jorgegilcavazos.ballislife.data.firebase.remoteconfig.RemoteConfigImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.local.AppLocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -14,6 +16,8 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositor
 import com.gmail.jorgegilcavazos.ballislife.data.repository.games.GamesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepositoryImpl;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepositoryImpl;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
@@ -66,6 +70,10 @@ public abstract class BindModule {
             HighlightsRepositoryImpl highlightsRepositoryImpl);
 
     @Binds
+    public abstract FavoritesRepository bindFavoritesRepository(
+            FavoritesRepositoryImpl favoritesRepositoryImpl);
+
+    @Binds
     public abstract SubmissionRepository bindSubmissionRepository(
             SubmissionRepositoryImpl submissionRepositoryImpl);
 
@@ -89,4 +97,7 @@ public abstract class BindModule {
     @Binds
     public abstract BoxScoreRepository bindBoxScoreRepository(
             BoxScoreRepositoryImpl boxScoreRepositoryImpl);
+
+    @Binds
+    public abstract RemoteConfig bindRemoteConfig(RemoteConfigImpl remoteConfigImpl);
 }

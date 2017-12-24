@@ -59,6 +59,8 @@
     <color name="flairColor">#009688</color>
     <color name="redditActionColor">#757575</color>
     <color name="redditInfoColor">#A5A5A5</color>
+    <color name="redditAuthor">#4d68ff</color>
+    <color name="redditMe">#27bbff</color>
 
     <color name="commentBgNormalLight">#FFFFFF</color>
     <color name="commentBgSelectedLight">#E5E5E5</color>

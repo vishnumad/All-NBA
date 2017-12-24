@@ -1,15 +1,17 @@
-package com.gmail.jorgegilcavazos.ballislife.features.highlights;
+package com.gmail.jorgegilcavazos.ballislife.features.highlights.home;
 
 import android.support.annotation.NonNull;
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -20,26 +22,30 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 
 public class HighlightsPresenter extends BasePresenter<HighlightsView> {
 
-    private HighlightsRepository highlightsRepository;
-    private LocalRepository localRepository;
-    private BaseSchedulerProvider schedulerProvider;
-    private CompositeDisposable disposables;
-    private NetworkUtils networkUtils;
-    private ErrorHandler errorHandler;
+    private final HighlightsRepository highlightsRepository;
+    private final FavoritesRepository favoritesRepository;
+    private final LocalRepository localRepository;
+    private final BaseSchedulerProvider schedulerProvider;
+    private final CompositeDisposable disposables;
+    private final NetworkUtils networkUtils;
+    private final ErrorHandler errorHandler;
 
     @Inject
     public HighlightsPresenter(
             HighlightsRepository highlightsRepository,
+            FavoritesRepository favoritesRepository,
             LocalRepository localRepository,
             BaseSchedulerProvider schedulerProvider,
             NetworkUtils networkUtils,
             ErrorHandler errorHandler) {
         this.highlightsRepository = highlightsRepository;
+        this.favoritesRepository = favoritesRepository;
         this.localRepository = localRepository;
         this.schedulerProvider = schedulerProvider;
         this.networkUtils = networkUtils;
@@ -53,16 +59,18 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         super.attachView(view);
 
         disposables.add(view.explorePremiumClicks()
-                .subscribe(o -> {
+                .filter(swishCard -> swishCard == SwishCard.HIGHLIGHT_SORTING)
+                .subscribe(swishCard -> {
                     localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
-                    view.dismissSwishCard();
+                    view.dismissSwishCard(swishCard);
                     view.openPremiumActivity();
                 }));
 
         disposables.add(view.gotItClicks()
-                .subscribe(o -> {
+                .filter(swishCard -> swishCard == SwishCard.HIGHLIGHT_SORTING)
+                .subscribe(swishCard -> {
                     localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
-                    view.dismissSwishCard();
+                    view.dismissSwishCard(swishCard);
                 }));
     }
 
@@ -79,7 +87,7 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
 
     public void loadFirstAvailable() {
         List<Highlight> highlights = highlightsRepository.getCachedHighlights();
-        if (highlights.isEmpty()) {
+        if (highlights.isEmpty() || highlightsRepository.getSorting() != view.getSorting()) {
             loadHighlights(true);
         } else {
             view.showHighlights(highlights, true);
@@ -213,9 +221,38 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         );
     }
 
+    public void subscribeToFavoriteClick(Observable<Highlight> highlights) {
+        disposables.add(highlights
+                .subscribe(highlight -> {
+                    if (StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
+                        view.showMustLogInToFavoriteMsg();
+                    } else {
+                        view.showAddingToFavoritesMsg();
+                        addToFavorites(highlight);
+                    }
+                }));
+    }
+
     public void onViewTypeSelected(HighlightViewType viewType) {
         localRepository.saveFavoriteHighlightViewType(viewType);
         view.changeViewType(viewType);
+    }
+
+    private void addToFavorites(Highlight highlight) {
+        disposables.add(favoritesRepository
+                .saveToFavorites(highlight)
+                .subscribeWith(new DisposableCompletableObserver() {
+                    @Override
+                    public void onComplete() {
+                        view.showAddedToFavoritesMsg();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        view.showAddToFavoritesFailed();
+                    }
+                })
+        );
     }
 
 }

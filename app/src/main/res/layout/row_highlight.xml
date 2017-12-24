@@ -15,14 +15,14 @@
         android:background="?selectableItemBackgroundBorderless">
 
         <ImageView
-            android:id="@+id/image_thumbnail"
+            android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="190dp"
             android:background="@color/black"
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:id="@+id/image_thumbnail_unavailable"
+            android:id="@+id/thumbnailUnavailable"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
@@ -43,7 +43,7 @@
             android:layout_alignBottom="@id/gradient">
 
             <TextView
-                android:id="@+id/text_title"
+                android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -54,7 +54,7 @@
                 android:textColor="@color/white"/>
 
             <ImageButton
-                android:id="@+id/button_share"
+                android:id="@+id/shareBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackgroundBorderless"
@@ -67,9 +67,9 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/viewThreadText"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:id="@+id/text_view_thread"
             android:text="@string/view_thread"
             android:layout_width="wrap_content"
             android:padding="8dp"

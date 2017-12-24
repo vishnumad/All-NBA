@@ -66,4 +66,7 @@ public class Constants {
     public static final String TOPIC_TRIPLE_DOUBLES = "TRIPLE_DOUBLES";
     public static final String TOPIC_QUADRUPLE_DOUBLES = "QUADRUPLE_DOUBLES";
     public static final String TOPIC_5_X_5 = "FIVE_X_FIVE";
+
+    // Firebase Remote Config Flags
+    public static final String USE_SWISH_BACKEND_BOX_SCORE = "use_swish_backend_box_score";
 }

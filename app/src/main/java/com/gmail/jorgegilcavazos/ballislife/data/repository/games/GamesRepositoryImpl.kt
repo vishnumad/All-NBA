@@ -2,6 +2,8 @@ package com.gmail.jorgegilcavazos.ballislife.data.repository.games
 
 import android.annotation.SuppressLint
 import android.support.annotation.VisibleForTesting
+import com.gmail.jorgegilcavazos.ballislife.data.actions.games.GamesResult
+import com.gmail.jorgegilcavazos.ballislife.data.actions.games.GamesResult.LoadGamesResult
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiModel
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
@@ -56,6 +58,42 @@ class GamesRepositoryImpl @Inject constructor(
     return Observable.concat(memory, network)
   }
 
+  override fun loadGames(
+      date: Calendar,
+      forceNetwork: Boolean): Observable<GamesResult.LoadGamesResult> {
+    val network = networkSource(date).toObservable()
+        .concatMap {
+          if (it.isEmpty()) {
+            Observable.just(LoadGamesResult.NoGames)
+          } else {
+            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.id }, date))
+          }
+        }
+        .onErrorReturn { LoadGamesResult.Failure(it) }
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.ui())
+        .startWith(LoadGamesResult.NetworkInProgress)
+
+    val memory = memorySource(date).toObservable()
+        .concatMap {
+          if (it.isNotEmpty()) {
+            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.id }, date))
+          } else {
+            Observable.just(LoadGamesResult.NoCachedGames)
+          }
+        }
+        .onErrorReturn { LoadGamesResult.Failure(it) }
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.ui())
+        .startWith(LoadGamesResult.MemoryInProgress)
+
+    if (forceNetwork) {
+      return network
+    }
+
+    return Observable.concat(memory, network)
+  }
+
   private fun networkSource(date: Calendar): Single<Map<String, GameV2>> {
     return gamesService
         .getDayGames(
@@ -70,7 +108,7 @@ class GamesRepositoryImpl @Inject constructor(
   private fun memorySource(date: Calendar): Single<Map<String, GameV2>> {
     return Single.just(gamesMap
         .filterValues {
-          it.timeUtc > DateFormatUtil.getDateStartUtc(date)
+          it.timeUtc >= DateFormatUtil.getDateStartUtc(date)
               && it.timeUtc < DateFormatUtil.getDateEndUtc(date)
         })
         .doOnSuccess { saveGamesInCache(it) }

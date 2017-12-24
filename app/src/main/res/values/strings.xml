@@ -80,6 +80,8 @@
     <string name="sort_top_day">Top - Day</string>
     <string name="sort_top_week">Top - Week</string>
     <string name="sort_top_season">Top - Season</string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
 
     <!-- Posts -->
     <string name="not_authenticated">Not authenticated</string>
@@ -145,6 +147,7 @@
     <string name="pref_enable_youtube_in_app">In-app Player for YouTube</string>
     <string name="pref_no_spoilers_mode">Hide Scores</string>
     <string name="pref_open_box_score_default">Open Box Score by Default</string>
+    <string name="pref_dark_theme">Dark Theme</string>
 
     <string name="title_settings_cga">Close Game</string>
     <string name="dialog_settings_cga">Pick teams to follow</string>
@@ -159,13 +162,27 @@
     <string name="key_triple_double_alert">triple_double_alert</string>
     <string name="key_quadruple_double_alert">quadruple_double_alert</string>
     <string name="key_5x5_alert">five_x_five_alert</string>
+    <string name="key_dark_theme">dark_theme</string>
 
 
     <string name="title_settings_start">Game Starting</string>
     <string name="dialog_settings_start">Pick teams to receive alerts</string>
-    <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
+    <string name="summary_settings_start">Receive an alert before a game starts</string>
+
+    <string name="title_settings_halftime">Halftime Score</string>
+    <string name="dialog_settings_halftime">Pick teams to receive alerts</string>
+    <string name="summary_settings_halftime">Receive a score update at halftime</string>
+
+    <string name="title_settings_end_of_game">End of Game</string>
+    <string name="dialog_settings_end_of_game">Pick teams to receive alerts</string>
+    <string name="summary_settings_end_of_game">Receive an alert with the final score</string>
+
+
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
+    <string name="key_settings_halftime">pref_halftime_topics</string>
+    <string name="key_settings_end_of_game">pref_end_of_game_topics</string>
+
     <string name="pref_startup_fragment_title">Startup Page</string>
     <string-array name="pref_startup_fragment_entries">
         <item>Games</item>
@@ -350,8 +367,7 @@
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
-    <string-array name="pref_cga_values_def">
-    </string-array>
+    <string-array name="pref_cga_values_def"/>
 
     <!-- DO NOT TRANSLATE -->
     <string-array name="pref_start_titles">
@@ -422,7 +438,145 @@
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_halftime_titles">
+        <item>Atlanta</item>
+        <item>Brooklyn</item>
+        <item>Boston</item>
+        <item>Charlotte</item>
+        <item>Chicago</item>
+        <item>Cleveland</item>
+        <item>Dallas</item>
+        <item>Denver</item>
+        <item>Detroit</item>
+        <item>Golden State</item>
+        <item>Houston</item>
+        <item>Indiana</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
+        <item>Memphis</item>
+        <item>Miami</item>
+        <item>Milwaukee</item>
+        <item>Minnesota</item>
+        <item>New Orleans</item>
+        <item>New York</item>
+        <item>Oklahoma City</item>
+        <item>Orlando</item>
+        <item>Philadelphia</item>
+        <item>Phoenix</item>
+        <item>Portland</item>
+        <item>Sacramento</item>
+        <item>San Antonio</item>
+        <item>Toronto</item>
+        <item>Utah</item>
+        <item>Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_halftime_values">
+        <item>Halftime-Atlanta</item>
+        <item>Halftime-Brooklyn</item>
+        <item>Halftime-Boston</item>
+        <item>Halftime-Charlotte</item>
+        <item>Halftime-Chicago</item>
+        <item>Halftime-Cleveland</item>
+        <item>Halftime-Dallas</item>
+        <item>Halftime-Denver</item>
+        <item>Halftime-Detroit</item>
+        <item>Halftime-Golden-State</item>
+        <item>Halftime-Houston</item>
+        <item>Halftime-Indiana</item>
+        <item>Halftime-Los-Angeles-C</item>
+        <item>Halftime-Los-Angeles-L</item>
+        <item>Halftime-Memphis</item>
+        <item>Halftime-Miami</item>
+        <item>Halftime-Milwaukee</item>
+        <item>Halftime-Minnesota</item>
+        <item>Halftime-New-Orleans</item>
+        <item>Halftime-New-York</item>
+        <item>Halftime-Oklahoma-City</item>
+        <item>Halftime-Orlando</item>
+        <item>Halftime-Philadelphia</item>
+        <item>Halftime-Phoenix</item>
+        <item>Halftime-Portland</item>
+        <item>Halftime-Sacramento</item>
+        <item>Halftime-San-Antonio</item>
+        <item>Halftime-Toronto</item>
+        <item>Halftime-Utah</item>
+        <item>Halftime-Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_end_of_game_titles">
+        <item>Atlanta</item>
+        <item>Brooklyn</item>
+        <item>Boston</item>
+        <item>Charlotte</item>
+        <item>Chicago</item>
+        <item>Cleveland</item>
+        <item>Dallas</item>
+        <item>Denver</item>
+        <item>Detroit</item>
+        <item>Golden State</item>
+        <item>Houston</item>
+        <item>Indiana</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
+        <item>Memphis</item>
+        <item>Miami</item>
+        <item>Milwaukee</item>
+        <item>Minnesota</item>
+        <item>New Orleans</item>
+        <item>New York</item>
+        <item>Oklahoma City</item>
+        <item>Orlando</item>
+        <item>Philadelphia</item>
+        <item>Phoenix</item>
+        <item>Portland</item>
+        <item>Sacramento</item>
+        <item>San Antonio</item>
+        <item>Toronto</item>
+        <item>Utah</item>
+        <item>Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_end_of_game_values">
+        <item>EOG-Atlanta</item>
+        <item>EOG-Brooklyn</item>
+        <item>EOG-Boston</item>
+        <item>EOG-Charlotte</item>
+        <item>EOG-Chicago</item>
+        <item>EOG-Cleveland</item>
+        <item>EOG-Dallas</item>
+        <item>EOG-Denver</item>
+        <item>EOG-Detroit</item>
+        <item>EOG-Golden-State</item>
+        <item>EOG-Houston</item>
+        <item>EOG-Indiana</item>
+        <item>EOG-Los-Angeles-C</item>
+        <item>EOG-Los-Angeles-L</item>
+        <item>EOG-Memphis</item>
+        <item>EOG-Miami</item>
+        <item>EOG-Milwaukee</item>
+        <item>EOG-Minnesota</item>
+        <item>EOG-New-Orleans</item>
+        <item>EOG-New-York</item>
+        <item>EOG-Oklahoma-City</item>
+        <item>EOG-Orlando</item>
+        <item>EOG-Philadelphia</item>
+        <item>EOG-Phoenix</item>
+        <item>EOG-Portland</item>
+        <item>EOG-Sacramento</item>
+        <item>EOG-San-Antonio</item>
+        <item>EOG-Toronto</item>
+        <item>EOG-Utah</item>
+        <item>EOG-Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
     <string-array name="pref_start_values_def"/>
+    <string-array name="pref_halftime_values_def"/>
+    <string-array name="pref_end_of_game_values_def"/>
 
     <string name="would_you_like_to_sign_in">Would you like to sign in to your Reddit account? \n\n Signing in with reddit allows you to vote submissions and comments, reply to other users and save your favorite posts.</string>
     <string name="log_in_caps">LOG IN</string>
@@ -451,13 +605,12 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        • New setting to hide scores\n•
-        Delay live game thread comments\n•
-        New setting to open box score by default\n•
-        Added sorting options for highlights\n•
-        Added alerts for triple/quadruple doubles and 5x5s\n•
-        Favorite team\'s subreddit is now pinned at the top\n•
-        New setting to replace /r/NBA originals with chips\n•
+        • New favorite highlights section\n•
+        Tables in reddit posts/comments are now properly formatted\n•
+        New halftime and end of game notifications\n•
+        New date picker for games schedule\n•
+        Added theme toggle in settings screen\n•
+        UI improvements and bug fixes
         Minor bug fixes and UI improvements
     </string>
     <string name="submitted_comment">Submitted comment</string>
@@ -475,12 +628,41 @@
     <string name="add_a_delay_to_these_comments">Add a delay to these comments</string>
     <string name="help_support_swish">Help support Swish</string>
     <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>. Help support the app and get these awesome benefits:</string>
+
+    <!-- SWISH SORTING CARD -->
     <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
-    <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
+    <string name="swish_card_highlight_sorting_content">
+        Sort highlights by popularity and unlock more awesome features with Swish Premium
+    </string>
     <string name="swish_card_highlight_sorting_action">Explore premium</string>
+
+    <!-- SWISH FAVORITES CARD -->
+    <string name="swish_card_highlight_favorites_title">
+        Want to save your favorite highlights?</string>
+    <string name="swish_card_highlight_favorites_content">
+        Keep your favorite highlights here and unlock more awesome features with Swish Premium
+    </string>
+    <string name="swish_card_highlight_favorites_action">Explore premium</string>
+
+    <!-- SWISH FAVORITES EMPTY CARD -->
+    <string name="swish_card_favorites_empty_title">
+        Your favorites will be shown here
+    </string>
+    <string name="swish_card_favorites_empty_content">
+        You can add a highlight to your favorites by long-pressing it in the home tab
+    </string>
+
     <string name="triple_doubles">Triple Doubles</string>
     <string name="quadruple_doubles">Quadruple Doubles</string>
     <string name="five_x_fives">5x5\'s</string>
+    <string name="click_to_view_table">Click to view table</string>
+    <string name="about">About</string>
+    <string name="key_app_version">app_version</string>
+    <string name="key_feedback">feedback</string>
+    <string name="key_go_premium">key_go_premium</string>
+    <string name="key_rate_app">key_rate_app</string>
+    <string name="report_bug_or_suggest">Report bugs or suggest a new feature</string>
+    <string name="send">Send</string>
 
     <string-array name="add_delay_options">
         <item>None</item>
@@ -492,4 +674,16 @@
         <item>2 minute</item>
         <item>5 minute</item>
     </string-array>
+
+    <string name="add_fav_failed">Something went wrong</string>
+    <string name="add_fav_success">Added to favorites</string>
+    <string name="add_fav_progress">Adding to favorites</string>
+    <string name="fav_deletion_title">Are you sure?</string>
+    <string name="fav_deletion_content">Do you want to delete this highlight from favorites?</string>
+    <string name="fav_deletion_positive">Yes</string>
+    <string name="fav_deletion_negative">No</string>
+    <string name="thank_you">Thank you!</string>
+    <string name="go_premium_pref_summary">Support Swish and unlock awesome features</string>
+    <string name="rate_app">Rate app!</string>
+    <string name="favorite_must_log_in">You must log in to save a highlight</string>
 </resources>

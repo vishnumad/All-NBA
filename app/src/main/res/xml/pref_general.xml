@@ -34,6 +34,11 @@
             android:key="@string/key_no_spoilers_mode"
             android:title="@string/pref_no_spoilers_mode" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/key_dark_theme"
+            android:title="@string/pref_dark_theme"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -62,6 +67,24 @@
             android:key="@string/key_settings_start"
             android:summary="@string/summary_settings_start"
             android:title="@string/title_settings_start"/>
+
+        <MultiSelectListPreference
+            android:defaultValue="@array/pref_halftime_values_def"
+            android:dialogTitle="@string/dialog_settings_halftime"
+            android:entries="@array/pref_halftime_titles"
+            android:entryValues="@array/pref_halftime_values"
+            android:key="@string/key_settings_halftime"
+            android:summary="@string/summary_settings_halftime"
+            android:title="@string/title_settings_halftime"/>
+
+        <MultiSelectListPreference
+            android:defaultValue="@array/pref_end_of_game_values_def"
+            android:dialogTitle="@string/dialog_settings_end_of_game"
+            android:entries="@array/pref_end_of_game_titles"
+            android:entryValues="@array/pref_end_of_game_values"
+            android:key="@string/key_settings_end_of_game"
+            android:summary="@string/summary_settings_end_of_game"
+            android:title="@string/title_settings_end_of_game"/>
 
         <SwitchPreference
             android:defaultValue="false"
@@ -93,6 +116,31 @@
             android:defaultValue="false"
             android:title="Replace /r/NBA originals with chips"
             android:summary="Declutter your feed with smaller chips for /r/NBA originals such as Daily Locker Room threads" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="about_category"
+        android:title="@string/about">
+
+        <Preference
+            android:key="@string/key_app_version"
+            android:title="Swish Version"
+            android:summary="1.0"/>
+
+        <Preference
+            android:key="@string/key_feedback"
+            android:title="Feedback"
+            android:summary="@string/report_bug_or_suggest"/>
+
+        <Preference
+            android:key="@string/key_go_premium"
+            android:title="@string/go_premium"
+            android:summary="@string/go_premium_pref_summary"/>
+
+        <Preference
+            android:key="@string/key_rate_app"
+            android:title="@string/rate_app"/>
 
     </PreferenceCategory>
 

@@ -35,8 +35,8 @@ class BoxScorePresenter @Inject constructor(
 
 					if (boxModel.success) {
 						when (selectedTeam) {
-							BoxScoreSelectedTeam.HOME -> view.showHomeBoxScore(boxModel.boxScoreValues!!)
-							BoxScoreSelectedTeam.VISITOR -> view.showVisitorBoxScore(boxModel.boxScoreValues!!)
+							BoxScoreSelectedTeam.HOME -> view.showHomeBoxScore(boxModel.boxScore!!.game)
+							BoxScoreSelectedTeam.VISITOR -> view.showVisitorBoxScore(boxModel.boxScore!!.game)
 						}
 
 						view.setLoadingIndicator(false)

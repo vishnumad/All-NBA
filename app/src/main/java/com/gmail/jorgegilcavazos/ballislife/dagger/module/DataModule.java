@@ -8,6 +8,7 @@ import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalSharedPreferences;
 import com.gmail.jorgegilcavazos.ballislife.data.service.HighlightsService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService;
+import com.gmail.jorgegilcavazos.ballislife.data.service.NbaService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditGameThreadsService;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtilsImpl;
@@ -32,10 +33,12 @@ import static com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthenticat
 @Module
 public class DataModule {
 
-    String baseUrl;
+    String swishBaseUrl;
+    String nbaBaseUrl;
 
-    public DataModule(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public DataModule(String swishBaseUrl, String nbaBaseUrl) {
+        this.swishBaseUrl = swishBaseUrl;
+        this.nbaBaseUrl = nbaBaseUrl;
     }
 
     @Provides
@@ -56,11 +59,25 @@ public class DataModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
+    @Named("SwishBackend")
+    Retrofit provideRetrofitForSwish(Gson gson, OkHttpClient okHttpClient) {
         Retrofit retrofit = new Retrofit.Builder().client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .baseUrl(baseUrl)
+                .baseUrl(swishBaseUrl)
+                .build();
+
+        return retrofit;
+    }
+
+    @Provides
+    @Singleton
+    @Named("NbaBackend")
+    Retrofit provideRetrofitForNba(Gson gson, OkHttpClient okHttpClient) {
+        Retrofit retrofit = new Retrofit.Builder().client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .baseUrl(nbaBaseUrl)
                 .build();
 
         return retrofit;
@@ -89,20 +106,26 @@ public class DataModule {
 
     @Provides
     @Singleton
-    HighlightsService provideHighlightsService(Retrofit retrofit) {
+    HighlightsService provideHighlightsService(@Named("SwishBackend") Retrofit retrofit) {
         return retrofit.create(HighlightsService.class);
     }
 
     @Provides
     @Singleton
-    NbaGamesService provideNbaGamesService(Retrofit retrofit) {
+    NbaGamesService provideNbaGamesService(@Named("SwishBackend") Retrofit retrofit) {
         return retrofit.create(NbaGamesService.class);
     }
 
     @Provides
     @Singleton
-    RedditGameThreadsService provideRedditGameThreadsService(Retrofit retrofit) {
+    RedditGameThreadsService provideRedditGameThreadsService(@Named("SwishBackend") Retrofit retrofit) {
         return retrofit.create(RedditGameThreadsService.class);
+    }
+
+    @Provides
+    @Singleton
+    NbaService provideNbaService(@Named("NbaBackend") Retrofit retrofit) {
+        return retrofit.create(NbaService.class);
     }
 
     @Provides

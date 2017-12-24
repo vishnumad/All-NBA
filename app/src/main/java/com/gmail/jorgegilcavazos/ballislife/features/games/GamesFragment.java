@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -13,21 +14,28 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.DateSelectedEvent;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.LoadGamesEvent;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.OpenGameEvent;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiEvent.RefreshGamesEvent;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
+import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxrelay2.PublishRelay;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,7 +49,7 @@ import io.reactivex.Observable;
  * Displays a list of {@link NbaGame}s for the selected date.
  */
 public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLayout
-        .OnRefreshListener {
+        .OnRefreshListener, DatePickerDialog.OnDateSetListener {
     private static final String SELECTED_TIME = "SelectedTime";
     private static final String LIST_STATE = "ListState";
     public final static String TAG = "GamesFragment";
@@ -56,7 +64,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
 
     @BindView(R.id.navigator_button_left) ImageButton btnPrevDay;
     @BindView(R.id.navigator_button_right) ImageButton btnNextDay;
-    @BindView(R.id.navigator_text) TextView tvNavigatorDate;
+    @BindView(R.id.navigatorText) TextView navigatorText;
     @BindView(R.id.no_games_text) TextView tvNoGames;
     @BindView(R.id.games_rv) RecyclerView rvGames;
     @BindView(R.id.swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
@@ -66,6 +74,12 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     private GameAdapter gameAdapter;
     private Snackbar snackbar;
     private Unbinder unbinder;
+
+    private Calendar calendar = Calendar.getInstance();
+
+    private PublishRelay<DateSelectedEvent> dateSelectionEvents = PublishRelay.create();
+    private PublishRelay<LoadGamesEvent> loadGamesEvents = PublishRelay.create();
+    private PublishRelay<RefreshGamesEvent> refreshGamesEvents = PublishRelay.create();
 
     public GamesFragment() {
         // Required empty public constructor.
@@ -99,8 +113,31 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         rvGames.setAdapter(gameAdapter);
 
         if (savedInstanceState != null) {
-            presenter.setSelectedDate(savedInstanceState.getLong(SELECTED_TIME));
+            calendar.setTimeInMillis(savedInstanceState.getLong(SELECTED_TIME));
         }
+
+        btnPrevDay.setOnClickListener(v -> {
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            dateSelectionEvents.accept(new DateSelectedEvent(calendarClone()));
+        });
+
+        btnNextDay.setOnClickListener(v -> {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            dateSelectionEvents.accept(new DateSelectedEvent(calendarClone()));
+        });
+
+        navigatorText.setOnClickListener(v -> {
+            Calendar today = Calendar.getInstance();
+            DatePickerDialog datePicker = new DatePickerDialog(
+                    getActivity(),
+                    this,
+                    today.get(Calendar.YEAR),
+                    today.get(Calendar.MONTH),
+                    today.get(Calendar.DAY_OF_MONTH));
+            // First available game in backend.
+            datePicker.getDatePicker().setMinDate(1507204822000L);
+            datePicker.show();
+        });
 
         presenter.attachView(this);
 
@@ -118,14 +155,14 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     @Override
     public void onResume() {
         super.onResume();
-        presenter.loadGames(false);
+        loadGamesEvents.accept(new LoadGamesEvent(calendarClone()));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         listState = layoutManager.onSaveInstanceState();
-        outState.putLong(SELECTED_TIME, presenter.getSelectedDate());
+        outState.putLong(SELECTED_TIME, calendar.getTime().getTime());
         outState.putParcelable(LIST_STATE, listState);
     }
 
@@ -137,24 +174,40 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     }
 
     @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+        this.calendar.set(Calendar.YEAR, year);
+        this.calendar.set(Calendar.MONTH, month);
+        this.calendar.set(Calendar.DAY_OF_MONTH, day);
+        dateSelectionEvents.accept(new DateSelectedEvent(calendarClone()));
+    }
+
+    @Override
     public void onRefresh() {
-        presenter.loadGames(true);
-    }
-
-    @Override
-    public Observable<Object> prevDayClicks() {
-        return RxView.clicks(btnPrevDay);
-    }
-
-    @Override
-    public Observable<Object> nextDayClicks() {
-        return RxView.clicks(btnNextDay);
+        refreshGamesEvents.accept(new RefreshGamesEvent(calendarClone()));
     }
 
     @NotNull
     @Override
-    public Observable<GameV2> gameClicks() {
-        return gameAdapter.getGameClicks();
+    public Observable<OpenGameEvent> openGameEvents() {
+        return gameAdapter.getGameClicks().map(OpenGameEvent::new);
+    }
+
+    @NotNull
+    @Override
+    public Observable<DateSelectedEvent> dateSelectionEvents() {
+        return dateSelectionEvents;
+    }
+
+    @NotNull
+    @Override
+    public Observable<LoadGamesEvent> loadGamesEvents() {
+        return loadGamesEvents;
+    }
+
+    @NotNull
+    @Override
+    public Observable<RefreshGamesEvent> refreshGamesEvents() {
+        return refreshGamesEvents;
     }
 
     @Override
@@ -163,8 +216,8 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     }
 
     @Override
-    public void setDateNavigatorText(String dateText) {
-        tvNavigatorDate.setText(dateText);
+    public void setDateNavigatorText() {
+        navigatorText.setText(DateFormatUtil.formatNavigatorDate(calendar.getTime()));
     }
 
     @Override
@@ -179,7 +232,7 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
     }
 
     @Override
-    public void showGameDetails(@NonNull GameV2 game, long selectedDate) {
+    public void showGameDetails(@NonNull GameV2 game) {
         Intent intent = new Intent(getActivity(), CommentsActivity.class);
         intent.putExtra(GAME_THREAD_HOME, game.getHomeTeamAbbr());
         intent.putExtra(GAME_THREAD_AWAY, game.getAwayTeamAbbr());
@@ -204,8 +257,10 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
             return;
         }
 
-        snackbar = Snackbar.make(getView(), R.string.your_device_is_offline, Snackbar
-                .LENGTH_INDEFINITE).setAction(R.string.retry, v -> presenter.loadGames(true));
+        snackbar = Snackbar.make(getView(), R.string.your_device_is_offline, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, v -> {
+                    refreshGamesEvents.accept(new RefreshGamesEvent(calendarClone()));
+                });
         snackbar.show();
     }
 
@@ -215,8 +270,10 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
             return;
         }
 
-        snackbar = Snackbar.make(getView(), getString(R.string.something_went_wrong, code),
-                Snackbar.LENGTH_SHORT).setAction(R.string.retry, v -> presenter.loadGames(true));
+        snackbar = Snackbar.make(getView(), getString(R.string.something_went_wrong, code), Snackbar.LENGTH_SHORT)
+                .setAction(R.string.retry, v -> {
+                    refreshGamesEvents.accept(new RefreshGamesEvent(calendarClone()));
+                });
         snackbar.show();
     }
 
@@ -225,5 +282,17 @@ public class GamesFragment extends Fragment implements GamesView, SwipeRefreshLa
         if (snackbar != null) {
             snackbar.dismiss();
         }
+    }
+
+    @NotNull
+    @Override
+    public Calendar getCurrentDateShown() {
+        return calendar;
+    }
+
+    private Calendar calendarClone() {
+        Calendar copy = Calendar.getInstance();
+        copy.setTime(calendar.getTime());
+        return copy;
     }
 }

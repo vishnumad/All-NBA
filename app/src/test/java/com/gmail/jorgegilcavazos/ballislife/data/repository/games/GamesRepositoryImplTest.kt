@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.data.repository.games
 
+import com.gmail.jorgegilcavazos.ballislife.data.actions.games.GamesResult
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaGamesService
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
@@ -104,6 +105,68 @@ class GamesRepositoryImplTest {
     testObserver.assertValueAt(1, { it.isMemorySuccess && it.games.isEmpty() })
     testObserver.assertValueAt(2, { it.isNetworkInProgress })
     testObserver.assertError({ it == exception })
+  }
+
+  @Test
+  fun loadGamesWithCacheEmptyResult() {
+    val game1 = createGame("1")
+    val response = hashMapOf("9f0ji2" to game1)
+    `when`(gamesService.getDayGames(anyString(), anyLong(), anyLong()))
+        .thenReturn(Single.just(response))
+
+    val testObserver = repository.loadGames(Calendar.getInstance(), false).test()
+
+    testObserver.assertValueAt(0, { it is GamesResult.LoadGamesResult.MemoryInProgress })
+    testObserver.assertValueAt(1, { it is GamesResult.LoadGamesResult.NoCachedGames })
+    testObserver.assertValueAt(2, { it is GamesResult.LoadGamesResult.NetworkInProgress})
+    testObserver.assertValueAt(3, { it is GamesResult.LoadGamesResult.Success })
+    testObserver.assertValueAt(3, { (it as GamesResult.LoadGamesResult.Success).games[0] == game1 })
+  }
+
+  @Test
+  fun loadGamesWithCacheAvailableResult() {
+    val game1 = createGame("1")
+    val response = hashMapOf("9f0ji2" to game1)
+    repository.saveGamesInCache(response)
+    `when`(gamesService.getDayGames(anyString(), anyLong(), anyLong()))
+        .thenReturn(Single.just(response))
+
+    val testObserver = repository.loadGames(Calendar.getInstance(), false).test()
+
+    testObserver.assertValueAt(0, { it is GamesResult.LoadGamesResult.MemoryInProgress })
+    testObserver.assertValueAt(1, { it is GamesResult.LoadGamesResult.Success })
+    testObserver.assertValueAt(1, { (it as GamesResult.LoadGamesResult.Success).games[0] == game1 })
+    testObserver.assertValueAt(2, { it is GamesResult.LoadGamesResult.NetworkInProgress})
+    testObserver.assertValueAt(3, { it is GamesResult.LoadGamesResult.Success })
+    testObserver.assertValueAt(3, { (it as GamesResult.LoadGamesResult.Success).games[0] == game1 })
+  }
+
+  @Test
+  fun loadGamesWithNonAvailableResult() {
+    `when`(gamesService.getDayGames(anyString(), anyLong(), anyLong()))
+        .thenReturn(Single.just(emptyMap()))
+
+    val testObserver = repository.loadGames(Calendar.getInstance(), false).test()
+
+    testObserver.assertValueAt(0, { it is GamesResult.LoadGamesResult.MemoryInProgress })
+    testObserver.assertValueAt(1, { it is GamesResult.LoadGamesResult.NoCachedGames })
+    testObserver.assertValueAt(2, { it is GamesResult.LoadGamesResult.NetworkInProgress})
+    testObserver.assertValueAt(3, { it is GamesResult.LoadGamesResult.NoGames })
+  }
+
+  @Test
+  fun loadGamesFailureResult() {
+    val error = Exception()
+    `when`(gamesService.getDayGames(anyString(), anyLong(), anyLong()))
+        .thenReturn(Single.error(error))
+
+    val testObserver = repository.loadGames(Calendar.getInstance(), false).test()
+
+    testObserver.assertValueAt(0, { it is GamesResult.LoadGamesResult.MemoryInProgress })
+    testObserver.assertValueAt(1, { it is GamesResult.LoadGamesResult.NoCachedGames })
+    testObserver.assertValueAt(2, { it is GamesResult.LoadGamesResult.NetworkInProgress})
+    testObserver.assertValueAt(3, { it is GamesResult.LoadGamesResult.Failure })
+    testObserver.assertValueAt(3, { (it as GamesResult.LoadGamesResult.Failure).t == error })
   }
 
   private fun createGame(id: String, calendar: Calendar = Calendar.getInstance()): GameV2 {

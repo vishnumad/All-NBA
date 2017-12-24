@@ -23,6 +23,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvide
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +39,7 @@ public class StandingsFragment extends Fragment implements StandingsView,
     private static final int WEST = 1;
 
     @Inject
+    @Named("SwishBackend")
     Retrofit retrofit;
 
     @Inject

@@ -283,8 +283,8 @@ public class SubmittionActivity extends BaseNoActionBarActivity implements
     @Override
     public void showComments(@NonNull List<ThreadItem> commentNodes, @NonNull Submission
             submission) {
-        threadAdapter.setData(commentNodes);
         threadAdapter.setSubmission(submission);
+        threadAdapter.setData(commentNodes);
     }
 
     @Override

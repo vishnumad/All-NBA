@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.boxscore
 
 import com.gmail.jorgegilcavazos.ballislife.data.repository.boxscore.BoxScoreRepository
+import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreResponse
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreTeam
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
@@ -41,7 +42,8 @@ class BoxScorePresenterTest {
 
 	@Test
 	fun loadHomeBoxScoreSuccess() {
-		val boxScore = BoxScoreValues(BoxScoreTeam(listOf(), 0), BoxScoreTeam(listOf(), 0))
+		val boxScore = BoxScoreResponse(BoxScoreValues(
+				BoxScoreTeam(listOf(), 0), BoxScoreTeam(listOf(), 0)))
 		`when`(mockBoxScoreRepository.boxScore("GAME_ID", true))
 				.thenReturn(Observable.just(
 						BoxScoreUIModel.inProgress(),
@@ -52,13 +54,14 @@ class BoxScorePresenterTest {
 		verify(mockView).hideBoxScore()
 		verify(mockView).setLoadingIndicator(true)
 		verify(mockView, times(2)).showBoxScoreNotAvailableMessage(false)
-		verify(mockView).showHomeBoxScore(boxScore)
+		verify(mockView).showHomeBoxScore(boxScore.game)
 		verify(mockView).setLoadingIndicator(false)
 	}
 
 	@Test
 	fun loadVisitorBoxScoreSuccess() {
-		val boxScore = BoxScoreValues(BoxScoreTeam(listOf(), 0), BoxScoreTeam(listOf(), 0))
+		val boxScore = BoxScoreResponse(BoxScoreValues(
+				BoxScoreTeam(listOf(), 0), BoxScoreTeam(listOf(), 0)))
 		`when`(mockBoxScoreRepository.boxScore("GAME_ID", true))
 				.thenReturn(Observable.just(
 						BoxScoreUIModel.inProgress(),
@@ -69,7 +72,7 @@ class BoxScorePresenterTest {
 		verify(mockView).hideBoxScore()
 		verify(mockView).setLoadingIndicator(true)
 		verify(mockView, times(2)).showBoxScoreNotAvailableMessage(false)
-		verify(mockView).showVisitorBoxScore(boxScore)
+		verify(mockView).showVisitorBoxScore(boxScore.game)
 		verify(mockView).setLoadingIndicator(false)
 	}
 
