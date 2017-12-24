@@ -68,6 +68,24 @@
             android:summary="@string/summary_settings_start"
             android:title="@string/title_settings_start"/>
 
+        <MultiSelectListPreference
+            android:defaultValue="@array/pref_halftime_values_def"
+            android:dialogTitle="@string/dialog_settings_halftime"
+            android:entries="@array/pref_halftime_titles"
+            android:entryValues="@array/pref_halftime_values"
+            android:key="@string/key_settings_halftime"
+            android:summary="@string/summary_settings_halftime"
+            android:title="@string/title_settings_halftime"/>
+
+        <MultiSelectListPreference
+            android:defaultValue="@array/pref_end_of_game_values_def"
+            android:dialogTitle="@string/dialog_settings_end_of_game"
+            android:entries="@array/pref_end_of_game_titles"
+            android:entryValues="@array/pref_end_of_game_values"
+            android:key="@string/key_settings_end_of_game"
+            android:summary="@string/summary_settings_end_of_game"
+            android:title="@string/title_settings_end_of_game"/>
+
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/key_triple_double_alert"

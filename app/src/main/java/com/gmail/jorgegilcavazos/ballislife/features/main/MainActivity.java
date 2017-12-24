@@ -52,12 +52,10 @@ import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -154,7 +152,6 @@ public class MainActivity extends BaseNoActionBarActivity {
             }
         }
 
-        resubscribeToTopics();
         setUpToolbar();
         setUpNavigationView();
         setUpDrawerContent();
@@ -570,31 +567,6 @@ public class MainActivity extends BaseNoActionBarActivity {
                 startActivity(profileIntent);
             }
         });
-    }
-
-    private void resubscribeToTopics() {
-        // Subscribe to all CGA topics
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> cgaTopics = preferences.getStringSet(SettingsFragment.KEY_PREF_CGA_TOPICS,
-                null);
-        String[] availableGameTopics = getResources().getStringArray(R.array.pref_cga_values);
-        updateTopicSubscriptions(cgaTopics, availableGameTopics);
-    }
-
-    private void updateTopicSubscriptions(Set<String> newTopics, String[] availableTopics) {
-        if (newTopics != null) {
-            for (String availableTopic : availableTopics) {
-                if (newTopics.contains(availableTopic)) {
-                    FirebaseMessaging.getInstance().subscribeToTopic(availableTopic);
-                } else {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
-                }
-            }
-        } else {
-            for (String availableTopic : availableTopics) {
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(availableTopic);
-            }
-        }
     }
 
     private void setupDynamicShortcut() {

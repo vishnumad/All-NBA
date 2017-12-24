@@ -13,7 +13,6 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
-import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -40,6 +39,8 @@ public class SettingsFragment extends PreferenceFragment
     // Should match string values in strings.xml
     public static final String KEY_PREF_CGA_TOPICS = "pref_cga_topics";
     public static final String KEY_PREF_START_TOPICS = "pref_start_topics";
+    public static final String KEY_PREF_HALFTIME_TOPICS = "pref_halftime_topics";
+    public static final String KEY_PREF_END_OF_GAME_TOPICS = "pref_end_of_game_topics";
     public static final String KEY_ENABLE_ALERTS = "pref_enable_alerts";
     public static final String KEY_STARTUP_FRAGMENT = "key_startup_fragment";
     public static final String KEY_YOUTUBE_IN_APP = "in_app_youtube";
@@ -80,12 +81,9 @@ public class SettingsFragment extends PreferenceFragment
 
         // Feedback button listener to show dialog
         Preference feedback = findPreference(KEY_FEEDBACK);
-        feedback.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                feedbackDialog();
-                return true;
-            }
+        feedback.setOnPreferenceClickListener(preference -> {
+            feedbackDialog();
+            return true;
         });
 
         initListeners();
@@ -131,6 +129,20 @@ public class SettingsFragment extends PreferenceFragment
                         .getStringArray(R.array.pref_start_values);
 
                 updateTopicSubscriptions(newStartTopics, availableStartTopics);
+                break;
+            case KEY_PREF_HALFTIME_TOPICS:
+                Set<String> newHalftimeTopics = sharedPreferences.getStringSet(key, null);
+                String[] availableHalftimeTopics = getResources()
+                        .getStringArray(R.array.pref_halftime_values);
+
+                updateTopicSubscriptions(newHalftimeTopics, availableHalftimeTopics);
+                break;
+            case KEY_PREF_END_OF_GAME_TOPICS:
+                Set<String> newEOGTopics = sharedPreferences.getStringSet(key, null);
+                String[] availableEOGTopics = getResources()
+                        .getStringArray(R.array.pref_halftime_values);
+
+                updateTopicSubscriptions(newEOGTopics, availableEOGTopics);
                 break;
             case KEY_NO_SPOILERS_MODE:
                 SwitchPreference noSpoilers = (SwitchPreference) preference;

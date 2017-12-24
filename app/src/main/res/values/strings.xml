@@ -167,9 +167,22 @@
 
     <string name="title_settings_start">Game Starting</string>
     <string name="dialog_settings_start">Pick teams to receive alerts</string>
-    <string name="summary_settings_start">Receive an alert when your favorite teams are about to play</string>
+    <string name="summary_settings_start">Receive an alert before a game starts</string>
+
+    <string name="title_settings_halftime">Halftime Score</string>
+    <string name="dialog_settings_halftime">Pick teams to receive alerts</string>
+    <string name="summary_settings_halftime">Receive a score update at halftime</string>
+
+    <string name="title_settings_end_of_game">End of Game</string>
+    <string name="dialog_settings_end_of_game">Pick teams to receive alerts</string>
+    <string name="summary_settings_end_of_game">Receive an alert with the final score</string>
+
+
     <!-- DO NOT TRANSLATE -->
     <string name="key_settings_start">pref_start_topics</string>
+    <string name="key_settings_halftime">pref_halftime_topics</string>
+    <string name="key_settings_end_of_game">pref_end_of_game_topics</string>
+
     <string name="pref_startup_fragment_title">Startup Page</string>
     <string-array name="pref_startup_fragment_entries">
         <item>Games</item>
@@ -354,8 +367,7 @@
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
-    <string-array name="pref_cga_values_def">
-    </string-array>
+    <string-array name="pref_cga_values_def"/>
 
     <!-- DO NOT TRANSLATE -->
     <string-array name="pref_start_titles">
@@ -426,7 +438,145 @@
     </string-array>
 
     <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_halftime_titles">
+        <item>Atlanta</item>
+        <item>Brooklyn</item>
+        <item>Boston</item>
+        <item>Charlotte</item>
+        <item>Chicago</item>
+        <item>Cleveland</item>
+        <item>Dallas</item>
+        <item>Denver</item>
+        <item>Detroit</item>
+        <item>Golden State</item>
+        <item>Houston</item>
+        <item>Indiana</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
+        <item>Memphis</item>
+        <item>Miami</item>
+        <item>Milwaukee</item>
+        <item>Minnesota</item>
+        <item>New Orleans</item>
+        <item>New York</item>
+        <item>Oklahoma City</item>
+        <item>Orlando</item>
+        <item>Philadelphia</item>
+        <item>Phoenix</item>
+        <item>Portland</item>
+        <item>Sacramento</item>
+        <item>San Antonio</item>
+        <item>Toronto</item>
+        <item>Utah</item>
+        <item>Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_halftime_values">
+        <item>Halftime-Atlanta</item>
+        <item>Halftime-Brooklyn</item>
+        <item>Halftime-Boston</item>
+        <item>Halftime-Charlotte</item>
+        <item>Halftime-Chicago</item>
+        <item>Halftime-Cleveland</item>
+        <item>Halftime-Dallas</item>
+        <item>Halftime-Denver</item>
+        <item>Halftime-Detroit</item>
+        <item>Halftime-Golden-State</item>
+        <item>Halftime-Houston</item>
+        <item>Halftime-Indiana</item>
+        <item>Halftime-Los-Angeles-C</item>
+        <item>Halftime-Los-Angeles-L</item>
+        <item>Halftime-Memphis</item>
+        <item>Halftime-Miami</item>
+        <item>Halftime-Milwaukee</item>
+        <item>Halftime-Minnesota</item>
+        <item>Halftime-New-Orleans</item>
+        <item>Halftime-New-York</item>
+        <item>Halftime-Oklahoma-City</item>
+        <item>Halftime-Orlando</item>
+        <item>Halftime-Philadelphia</item>
+        <item>Halftime-Phoenix</item>
+        <item>Halftime-Portland</item>
+        <item>Halftime-Sacramento</item>
+        <item>Halftime-San-Antonio</item>
+        <item>Halftime-Toronto</item>
+        <item>Halftime-Utah</item>
+        <item>Halftime-Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_end_of_game_titles">
+        <item>Atlanta</item>
+        <item>Brooklyn</item>
+        <item>Boston</item>
+        <item>Charlotte</item>
+        <item>Chicago</item>
+        <item>Cleveland</item>
+        <item>Dallas</item>
+        <item>Denver</item>
+        <item>Detroit</item>
+        <item>Golden State</item>
+        <item>Houston</item>
+        <item>Indiana</item>
+        <item>Los Angeles Clippers</item>
+        <item>Los Angeles Lakers</item>
+        <item>Memphis</item>
+        <item>Miami</item>
+        <item>Milwaukee</item>
+        <item>Minnesota</item>
+        <item>New Orleans</item>
+        <item>New York</item>
+        <item>Oklahoma City</item>
+        <item>Orlando</item>
+        <item>Philadelphia</item>
+        <item>Phoenix</item>
+        <item>Portland</item>
+        <item>Sacramento</item>
+        <item>San Antonio</item>
+        <item>Toronto</item>
+        <item>Utah</item>
+        <item>Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
+    <string-array name="pref_end_of_game_values">
+        <item>EOG-Atlanta</item>
+        <item>EOG-Brooklyn</item>
+        <item>EOG-Boston</item>
+        <item>EOG-Charlotte</item>
+        <item>EOG-Chicago</item>
+        <item>EOG-Cleveland</item>
+        <item>EOG-Dallas</item>
+        <item>EOG-Denver</item>
+        <item>EOG-Detroit</item>
+        <item>EOG-Golden-State</item>
+        <item>EOG-Houston</item>
+        <item>EOG-Indiana</item>
+        <item>EOG-Los-Angeles-C</item>
+        <item>EOG-Los-Angeles-L</item>
+        <item>EOG-Memphis</item>
+        <item>EOG-Miami</item>
+        <item>EOG-Milwaukee</item>
+        <item>EOG-Minnesota</item>
+        <item>EOG-New-Orleans</item>
+        <item>EOG-New-York</item>
+        <item>EOG-Oklahoma-City</item>
+        <item>EOG-Orlando</item>
+        <item>EOG-Philadelphia</item>
+        <item>EOG-Phoenix</item>
+        <item>EOG-Portland</item>
+        <item>EOG-Sacramento</item>
+        <item>EOG-San-Antonio</item>
+        <item>EOG-Toronto</item>
+        <item>EOG-Utah</item>
+        <item>EOG-Washington</item>
+    </string-array>
+
+    <!-- DO NOT TRANSLATE -->
     <string-array name="pref_start_values_def"/>
+    <string-array name="pref_halftime_values_def"/>
+    <string-array name="pref_end_of_game_values_def"/>
 
     <string name="would_you_like_to_sign_in">Would you like to sign in to your Reddit account? \n\n Signing in with reddit allows you to vote submissions and comments, reply to other users and save your favorite posts.</string>
     <string name="log_in_caps">LOG IN</string>
