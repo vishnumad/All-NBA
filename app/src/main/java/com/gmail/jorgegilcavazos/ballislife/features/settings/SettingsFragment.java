@@ -57,6 +57,8 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_5_X_5 = "five_x_five_alert";
     public static final String KEY_APP_VERSION = "app_version";
     public static final String KEY_FEEDBACK = "feedback";
+    public static final String KEY_GO_PREMIUM = "key_go_premium";
+
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
     public static final String STARTUP_FRAGMENT_HIGHLIGHTS = "2";
@@ -87,6 +89,13 @@ public class SettingsFragment extends PreferenceFragment
         Preference feedback = findPreference(KEY_FEEDBACK);
         feedback.setOnPreferenceClickListener(preference -> {
             feedbackDialog();
+            return true;
+        });
+
+        Preference goPremium = findPreference(KEY_GO_PREMIUM);
+        goPremium.setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
+            startActivity(intent);
             return true;
         });
 

@@ -660,6 +660,7 @@
     <string name="about">About</string>
     <string name="key_app_version">app_version</string>
     <string name="key_feedback">feedback</string>
+    <string name="key_go_premium">key_go_premium</string>
     <string name="report_bug_or_suggest">Report bugs or suggest a new feature</string>
     <string name="send">Send</string>
 
@@ -682,4 +683,5 @@
     <string name="fav_deletion_positive">Yes</string>
     <string name="fav_deletion_negative">No</string>
     <string name="thank_you">Thank you!</string>
+    <string name="go_premium_pref_summary">Support Swish and unlock awesome features</string>
 </resources>

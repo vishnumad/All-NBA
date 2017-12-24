@@ -125,13 +125,18 @@
 
         <Preference
             android:key="@string/key_app_version"
-            android:title="App Version"
+            android:title="Swish Version"
             android:summary="1.0"/>
 
         <Preference
             android:key="@string/key_feedback"
             android:title="Feedback"
             android:summary="@string/report_bug_or_suggest"/>
+
+        <Preference
+            android:key="@string/key_go_premium"
+            android:title="@string/go_premium"
+            android:summary="@string/go_premium_pref_summary"/>
 
     </PreferenceCategory>
 
