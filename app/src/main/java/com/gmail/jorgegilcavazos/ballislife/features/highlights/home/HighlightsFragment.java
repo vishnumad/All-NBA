@@ -396,6 +396,11 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
         Toast.makeText(getActivity(), R.string.add_fav_failed, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void showMustLogInToFavoriteMsg() {
+        Toast.makeText(getActivity(), R.string.favorite_must_log_in, Toast.LENGTH_SHORT).show();
+    }
+
     private void openViewPickerDialog() {
         final MaterialDialog materialDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.change_view)

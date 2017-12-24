@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
@@ -238,5 +239,42 @@ public class HighlightsPresenterTest {
 
         verify(mockView).dismissSwishCard(SwishCard.HIGHLIGHT_SORTING);
         verify(mockLocalRepository).markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
+    }
+
+    @Test
+    public void addHighlightToFavoriteOnClickSuccess() {
+        Highlight highlight = new Highlight();
+        when(mockFavoritesRepository.saveToFavorites(highlight)).thenReturn(Completable.complete());
+        when(mockLocalRepository.getUsername()).thenReturn("Obi-Wan_Ginobili");
+
+        presenter.subscribeToFavoriteClick(Observable.just(highlight));
+
+        verify(mockView).showAddingToFavoritesMsg();
+        verify(mockFavoritesRepository).saveToFavorites(highlight);
+        verify(mockView).showAddedToFavoritesMsg();
+    }
+
+    @Test
+    public void addHighlightToFavoriteOnClickFailure() {
+        Highlight highlight = new Highlight();
+        when(mockFavoritesRepository.saveToFavorites(highlight))
+                .thenReturn(Completable.error(new Exception()));
+        when(mockLocalRepository.getUsername()).thenReturn("Obi-Wan_Ginobili");
+
+        presenter.subscribeToFavoriteClick(Observable.just(highlight));
+
+        verify(mockView).showAddingToFavoritesMsg();
+        verify(mockFavoritesRepository).saveToFavorites(highlight);
+        verify(mockView).showAddToFavoritesFailed();
+    }
+
+    @Test
+    public void doNotAddHighlightToFavoriteWhenLoggedOut() {
+        Highlight highlight = new Highlight();
+        when(mockLocalRepository.getUsername()).thenReturn(null);
+
+        presenter.subscribeToFavoriteClick(Observable.just(highlight));
+
+        verify(mockView).showMustLogInToFavoriteMsg();
     }
 }
