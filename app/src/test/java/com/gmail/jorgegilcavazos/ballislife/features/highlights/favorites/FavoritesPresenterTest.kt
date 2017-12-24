@@ -21,6 +21,10 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class FavoritesPresenterTest {
 
+  companion object {
+    private val USERNAME = "Obi-Wan_Ginobili"
+  }
+
   @Mock private lateinit var mockView: FavoritesView
   @Mock private lateinit var mockLocalRepository: LocalRepository
   @Mock private lateinit var mockFavoritesRepository: FavoritesRepository
@@ -62,6 +66,7 @@ class FavoritesPresenterTest {
   fun showConfirmationDialogIfFavorite() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     favoriteClicks.accept(highlight)
@@ -73,6 +78,7 @@ class FavoritesPresenterTest {
   fun removeHighlightFromFavoritesOnDeletion() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     favoriteDeletions.accept(highlight)
@@ -85,6 +91,7 @@ class FavoritesPresenterTest {
   fun openStreamableOnOpenEvent() {
     val highlight = Highlight(url = "streamable.com/abcd")
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openHighlightEvents.accept(highlight)
@@ -96,6 +103,7 @@ class FavoritesPresenterTest {
   fun openYoutubeOnOpenEvent() {
     val highlight = Highlight(url = "youtube.com?v=abcd")
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openHighlightEvents.accept(highlight)
@@ -107,6 +115,7 @@ class FavoritesPresenterTest {
   fun showInvalidStreamableOnBadSource() {
     val highlight = Highlight(url = "streamable.com")
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openHighlightEvents.accept(highlight)
@@ -118,6 +127,7 @@ class FavoritesPresenterTest {
   fun showInvalidYoutubeOnBadSource() {
     val highlight = Highlight(url = "youtube.net")
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openHighlightEvents.accept(highlight)
@@ -129,6 +139,7 @@ class FavoritesPresenterTest {
   fun showInvalidSourceIfNotStreamableOrYoutube() {
     val highlight = Highlight(url = "instagram.com?v=50")
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openHighlightEvents.accept(highlight)
@@ -140,6 +151,7 @@ class FavoritesPresenterTest {
   fun showSubmissionOnOpenEvent() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     openSubmissionEvents.accept(highlight)
@@ -151,6 +163,7 @@ class FavoritesPresenterTest {
   fun showShareDialogOnShareEvent() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     shareHighlightEvents.accept(highlight)
@@ -162,6 +175,7 @@ class FavoritesPresenterTest {
   fun addHighlightOnRepositoryPush() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     favorites.accept(highlight)
@@ -173,6 +187,7 @@ class FavoritesPresenterTest {
   fun addHighlightOnNewlyAddedPush() {
     val highlight = Highlight()
     `when`(mockView.isPremium()).thenReturn(true)
+    `when`(mockLocalRepository.username).thenReturn(USERNAME)
     presenter.attachView(mockView)
 
     newlyAddedFavorites.accept(highlight)

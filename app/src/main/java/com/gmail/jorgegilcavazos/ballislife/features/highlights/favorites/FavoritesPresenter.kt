@@ -38,8 +38,8 @@ class FavoritesPresenter @Inject constructor(
         }
         .addTo(disposables)
 
-    // All of the following events are for premium users only.
-    if (!view.isPremium()) {
+    // All of the following events are for premium users only who are logged in.
+    if (!view.isPremium() || localRepository.username.isNullOrEmpty()) {
       return
     }
 
@@ -101,7 +101,7 @@ class FavoritesPresenter @Inject constructor(
   }
 
   fun loadMore() {
-    if (view.isPremium()) {
+    if (view.isPremium() && !localRepository.username.isNullOrEmpty()) {
       favoritesRepository.loadMore()
     }
   }

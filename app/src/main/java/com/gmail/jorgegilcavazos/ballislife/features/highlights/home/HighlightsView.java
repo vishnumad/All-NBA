@@ -57,4 +57,6 @@ public interface HighlightsView {
     void showAddedToFavoritesMsg();
 
     void showAddToFavoritesFailed();
+
+    void showMustLogInToFavoriteMsg();
 }

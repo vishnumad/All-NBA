@@ -11,6 +11,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler;
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
@@ -223,8 +224,12 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
     public void subscribeToFavoriteClick(Observable<Highlight> highlights) {
         disposables.add(highlights
                 .subscribe(highlight -> {
-                    view.showAddingToFavoritesMsg();
-                    addToFavorites(highlight);
+                    if (StringUtils.Companion.isNullOrEmpty(localRepository.getUsername())) {
+                        view.showMustLogInToFavoriteMsg();
+                    } else {
+                        view.showAddingToFavoritesMsg();
+                        addToFavorites(highlight);
+                    }
                 }));
     }
 

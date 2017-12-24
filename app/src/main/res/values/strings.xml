@@ -685,4 +685,5 @@
     <string name="thank_you">Thank you!</string>
     <string name="go_premium_pref_summary">Support Swish and unlock awesome features</string>
     <string name="rate_app">Rate app!</string>
+    <string name="favorite_must_log_in">You must log in to save a highlight</string>
 </resources>
