@@ -16,10 +16,9 @@ import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
-
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapterV2
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity
@@ -45,7 +44,7 @@ class FavoritesFragment : Fragment(), FavoritesView {
 
   private var listState: Parcelable? = null
   private lateinit var linearLayoutManager: LinearLayoutManager
-  private lateinit var highlightAdapter: HighlightAdapter
+  private lateinit var highlightAdapter: HighlightAdapterV2
   private lateinit var endlessScroller: EndlessRecyclerViewScrollListener
   private lateinit var viewType: HighlightViewType
 
@@ -63,7 +62,14 @@ class FavoritesFragment : Fragment(), FavoritesView {
 
     viewType = localRepository.favoriteHighlightViewType
     linearLayoutManager = LinearLayoutManager(activity)
-    highlightAdapter = HighlightAdapter(activity, mutableListOf(), viewType, false, isPremium())
+
+    // Only of of the three showCard parameters should be true.
+    highlightAdapter = HighlightAdapterV2(
+        context = activity,
+        highlights = mutableListOf(),
+        highlightViewType = viewType,
+        isPremium = isPremium()
+    )
   }
 
   override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -118,7 +124,7 @@ class FavoritesFragment : Fragment(), FavoritesView {
     highlightAdapter.removeHighlight(highlight)
   }
 
-  override fun favoriteClicks(): Observable<Highlight> = highlightAdapter.favoriteClicks
+  override fun favoriteClicks(): Observable<Highlight> = highlightAdapter.getFavoriteClicks()
 
   override fun showRemoveFromFavoritesConfirmation(highlight: Highlight) {
     MaterialDialog.Builder(activity)
@@ -137,12 +143,16 @@ class FavoritesFragment : Fragment(), FavoritesView {
     return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted
   }
 
-  override fun openHighlightEvents(): Observable<Highlight> = highlightAdapter.viewClickObservable
+  override fun openHighlightEvents(): Observable<Highlight> {
+    return highlightAdapter.getViewClickObservable()
+  }
 
-  override fun shareHighlightEvents(): Observable<Highlight> = highlightAdapter.shareClickObservable
+  override fun shareHighlightEvents(): Observable<Highlight> {
+    return highlightAdapter.getShareClickObservable()
+  }
 
   override fun openSubmissionEvents(): Observable<Highlight> {
-   return highlightAdapter.submissionClickObservable
+   return highlightAdapter.getSubmissionClickObservable()
   }
 
   override fun openStreamable(shortCode: String) {

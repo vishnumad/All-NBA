@@ -29,7 +29,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapterV2;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
@@ -68,7 +68,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     Parcelable listState;
     private HighlightViewType viewType;
     private Unbinder unbinder;
-    private HighlightAdapter highlightAdapter;
+    private HighlightAdapterV2 highlightAdapter;
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
     private Menu menu;
@@ -92,12 +92,15 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
         linearLayoutManager = new LinearLayoutManager(getActivity());
 
-        highlightAdapter = new HighlightAdapter(
+        // Only of of the three showCard parameters should be true.
+        highlightAdapter = new HighlightAdapterV2(
                 getActivity(),
                 new ArrayList<>(25),
                 viewType,
+                isPremium(),
                 shouldShowSortingCard(),
-                isPremium());
+                false /* showSwishFavoritesCard */,
+                false /* showAddFavoritesCard */);
 
         setHasOptionsMenu(true);
     }

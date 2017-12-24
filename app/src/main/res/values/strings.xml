@@ -479,9 +479,30 @@
     <string name="add_a_delay_to_these_comments">Add a delay to these comments</string>
     <string name="help_support_swish">Help support Swish</string>
     <string name="go_premium_body">Swish is an open project self-funded by <font color='#FF9800'>/u/Obi-Wan_Ginobili</font>. Help support the app and get these awesome benefits:</string>
+
+    <!-- SWISH SORTING CARD -->
     <string name="swish_card_highlight_sorting_title">Want to see the top highlights?</string>
-    <string name="swish_card_highlight_sorting_content">Sort highlights by popularity and unlock more awesome features with Swish Premium</string>
+    <string name="swish_card_highlight_sorting_content">
+        Sort highlights by popularity and unlock more awesome features with Swish Premium
+    </string>
     <string name="swish_card_highlight_sorting_action">Explore premium</string>
+
+    <!-- SWISH FAVORITES CARD -->
+    <string name="swish_card_highlight_favorites_title">
+        Want to save your favorite highlights?</string>
+    <string name="swish_card_highlight_favorites_content">
+        Keep your favorite highlights here and unlock more awesome features with Swish Premium
+    </string>
+    <string name="swish_card_highlight_favorites_action">Explore premium</string>
+
+    <!-- SWISH FAVORITES EMPTY CARD -->
+    <string name="swish_card_favorites_empty_title">
+        You haven\'t saved any highlights yet
+    </string>
+    <string name="swish_card_favorites_empty_content">
+        You can add a highlight to your favorites by long-pressing it in the home tab
+    </string>
+
     <string name="triple_doubles">Triple Doubles</string>
     <string name="quadruple_doubles">Quadruple Doubles</string>
     <string name="five_x_fives">5x5\'s</string>
