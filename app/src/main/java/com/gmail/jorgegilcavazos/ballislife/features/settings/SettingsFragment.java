@@ -13,6 +13,8 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.support.design.widget.TextInputEditText;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
@@ -24,8 +26,10 @@ import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.main.MainActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
+import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Set;
@@ -308,7 +312,8 @@ public class SettingsFragment extends PreferenceFragment
         Preference logInStatusPref = findPreference("log_in_status_pref");
         if (localRepository.getUsername() != null) {
             logInStatusPref.setTitle(R.string.log_out);
-            logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user), localRepository.getUsername()));
+            logInStatusPref.setSummary(String.format(getString(R.string.logged_as_user),
+                    localRepository.getUsername()));
 
         } else {
             logInStatusPref.setTitle(R.string.log_in);
@@ -343,9 +348,9 @@ public class SettingsFragment extends PreferenceFragment
     }
 
     public String appVersion() throws PackageManager.NameNotFoundException {
-        PackageInfo pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
-        String version = pInfo.versionName;
-        return version;
+        PackageInfo pInfo = getActivity().getPackageManager()
+                .getPackageInfo(getActivity().getPackageName(), 0);
+        return pInfo.versionName;
     }
 
     public void feedbackDialog() {
@@ -353,6 +358,17 @@ public class SettingsFragment extends PreferenceFragment
                 .title(R.string.report_bug_or_suggest)
                 .customView(R.layout.feedback_form_layout, false)
                 .positiveText(R.string.send)
+                .onPositive((dialog, which) -> {
+                    TextInputEditText editText = dialog.getCustomView()
+                            .findViewById(R.id.feedbackEditText);
+                    String feedback = editText.getText().toString();
+                    if (!StringUtils.Companion.isNullOrEmpty(feedback)) {
+                        FirebaseFirestore.getInstance()
+                                .collection("feedback")
+                                .add(new Feedback(feedback));
+                    }
+                    Toast.makeText(getActivity(), R.string.thank_you, Toast.LENGTH_SHORT).show();
+                })
                 .build();
 
         feedbackDialog.show();

@@ -662,7 +662,6 @@
     <string name="key_feedback">feedback</string>
     <string name="report_bug_or_suggest">Report bugs or suggest a new feature</string>
     <string name="send">Send</string>
-    <string name="hint_feedback_form">Tell us what went wrong or what feature you\'d like to see next</string>
 
     <string-array name="add_delay_options">
         <item>None</item>
@@ -682,4 +681,5 @@
     <string name="fav_deletion_content">Do you want to delete this highlight from favorites?</string>
     <string name="fav_deletion_positive">Yes</string>
     <string name="fav_deletion_negative">No</string>
+    <string name="thank_you">Thank you!</string>
 </resources>
