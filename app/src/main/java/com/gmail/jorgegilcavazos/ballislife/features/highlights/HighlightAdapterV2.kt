@@ -17,7 +17,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 /**
- * RecyclerView adapter for [Highlight]. Only one card should be enabled simultaneously.
+ * RecyclerView adapter for a [Highlight]. Only one card should be enabled simultaneously.
  */
 class HighlightAdapterV2(
     private val context: Context,
@@ -34,8 +34,8 @@ class HighlightAdapterV2(
   private val shareClickSubject = PublishSubject.create<Highlight>()
   private val favoriteClicks = PublishRelay.create<Highlight>()
   private val submissionClickSubject = PublishSubject.create<Highlight>()
-  private val exploreClicks = PublishSubject.create<Any>()
-  private val gotItClicks = PublishSubject.create<Any>()
+  private val exploreClicks = PublishSubject.create<SwishCard>()
+  private val gotItClicks = PublishSubject.create<SwishCard>()
 
   fun ViewGroup.inflate(layoutResId: Int): View =
       LayoutInflater.from(this.context).inflate(layoutResId, this, false)
@@ -97,8 +97,12 @@ class HighlightAdapterV2(
     else -> throw IllegalStateException("No matching layout for pos: " + position)
   }
 
-  fun removeSortingCard() {
-    showSwishSortingCard = false
+  fun removeSwishCard(swishCard: SwishCard) {
+    when (swishCard) {
+      SwishCard.HIGHLIGHT_SORTING -> showSwishSortingCard = false
+      SwishCard.HIGHLIGHT_FAVORITES -> showSwishFavoritesCard = false
+      SwishCard.EMPTY_FAVORITE_HIGHLIGHTS -> showAddFavoritesCard = false
+    }
     notifyItemRemoved(0)
   }
 
@@ -148,9 +152,9 @@ class HighlightAdapterV2(
 
   fun getSubmissionClickObservable(): Observable<Highlight> = submissionClickSubject
 
-  fun getExplorePremiumClicks(): Observable<Any> = exploreClicks
+  fun getExplorePremiumClicks(): Observable<SwishCard> = exploreClicks
 
-  fun getGotItClicks(): Observable<Any> = gotItClicks
+  fun getGotItClicks(): Observable<SwishCard> = gotItClicks
 
   private fun preFetchImages(highlights: List<Highlight>) {
     for ((_, _, thumbnail, hdThumbnail) in highlights) {

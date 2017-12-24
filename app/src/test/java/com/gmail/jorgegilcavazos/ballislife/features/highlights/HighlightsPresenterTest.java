@@ -42,8 +42,8 @@ public class HighlightsPresenterTest {
     @Mock private NetworkUtils mockNetworkUtils;
     @Mock private ErrorHandler mockErrorHandler;
 
-    private PublishSubject<Object> explorePremiumClicks = PublishSubject.create();
-    private PublishSubject<Object> gotItClicks = PublishSubject.create();
+    private PublishSubject<SwishCard> explorePremiumClicks = PublishSubject.create();
+    private PublishSubject<SwishCard> gotItClicks = PublishSubject.create();
 
     private HighlightsPresenter presenter;
 
@@ -225,18 +225,18 @@ public class HighlightsPresenterTest {
 
     @Test
     public void explorePremiumOnClick() {
-        explorePremiumClicks.onNext(new Object());
+        explorePremiumClicks.onNext(SwishCard.HIGHLIGHT_SORTING);
 
-        verify(mockView).dismissSwishCard();
+        verify(mockView).dismissSwishCard(SwishCard.HIGHLIGHT_SORTING);
         verify(mockView).openPremiumActivity();
         verify(mockLocalRepository).markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
     }
 
     @Test
     public void gotItFlowOnClick() {
-        gotItClicks.onNext(new Object());
+        gotItClicks.onNext(SwishCard.HIGHLIGHT_SORTING);
 
-        verify(mockView).dismissSwishCard();
+        verify(mockView).dismissSwishCard(SwishCard.HIGHLIGHT_SORTING);
         verify(mockLocalRepository).markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
     }
 }

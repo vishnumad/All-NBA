@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard
 import io.reactivex.Observable
 
 interface FavoritesView {
@@ -36,4 +37,12 @@ interface FavoritesView {
   fun showSubmission(highlight: Highlight)
 
   fun showShareDialog(highlight: Highlight)
+
+  fun swishCardExploreClicks() : Observable<SwishCard>
+
+  fun swishCardGotItClicks(): Observable<SwishCard>
+
+  fun dismissSwishCard(swishCard: SwishCard)
+
+  fun openPremiumActivity()
 }

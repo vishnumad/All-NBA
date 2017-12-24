@@ -1,7 +1,9 @@
 package com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.FavoritesRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.disposables.CompositeDisposable
 import org.junit.Before
@@ -20,6 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class FavoritesPresenterTest {
 
   @Mock private lateinit var mockView: FavoritesView
+  @Mock private lateinit var mockLocalRepository: LocalRepository
   @Mock private lateinit var mockFavoritesRepository: FavoritesRepository
 
   private val favoriteClicks = PublishRelay.create<Highlight>()
@@ -29,6 +32,8 @@ class FavoritesPresenterTest {
   private val shareHighlightEvents = PublishRelay.create<Highlight>()
   private val favorites = PublishRelay.create<Highlight>()
   private val newlyAddedFavorites = PublishRelay.create<Highlight>()
+  private val swishCardExploreClicks = PublishRelay.create<SwishCard>()
+  private val swishCardGotItClicks = PublishRelay.create<SwishCard>()
 
   private lateinit var presenter: FavoritesPresenter
 
@@ -43,8 +48,14 @@ class FavoritesPresenterTest {
     `when`(mockView.openSubmissionEvents()).thenReturn(openSubmissionEvents)
     `when`(mockFavoritesRepository.favorites()).thenReturn(favorites)
     `when`(mockFavoritesRepository.newlyAddedFavorites()).thenReturn(newlyAddedFavorites)
+    `when`(mockView.swishCardExploreClicks()).thenReturn(swishCardExploreClicks)
+    `when`(mockView.swishCardGotItClicks()).thenReturn(swishCardGotItClicks)
 
-    presenter = FavoritesPresenter(mockFavoritesRepository, CompositeDisposable())
+    presenter = FavoritesPresenter(
+        mockLocalRepository,
+        mockFavoritesRepository,
+        CompositeDisposable()
+    )
   }
 
   @Test
@@ -167,5 +178,26 @@ class FavoritesPresenterTest {
     newlyAddedFavorites.accept(highlight)
 
     verify(mockView).addHighlight(highlight, addToTop = true)
+  }
+
+  @Test
+  fun openPremiumActivityOnSwishFavoritesCardClick() {
+    `when`(mockView.isPremium()).thenReturn(false)
+    presenter.attachView(mockView)
+
+    swishCardExploreClicks.accept(SwishCard.HIGHLIGHT_FAVORITES)
+
+    verify(mockView).openPremiumActivity()
+  }
+
+  @Test
+  fun dismissEmptyHighlightsCardOnClick() {
+    `when`(mockView.isPremium()).thenReturn(false)
+    presenter.attachView(mockView)
+
+    swishCardGotItClicks.accept(SwishCard.EMPTY_FAVORITE_HIGHLIGHTS)
+
+    verify(mockView).dismissSwishCard(SwishCard.EMPTY_FAVORITE_HIGHLIGHTS)
+    verify(mockLocalRepository).markSwishCardSeen(SwishCard.EMPTY_FAVORITE_HIGHLIGHTS)
   }
 }

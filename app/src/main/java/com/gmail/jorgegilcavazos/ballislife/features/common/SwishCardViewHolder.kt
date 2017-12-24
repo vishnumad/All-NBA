@@ -10,11 +10,11 @@ import kotlinx.android.synthetic.main.swish_edu_card.view.*
 class SwishCardViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
   fun bindData(swishCard: SwishCard,
-               actionClicks: PublishSubject<Any>,
-               gotItClicks: PublishSubject<Any>) = with(itemView) {
+               actionClicks: PublishSubject<SwishCard>,
+               gotItClicks: PublishSubject<SwishCard>) = with(itemView) {
 
-    actionBtn.setOnClickListener { actionClicks.onNext(Any()) }
-    gotItBtn.setOnClickListener { gotItClicks.onNext(Any()) }
+    actionBtn.setOnClickListener { actionClicks.onNext(swishCard) }
+    gotItBtn.setOnClickListener { gotItClicks.onNext(swishCard) }
 
     when (swishCard) {
       SwishCard.HIGHLIGHT_SORTING -> {
@@ -22,17 +22,20 @@ class SwishCardViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         content.text = itemView.context.getString(R.string.swish_card_highlight_sorting_content)
         actionBtn.text = itemView.context.getString(R.string.swish_card_highlight_sorting_action)
         actionBtn.visibility = View.VISIBLE
+        gotItBtn.visibility = View.VISIBLE
       }
       SwishCard.HIGHLIGHT_FAVORITES -> {
         title.text = itemView.context.getString(R.string.swish_card_highlight_favorites_title)
         content.text = itemView.context.getString(R.string.swish_card_highlight_favorites_content)
         actionBtn.text = itemView.context.getString(R.string.swish_card_highlight_favorites_action)
         actionBtn.visibility = View.VISIBLE
+        gotItBtn.visibility = View.GONE
       }
       SwishCard.EMPTY_FAVORITE_HIGHLIGHTS -> {
         title.text = itemView.context.getString(R.string.swish_card_favorites_empty_title)
         content.text = itemView.context.getString(R.string.swish_card_favorites_empty_content)
         actionBtn.visibility = View.GONE
+        gotItBtn.visibility = View.VISIBLE
       }
     }
   }

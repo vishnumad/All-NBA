@@ -58,16 +58,18 @@ public class HighlightsPresenter extends BasePresenter<HighlightsView> {
         super.attachView(view);
 
         disposables.add(view.explorePremiumClicks()
-                .subscribe(o -> {
+                .filter(swishCard -> swishCard == SwishCard.HIGHLIGHT_SORTING)
+                .subscribe(swishCard -> {
                     localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
-                    view.dismissSwishCard();
+                    view.dismissSwishCard(swishCard);
                     view.openPremiumActivity();
                 }));
 
         disposables.add(view.gotItClicks()
-                .subscribe(o -> {
+                .filter(swishCard -> swishCard == SwishCard.HIGHLIGHT_SORTING)
+                .subscribe(swishCard -> {
                     localRepository.markSwishCardSeen(SwishCard.HIGHLIGHT_SORTING);
-                    view.dismissSwishCard();
+                    view.dismissSwishCard(swishCard);
                 }));
     }
 

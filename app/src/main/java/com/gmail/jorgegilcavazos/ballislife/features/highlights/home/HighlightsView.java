@@ -2,6 +2,7 @@ package com.gmail.jorgegilcavazos.ballislife.features.highlights.home;
 
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
 
 import java.util.List;
 
@@ -43,13 +44,13 @@ public interface HighlightsView {
 
     Sorting getSorting();
 
-    Observable<Object> explorePremiumClicks();
+    Observable<SwishCard> explorePremiumClicks();
 
-    Observable<Object> gotItClicks();
+    Observable<SwishCard> gotItClicks();
 
     void openPremiumActivity();
 
-    void dismissSwishCard();
+    void dismissSwishCard(SwishCard swishCard);
 
     void showAddingToFavoritesMsg();
 

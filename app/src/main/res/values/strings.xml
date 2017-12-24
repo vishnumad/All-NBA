@@ -497,7 +497,7 @@
 
     <!-- SWISH FAVORITES EMPTY CARD -->
     <string name="swish_card_favorites_empty_title">
-        You haven\'t saved any highlights yet
+        Your favorites will be shown here
     </string>
     <string name="swish_card_favorites_empty_content">
         You can add a highlight to your favorites by long-pressing it in the home tab

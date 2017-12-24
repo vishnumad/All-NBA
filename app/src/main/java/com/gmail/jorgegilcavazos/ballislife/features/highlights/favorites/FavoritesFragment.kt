@@ -18,9 +18,11 @@ import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener
+import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapterV2
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard
 import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity
 import com.gmail.jorgegilcavazos.ballislife.util.Constants
@@ -63,12 +65,20 @@ class FavoritesFragment : Fragment(), FavoritesView {
     viewType = localRepository.favoriteHighlightViewType
     linearLayoutManager = LinearLayoutManager(activity)
 
+    // Show the favorites feature card to non-premium users.
+    val showSwishFavoritesCard = !isPremium()
+    // Show the add to favorites card to premium users until they mark it seen.
+    val showAddFavoritesCard = isPremium()
+        && !localRepository.swishCardSeen(SwishCard.EMPTY_FAVORITE_HIGHLIGHTS)
+
     // Only of of the three showCard parameters should be true.
     highlightAdapter = HighlightAdapterV2(
         context = activity,
         highlights = mutableListOf(),
         highlightViewType = viewType,
-        isPremium = isPremium()
+        isPremium = isPremium(),
+        showSwishFavoritesCard = showSwishFavoritesCard,
+        showAddFavoritesCard = showAddFavoritesCard
     )
   }
 
@@ -208,5 +218,22 @@ class FavoritesFragment : Fragment(), FavoritesView {
     shareIntent.type = "text/plain"
     shareIntent.putExtra(Intent.EXTRA_TEXT, highlight.url)
     startActivity(Intent.createChooser(shareIntent, resources.getString(R.string.share_video)))
+  }
+
+  override fun swishCardExploreClicks(): Observable<SwishCard> {
+    return highlightAdapter.getExplorePremiumClicks()
+  }
+
+  override fun swishCardGotItClicks(): Observable<SwishCard> {
+    return highlightAdapter.getGotItClicks()
+  }
+
+  override fun dismissSwishCard(swishCard: SwishCard) {
+    highlightAdapter.removeSwishCard(swishCard)
+  }
+
+  override fun openPremiumActivity() {
+    val intent = Intent(activity, GoPremiumActivity::class.java)
+    startActivity(intent)
   }
 }

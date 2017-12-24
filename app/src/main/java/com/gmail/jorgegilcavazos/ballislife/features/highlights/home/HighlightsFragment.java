@@ -361,12 +361,12 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public Observable<Object> explorePremiumClicks() {
+    public Observable<SwishCard> explorePremiumClicks() {
         return highlightAdapter.getExplorePremiumClicks();
     }
 
     @Override
-    public Observable<Object> gotItClicks() {
+    public Observable<SwishCard> gotItClicks() {
         return highlightAdapter.getGotItClicks();
     }
 
@@ -377,8 +377,8 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     @Override
-    public void dismissSwishCard() {
-        highlightAdapter.removeSortingCard();
+    public void dismissSwishCard(SwishCard swishCard) {
+        highlightAdapter.removeSwishCard(swishCard);
     }
 
     @Override
