@@ -31,6 +31,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.TeamName;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import java.util.Set;
 
@@ -58,6 +59,7 @@ public class SettingsFragment extends PreferenceFragment
     public static final String KEY_APP_VERSION = "app_version";
     public static final String KEY_FEEDBACK = "feedback";
     public static final String KEY_GO_PREMIUM = "key_go_premium";
+    public static final String KEY_RATE_APP = "key_rate_app";
 
     public static final String STARTUP_FRAGMENT_GAMES = "0";
     public static final String STARTUP_FRAGMENT_RNBA = "1";
@@ -96,6 +98,12 @@ public class SettingsFragment extends PreferenceFragment
         goPremium.setOnPreferenceClickListener(preference -> {
             Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
             startActivity(intent);
+            return true;
+        });
+
+        Preference rateApp = findPreference(KEY_RATE_APP);
+        rateApp.setOnPreferenceClickListener(preference -> {
+            RateThisApp.showRateDialog(getActivity());
             return true;
         });
 

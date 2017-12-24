@@ -138,6 +138,10 @@
             android:title="@string/go_premium"
             android:summary="@string/go_premium_pref_summary"/>
 
+        <Preference
+            android:key="@string/key_rate_app"
+            android:title="@string/rate_app"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

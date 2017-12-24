@@ -54,6 +54,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.kobakei.ratethisapp.RateThisApp;
 
 import java.util.Arrays;
 
@@ -150,6 +151,11 @@ public class MainActivity extends BaseNoActionBarActivity {
                         .show();
                 Once.markDone(SHOW_WHATS_NEW);
             }
+
+            // Monitor launch times and interval from installation
+            RateThisApp.onCreate(this);
+            // If the condition is satisfied, "Rate this app" dialog will be shown
+            RateThisApp.showRateDialogIfNeeded(this);
         }
 
         setUpToolbar();
