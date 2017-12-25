@@ -161,7 +161,7 @@ public class SettingsFragment extends PreferenceFragment
             case KEY_PREF_END_OF_GAME_TOPICS:
                 Set<String> newEOGTopics = sharedPreferences.getStringSet(key, null);
                 String[] availableEOGTopics = getResources()
-                        .getStringArray(R.array.pref_halftime_values);
+                        .getStringArray(R.array.pref_end_of_game_values);
 
                 updateTopicSubscriptions(newEOGTopics, availableEOGTopics);
                 break;
