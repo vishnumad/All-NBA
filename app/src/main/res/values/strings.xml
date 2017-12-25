@@ -611,7 +611,6 @@
         New date picker for games schedule\n•
         Added theme toggle in settings screen\n•
         UI improvements and bug fixes
-        Minor bug fixes and UI improvements
     </string>
     <string name="submitted_comment">Submitted comment</string>
     <string name="could_not_save_comment_missing_parent">Couldn\'t save comment, missing parent</string>
