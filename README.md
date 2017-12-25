@@ -8,11 +8,10 @@
 
 Android app for NBA fans. Features live scores, highlights, alerts and Reddit integration for discussions.
 
-## Download
-[<img src="art/playstore.png" alt="Ready" width="19%;"/>](https://play.google.com/store/apps/details?id=com.gmail.jorgegilcavazos.ballislife)
+[<img src="art/playstore.png" alt="Ready" width="20%;"/>](https://play.google.com/store/apps/details?id=com.gmail.jorgegilcavazos.ballislife)
 
 ## Screenshots
-<img src="art/v1.2.1/games.png" alt="Ready" width="16%;"/><img src="art/v1.2.1/gamethread.png" alt="Ready" width="16%;"/><img src="art/v1.2.1/boxscore.png" alt="Ready" width="16%;"/><img src="art/v1.2.1/rnba.png" alt="Ready" width="16%;"/><img src="art/v1.2.1/submission.png" alt="Ready" width="16%;"/><img src="art/v1.2.1/highlights.png" alt="Ready" width="16%;"/>
+<img src="art/v1.2.1/games.png" alt="Ready" width="19%;"/> <img src="art/v1.2.1/gamethread.png" alt="Ready" width="19%;"/> <img src="art/v1.2.1/rnba.png" alt="Ready" width="19%;"/> <img src="art/v1.2.1/submission.png" alt="Ready" width="19%;"/> <img src="art/v1.2.1/highlights.png" alt="Ready" width="19%;"/>
 
 ## Contributing  
 
