@@ -179,7 +179,7 @@ class RedditActionsImpl @Inject constructor(
             score = 1,
             created = Calendar.getInstance().time,
             body = body,
-            bodyHtml = "",
+            bodyHtml = body,
             authorFlair = null,
             vote = VoteDirection.UPVOTE,
             edited = false), depth = 1)
