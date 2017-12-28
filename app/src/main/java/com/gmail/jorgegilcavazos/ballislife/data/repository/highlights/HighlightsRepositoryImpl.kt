@@ -118,7 +118,7 @@ class HighlightsRepositoryImpl @Inject constructor(
   }
 
   override fun getCachedHighlights(): List<Highlight> {
-    return cachedHighlights
+    return ArrayList(cachedHighlights)
   }
 
   override fun getSorting(): Sorting {
