@@ -156,7 +156,7 @@ public class AppLocalRepository implements LocalRepository {
 
     @Override
     public String getFavoriteTeam() {
-        String team =  defaultSharedPreferences.getString("teams_list", null);
+        String team = defaultSharedPreferences.getString("teams_list", null);
         if (team == null || team.equals("noteam")) {
             return null;
         }

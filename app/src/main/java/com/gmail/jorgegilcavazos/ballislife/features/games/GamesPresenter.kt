@@ -1,8 +1,11 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
+import com.gmail.jorgegilcavazos.ballislife.util.TeamUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.OnErrorNotImplementedException
@@ -10,6 +13,7 @@ import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class GamesPresenter @Inject constructor(
+    private val localRepository: LocalRepository,
     private val gamesModelTransformer: GamesModelTransformer,
     private val disposables: CompositeDisposable,
     private val networkUtils: NetworkUtils,
@@ -41,7 +45,7 @@ class GamesPresenter @Inject constructor(
         }
         is GamesUiModelV2.Success -> {
           if (view.getCurrentDateShown() == model.date) {
-            view.showGames(model.games)
+            view.showGames(gamesListWithFavoriteTeamFirst(model.games.toMutableList()))
             view.setLoadingIndicator(false)
             view.setNoGamesIndicator(false)
           }
@@ -76,6 +80,29 @@ class GamesPresenter @Inject constructor(
     disposables.clear()
     view.dismissSnackbar()
     super.detachView()
+  }
+
+  /**
+   * Moves the user's favorite team to the top if one is selected.
+   */
+  private fun gamesListWithFavoriteTeamFirst(games: MutableList<GameV2>): List<GameV2> {
+    val favTeam = localRepository.favoriteTeam
+    if (favTeam == null) {
+      // No favorite team selected, return unchanged list.
+      return games
+    } else {
+      val favTeamId = TeamUtils.getTeamId(favTeam)
+      val favTeamGame = games.find { it.homeTeamId == favTeamId || it.awayTeamId == favTeamId }
+      return if (favTeamGame == null) {
+        // Favorite team not in list of games, return unchanged list.
+        games
+      } else {
+        // Remove favorite team from current position and place at index 0, then return that list.
+        games.remove(favTeamGame)
+        games.add(0, favTeamGame)
+        games
+      }
+    }
   }
 
 }
