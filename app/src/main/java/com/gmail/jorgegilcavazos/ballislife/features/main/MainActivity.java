@@ -33,7 +33,7 @@ import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
-import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesHomeFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsMenuFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
@@ -451,18 +451,18 @@ public class MainActivity extends BaseNoActionBarActivity {
             appBarLayout.setElevation(0);
         }
 
-        Fragment gamesFragment = null;
+        Fragment gamesHomeFragment = null;
         if (selectedFragment == GAMES_FRAGMENT_ID) {
-            gamesFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
-            if(!(gamesFragment instanceof GamesFragment)) {
-                gamesFragment = null;
+            gamesHomeFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(!(gamesHomeFragment instanceof GamesHomeFragment)) {
+                gamesHomeFragment = null;
             }
         }
 
-        if (gamesFragment == null) {
-            gamesFragment = GamesFragment.newInstance();
+        if (gamesHomeFragment == null) {
+            gamesHomeFragment = GamesHomeFragment.Companion.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    gamesFragment, R.id.fragment);
+                    gamesHomeFragment, R.id.fragment);
         }
 
         expandToolbar();

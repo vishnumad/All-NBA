@@ -19,7 +19,6 @@ class GamesPresenter @Inject constructor(
     super.attachView(view)
 
     val uiEvents = Observable.merge(
-        view.dateSelectionEvents(),
         view.loadGamesEvents(),
         view.refreshGamesEvents(),
         view.openGameEvents()
@@ -31,14 +30,12 @@ class GamesPresenter @Inject constructor(
           view.setNoGamesIndicator(false)
         }
         is GamesUiModelV2.MemoryInProgress -> {
-          view.setDateNavigatorText()
           view.hideGames()
           view.setLoadingIndicator(false)
           view.setNoGamesIndicator(false)
           view.dismissSnackbar()
         }
         is GamesUiModelV2.NetworkInProgress -> {
-          view.setDateNavigatorText()
           view.setNoGamesIndicator(false)
           view.dismissSnackbar()
         }

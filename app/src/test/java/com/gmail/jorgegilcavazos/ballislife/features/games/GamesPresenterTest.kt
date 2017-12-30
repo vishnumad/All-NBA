@@ -23,7 +23,6 @@ class GamesPresenterTest {
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
 
-  private val dateSelectionEvents = PublishRelay.create<GamesUiEvent.DateSelectedEvent>()
   private val loadGamesEvents = PublishRelay.create<GamesUiEvent.LoadGamesEvent>()
   private val refreshGamesEvents = PublishRelay.create<GamesUiEvent.RefreshGamesEvent>()
   private val openGameEvents = PublishRelay.create<GamesUiEvent.OpenGameEvent>()
@@ -32,7 +31,6 @@ class GamesPresenterTest {
 
   @Before
   fun setup() {
-    `when`(mockView.dateSelectionEvents()).thenReturn(dateSelectionEvents)
     `when`(mockView.loadGamesEvents()).thenReturn(loadGamesEvents)
     `when`(mockView.refreshGamesEvents()).thenReturn(refreshGamesEvents)
     `when`(mockView.openGameEvents()).thenReturn(openGameEvents)
@@ -63,7 +61,6 @@ class GamesPresenterTest {
     presenter.attachView(mockView)
 
     verify(mockView).setNoGamesIndicator(false)
-    verify(mockView).setDateNavigatorText()
     verify(mockView).hideGames()
     verify(mockView).setLoadingIndicator(false)
     verify(mockView).dismissSnackbar()
@@ -77,7 +74,6 @@ class GamesPresenterTest {
     presenter.attachView(mockView)
 
     verify(mockView).setNoGamesIndicator(false)
-    verify(mockView).setDateNavigatorText()
     verify(mockView).dismissSnackbar()
   }
 
