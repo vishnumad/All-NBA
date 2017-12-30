@@ -89,7 +89,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         View view = inflater.inflate(R.layout.fragment_box_score, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        teamSelected = BoxScoreSelectedTeam.HOME;
+        teamSelected = BoxScoreSelectedTeam.VISITOR;
         setHomeAwayBackground();
 
         btnAway.setText(awayTeam);
