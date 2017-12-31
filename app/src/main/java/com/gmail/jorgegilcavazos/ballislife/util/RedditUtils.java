@@ -426,6 +426,8 @@ public final class RedditUtils {
                 return R.drawable.uta_snoo;
             case Constants.SUB_WAS:
                 return R.drawable.was_snoo;
+            case Constants.MULTI_SWISH:
+                return R.drawable.ic_launcher;
             default:
                 return R.drawable.rnbasnoo;
         }

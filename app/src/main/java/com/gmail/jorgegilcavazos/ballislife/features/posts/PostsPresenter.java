@@ -14,6 +14,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.exception.NotAuthenticatedExcep
 import com.gmail.jorgegilcavazos.ballislife.util.exception.NotLoggedInException;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
 
+import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
@@ -35,7 +36,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     private RedditAuthentication redditAuthentication;
     private LocalRepository localRepository;
     private PostsRepository postsRepository;
-    private RedditService service;
+    private RedditService redditService;
     private BaseSchedulerProvider schedulerProvider;
 
     private CompositeDisposable disposables;
@@ -51,7 +52,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         this.redditAuthentication = redditAuthentication;
         this.localRepository = localRepository;
         this.postsRepository = postsRepository;
-        this.service = redditService;
+        this.redditService = redditService;
         this.schedulerProvider = schedulerProvider;
 
         disposables = new CompositeDisposable();
@@ -63,7 +64,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
 
     public void loadSubscriberCount() {
         disposables.add(redditAuthentication.authenticate()
-                .andThen(service.getSubscriberCount(redditAuthentication.getRedditClient(),
+                .andThen(redditService.getSubscriberCount(redditAuthentication.getRedditClient(),
                         subreddit))
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -86,8 +87,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
     public void loadFirstAvailable(Sorting sorting, TimePeriod timePeriod) {
         List<SubmissionWrapper> submissions = postsRepository.getCachedSubmissions();
         if (submissions.isEmpty()) {
-            resetLoaderFromStartWithParams(sorting, timePeriod);
-            loadPosts(true /* reset */);
+            resetPaginatorThenLoadPosts(sorting, timePeriod);
         } else {
             if (localRepository.stickyChipsEnabled() && sorting == Sorting.HOT) {
                 NBASubChips chips = removeCommonStickiedSubmissions(submissions);
@@ -107,11 +107,28 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         }
     }
 
-    /**
-     * Must be called before loadPosts(reset = true).
-     */
-    public void resetLoaderFromStartWithParams(Sorting sorting, TimePeriod timePeriod) {
-        postsRepository.reset(sorting, timePeriod, subreddit);
+    public void resetPaginatorThenLoadPosts(Sorting sorting, TimePeriod timePeriod) {
+        if (subreddit.equals(Constants.MULTI_SWISH)) {
+            redditService.getMultiReddit(redditAuthentication.getRedditClient(),
+                    "Obi-Wan_Ginobili", Constants.MULTI_SWISH)
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.ui())
+                    .subscribeWith(new DisposableSingleObserver<MultiReddit>() {
+                        @Override
+                        public void onSuccess(MultiReddit multiReddit) {
+                            postsRepository.reset(sorting, timePeriod, multiReddit);
+                            loadPosts(true /* reset */);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            view.showPostsLoadingFailedSnackbar(true);
+                        }
+                    });
+        } else {
+            postsRepository.reset(sorting, timePeriod, subreddit);
+            loadPosts(true /* reset */);
+        }
     }
 
     public void loadPosts(final boolean reset) {
@@ -126,7 +143,8 @@ public class PostsPresenter extends BasePresenter<PostsView> {
                 .andThen(postsRepository.next())
                 .map(this::filterHiddenPosts)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.ui()).subscribeWith(new DisposableSingleObserver<List<SubmissionWrapper>>() {
+                .observeOn(schedulerProvider.ui()).subscribeWith(
+                        new DisposableSingleObserver<List<SubmissionWrapper>>() {
                     @Override
                     public void onSuccess(List<SubmissionWrapper> submissions) {
                         if (submissions.isEmpty()) {
@@ -187,7 +205,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable(loggedIn -> {
                     if (loggedIn) {
-                        return service.voteSubmission(redditAuthentication.getRedditClient(),
+                        return redditService.voteSubmission(redditAuthentication.getRedditClient(),
                                                       submission,
                                                       direction);
                     } else {
@@ -219,7 +237,7 @@ public class PostsPresenter extends BasePresenter<PostsView> {
         disposables.add(redditAuthentication.authenticate()
                 .andThen(redditAuthentication.checkUserLoggedIn()).flatMapCompletable(loggedIn -> {
                     if (loggedIn) {
-                        return service.saveSubmission(redditAuthentication.getRedditClient(),
+                        return redditService.saveSubmission(redditAuthentication.getRedditClient(),
                                                       submission,
                                                       saved);
                     } else {

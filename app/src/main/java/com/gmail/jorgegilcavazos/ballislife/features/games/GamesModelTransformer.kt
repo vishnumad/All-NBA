@@ -22,8 +22,6 @@ class GamesModelTransformer @Inject constructor(private val gamesActions: GamesA
     val actions = ObservableTransformer<GamesUiEvent, GamesAction> {
       it.publish { shared ->
         Observable.merge(
-            shared.ofType(GamesUiEvent.DateSelectedEvent::class.java)
-                .compose { it.map { event -> GamesAction.LoadGamesAction(event.date, false) } },
             shared.ofType(GamesUiEvent.LoadGamesEvent::class.java)
                 .compose { it.map { event -> GamesAction.LoadGamesAction(event.date, false) } },
             shared.ofType(GamesUiEvent.RefreshGamesEvent::class.java)

@@ -228,6 +228,7 @@
     <string name="r_tor">TorontoRaptors</string>
     <string name="r_uta">UtahJazz</string>
     <string name="r_was">WashingtonWizards</string>
+    <string name="swish_multi">SwishMulti</string>
 
 
     <string-array name="pref_teams_list_titles">
@@ -605,11 +606,9 @@
     <string name="got_it">GOT IT</string>
     <string name="dont_show_again">DON\'T SHOW AGAIN</string>
     <string name="whats_new_content">
-        • New favorite highlights section\n•
-        Tables in reddit posts/comments are now properly formatted\n•
-        New halftime and end of game notifications\n•
-        New date picker for games schedule\n•
-        Added theme toggle in settings screen\n•
+        • Swipe left/right to navigate games!\n•
+        Favorite team\'s game is now pinned to the top\n•
+        Added OREB &amp; DREB to the box scores\n•
         UI improvements and bug fixes
     </string>
     <string name="submitted_comment">Submitted comment</string>

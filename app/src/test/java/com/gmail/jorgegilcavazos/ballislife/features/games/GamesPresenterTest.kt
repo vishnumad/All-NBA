@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
@@ -22,8 +23,8 @@ class GamesPresenterTest {
   @Mock private lateinit var mockGamesModelTransformer: GamesModelTransformer
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
+  @Mock private lateinit var localRepository: LocalRepository
 
-  private val dateSelectionEvents = PublishRelay.create<GamesUiEvent.DateSelectedEvent>()
   private val loadGamesEvents = PublishRelay.create<GamesUiEvent.LoadGamesEvent>()
   private val refreshGamesEvents = PublishRelay.create<GamesUiEvent.RefreshGamesEvent>()
   private val openGameEvents = PublishRelay.create<GamesUiEvent.OpenGameEvent>()
@@ -32,12 +33,12 @@ class GamesPresenterTest {
 
   @Before
   fun setup() {
-    `when`(mockView.dateSelectionEvents()).thenReturn(dateSelectionEvents)
     `when`(mockView.loadGamesEvents()).thenReturn(loadGamesEvents)
     `when`(mockView.refreshGamesEvents()).thenReturn(refreshGamesEvents)
     `when`(mockView.openGameEvents()).thenReturn(openGameEvents)
 
     presenter = GamesPresenter(
+        localRepository,
         mockGamesModelTransformer,
         CompositeDisposable(),
         mockNetworkUtils,
@@ -63,7 +64,6 @@ class GamesPresenterTest {
     presenter.attachView(mockView)
 
     verify(mockView).setNoGamesIndicator(false)
-    verify(mockView).setDateNavigatorText()
     verify(mockView).hideGames()
     verify(mockView).setLoadingIndicator(false)
     verify(mockView).dismissSnackbar()
@@ -77,7 +77,6 @@ class GamesPresenterTest {
     presenter.attachView(mockView)
 
     verify(mockView).setNoGamesIndicator(false)
-    verify(mockView).setDateNavigatorText()
     verify(mockView).dismissSnackbar()
   }
 

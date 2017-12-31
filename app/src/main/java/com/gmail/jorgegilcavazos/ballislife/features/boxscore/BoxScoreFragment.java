@@ -89,7 +89,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         View view = inflater.inflate(R.layout.fragment_box_score, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        teamSelected = BoxScoreSelectedTeam.HOME;
+        teamSelected = BoxScoreSelectedTeam.VISITOR;
         setHomeAwayBackground();
 
         btnAway.setText(awayTeam);
@@ -177,14 +177,14 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             i++;
         }
 
-        StatLine total = new StatLine(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"0","0");
+        StatLine total = new StatLine(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"0","0");
         i = 1;
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getVls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
             addToTeamTotalStats(statLine, total);
             if (i == 5 || i == players.size()-1) {
-                addSeparatorRowToStats(19);
+                addSeparatorRowToStats(21); // # Stats + 3 for fg%, 3pt%, ft%
             }
             i++;
         }
@@ -221,14 +221,14 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             i++;
         }
 
-        StatLine total = new StatLine(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"0","0");
+        StatLine total = new StatLine(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"0","0");
         i = 1;
         addRowToStatsTable2(Optional.absent());
         for (StatLine statLine : values.getHls().getPstsg()) {
             addRowToStatsTable2(Optional.of(statLine));
             addToTeamTotalStats(statLine, total);
             if (i == 5 || i == players.size()-1) {
-                addSeparatorRowToStats(19);
+                addSeparatorRowToStats(21); // # Stats + 3 for fg%, 3pt%, ft%
             }
             i++;
         }
@@ -294,6 +294,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
         row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
         row.addView(addNormalItem(row, String.valueOf(statLine.getBlka())));
+        row.addView(addNormalItem(row, String.valueOf(statLine.getOreb())));
+        row.addView(addNormalItem(row, String.valueOf(statLine.getDreb())));
         row.addView(addNormalItem(row, String.valueOf(statLine.getFgm())));
         row.addView(addNormalItem(row, String.valueOf(statLine.getFga())));
         row.addView(addNormalItem(row, getShootingPct(statLine.getFga(), statLine.getFgm())));
@@ -318,6 +320,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         total.setStl(curr.getStl()+total.getStl());
         total.setBlk(curr.getBlk()+total.getBlk());
         total.setBlka(curr.getBlka()+total.getBlka());
+        total.setOreb(curr.getOreb()+total.getOreb());
+        total.setDreb(curr.getDreb()+total.getDreb());
         total.setFgm(curr.getFgm()+total.getFgm());
         total.setFga(curr.getFga()+total.getFga());
         total.setTpm(curr.getTpm()+total.getTpm());
@@ -343,6 +347,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addNormalItem(row, String.valueOf(statLine.getStl())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getBlk())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getBlka())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getOreb())));
+            row.addView(addNormalItem(row, String.valueOf(statLine.getDreb())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFgm())));
             row.addView(addNormalItem(row, String.valueOf(statLine.getFga())));
             row.addView(addNormalItem(row, getShootingPct(statLine.getFga(), statLine.getFgm())));
@@ -363,6 +369,8 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
             row.addView(addHeaderItem(row, "STL"));
             row.addView(addHeaderItem(row, "BLK"));
             row.addView(addHeaderItem(row, "BA"));
+            row.addView(addHeaderItem(row, "OREB"));
+            row.addView(addHeaderItem(row, "DREB"));
             row.addView(addHeaderItem(row, "FGM"));
             row.addView(addHeaderItem(row, "FGA"));
             row.addView(addHeaderItem(row, "FG%"));

@@ -9,15 +9,11 @@ interface GamesView {
 
   fun openGameEvents(): Observable<OpenGameEvent>
 
-  fun dateSelectionEvents(): Observable<DateSelectedEvent>
-
   fun loadGamesEvents(): Observable<LoadGamesEvent>
 
   fun refreshGamesEvents(): Observable<RefreshGamesEvent>
 
   fun setLoadingIndicator(active: Boolean)
-
-  fun setDateNavigatorText()
 
   fun hideGames()
 

@@ -9,10 +9,11 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
-import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.paginators.Paginator;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.List;
@@ -83,7 +84,7 @@ public interface RedditService {
     /**
      * Returns an Rx Single that emits a listing of the next page of Submission given a paginator.
      */
-    Single<Listing<Submission>> getSubmissionListing(SubredditPaginator paginator);
+    Single<Listing<Submission>> getSubmissionListing(Paginator<Submission> paginator);
 
     /**
      * Returns an Rx Completable that performs a vote on a fiven submission.
@@ -126,4 +127,10 @@ public interface RedditService {
      * Returns an Rx Single of the load more comments response of a {@link CommentNode}.
      */
     Single<List<CommentNode>> loadMoreComments(RedditClient reddit, CommentNode commentNode);
+
+    /**
+     *
+     * Returns an Rx Single of the desired {@link MultiReddit}.
+     */
+    Single<MultiReddit> getMultiReddit(RedditClient reddit, String owner, String multi);
 }

@@ -44,6 +44,7 @@ public class Constants {
     public static final String SUB_TOR = "TorontoRaptors";
     public static final String SUB_UTA = "UtahJazz";
     public static final String SUB_WAS = "WashingtonWizards";
+    public static final String MULTI_SWISH = "SwishMulti";
 
     // Generic view types
     public static final int VIEW_HEADER = 0;

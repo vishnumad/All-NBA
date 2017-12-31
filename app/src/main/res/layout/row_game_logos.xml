@@ -11,134 +11,151 @@
     app:cardBackgroundColor="?attr/cardsDialog">
 
     <RelativeLayout
-        android:id="@+id/layout_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp">
-
-        <ImageView
-            android:id="@+id/awayicon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
-            android:src="@mipmap/ic_launcher"/>
-
-        <TextView
-            android:id="@+id/awaylabel"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/awayicon"
-            android:text="A"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textAlignment="center"
-            android:textSize="15sp"/>
-
-        <ImageView
-            android:id="@+id/homeicon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="5dp"
-            android:src="@mipmap/ic_launcher"/>
-
-        <TextView
-            android:id="@+id/homelabel"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/homeicon"
-            android:text="B"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textAlignment="center"
-            android:textSize="15sp"/>
+        android:layout_height="110dp">
 
         <RelativeLayout
-            android:id="@+id/timeBroadCasterContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@id/awayicon"
-            android:layout_toStartOf="@id/homeicon">
+            android:id="@+id/layout_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp">
+
+            <ImageView
+                android:id="@+id/awayicon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/ic_launcher"/>
 
             <TextView
-                android:id="@+id/text_time"
-                android:layout_width="wrap_content"
+                android:id="@+id/awaylabel"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="6:00 PM"
+                android:layout_below="@+id/awayicon"
+                android:text="A"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="18sp"
-                android:layout_centerInParent="true"/>
+                android:textAlignment="center"
+                android:textSize="15sp"/>
+
+            <ImageView
+                android:id="@+id/homeicon"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="5dp"
+                android:src="@mipmap/ic_launcher"/>
 
             <TextView
-                android:id="@+id/broadcaster"
+                android:id="@+id/homelabel"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/homeicon"
+                android:text="B"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textAlignment="center"
+                android:textSize="15sp"/>
+
+            <RelativeLayout
+                android:id="@+id/timeBroadCasterContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/awayicon"
+                android:layout_toStartOf="@id/homeicon">
+
+                <TextView
+                    android:id="@+id/text_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="6:00 PM"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textSize="18sp"
+                    android:layout_centerInParent="true"/>
+
+                <TextView
+                    android:id="@+id/broadcaster"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_time"
+                    android:layout_centerHorizontal="true"
+                    android:text="ESPN"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_final"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text_time"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@id/awayicon"
+                android:layout_toStartOf="@id/homeicon"
+                android:gravity="center"
+                android:textSize="15sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+            <TextView
+                android:id="@+id/awayscore"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/awayicon"
+                android:layout_toStartOf="@id/period"
+                android:gravity="center"
+                android:text="50"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/homescore"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@id/period"
+                android:layout_toStartOf="@+id/homeicon"
+                android:gravity="center"
+                android:text="100"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:text="ESPN"
+                android:paddingTop="30dp"
+                android:text="12:00"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+            <TextView
+                android:id="@+id/period"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/clock"
+                android:layout_centerHorizontal="true"
+                android:text="4th Qtr"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/text_final"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+        <View
+            android:id="@+id/favoriteMarker"
+            android:layout_marginTop="-6dp"
+            android:layout_marginEnd="-6dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:rotation="45"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@id/awayicon"
-            android:layout_toStartOf="@id/homeicon"
-            android:gravity="center"
-            android:textSize="15sp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-
-        <TextView
-            android:id="@+id/awayscore"
-            android:layout_width="80dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/awayicon"
-            android:layout_toStartOf="@id/period"
-            android:gravity="center"
-            android:text="50"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textAlignment="center"/>
-
-        <TextView
-            android:id="@+id/homescore"
-            android:layout_width="80dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@id/period"
-            android:layout_toStartOf="@+id/homeicon"
-            android:gravity="center"
-            android:text="100"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textAlignment="center"/>
-
-        <TextView
-            android:id="@+id/clock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:paddingTop="30dp"
-            android:text="12:00"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
-
-        <TextView
-            android:id="@+id/period"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/clock"
-            android:layout_centerHorizontal="true"
-            android:text="4th Qtr"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/triangle_shape" />
 
     </RelativeLayout>
 

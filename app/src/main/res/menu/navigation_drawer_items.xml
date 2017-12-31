@@ -197,6 +197,14 @@
             android:orderInCategory="30"
             android:id="@+id/nav_was"
             android:title="@string/r_was"/>
+
+        <!--
+        Disabled until https://github.com/mattbdean/JRAW/pull/167 is included in the JRAW release
+        <item
+            android:orderInCategory="30"
+            android:id="@+id/nav_swish_multi"
+            android:title="@string/swish_multi"/>
+        -->
     </group>
 
 </menu>

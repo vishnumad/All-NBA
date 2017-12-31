@@ -21,6 +21,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.NbaGame;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
+import com.gmail.jorgegilcavazos.ballislife.util.TeamUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -101,6 +102,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.homeicon) ImageView ivHomeLogo;
         @BindView(R.id.awayicon) ImageView ivAwayLogo;
         @BindView(R.id.broadcaster) TextView tvBroadcaster;
+        @BindView(R.id.favoriteMarker) View favoriteMarker;
 
         private final LocalRepository localRepository;
 
@@ -111,14 +113,26 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         public void bindData(
-                GameV2 nbaGame, PublishSubject<GameV2> gameClicks,
-                             boolean isLastGame) {
+                GameV2 nbaGame,
+                PublishSubject<GameV2> gameClicks,
+                boolean isLastGame) {
             int resKeyHome = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getHomeTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
                     .getPackageName());
             int resKeyAway = itemView.getContext().getResources().getIdentifier(nbaGame
                     .getAwayTeamAbbr().toLowerCase(), "drawable", itemView.getContext()
                     .getPackageName());
+
+            // Set favorite team marker if game has fav team.
+            favoriteMarker.setVisibility(View.GONE);
+            String favoriteTeam = localRepository.getFavoriteTeam();
+            if (favoriteTeam != null) {
+                String favoriteTeamId = TeamUtils.Companion.getTeamId(favoriteTeam);
+                if (nbaGame.getAwayTeamId().equals(favoriteTeamId)
+                        || nbaGame.getHomeTeamId().equals(favoriteTeamId)) {
+                    favoriteMarker.setVisibility(View.VISIBLE);
+                }
+            }
 
             ivHomeLogo.setImageResource(resKeyHome);
             ivAwayLogo.setImageResource(resKeyAway);
