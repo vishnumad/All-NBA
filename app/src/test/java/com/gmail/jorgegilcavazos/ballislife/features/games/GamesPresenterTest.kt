@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
+import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
@@ -22,6 +23,7 @@ class GamesPresenterTest {
   @Mock private lateinit var mockGamesModelTransformer: GamesModelTransformer
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
+  @Mock private lateinit var localRepository: LocalRepository
 
   private val loadGamesEvents = PublishRelay.create<GamesUiEvent.LoadGamesEvent>()
   private val refreshGamesEvents = PublishRelay.create<GamesUiEvent.RefreshGamesEvent>()
@@ -36,6 +38,7 @@ class GamesPresenterTest {
     `when`(mockView.openGameEvents()).thenReturn(openGameEvents)
 
     presenter = GamesPresenter(
+        localRepository,
         mockGamesModelTransformer,
         CompositeDisposable(),
         mockNetworkUtils,
