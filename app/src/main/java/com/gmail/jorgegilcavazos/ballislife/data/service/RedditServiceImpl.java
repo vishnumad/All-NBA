@@ -19,7 +19,7 @@ import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.Subreddit;
 import net.dean.jraw.models.VoteDirection;
-import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.paginators.Paginator;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.ArrayList;
@@ -195,7 +195,7 @@ public class RedditServiceImpl implements RedditService {
     }
 
     @Override
-    public Single<Listing<Submission>> getSubmissionListing(final SubredditPaginator paginator) {
+    public Single<Listing<Submission>> getSubmissionListing(final Paginator<Submission> paginator) {
         return Single.create(e -> {
             try {
                 Listing<Submission> listing = paginator.next(false);

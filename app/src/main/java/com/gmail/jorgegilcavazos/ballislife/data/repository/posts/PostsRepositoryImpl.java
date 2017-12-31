@@ -4,7 +4,13 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 
+import net.dean.jraw.ApiException;
+import net.dean.jraw.RedditClient;
+import net.dean.jraw.managers.MultiRedditManager;
+import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.Submission;
+import net.dean.jraw.paginators.MultiRedditPaginator;
+import net.dean.jraw.paginators.Paginator;
 import net.dean.jraw.paginators.Sorting;
 import net.dean.jraw.paginators.SubredditPaginator;
 import net.dean.jraw.paginators.TimePeriod;
@@ -23,7 +29,7 @@ public class PostsRepositoryImpl implements PostsRepository {
     private RedditAuthentication redditAuthentication;
     private RedditService redditService;
 
-    private SubredditPaginator paginator;
+    private Paginator<Submission> paginator;
     private List<SubmissionWrapper> cachedSubmissionWrappers;
 
 
@@ -41,6 +47,25 @@ public class PostsRepositoryImpl implements PostsRepository {
         SubredditPaginator paginator = new SubredditPaginator(
                 redditAuthentication.getRedditClient(),
                 subreddit);
+        reset(paginator, sorting, timePeriod);
+    }
+
+    @Override
+    public void reset(Sorting sorting, TimePeriod timePeriod, String multiOwner, String multiName) {
+        RedditClient redditClient = redditAuthentication.getRedditClient();
+        MultiRedditManager multiRedditManager = new MultiRedditManager(redditClient);
+
+        try {
+            MultiReddit swishappMulti = multiRedditManager.get("Obi-Wan_Ginobili", "swishapp");
+            MultiRedditPaginator paginator = new MultiRedditPaginator(
+                    redditAuthentication.getRedditClient(), swishappMulti);
+            reset(paginator, sorting, timePeriod);
+        } catch (ApiException e) {
+            throw new RuntimeException("Error getting swishapp multireddit: " + e.toString());
+        }
+    }
+
+    private void reset(Paginator<Submission> paginator, Sorting sorting, TimePeriod timePeriod) {
         paginator.setLimit(20);
         paginator.setSorting(sorting);
         paginator.setTimePeriod(timePeriod);

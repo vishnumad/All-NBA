@@ -12,7 +12,7 @@ import net.dean.jraw.models.Listing;
 import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
-import net.dean.jraw.paginators.SubredditPaginator;
+import net.dean.jraw.paginators.Paginator;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.List;
@@ -83,7 +83,7 @@ public interface RedditService {
     /**
      * Returns an Rx Single that emits a listing of the next page of Submission given a paginator.
      */
-    Single<Listing<Submission>> getSubmissionListing(SubredditPaginator paginator);
+    Single<Listing<Submission>> getSubmissionListing(Paginator<Submission> paginator);
 
     /**
      * Returns an Rx Completable that performs a vote on a fiven submission.

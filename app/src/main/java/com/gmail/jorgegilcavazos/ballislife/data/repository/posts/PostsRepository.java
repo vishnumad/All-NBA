@@ -12,6 +12,8 @@ import io.reactivex.Single;
 public interface PostsRepository {
     void reset(Sorting sorting, TimePeriod timePeriod, String subreddit);
 
+    void reset(Sorting sorting, TimePeriod timePeriod, String multiOwner, String multiName);
+
     Single<List<SubmissionWrapper>> next();
 
     List<SubmissionWrapper> getCachedSubmissions();
