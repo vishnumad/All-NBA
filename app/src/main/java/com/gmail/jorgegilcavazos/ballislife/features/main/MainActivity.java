@@ -433,6 +433,16 @@ public class MainActivity extends BaseNoActionBarActivity {
                     setPostsFragment(Constants.SUB_WAS);
                     drawerLayout.closeDrawer(GravityCompat.START);
                     return true;
+                /*
+                    Disabled until https://github.com/mattbdean/JRAW/pull/167 is included in the
+                    JRAW release.
+
+                case R.id.nav_swish_multi:
+                    setPostsFragment(Constants.MULTI_SWISH);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                    return true;
+
+                 */
                 case R.id.go_premium:
                     onGoPremiumClick();
                     return true;

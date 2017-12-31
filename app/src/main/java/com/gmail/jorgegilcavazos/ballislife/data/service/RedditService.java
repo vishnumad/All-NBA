@@ -9,6 +9,7 @@ import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.VoteDirection;
@@ -126,4 +127,10 @@ public interface RedditService {
      * Returns an Rx Single of the load more comments response of a {@link CommentNode}.
      */
     Single<List<CommentNode>> loadMoreComments(RedditClient reddit, CommentNode commentNode);
+
+    /**
+     *
+     * Returns an Rx Single of the desired {@link MultiReddit}.
+     */
+    Single<MultiReddit> getMultiReddit(RedditClient reddit, String owner, String multi);
 }

@@ -4,9 +4,6 @@ import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.service.RedditService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 
-import net.dean.jraw.ApiException;
-import net.dean.jraw.RedditClient;
-import net.dean.jraw.managers.MultiRedditManager;
 import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.paginators.MultiRedditPaginator;
@@ -51,18 +48,10 @@ public class PostsRepositoryImpl implements PostsRepository {
     }
 
     @Override
-    public void reset(Sorting sorting, TimePeriod timePeriod, String multiOwner, String multiName) {
-        RedditClient redditClient = redditAuthentication.getRedditClient();
-        MultiRedditManager multiRedditManager = new MultiRedditManager(redditClient);
-
-        try {
-            MultiReddit swishappMulti = multiRedditManager.get("Obi-Wan_Ginobili", "swishapp");
-            MultiRedditPaginator paginator = new MultiRedditPaginator(
-                    redditAuthentication.getRedditClient(), swishappMulti);
-            reset(paginator, sorting, timePeriod);
-        } catch (ApiException e) {
-            throw new RuntimeException("Error getting swishapp multireddit: " + e.toString());
-        }
+    public void reset(Sorting sorting, TimePeriod timePeriod, MultiReddit multiReddit) {
+        MultiRedditPaginator paginator = new MultiRedditPaginator(
+                redditAuthentication.getRedditClient(), multiReddit);
+        reset(paginator, sorting, timePeriod);
     }
 
     private void reset(Paginator<Submission> paginator, Sorting sorting, TimePeriod timePeriod) {
@@ -87,7 +76,7 @@ public class PostsRepositoryImpl implements PostsRepository {
 
             cachedSubmissionWrappers.addAll(submissionWrappers);
             return Single.just(submissionWrappers);
-                });
+        });
     }
 
     @Override

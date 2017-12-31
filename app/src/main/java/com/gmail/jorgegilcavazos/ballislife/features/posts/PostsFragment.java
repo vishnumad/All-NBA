@@ -202,76 +202,65 @@ public class PostsFragment extends Fragment implements PostsView,
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 presenter.loadSubscriberCount();
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 return true;
             case R.id.action_change_view:
                 openViewPickerDialog();
                 return true;
             case R.id.action_sort_hot:
                 sorting = Sorting.HOT;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("HOT");
                 return true;
             case R.id.action_sort_new:
                 sorting = Sorting.NEW;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("NEW");
                 return true;
             case R.id.action_sort_rising:
                 sorting = Sorting.RISING;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("RISING");
                 return true;
             case R.id.action_sort_controversial:
                 sorting = Sorting.CONTROVERSIAL;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("CONTROVERSIAL");
                 return true;
             case R.id.action_sort_top_hour:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.HOUR;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: HOUR");
                 return true;
             case R.id.action_sort_top_day:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.DAY;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: DAY");
                 return true;
             case R.id.action_sort_top_week:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.WEEK;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: WEEK");
                 return true;
             case R.id.action_sort_top_month:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.MONTH;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: MONTH");
                 return true;
             case R.id.action_sort_top_year:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.YEAR;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: YEAR");
                 return true;
             case R.id.action_sort_top_all:
                 sorting = Sorting.TOP;
                 timePeriod = TimePeriod.ALL;
-                presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                presenter.loadPosts(true /* reset */);
+                presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle("TOP: ALL");
                 return true;
         }
@@ -281,8 +270,7 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onRefresh() {
         presenter.loadSubscriberCount();
-        presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-        presenter.loadPosts(true /* reset */);
+        presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
     }
 
     @Override
@@ -310,15 +298,11 @@ public class PostsFragment extends Fragment implements PostsView,
         if (getView() != null) {
             snackbar = Snackbar.make(getView(), R.string.posts_loading_failed,
                     Snackbar.LENGTH_INDEFINITE);
-            snackbar.setAction(R.string.retry, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (reset) {
-                        presenter.resetLoaderFromStartWithParams(sorting, timePeriod);
-                        presenter.loadPosts(true /* reset */);
-                    } else {
-                        presenter.loadPosts(false);
-                    }
+            snackbar.setAction(R.string.retry, v -> {
+                if (reset) {
+                    presenter.resetPaginatorThenLoadPosts(sorting, timePeriod);
+                } else {
+                    presenter.loadPosts(false);
                 }
             });
             snackbar.show();
@@ -444,20 +428,14 @@ public class PostsFragment extends Fragment implements PostsView,
         View viewTypeCard = view.findViewById(R.id.layout_type_card);
         View viewTypeList = view.findViewById(R.id.layout_type_list);
 
-        viewTypeCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.POSTS_VIEW_WIDE_CARD);
-                materialDialog.dismiss();
-            }
+        viewTypeCard.setOnClickListener(v -> {
+            presenter.onViewTypeSelected(Constants.POSTS_VIEW_WIDE_CARD);
+            materialDialog.dismiss();
         });
 
-        viewTypeList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onViewTypeSelected(Constants.POSTS_VIEW_LIST);
-                materialDialog.dismiss();
-            }
+        viewTypeList.setOnClickListener(v -> {
+            presenter.onViewTypeSelected(Constants.POSTS_VIEW_LIST);
+            materialDialog.dismiss();
         });
 
         materialDialog.show();

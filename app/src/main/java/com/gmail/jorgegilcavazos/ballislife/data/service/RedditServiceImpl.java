@@ -10,11 +10,13 @@ import net.dean.jraw.http.oauth.Credentials;
 import net.dean.jraw.http.oauth.OAuthData;
 import net.dean.jraw.http.oauth.OAuthHelper;
 import net.dean.jraw.managers.AccountManager;
+import net.dean.jraw.managers.MultiRedditManager;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.CommentSort;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Listing;
+import net.dean.jraw.models.MultiReddit;
 import net.dean.jraw.models.PublicContribution;
 import net.dean.jraw.models.Submission;
 import net.dean.jraw.models.Subreddit;
@@ -340,5 +342,13 @@ public class RedditServiceImpl implements RedditService {
     public Single<List<CommentNode>> loadMoreComments(RedditClient reddit, CommentNode
             commentNode) {
         return Single.create(e -> e.onSuccess(commentNode.loadMoreComments(reddit)));
+    }
+
+    @Override
+    public Single<MultiReddit> getMultiReddit(RedditClient reddit, String owner, String multi) {
+        return Single.create(e -> {
+            MultiRedditManager multiRedditManager = new MultiRedditManager(reddit);
+            e.onSuccess(multiRedditManager.get(owner, multi));
+        });
     }
 }
