@@ -461,19 +461,9 @@ public class MainActivity extends BaseNoActionBarActivity {
             appBarLayout.setElevation(0);
         }
 
-        Fragment gamesHomeFragment = null;
-        if (selectedFragment == GAMES_FRAGMENT_ID) {
-            gamesHomeFragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
-            if(!(gamesHomeFragment instanceof GamesHomeFragment)) {
-                gamesHomeFragment = null;
-            }
-        }
-
-        if (gamesHomeFragment == null) {
-            gamesHomeFragment = GamesHomeFragment.Companion.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    gamesHomeFragment, R.id.fragment);
-        }
+        // Use new fragment instance so that the viewpager / dates are re-created. See #230.
+        ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                GamesHomeFragment.Companion.newInstance(), R.id.fragment);
 
         expandToolbar();
         selectedFragment = GAMES_FRAGMENT_ID;

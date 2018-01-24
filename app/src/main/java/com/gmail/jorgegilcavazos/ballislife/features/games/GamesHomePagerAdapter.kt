@@ -1,6 +1,7 @@
 package com.gmail.jorgegilcavazos.ballislife.features.games
 
 import android.content.Context
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import java.util.*
@@ -16,10 +17,12 @@ class GamesHomePagerAdapter(
   companion object {
     // Number of pages available for pagination. The center page corresponds to today so there
     // would be 250 pages (days) to the left and 250 pages (days) to the right.
-    private val NUM_PAGES = 501
+    private const val NUM_PAGES = 501
   }
 
-  override fun getItem(position: Int) = GamesFragment.newInstance(getDateForPosition(position))
+  override fun getItem(position: Int): Fragment {
+    return GamesFragment.newInstance(getDateForPosition(position))
+  }
 
   override fun getCount() = NUM_PAGES
 
