@@ -498,11 +498,11 @@ public final class RedditUtils {
             case "HawksSecond":
                 return R.drawable.atl;
             case "Heat":
-                return R.drawable.atl;
+                return R.drawable.mia;
             case "Heat2":
-                return R.drawable.atl;
+                return R.drawable.mia;
             case "Heat3":
-                return R.drawable.atl;
+                return R.drawable.mia;
             case "Pelicans":
                 return R.drawable.nop;
             case "Pelicans2":
