@@ -30,6 +30,7 @@ import com.crashlytics.android.Crashlytics;
 import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -65,6 +66,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
@@ -92,6 +94,7 @@ public class MainActivity extends BaseNoActionBarActivity {
     // Should match value in strings.xml
     private static final String NO_FAV_TEAM_VAL = "noteam";
 
+    @Inject PremiumService premiumService;
     @Inject LocalRepository localRepository;
     @Inject @Named("redditSharedPreferences") SharedPreferences redditSharedPrefs;
     @Inject PostsRepository postsRepository;
@@ -164,6 +167,11 @@ public class MainActivity extends BaseNoActionBarActivity {
         loadRedditUsername();
         loadThemeToggleIcon();
         setupDynamicShortcut();
+
+        disposables.add(premiumService.isPremiumUpdates()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribe(this::setGoPremiumVisibility));
 
         // TODO: Move this out of here, either to application start or a presenter.
         disposables = new CompositeDisposable();
@@ -282,7 +290,7 @@ public class MainActivity extends BaseNoActionBarActivity {
                     navMenuView.setVerticalScrollBarEnabled(false);
                 }
                 updateNavViewFavoriteTeam();
-                hideGoPremiumIfPremium();
+                setGoPremiumVisibility(premiumService.isPremium());
             }
         }
     }
@@ -647,13 +655,13 @@ public class MainActivity extends BaseNoActionBarActivity {
         super.onResume();
         loadRedditUsername();
         updateNavViewFavoriteTeam();
-        hideGoPremiumIfPremium();
+        setGoPremiumVisibility(premiumService.isPremium());
     }
 
-    private void hideGoPremiumMenuItem() {
+    private void setGoPremiumVisibility(boolean isPremium) {
         if (navigationView != null) {
             Menu navMenu = navigationView.getMenu();
-            navMenu.findItem(R.id.go_premium).setVisible(false);
+            navMenu.findItem(R.id.go_premium).setVisible(!isPremium);
         }
     }
 
@@ -663,11 +671,10 @@ public class MainActivity extends BaseNoActionBarActivity {
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
         bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_NAV_DRAWER);
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
-        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
-                .isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+        if (premiumService.isPremium()) {
             Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
                     .show();
-            hideGoPremiumMenuItem();
+            setGoPremiumVisibility(true);
         } else {
             Intent intent = new Intent(this, GoPremiumActivity.class);
             startActivity(intent);
@@ -703,13 +710,6 @@ public class MainActivity extends BaseNoActionBarActivity {
             localRepository.saveAppTheme(SwishTheme.LIGHT);
         }
         recreate();
-    }
-
-    private void hideGoPremiumIfPremium() {
-        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
-                .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted()) {
-            hideGoPremiumMenuItem();
-        }
     }
 
     private void updateNavViewFavoriteTeam() {

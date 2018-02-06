@@ -82,8 +82,9 @@
 
         <activity android:name=".features.reply.ReplyActivity">
         </activity>
-        <activity android:name=".features.gopremium.GoPremiumActivity">
-        </activity>
+        <activity android:name=".features.gopremium.GoPremiumActivity"
+            android:theme="@style/AppTheme.Dark.NoActionBar"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

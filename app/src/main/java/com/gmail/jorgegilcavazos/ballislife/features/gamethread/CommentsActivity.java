@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.anjlab.android.iab.v3.BillingProcessor;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -45,7 +44,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     LocalRepository localRepository;
 
     private PagerAdapter pagerAdapter;
-    public BillingProcessor billingProcessor;
 
     @Override
     public void injectAppComponent() {
@@ -62,8 +60,6 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        billingProcessor = ((BallIsLifeApplication) getApplication()).getBillingProcessor();
 
         Intent intent = getIntent();
         String homeTeam = intent.getStringExtra(GamesFragment.GAME_THREAD_HOME);

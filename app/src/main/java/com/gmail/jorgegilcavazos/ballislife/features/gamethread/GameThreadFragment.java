@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.ThreadAdapter;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
@@ -64,6 +65,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Inject GameThreadPresenterV2 presenter;
     @Inject LocalRepository localRepository;
+    @Inject PremiumService premiumService;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
@@ -223,8 +225,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Override
     public boolean isPremiumPurchased() {
-        return ((CommentsActivity) getActivity()).billingProcessor
-                .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted();
+        return premiumService.isPremium();
     }
 
     @Override

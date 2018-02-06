@@ -16,6 +16,7 @@ import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity
@@ -43,6 +44,7 @@ class FavoritesFragment : Fragment(), FavoritesView {
 
   @Inject lateinit var presenter: FavoritesPresenter
   @Inject lateinit var localRepository: LocalRepository
+  @Inject lateinit var premiumService: PremiumService
 
   private var listState: Parcelable? = null
   private lateinit var linearLayoutManager: LinearLayoutManager
@@ -149,8 +151,7 @@ class FavoritesFragment : Fragment(), FavoritesView {
   override fun favoriteDeletions(): Observable<Highlight> = favoriteDeletions
 
   override fun isPremium(): Boolean {
-    val bp = (activity.application as BallIsLifeApplication).billingProcessor
-    return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted
+    return premiumService.isPremium() || localRepository.isUserWhitelisted
   }
 
   override fun openHighlightEvents(): Observable<Highlight> {

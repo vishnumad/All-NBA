@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.anjlab.android.iab.v3.BillingProcessor;
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
@@ -61,6 +61,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Inject HighlightsRepository highlightsRepository;
     @Inject BaseSchedulerProvider schedulerProvider;
     @Inject HighlightsPresenter presenter;
+    @Inject PremiumService premiumService;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
@@ -446,9 +447,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     }
 
     private boolean isPremium() {
-        BillingProcessor bp = ((BallIsLifeApplication) getActivity().getApplication())
-                .getBillingProcessor();
-        return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted();
+        return premiumService.isPremium();
     }
 
     private boolean shouldShowSortingCard() {
