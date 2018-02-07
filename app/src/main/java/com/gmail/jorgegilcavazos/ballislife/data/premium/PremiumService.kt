@@ -61,7 +61,7 @@ class PremiumService @Inject constructor(
   }
 
   fun isPremium(): Boolean {
-    return premiumPurchased()
+    return premiumPurchased() || localRepository.isUserWhitelisted
   }
 
   fun isPremiumUpdates(): Observable<Boolean> = isPremiumUpdates

@@ -144,8 +144,8 @@ public class MainActivity extends BaseNoActionBarActivity {
             startActivity(intent);
             Once.markDone(SHOW_TOUR);
         } else {
-            if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW) && localRepository
-                    .shouldShowWhatsNew()) {
+            if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW)
+                    && localRepository.shouldShowWhatsNew()) {
                 new MaterialDialog.Builder(this).title(R.string.whats_new)
                         .content(R.string.whats_new_content)
                         .positiveText(R.string.got_it)
@@ -168,13 +168,14 @@ public class MainActivity extends BaseNoActionBarActivity {
         loadThemeToggleIcon();
         setupDynamicShortcut();
 
+        // TODO: Move this out of here, either to application start or a presenter.
+        disposables = new CompositeDisposable();
+
         disposables.add(premiumService.isPremiumUpdates()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
                 .subscribe(this::setGoPremiumVisibility));
 
-        // TODO: Move this out of here, either to application start or a presenter.
-        disposables = new CompositeDisposable();
         disposables.add(redditAuthentication.authenticate()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
