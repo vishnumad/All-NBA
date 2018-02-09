@@ -3,6 +3,9 @@ package com.gmail.jorgegilcavazos.ballislife.dagger.module;
 import android.app.Application;
 import android.content.Context;
 
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -27,5 +30,11 @@ public class AppModule {
     @Singleton
     public Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    public FirebaseAnalytics provideFirebaseAnalytics() {
+        return ((BallIsLifeApplication) application).getFirebaseAnalytics();
     }
 }

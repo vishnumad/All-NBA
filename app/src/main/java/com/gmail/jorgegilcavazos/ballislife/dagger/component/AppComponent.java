@@ -5,9 +5,11 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.module.BindModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
 import com.gmail.jorgegilcavazos.ballislife.features.boxscore.BoxScoreFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
+import com.gmail.jorgegilcavazos.ballislife.features.games.GamesHomeFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightsMenuFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.favorites.FavoritesFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.highlights.home.HighlightsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.login.LoginActivity;
@@ -18,7 +20,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.features.standings.StandingsFragment;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.tour.TourLoginActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 
@@ -47,7 +49,7 @@ public interface AppComponent {
 
     void inject(SettingsFragment settingsFragment);
 
-    void inject(SubmittionActivity submissionActivity);
+    void inject(SubmissionActivity submissionActivity);
 
     void inject(BoxScoreFragment boxScoreFragment);
 
@@ -64,4 +66,8 @@ public interface AppComponent {
     void inject(TourLoginActivity tourLoginActivity);
 
     void inject(FavoritesFragment favoritesFragment);
+
+    void inject(GamesHomeFragment gamesHomeFragment);
+
+    void inject(HighlightsMenuFragment highlightsMenuFragment);
 }

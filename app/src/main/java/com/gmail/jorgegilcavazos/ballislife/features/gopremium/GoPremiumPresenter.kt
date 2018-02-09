@@ -3,6 +3,8 @@ package com.gmail.jorgegilcavazos.ballislife.features.gopremium
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.common.PlayBillingItems
 import com.gmail.jorgegilcavazos.ballislife.common.PlayBillingItems.*
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class GoPremiumPresenter @Inject constructor(
     private val rxPlayBilling: RxPlayBilling,
     private val schedulerProvider: BaseSchedulerProvider,
-    private val disposable: CompositeDisposable
+    private val disposable: CompositeDisposable,
+    private val eventLogger: EventLogger
 ) : BasePresenter<GoPremiumView>() {
 
   override fun attachView(view: GoPremiumView) {
@@ -40,6 +43,7 @@ class GoPremiumPresenter @Inject constructor(
 
     view.monthlyClicks()
         .debounce(400, TimeUnit.MILLISECONDS)
+        .doOnNext { eventLogger.logEvent(SwishEvent.PREMIUM_MONTHLY, null) }
         .flatMap {
           rxPlayBilling.purchaseSubscription(
               PlayBillingItems.SWISH_PREMIUM_MONTHLY_SUB.sku,
@@ -57,6 +61,7 @@ class GoPremiumPresenter @Inject constructor(
 
     view.yearlyClicks()
         .debounce(400, TimeUnit.MILLISECONDS)
+        .doOnNext { eventLogger.logEvent(SwishEvent.PREMIUM_YEARLY, null) }
         .flatMap {
           rxPlayBilling.purchaseSubscription(
               PlayBillingItems.SWISH_PREMIUM_YEARLY_SUB.sku,
@@ -74,6 +79,7 @@ class GoPremiumPresenter @Inject constructor(
 
     view.lifetimeClicks()
         .debounce(400, TimeUnit.MILLISECONDS)
+        .doOnNext { eventLogger.logEvent(SwishEvent.PREMIUM_LIFETIME, null) }
         .flatMap {
           rxPlayBilling.purchaseItem(
               PlayBillingItems.SWISH_PREMIUM_LIFETIME_IAP.sku,

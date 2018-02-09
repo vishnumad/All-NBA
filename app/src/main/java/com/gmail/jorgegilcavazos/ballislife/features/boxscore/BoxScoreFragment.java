@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.model.BoxScoreValues;
@@ -29,6 +30,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.StatLine;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.common.base.Optional;
 
 import java.util.ArrayList;
@@ -53,6 +56,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
 
     @Inject BoxScorePresenter presenter;
     @Inject LocalRepository localRepository;
+    @Inject PremiumService premiumService;
 
     @BindView(R.id.button_home) Button btnHome;
     @BindView(R.id.button_away) Button btnAway;
@@ -61,6 +65,7 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     @BindView(R.id.playersTable) TableLayout playersTable;
     @BindView(R.id.statsTable) TableLayout statsTable;
     @BindView(R.id.scrollView) ScrollView scrollView;
+    @BindView(R.id.adView) AdView adView;
 
     private Unbinder unbinder;
 
@@ -101,6 +106,17 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
         presenter.loadBoxScore(gameId, teamSelected, true /* forceNetwork */);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (premiumService.isPremium()) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.setVisibility(View.VISIBLE);
+            adView.loadAd(new AdRequest.Builder().build());
+        }
     }
 
     @Override

@@ -29,6 +29,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
@@ -51,6 +55,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -66,7 +71,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableCompletableObserver;
 import jonathanfinerty.once.Once;
 
@@ -100,6 +104,7 @@ public class MainActivity extends BaseNoActionBarActivity {
     @Inject PostsRepository postsRepository;
     @Inject RedditAuthentication redditAuthentication;
     @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject EventLogger eventLogger;
 
     @BindView(R.id.mainAppBarLayout) AppBarLayout appBarLayout;
 
@@ -126,6 +131,7 @@ public class MainActivity extends BaseNoActionBarActivity {
         ButterKnife.bind(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Fabric.with(this, new Crashlytics());
+        MobileAds.initialize(this, "ca-app-pub-1607327298064379~6693958953");
 
         setupRemoteConfig();
 
@@ -667,11 +673,11 @@ public class MainActivity extends BaseNoActionBarActivity {
     }
 
     private void onGoPremiumClick() {
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, Constants.PREMIUM_DIALOG_NAME);
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
-        bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_NAV_DRAWER);
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+        Bundle params = new Bundle();
+        params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                GoPremiumOrigin.NAVIGATION_DRAWER.getOriginName());
+        eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
+
         if (premiumService.isPremium()) {
             Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
                     .show();

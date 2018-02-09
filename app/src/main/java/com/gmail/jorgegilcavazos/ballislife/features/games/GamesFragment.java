@@ -102,8 +102,6 @@ public class GamesFragment extends Fragment implements GamesView,
             savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games, container, false);
         unbinder = ButterKnife.bind(this, view);
-        FirebaseAnalytics.getInstance(getActivity()).setCurrentScreen(getActivity(), this
-                .getClass().getSimpleName(), this.getClass().getSimpleName());
 
         swipeRefreshLayout.setOnRefreshListener(this);
 

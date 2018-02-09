@@ -23,6 +23,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.highlights.HighlightsRepository;
@@ -33,7 +37,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight;
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -62,6 +66,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Inject BaseSchedulerProvider schedulerProvider;
     @Inject HighlightsPresenter presenter;
     @Inject PremiumService premiumService;
+    @Inject EventLogger eventLogger;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_highlights) RecyclerView rvHighlights;
@@ -189,6 +194,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 return true;
             case R.id.action_sort_top_day:
                 if (!isPremium()) {
+                    logGoPremiumFromSorting();
                     openPremiumActivity();
                     return true;
                 }
@@ -197,6 +203,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 return true;
             case R.id.action_sort_top_week:
                 if (!isPremium()) {
+                    logGoPremiumFromSorting();
                     openPremiumActivity();
                     return true;
                 }
@@ -205,6 +212,7 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
                 return true;
             case R.id.action_sort_top_season:
                 if (!isPremium()) {
+                    logGoPremiumFromSorting();
                     openPremiumActivity();
                     return true;
                 }
@@ -348,10 +356,10 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
 
     @Override
     public void onSubmissionClick(Highlight highlight) {
-        Intent intent = new Intent(getActivity(), SubmittionActivity.class);
+        Intent intent = new Intent(getActivity(), SubmissionActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, highlight.getId());
-        bundle.putString(SubmittionActivity.KEY_TITLE, getString(R.string.highlights));
+        bundle.putString(SubmissionActivity.KEY_TITLE, getString(R.string.highlights));
         intent.putExtras(bundle);
         startActivity(intent);
     }
@@ -400,6 +408,21 @@ public class HighlightsFragment extends Fragment implements HighlightsView,
     @Override
     public void showMustLogInToFavoriteMsg() {
         Toast.makeText(getActivity(), R.string.favorite_must_log_in, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void logExplorePremiumFromSorting() {
+        Bundle params = new Bundle();
+        params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                GoPremiumOrigin.HIGHLIGHTS_SORTING_EXPLORE_CARD.getOriginName());
+        eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
+    }
+
+    public void logGoPremiumFromSorting() {
+        Bundle params = new Bundle();
+        params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                GoPremiumOrigin.HIGHLIGHTS_SORTING.getOriginName());
+        eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
     }
 
     private void openViewPickerDialog() {

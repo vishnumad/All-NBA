@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
@@ -21,6 +22,8 @@ import com.gmail.jorgegilcavazos.ballislife.util.Pair;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.Utilities;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.common.base.Optional;
 import com.squareup.picasso.Picasso;
 
@@ -49,15 +52,27 @@ public class FullCardViewHolder extends RecyclerView.ViewHolder {
     public @BindView(R.id.text_link) TextView tvLink;
     public @BindView(R.id.header_layout) View headerLayout;
     public @BindView(R.id.bodyTextContainer) LinearLayout bodyTextContainer;
+    public @BindView(R.id.adView) AdView adView;
 
     private int textColor;
     private SwishTheme swishTheme;
 
-    public FullCardViewHolder(View itemView, int textColor, SwishTheme swishTheme) {
+    public FullCardViewHolder(
+            View itemView,
+            int textColor,
+            SwishTheme swishTheme,
+            PremiumService premiumService) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         this.textColor = textColor;
         this.swishTheme = swishTheme;
+
+        if (premiumService.isPremium()) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.loadAd(new AdRequest.Builder().build());
+            adView.setVisibility(View.VISIBLE);
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

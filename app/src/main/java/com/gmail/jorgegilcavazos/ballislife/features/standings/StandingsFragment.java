@@ -14,11 +14,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.service.NbaStandingsService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.model.Standings;
 import com.gmail.jorgegilcavazos.ballislife.util.TeamUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.List;
 
@@ -39,14 +44,14 @@ public class StandingsFragment extends Fragment implements StandingsView,
     private static final int WEST = 1;
 
     @Inject
-    @Named("SwishBackend")
-    Retrofit retrofit;
-
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Named("SwishBackend") Retrofit retrofit;
+    @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject EventLogger eventLogger;
+    @Inject PremiumService premiumService;
 
     @BindView(R.id.standings_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.layout_content) LinearLayout layoutContent;
+    @BindView(R.id.adView) AdView adView;
 
     private Snackbar snackbar;
     private Unbinder unbinder;
@@ -89,6 +94,23 @@ public class StandingsFragment extends Fragment implements StandingsView,
         presenter.loadStandings();
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (premiumService.isPremium()) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.loadAd(new AdRequest.Builder().build());
+            adView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        eventLogger.setCurrentScreen(getActivity(), SwishScreen.STANDINGS);
     }
 
     @Override

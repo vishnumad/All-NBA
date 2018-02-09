@@ -10,6 +10,7 @@ import com.gmail.jorgegilcavazos.ballislife.dagger.component.AppComponent;
 import com.gmail.jorgegilcavazos.ballislife.dagger.component.DaggerAppComponent;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.AppModule;
 import com.gmail.jorgegilcavazos.ballislife.dagger.module.DataModule;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.squareup.leakcanary.LeakCanary;
 
 import jonathanfinerty.once.Once;
@@ -28,11 +29,15 @@ public class BallIsLifeApplication extends Application {
         return context;
     }
 
+    private FirebaseAnalytics firebaseAnalytics;
+
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(context);
 
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
@@ -58,5 +63,9 @@ public class BallIsLifeApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+    public FirebaseAnalytics getFirebaseAnalytics() {
+        return firebaseAnalytics;
     }
 }

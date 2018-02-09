@@ -1,198 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="1dp"
-    app:cardBackgroundColor="?attr/cardsDialog">
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="1dp"
+        app:cardBackgroundColor="?attr/cardsDialog">
 
         <LinearLayout
-            android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?android:selectableItemBackground"
-            android:clickable="true"
-            android:orientation="vertical"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp">
-
-            <TextView
-                android:id="@+id/text_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Dirk Nowitzki's favorite trash talk "
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+            android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/header_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/text_author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="jorgegil96"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="@color/redditAuthor"
-                    android:textSize="10sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/text_timestamp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/text_title"
-                    android:layout_marginStart="5dp"
-                    android:layout_toRightOf="@+id/text_author"
-                    android:text="• 4 hrs ago"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textSize="10sp"/>
-
-                <TextView
-                    android:id="@+id/text_domain"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/text_title"
-                    android:layout_marginStart="5dp"
-                    android:layout_toRightOf="@id/text_timestamp"
-                    android:text="• self"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textSize="10sp"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/content_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/image_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:background="?attr/selectableItemBackground"
+                android:background="?android:selectableItemBackground"
                 android:clickable="true"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher"
-                android:visibility="visible"/>
+                android:orientation="vertical"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp">
 
-            <LinearLayout
-                android:id="@+id/bodyTextContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:orientation="vertical"/>
-
-            <LinearLayout
-                android:id="@+id/content_link"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="10dp"
-                    app:srcCompat="@drawable/ic_web_black_24dp"
-                    android:tint="?android:attr/textColorPrimary"/>
+                <TextView
+                    android:id="@+id/text_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dirk Nowitzki's favorite trash talk "
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_margin="5dp"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/text_domain_link"
+                        android:id="@+id/text_author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="streamable"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+                        android:text="jorgegil96"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="@color/redditAuthor"
+                        android:textSize="10sp"
+                        android:textStyle="bold"/>
 
                     <TextView
-                        android:id="@+id/text_link"
+                        android:id="@+id/text_timestamp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="http://streamable.com/wegndwefwefwefewfewfewfewfwef"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+                        android:layout_below="@+id/text_title"
+                        android:layout_marginStart="5dp"
+                        android:layout_toRightOf="@+id/text_author"
+                        android:text="• 4 hrs ago"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textSize="10sp"/>
 
+                    <TextView
+                        android:id="@+id/text_domain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/text_title"
+                        android:layout_marginStart="5dp"
+                        android:layout_toRightOf="@id/text_timestamp"
+                        android:text="• self"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textSize="10sp"/>
                 </LinearLayout>
 
             </LinearLayout>
 
-        </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/content_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/image_thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/ic_launcher"
+                    android:visibility="visible"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:orientation="horizontal">
+                <LinearLayout
+                    android:id="@+id/bodyTextContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical"/>
 
-                <ImageButton
-                    android:id="@+id/button_upvote"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_arrow_upward_black_18dp"/>
+                <LinearLayout
+                    android:id="@+id/content_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/text_points"
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_margin="10dp"
+                        app:srcCompat="@drawable/ic_web_black_24dp"
+                        android:tint="?android:attr/textColorPrimary"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_margin="5dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text_domain_link"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="streamable"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+                        <TextView
+                            android:id="@+id/text_link"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="http://streamable.com/wegndwefwefwefewfewfewfewfwef"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginStart="5dp"
-                    android:gravity="center"
-                    android:text="3240"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
-
-                <ImageButton
-                    android:id="@+id/button_downvote"
-                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_arrow_downward_black_18dp"/>
-            </LinearLayout>
+                    android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:orientation="horizontal">
+                    <ImageButton
+                        android:id="@+id/button_upvote"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_arrow_upward_black_18dp"/>
 
-                <ImageButton
-                    android:id="@+id/button_save"
-                    android:layout_width="40dp"
+                    <TextView
+                        android:id="@+id/text_points"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="5dp"
+                        android:gravity="center"
+                        android:text="3240"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+
+                    <ImageButton
+                        android:id="@+id/button_downvote"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_arrow_downward_black_18dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    app:srcCompat="@drawable/ic_bookmark_border_black_18dp"
-                    android:tint="?android:attr/textColorPrimary"/>
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/button_save"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?selectableItemBackgroundBorderless"
+                        app:srcCompat="@drawable/ic_bookmark_border_black_18dp"
+                        android:tint="?android:attr/textColorPrimary"/>
 
-        </RelativeLayout>
+                </LinearLayout>
 
-    </LinearLayout>
+            </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/submission_ad_banner_id"
+        android:layout_marginBottom="8dp"/>
+</LinearLayout>

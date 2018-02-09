@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
 import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActionBarActivity;
@@ -13,6 +15,7 @@ import javax.inject.Inject;
 public class SettingsActivity extends BaseActionBarActivity {
 
     @Inject PremiumService premiumService;
+    @Inject EventLogger eventLogger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,12 @@ public class SettingsActivity extends BaseActionBarActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        eventLogger.setCurrentScreen(this, SwishScreen.SETTINGS);
     }
 
     public boolean isPremium() {

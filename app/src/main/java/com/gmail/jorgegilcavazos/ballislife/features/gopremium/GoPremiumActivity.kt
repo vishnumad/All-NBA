@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import com.gmail.jorgegilcavazos.ballislife.R
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity
 import com.jakewharton.rxbinding2.view.clicks
@@ -25,6 +27,7 @@ import javax.inject.Inject
 class GoPremiumActivity : BaseNoActionBarActivity(), GoPremiumView {
 
   @Inject lateinit var presenter: GoPremiumPresenter
+  @Inject lateinit var eventLogger: EventLogger
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -65,6 +68,11 @@ class GoPremiumActivity : BaseNoActionBarActivity(), GoPremiumView {
     }
 
     presenter.attachView(this)
+  }
+
+  override fun onResume() {
+    super.onResume()
+    eventLogger.setCurrentScreen(this, SwishScreen.GO_PREMIUM)
   }
 
   override fun onDestroy() {

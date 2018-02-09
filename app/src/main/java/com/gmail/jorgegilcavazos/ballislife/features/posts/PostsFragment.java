@@ -26,7 +26,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -35,10 +38,12 @@ import com.gmail.jorgegilcavazos.ballislife.features.common.OnSubmissionClickLis
 import com.gmail.jorgegilcavazos.ballislife.features.model.NBASubChips;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SubscriberCount;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import net.dean.jraw.models.VoteDirection;
 import net.dean.jraw.paginators.Sorting;
@@ -60,24 +65,19 @@ public class PostsFragment extends Fragment implements PostsView,
     private static final String SUBREDDIT = "subreddit";
     private static final String LIST_STATE = "listState";
 
+    @Inject LocalRepository localRepository;
     @Inject
-    LocalRepository localRepository;
-
-    @Inject
-    @Named("redditSharedPreferences")
-    SharedPreferences redditSharedPreferences;
-
-    @Inject
-    PostsRepository postsRepository;
-
-    @Inject
-    PostsPresenter presenter;
-
-    @Inject
-    RedditAuthentication redditAuthentication;
+    @Named("redditSharedPreferences") SharedPreferences redditSharedPreferences;
+    @Inject PostsRepository postsRepository;
+    @Inject PostsPresenter presenter;
+    @Inject RedditAuthentication redditAuthentication;
+    @Inject EventLogger eventLogger;
+    @Inject PremiumService premiumService;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView_posts) RecyclerView recyclerViewPosts;
+    @BindView(R.id.adView) AdView adView;
+
     Parcelable listState;
     private int viewType;
     private String subreddit;
@@ -157,6 +157,17 @@ public class PostsFragment extends Fragment implements PostsView,
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (premiumService.isPremium()) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.loadAd(new AdRequest.Builder().build());
+            adView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
@@ -167,6 +178,7 @@ public class PostsFragment extends Fragment implements PostsView,
     @Override
     public void onResume() {
         super.onResume();
+        eventLogger.setCurrentScreen(getActivity(), SwishScreen.POSTS);
         // Load cached data if available, or from network if not.
         presenter.loadFirstAvailable(sorting, timePeriod);
     }
@@ -388,10 +400,10 @@ public class PostsFragment extends Fragment implements PostsView,
 
     @Override
     public void onSubmissionClick(String submissionId) {
-        Intent intent = new Intent(getActivity(), SubmittionActivity.class);
+        Intent intent = new Intent(getActivity(), SubmissionActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.THREAD_ID, submissionId);
-        bundle.putString(SubmittionActivity.KEY_TITLE, subreddit);
+        bundle.putString(SubmissionActivity.KEY_TITLE, subreddit);
         intent.putExtras(bundle);
         startActivity(intent);
     }

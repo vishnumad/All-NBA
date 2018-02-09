@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.games.GamesFragment;
@@ -40,8 +42,8 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    @Inject
-    LocalRepository localRepository;
+    @Inject LocalRepository localRepository;
+    @Inject EventLogger eventLogger;
 
     private PagerAdapter pagerAdapter;
 
@@ -91,6 +93,12 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         setSelectedTab(intent.getStringExtra(GamesFragment.GAME_STATUS));
 
         fab.setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        eventLogger.setCurrentScreen(this, SwishScreen.GAME_DETAIL);
     }
 
     @Override

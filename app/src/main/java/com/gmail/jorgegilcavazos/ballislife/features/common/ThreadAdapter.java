@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.gamethread.LoadMoreCommentsViewHolder;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
@@ -20,7 +21,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.SubmissionWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
@@ -53,11 +54,12 @@ import static com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType
  * Currently used to display comments only in the
  * {@link com.gmail.jorgegilcavazos.ballislife.features.gamethread.GameThreadFragment} and to
  * display comments AND a the card for a full submission in the
- * {@link SubmittionActivity}.
+ * {@link SubmissionActivity}.
  */
 public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private LocalRepository localRepository;
+    private PremiumService premiumService;
     private Context context;
     private List<ThreadItem> commentsList;
     private Map<String, List<ThreadItem>> collapsedItems = new HashMap<>();
@@ -82,11 +84,13 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private PublishSubject<CommentItem> loadMoreComments = PublishSubject.create();
 
     public ThreadAdapter(Context context,
+                         PremiumService premiumService,
                          LocalRepository localRepository,
                          List<ThreadItem> commentsList,
                          boolean hasHeader,
                          int textColor) {
         this.context = context;
+        this.premiumService = premiumService;
         this.localRepository = localRepository;
         this.commentsList = commentsList;
         this.hasHeader = hasHeader;
@@ -109,7 +113,8 @@ public class ThreadAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         if (viewType == SUBMISSION_HEADER.getValue()) {
             view = inflater.inflate(R.layout.post_layout_card, parent, false);
-            return new FullCardViewHolder(view, textColor, localRepository.getAppTheme());
+            return new FullCardViewHolder(view, textColor, localRepository.getAppTheme(),
+                    premiumService);
         } else if (viewType == COMMENT.getValue()) {
             view = inflater.inflate(R.layout.comment_layout, parent, false);
             return new CommentViewHolder(view, textColor, localRepository.getAppTheme());

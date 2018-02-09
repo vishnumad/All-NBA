@@ -1,5 +1,6 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread
 
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
@@ -14,6 +15,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.TrampolineSchedulerProvider
 import com.google.common.collect.FluentIterable
+import com.nhaarman.mockito_kotlin.mock
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
@@ -62,6 +64,7 @@ class GameThreadPresenterV2Test {
   @Mock private lateinit var disposable: CompositeDisposable
   @Mock private lateinit var mockNetworkUtils: NetworkUtils
   @Mock private lateinit var mockErrorHandler: ErrorHandler
+  private val mockEventLogger: EventLogger = mock()
 
   private lateinit var presenter: GameThreadPresenterV2
 
@@ -93,7 +96,8 @@ class GameThreadPresenterV2Test {
         localRepository,
         disposable,
         mockNetworkUtils,
-        mockErrorHandler)
+        mockErrorHandler,
+        mockEventLogger)
     presenter.attachView(mockView)
   }
 

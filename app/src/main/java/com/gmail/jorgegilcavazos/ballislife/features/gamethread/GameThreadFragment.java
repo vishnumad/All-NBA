@@ -21,6 +21,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -31,10 +35,10 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper;
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType;
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem;
 import com.gmail.jorgegilcavazos.ballislife.features.reply.ReplyActivity;
-import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
-import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import net.dean.jraw.models.Comment;
 
@@ -66,12 +70,14 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     @Inject GameThreadPresenterV2 presenter;
     @Inject LocalRepository localRepository;
     @Inject PremiumService premiumService;
+    @Inject EventLogger eventLogger;
 
     @BindView(R.id.game_thread_swipe_refresh_layout) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.comment_thread_rv) RecyclerView rvComments;
     @BindView(R.id.noThreadText) TextView noThreadText;
     @BindView(R.id.noCommentsText) TextView noCommentsText;
     @BindView(R.id.errorLoadingText) TextView errorLoadingText;
+    @BindView(R.id.adView) AdView adView;
 
     private PublishSubject<Object> fabClicks = PublishSubject.create();
     private PublishSubject<Boolean> streamChanges = PublishSubject.create();
@@ -132,8 +138,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
         int textColor = ThemeUtils.Companion.getTextColor(getActivity(), localRepository
                 .getAppTheme());
-        threadAdapter = new ThreadAdapter(getActivity(), localRepository, new ArrayList<>(),
-                false, textColor);
+        threadAdapter = new ThreadAdapter(getActivity(), premiumService, localRepository,
+                new ArrayList<>(), false, textColor);
 
         lmComments = new LinearLayoutManager(getActivity());
         rvComments.setLayoutManager(lmComments);
@@ -153,6 +159,17 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         presenter.loadGameThread();
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (premiumService.isPremium()) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.loadAd(new AdRequest.Builder().build());
+            adView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -429,12 +446,6 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
     @Override
     public void purchasePremium() {
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, Constants.PREMIUM_DIALOG_NAME);
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
-        bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_GAME_THREAD_SWITCH);
-        FirebaseAnalytics.getInstance(getActivity()).logEvent(FirebaseAnalytics.Event.VIEW_ITEM,
-                bundle);
         Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
         startActivity(intent);
     }
@@ -479,6 +490,14 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         selectedCommentDelay = delay;
     }
 
+    @Override
+    public void logGoPremiumFromStream() {
+        Bundle params = new Bundle();
+        params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                GoPremiumOrigin.GAME_THREAD_STREAM.getOriginName());
+        eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
+    }
+
     private void showAddDelayDialog() {
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.worried_about_spoilers)
@@ -487,6 +506,11 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
                 .itemsCallbackSingleChoice(getIndexOfCommentDelay(selectedCommentDelay),
                         (dialog, itemView, which, text) -> {
                             if (!isPremiumPurchased()) {
+                                Bundle params = new Bundle();
+                                params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                                        GoPremiumOrigin.GAME_THREAD_DELAY.getOriginName());
+                                eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
+
                                 purchasePremium();
                                 selectedCommentDelay = CommentDelay.NONE;
                                 return true;
@@ -519,6 +543,12 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
                                     break;
                             }
                             streamSwitch.setChecked(true);
+
+                            Bundle params = new Bundle();
+                            params.putInt(SwishEventParam.DELAY_TIME_SECONDS.getKey(),
+                                    selectedCommentDelay.getSeconds());
+                            eventLogger.logEvent(SwishEvent.DELAY_COMMENTS, params);
+
                             return true;
                 })
                 .positiveText(getString(R.string.add_delay))

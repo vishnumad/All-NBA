@@ -17,10 +17,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener;
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity;
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity;
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -47,8 +49,8 @@ public class ProfileActivity extends BaseNoActionBarActivity
     @BindView(R.id.profile_swipe_refresh) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.profile_recycler_view) RecyclerView recyclerView;
 
-    @Inject
-    ProfilePresenter presenter;
+    @Inject ProfilePresenter presenter;
+    @Inject EventLogger eventLogger;
 
     private LinearLayoutManager linearLayoutManager;
     private EndlessRecyclerViewScrollListener scrollListener;
@@ -142,6 +144,7 @@ public class ProfileActivity extends BaseNoActionBarActivity
     @Override
     protected void onResume() {
         super.onResume();
+        eventLogger.setCurrentScreen(this, SwishScreen.PROFILE);
         // Load cached data if available, from network if not.
         presenter.loadFirstAvailable();
     }
@@ -178,9 +181,9 @@ public class ProfileActivity extends BaseNoActionBarActivity
 
     @Override
     public void openSubmission(String submissionId) {
-        Intent intent = new Intent(ProfileActivity.this, SubmittionActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, SubmissionActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(SubmittionActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(SubmissionActivity.KEY_TITLE, getString(R.string.profile));
         extras.putString(Constants.THREAD_ID, submissionId);
         intent.putExtras(extras);
         startActivity(intent);
@@ -188,11 +191,11 @@ public class ProfileActivity extends BaseNoActionBarActivity
 
     @Override
     public void openSubmissionAndScrollToComment(String submissionId, String commentId) {
-        Intent intent = new Intent(ProfileActivity.this, SubmittionActivity.class);
+        Intent intent = new Intent(ProfileActivity.this, SubmissionActivity.class);
         Bundle extras = new Bundle();
-        extras.putString(SubmittionActivity.KEY_TITLE, getString(R.string.profile));
+        extras.putString(SubmissionActivity.KEY_TITLE, getString(R.string.profile));
         extras.putString(Constants.THREAD_ID, submissionId);
-        extras.putString(SubmittionActivity.KEY_COMMENT_TO_SCROLL_ID, commentId);
+        extras.putString(SubmissionActivity.KEY_COMMENT_TO_SCROLL_ID, commentId);
         intent.putExtras(extras);
         startActivity(intent);
     }
