@@ -15,7 +15,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.afollestad.materialdialogs.MaterialDialog
 import com.gmail.jorgegilcavazos.ballislife.R
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.common.EndlessRecyclerViewScrollListener
 import com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity
@@ -23,7 +28,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.highlights.HighlightAdapter
 import com.gmail.jorgegilcavazos.ballislife.features.model.Highlight
 import com.gmail.jorgegilcavazos.ballislife.features.model.HighlightViewType
 import com.gmail.jorgegilcavazos.ballislife.features.model.SwishCard
-import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmittionActivity
+import com.gmail.jorgegilcavazos.ballislife.features.submission.SubmissionActivity
 import com.gmail.jorgegilcavazos.ballislife.features.videoplayer.VideoPlayerActivity
 import com.gmail.jorgegilcavazos.ballislife.util.Constants
 import com.google.android.youtube.player.YouTubeApiServiceUtil
@@ -43,6 +48,8 @@ class FavoritesFragment : Fragment(), FavoritesView {
 
   @Inject lateinit var presenter: FavoritesPresenter
   @Inject lateinit var localRepository: LocalRepository
+  @Inject lateinit var premiumService: PremiumService
+  @Inject lateinit var eventLogger: EventLogger
 
   private var listState: Parcelable? = null
   private lateinit var linearLayoutManager: LinearLayoutManager
@@ -149,8 +156,7 @@ class FavoritesFragment : Fragment(), FavoritesView {
   override fun favoriteDeletions(): Observable<Highlight> = favoriteDeletions
 
   override fun isPremium(): Boolean {
-    val bp = (activity.application as BallIsLifeApplication).billingProcessor
-    return bp.isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted
+    return premiumService.isPremium() || localRepository.isUserWhitelisted
   }
 
   override fun openHighlightEvents(): Observable<Highlight> {
@@ -205,10 +211,10 @@ class FavoritesFragment : Fragment(), FavoritesView {
   }
 
   override fun showSubmission(highlight: Highlight) {
-    val intent = Intent(activity, SubmittionActivity::class.java)
+    val intent = Intent(activity, SubmissionActivity::class.java)
     val bundle = Bundle()
     bundle.putString(Constants.THREAD_ID, highlight.id)
-    bundle.putString(SubmittionActivity.KEY_TITLE, getString(R.string.highlights))
+    bundle.putString(SubmissionActivity.KEY_TITLE, getString(R.string.highlights))
     intent.putExtras(bundle)
     startActivity(intent)
   }
@@ -233,6 +239,10 @@ class FavoritesFragment : Fragment(), FavoritesView {
   }
 
   override fun openPremiumActivity() {
+    val params = Bundle()
+    params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.key,
+        GoPremiumOrigin.HIGHLIGHTS_FAVORITES_EXPLORE_CARD.originName)
+    eventLogger.logEvent(SwishEvent.GO_PREMIUM, params)
     val intent = Intent(activity, GoPremiumActivity::class.java)
     startActivity(intent)
   }

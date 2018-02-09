@@ -100,4 +100,6 @@ interface GameThreadView {
   fun getCommentDelay(): CommentDelay
 
   fun setCommentDelay(delay: CommentDelay)
+
+  fun logGoPremiumFromStream()
 }

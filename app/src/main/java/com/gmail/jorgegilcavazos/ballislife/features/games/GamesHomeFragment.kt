@@ -11,9 +11,18 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 
 import com.gmail.jorgegilcavazos.ballislife.R
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService
+import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
+import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
+import com.google.android.gms.ads.AdRequest
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.fragment_games_home.*
 import java.util.*
+import javax.inject.Inject
 
 
 /**
@@ -21,11 +30,21 @@ import java.util.*
  */
 class GamesHomeFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
+  @Inject lateinit var premiumService: PremiumService
+  @Inject lateinit var schedulerProvider: BaseSchedulerProvider
+  @Inject lateinit var disposable: CompositeDisposable
+  @Inject lateinit var eventLogger: EventLogger
+
   companion object {
     fun newInstance() = GamesHomeFragment()
   }
 
   private lateinit var adapter: GamesHomePagerAdapter
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    BallIsLifeApplication.getAppComponent().inject(this)
+  }
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                             savedInstanceState: Bundle?): View? {
@@ -34,6 +53,14 @@ class GamesHomeFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
+    setAdVisibility()
+
+    premiumService.isPremiumUpdates()
+        .subscribeOn(schedulerProvider.io())
+        .observeOn(schedulerProvider.ui())
+        .subscribe { setAdVisibility() }
+        .addTo(disposable)
 
     adapter = GamesHomePagerAdapter(activity, childFragmentManager)
     viewPager.adapter = adapter
@@ -67,6 +94,25 @@ class GamesHomeFragment : Fragment(), DatePickerDialog.OnDateSetListener {
       // First available game in backend.
       datePicker.datePicker.minDate = 1507204822000L
       datePicker.show()
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    eventLogger.setCurrentScreen(activity, SwishScreen.GAMES)
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    disposable.clear()
+  }
+
+  private fun setAdVisibility() {
+    if (premiumService.isPremium()) {
+      adView.visibility = View.GONE
+    } else {
+      adView.visibility = View.VISIBLE
+      adView.loadAd(AdRequest.Builder().build())
     }
   }
 

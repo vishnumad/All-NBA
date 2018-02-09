@@ -111,7 +111,9 @@ public class AppLocalRepository implements LocalRepository {
 
     @Override
     public boolean shouldShowWhatsNew() {
-        return localSharedPreferences.getBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, true);
+        boolean dontShow = false;
+        return localSharedPreferences.getBoolean(LocalSharedPreferences.SHOW_WHATS_NEW, true)
+                && dontShow;
     }
 
     @Override

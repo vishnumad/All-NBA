@@ -12,7 +12,8 @@
         android:textSize="16sp"
         android:textAlignment="center"
         android:layout_centerInParent="true"
-        style="@style/Base.TextAppearance.AppCompat.Display1"/>
+        style="@style/Base.TextAppearance.AppCompat.Display1"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/noCommentsText"
@@ -22,7 +23,8 @@
         android:textSize="16sp"
         android:textAlignment="center"
         android:layout_centerInParent="true"
-        style="@style/Base.TextAppearance.AppCompat.Display1"/>
+        style="@style/Base.TextAppearance.AppCompat.Display1"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/errorLoadingText"
@@ -32,10 +34,23 @@
         android:textSize="16sp"
         android:textAlignment="center"
         android:layout_centerInParent="true"
-        style="@style/Base.TextAppearance.AppCompat.Display1"/>
+        style="@style/Base.TextAppearance.AppCompat.Display1"
+        android:visibility="gone"/>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/game_thread_ad_banner_id"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/game_thread_swipe_refresh_layout"
+        android:layout_below="@id/adView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

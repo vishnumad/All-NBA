@@ -1,6 +1,8 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gamethread
 
 import android.support.annotation.VisibleForTesting
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent
 import com.gmail.jorgegilcavazos.ballislife.base.BasePresenter
 import com.gmail.jorgegilcavazos.ballislife.data.actions.RedditActions
 import com.gmail.jorgegilcavazos.ballislife.data.actions.models.ReplyUIModel
@@ -8,7 +10,11 @@ import com.gmail.jorgegilcavazos.ballislife.data.actions.models.SaveUIModel
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.comments.ContributionRepository
 import com.gmail.jorgegilcavazos.ballislife.data.repository.gamethreads.GameThreadsRepository
-import com.gmail.jorgegilcavazos.ballislife.features.model.*
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentDelay
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentItem
+import com.gmail.jorgegilcavazos.ballislife.features.model.CommentWrapper
+import com.gmail.jorgegilcavazos.ballislife.features.model.GameThreadType
+import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItem
 import com.gmail.jorgegilcavazos.ballislife.features.model.ThreadItemType.COMMENT
 import com.gmail.jorgegilcavazos.ballislife.util.ErrorHandler
 import com.gmail.jorgegilcavazos.ballislife.util.NetworkUtils
@@ -31,7 +37,8 @@ class GameThreadPresenterV2 @Inject constructor(
     private val localRepository: LocalRepository,
     private val disposable: CompositeDisposable,
     private val networkUtils: NetworkUtils,
-    private val errorHandler: ErrorHandler) : BasePresenter<GameThreadView>() {
+    private val errorHandler: ErrorHandler,
+    private val eventLogger: EventLogger) : BasePresenter<GameThreadView>() {
 
   private lateinit var type: GameThreadType
   private lateinit var home: String
@@ -112,12 +119,14 @@ class GameThreadPresenterV2 @Inject constructor(
         }.addTo(disposable)
 
     view.streamChanges()
-        .subscribe {
-          if (it) {
+        .subscribe { isChecked ->
+          if (isChecked) {
             if (view.isPremiumPurchased()) {
+              eventLogger.logEvent(SwishEvent.STREAM, null)
               shouldStream = true
               loadGameThread()
             } else {
+              view.logGoPremiumFromStream()
               view.setStreamSwitch(false)
               view.purchasePremium()
             }

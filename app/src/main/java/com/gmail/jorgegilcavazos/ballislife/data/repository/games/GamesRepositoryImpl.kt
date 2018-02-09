@@ -92,6 +92,28 @@ class GamesRepositoryImpl @Inject constructor(
     }
 
     return Observable.concat(memory, network)
+
+    /*
+    return if (!DateFormatUtil.isDateToday(date.time)) {
+      // If the date isn't today there's no need to refresh from the network, since the cached
+      // data won't need to be updated.
+      // We return from the memory source and only if there was no cached games we start a
+      // network request.
+      memory.flatMap { result ->
+        if (result == LoadGamesResult.NoCachedGames) {
+          // Memory had no cached games, return the network results.
+          network
+        } else {
+          // Return whatever the result was.
+          Observable.just(result)
+        }
+      }
+    } else {
+      // If the date is today we want to refresh game data always. We return the cached data
+      // first while we update the network, when the network data arrives we deliver those results.
+      Observable.concat(memory, network)
+    }
+    */
   }
 
   private fun networkSource(date: Calendar): Single<Map<String, GameV2>> {

@@ -4,17 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.gmail.jorgegilcavazos.ballislife.features.gopremium.GoPremiumActivity">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/help_support_swish"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textSize="26sp"
+        android:text="GO PREMIUM"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:layout_centerHorizontal="true"
+        android:textAllCaps="true"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
+
+    <ImageView
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/banner_premium"
+        android:adjustViewBounds="true"
+        android:layout_below="@id/title"/>
 
     <TextView
         android:id="@+id/body"
@@ -23,30 +34,88 @@
         android:text="@string/go_premium_body"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:layout_below="@id/title"/>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textAlignment="center"
+        android:layout_below="@id/banner"/>
 
-    <Button
-        android:id="@+id/goPremiumBtn"
+    <ImageButton
+        android:id="@+id/closeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_close_black_24dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/title"
+        android:layout_alignBottom="@id/title"
+        android:padding="5dp"
+        android:tint="?android:attr/textColorPrimary"
+        android:layout_marginEnd="4dp"/>
+
+    <TextView
+        android:id="@+id/freeTrial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="4dp"
+        android:text="@string/free_trial"
+        android:textSize="10sp"
+        android:layout_alignParentBottom="true"/>
+
+    <LinearLayout
+        android:id="@+id/priceOptions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Go Premium"
-        android:background="@color/colorAccent"
-        android:textColor="@color/white"
-        android:layout_marginTop="16dp"
-        android:layout_alignParentBottom="true"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_above="@id/freeTrial">
+
+        <include
+            android:id="@+id/priceOptionMonthly"
+            layout="@layout/sub_price_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <include
+            android:id="@+id/priceOptionYearly"
+            layout="@layout/sub_price_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <include
+            android:id="@+id/priceOptionLifetime"
+            layout="@layout/sub_price_option"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/body"
-        android:layout_above="@id/goPremiumBtn">
+        android:layout_above="@id/priceOptions"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp">
 
         <LinearLayout
             android:id="@+id/benefitContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"/>
 
     </ScrollView>
 </RelativeLayout>

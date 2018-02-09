@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.afollestad.easyvideoplayer.EasyVideoCallback;
 import com.afollestad.easyvideoplayer.EasyVideoPlayer;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen;
 import com.gmail.jorgegilcavazos.ballislife.data.service.StreamableService;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
@@ -30,8 +32,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
     public static final String SHORTCODE = "videoUrl";
     private static final String TAG = "VideoPlayerActivity";
 
-    @Inject
-    BaseSchedulerProvider schedulerProvider;
+    @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject EventLogger eventLogger;
 
     @BindView(R.id.player) EasyVideoPlayer videoPlayer;
 
@@ -76,6 +78,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements VideoPlaye
         presenter.stop();
         presenter.detachView();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        eventLogger.setCurrentScreen(this, SwishScreen.VIDEO_PLAYER);
     }
 
     @Override

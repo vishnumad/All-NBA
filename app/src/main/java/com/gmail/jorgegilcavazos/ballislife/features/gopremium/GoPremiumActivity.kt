@@ -1,34 +1,48 @@
 package com.gmail.jorgegilcavazos.ballislife.features.gopremium
 
-import android.content.Intent
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import com.gmail.jorgegilcavazos.ballislife.R
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
-import com.gmail.jorgegilcavazos.ballislife.features.main.BaseActionBarActivity
-import com.gmail.jorgegilcavazos.ballislife.util.Constants
-import kotlinx.android.synthetic.main.activity_go_premium.*
+import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity
+import com.jakewharton.rxbinding2.view.clicks
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.activity_go_premium.benefitContainer
+import kotlinx.android.synthetic.main.activity_go_premium.closeBtn
+import kotlinx.android.synthetic.main.activity_go_premium.priceOptionLifetime
+import kotlinx.android.synthetic.main.activity_go_premium.priceOptionMonthly
+import kotlinx.android.synthetic.main.activity_go_premium.priceOptionYearly
+import kotlinx.android.synthetic.main.sub_price_option.view.priceOptionHeaderTitle
+import kotlinx.android.synthetic.main.sub_price_option.view.priceOptionPrice
+import kotlinx.android.synthetic.main.sub_price_option.view.priceOptionText
+import javax.inject.Inject
 
 
-class GoPremiumActivity : BaseActionBarActivity() {
+class GoPremiumActivity : BaseNoActionBarActivity(), GoPremiumView {
+
+  @Inject lateinit var presenter: GoPremiumPresenter
+  @Inject lateinit var eventLogger: EventLogger
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_go_premium)
 
-    setTitle(R.string.go_premium)
-    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    closeBtn.setOnClickListener { onBackPressed() }
 
     val benefits = arrayOf(
+        "• 100% ad free. Forever.",
         "• Stream live game threads",
         "• Add a delay to game threads to avoid spoilers",
         "• Save your favorite highlights",
         "• Sort highlights by popularity",
         "• Hide scores (No spoilers)",
         "• Subscribe to triple-double, quadruple-double, and 5x5 alerts",
-        "• 100% ad free. Forever.",
         "• More coming soon!")
 
     benefits.forEach {
@@ -38,21 +52,36 @@ class GoPremiumActivity : BaseActionBarActivity() {
       benefitContainer.addView(benefitText)
     }
 
-    goPremiumBtn.setOnClickListener {
-      (application as BallIsLifeApplication).billingProcessor
-          .purchase(this, Constants.PREMIUM_PRODUCT_ID)
+    priceOptionMonthly.apply {
+      priceOptionHeaderTitle.text = getString(R.string.monthly_header)
+      priceOptionText.text = getString(R.string.monthly)
     }
+
+    priceOptionYearly.apply {
+      priceOptionHeaderTitle.text = getString(R.string.yearly_header)
+      priceOptionText.text = getString(R.string.yearly)
+    }
+
+    priceOptionLifetime.apply {
+      priceOptionHeaderTitle.text = getString(R.string.lifetime_header)
+      priceOptionText.text = getString(R.string.lifetime)
+    }
+
+    presenter.attachView(this)
+  }
+
+  override fun onResume() {
+    super.onResume()
+    eventLogger.setCurrentScreen(this, SwishScreen.GO_PREMIUM)
+  }
+
+  override fun onDestroy() {
+    presenter.detachView()
+    super.onDestroy()
   }
 
   override fun injectAppComponent() {
     BallIsLifeApplication.getAppComponent().inject(this)
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-    if (!(application as BallIsLifeApplication).billingProcessor
-        .handleActivityResult(requestCode, resultCode, data)) {
-      super.onActivityResult(requestCode, resultCode, data)
-    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -63,5 +92,45 @@ class GoPremiumActivity : BaseActionBarActivity() {
       }
     }
     return super.onOptionsItemSelected(item)
+  }
+
+  override fun showServiceUnavailable() {
+    Toast.makeText(this, "Service unavailable", Toast.LENGTH_SHORT).show()
+  }
+
+  override fun closeActivity() {
+    finish()
+  }
+
+  override fun setMonthlyPrice(price: String) {
+    priceOptionMonthly.priceOptionPrice.text = price
+  }
+
+  override fun setYearlyPrice(price: String) {
+    priceOptionYearly.priceOptionPrice.text = price
+  }
+
+  override fun setLifetimePrice(price: String) {
+    priceOptionLifetime.priceOptionPrice.text = price
+  }
+
+  override fun monthlyClicks(): Observable<Unit> {
+    return priceOptionMonthly.clicks()
+  }
+
+  override fun yearlyClicks(): Observable<Unit> {
+    return priceOptionYearly.clicks()
+  }
+
+  override fun lifetimeClicks(): Observable<Unit> {
+    return priceOptionLifetime.clicks()
+  }
+
+  override fun activity(): Activity {
+    return this
+  }
+
+  override fun showSubscriptionActivated() {
+    Toast.makeText(activity(), R.string.purchase_complete, Toast.LENGTH_SHORT).show()
   }
 }

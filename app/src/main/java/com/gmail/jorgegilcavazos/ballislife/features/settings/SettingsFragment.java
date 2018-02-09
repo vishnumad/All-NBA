@@ -18,6 +18,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -68,6 +72,7 @@ public class SettingsFragment extends PreferenceFragment
     @Inject RedditAuthentication redditAuthentication;
     @Inject BaseSchedulerProvider schedulerProvider;
     @Inject LocalRepository localRepository;
+    @Inject EventLogger eventLogger;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +101,10 @@ public class SettingsFragment extends PreferenceFragment
 
         Preference goPremium = findPreference(KEY_GO_PREMIUM);
         goPremium.setOnPreferenceClickListener(preference -> {
+            Bundle params = new Bundle();
+            params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                    GoPremiumOrigin.SETTINGS_ABOUT.getOriginName());
+            eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
             Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
             startActivity(intent);
             return true;
@@ -185,6 +194,10 @@ public class SettingsFragment extends PreferenceFragment
             case KEY_TRIPLE_DOUBLES:
                 SwitchPreference tripDouble = (SwitchPreference) preference;
                 if (!settingsActivity.isPremium() && tripDouble.isChecked()) {
+                    Bundle params = new Bundle();
+                    params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                            GoPremiumOrigin.ALERT_TRIPLE_DOUBLE.getOriginName());
+                    eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
                     tripDouble.setChecked(false);
                     Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
                     startActivity(intent);
@@ -201,6 +214,10 @@ public class SettingsFragment extends PreferenceFragment
             case KEY_QUADRUPLE_DOUBLES:
                 SwitchPreference quadDoubles = (SwitchPreference) preference;
                 if (!settingsActivity.isPremium() && quadDoubles.isChecked()) {
+                    Bundle params = new Bundle();
+                    params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                            GoPremiumOrigin.ALERT_QUADRUPLE_DOUBLE.getOriginName());
+                    eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
                     quadDoubles.setChecked(false);
                     Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
                     startActivity(intent);
@@ -217,6 +234,10 @@ public class SettingsFragment extends PreferenceFragment
             case KEY_5_X_5:
                 SwitchPreference fiveXFive = (SwitchPreference) preference;
                 if (!settingsActivity.isPremium() && fiveXFive.isChecked()) {
+                    Bundle params = new Bundle();
+                    params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                            GoPremiumOrigin.ALERT_5_X_5.getOriginName());
+                    eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
                     fiveXFive.setChecked(false);
                     Intent intent = new Intent(getActivity(), GoPremiumActivity.class);
                     startActivity(intent);

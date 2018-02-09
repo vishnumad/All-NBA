@@ -29,7 +29,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import com.gmail.jorgegilcavazos.ballislife.BuildConfig;
 import com.gmail.jorgegilcavazos.ballislife.R;
+import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger;
+import com.gmail.jorgegilcavazos.ballislife.analytics.GoPremiumOrigin;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEvent;
+import com.gmail.jorgegilcavazos.ballislife.analytics.SwishEventParam;
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository;
+import com.gmail.jorgegilcavazos.ballislife.data.premium.PremiumService;
 import com.gmail.jorgegilcavazos.ballislife.data.reddit.RedditAuthentication;
 import com.gmail.jorgegilcavazos.ballislife.data.repository.posts.PostsRepository;
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication;
@@ -50,6 +55,7 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.StringUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.UnitUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -92,11 +98,13 @@ public class MainActivity extends BaseNoActionBarActivity {
     // Should match value in strings.xml
     private static final String NO_FAV_TEAM_VAL = "noteam";
 
+    @Inject PremiumService premiumService;
     @Inject LocalRepository localRepository;
     @Inject @Named("redditSharedPreferences") SharedPreferences redditSharedPrefs;
     @Inject PostsRepository postsRepository;
     @Inject RedditAuthentication redditAuthentication;
     @Inject BaseSchedulerProvider schedulerProvider;
+    @Inject EventLogger eventLogger;
 
     @BindView(R.id.mainAppBarLayout) AppBarLayout appBarLayout;
 
@@ -123,6 +131,7 @@ public class MainActivity extends BaseNoActionBarActivity {
         ButterKnife.bind(this);
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Fabric.with(this, new Crashlytics());
+        MobileAds.initialize(this, "ca-app-pub-1607327298064379~6693958953");
 
         setupRemoteConfig();
 
@@ -141,8 +150,8 @@ public class MainActivity extends BaseNoActionBarActivity {
             startActivity(intent);
             Once.markDone(SHOW_TOUR);
         } else {
-            if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW) && localRepository
-                    .shouldShowWhatsNew()) {
+            if (!Once.beenDone(Once.THIS_APP_VERSION, SHOW_WHATS_NEW)
+                    && localRepository.shouldShowWhatsNew()) {
                 new MaterialDialog.Builder(this).title(R.string.whats_new)
                         .content(R.string.whats_new_content)
                         .positiveText(R.string.got_it)
@@ -167,6 +176,12 @@ public class MainActivity extends BaseNoActionBarActivity {
 
         // TODO: Move this out of here, either to application start or a presenter.
         disposables = new CompositeDisposable();
+
+        disposables.add(premiumService.isPremiumUpdates()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.ui())
+                .subscribe(this::setGoPremiumVisibility));
+
         disposables.add(redditAuthentication.authenticate()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.ui())
@@ -282,7 +297,7 @@ public class MainActivity extends BaseNoActionBarActivity {
                     navMenuView.setVerticalScrollBarEnabled(false);
                 }
                 updateNavViewFavoriteTeam();
-                hideGoPremiumIfPremium();
+                setGoPremiumVisibility(premiumService.isPremium());
             }
         }
     }
@@ -647,27 +662,26 @@ public class MainActivity extends BaseNoActionBarActivity {
         super.onResume();
         loadRedditUsername();
         updateNavViewFavoriteTeam();
-        hideGoPremiumIfPremium();
+        setGoPremiumVisibility(premiumService.isPremium());
     }
 
-    private void hideGoPremiumMenuItem() {
+    private void setGoPremiumVisibility(boolean isPremium) {
         if (navigationView != null) {
             Menu navMenu = navigationView.getMenu();
-            navMenu.findItem(R.id.go_premium).setVisible(false);
+            navMenu.findItem(R.id.go_premium).setVisible(!isPremium);
         }
     }
 
     private void onGoPremiumClick() {
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, Constants.PREMIUM_DIALOG_NAME);
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, Constants.PREMIUM_DIALOG_ID);
-        bundle.putString(FirebaseAnalytics.Param.ORIGIN, Constants.ORIGIN_NAV_DRAWER);
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
-        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
-                .isPurchased(Constants.PREMIUM_PRODUCT_ID)) {
+        Bundle params = new Bundle();
+        params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
+                GoPremiumOrigin.NAVIGATION_DRAWER.getOriginName());
+        eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
+
+        if (premiumService.isPremium()) {
             Toast.makeText(this, R.string.you_are_a_premium_user_already, Toast.LENGTH_SHORT)
                     .show();
-            hideGoPremiumMenuItem();
+            setGoPremiumVisibility(true);
         } else {
             Intent intent = new Intent(this, GoPremiumActivity.class);
             startActivity(intent);
@@ -703,13 +717,6 @@ public class MainActivity extends BaseNoActionBarActivity {
             localRepository.saveAppTheme(SwishTheme.LIGHT);
         }
         recreate();
-    }
-
-    private void hideGoPremiumIfPremium() {
-        if (((BallIsLifeApplication) getApplication()).getBillingProcessor()
-                .isPurchased(Constants.PREMIUM_PRODUCT_ID) || localRepository.isUserWhitelisted()) {
-            hideGoPremiumMenuItem();
-        }
     }
 
     private void updateNavViewFavoriteTeam() {
