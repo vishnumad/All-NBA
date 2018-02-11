@@ -120,6 +120,20 @@ public class BoxScoreFragment extends Fragment implements BoxScoreView {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // Check if the user is premium or if the game is unlocked and hide ads if either is
+        // true, but don't load the ad again if false. This is necessary for when the user
+        // watches a rewarded video or purchases premium in a different activity and returns to
+        // this screen.
+        if (premiumService.isPremium() || localRepository.isGameStreamUnlocked(gameId)) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         presenter.detachView();
         unbinder.unbind();

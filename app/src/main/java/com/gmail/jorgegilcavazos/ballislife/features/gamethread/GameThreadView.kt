@@ -102,4 +102,8 @@ interface GameThreadView {
   fun setCommentDelay(delay: CommentDelay)
 
   fun logGoPremiumFromStream()
+
+  fun openUnlockVsPremiumDialog()
+
+  fun gameId(): String
 }
