@@ -84,7 +84,8 @@ public class CommentsActivity extends BaseNoActionBarActivity implements TabLayo
         tabLayout.addTab(tabLayout.newTab().setText(R.string.post_game_thread));
         fab.hide();
 
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), bundle);
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(),
+                bundle);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(this);

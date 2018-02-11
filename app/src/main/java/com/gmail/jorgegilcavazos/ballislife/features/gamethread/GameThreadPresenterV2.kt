@@ -121,14 +121,13 @@ class GameThreadPresenterV2 @Inject constructor(
     view.streamChanges()
         .subscribe { isChecked ->
           if (isChecked) {
-            if (view.isPremiumPurchased()) {
+            if (view.isPremiumPurchased() || localRepository.isGameStreamUnlocked(view.gameId())) {
               eventLogger.logEvent(SwishEvent.STREAM, null)
               shouldStream = true
               loadGameThread()
             } else {
-              view.logGoPremiumFromStream()
+              view.openUnlockVsPremiumDialog()
               view.setStreamSwitch(false)
-              view.purchasePremium()
             }
           } else {
             view.setCommentDelay(CommentDelay.NONE)

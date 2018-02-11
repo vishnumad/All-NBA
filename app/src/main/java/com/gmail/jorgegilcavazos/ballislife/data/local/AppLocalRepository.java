@@ -9,7 +9,9 @@ import com.gmail.jorgegilcavazos.ballislife.features.settings.SettingsFragment;
 import com.gmail.jorgegilcavazos.ballislife.util.Constants;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -163,5 +165,22 @@ public class AppLocalRepository implements LocalRepository {
             return null;
         }
         return team;
+    }
+
+    @Override
+    public void saveGameStreamAsUnlocked(String gameId) {
+        Set<String> unlockedGameStreams = localSharedPreferences.getStringSet(
+                LocalSharedPreferences.STREAM_GAME_UNLOCKS, new HashSet<>());
+        unlockedGameStreams.add(gameId);
+
+        SharedPreferences.Editor editor = localSharedPreferences.edit();
+        editor.putStringSet(LocalSharedPreferences.STREAM_GAME_UNLOCKS, unlockedGameStreams);
+        editor.commit();
+    }
+
+    @Override
+    public boolean isGameStreamUnlocked(String gameId) {
+        return localSharedPreferences.getStringSet(LocalSharedPreferences.STREAM_GAME_UNLOCKS,
+                new HashSet<>()).contains(gameId);
     }
 }

@@ -596,6 +596,7 @@
     <string name="no_comments_have_been_made">No comments have been made</string>
     <string name="unsaving">Unsaving</string>
     <string name="view_thread">View thread</string>
+    <string name="go_premium_no_excl">Go Premium</string>
     <string name="go_premium">Go Premium!</string>
     <string name="you_are_a_premium_user_already">You are a Premium user already!</string>
     <string name="self">self</string>
@@ -688,4 +689,8 @@
     <string name="go_premium_pref_summary">Support Swish and unlock awesome features</string>
     <string name="rate_app">Rate app!</string>
     <string name="favorite_must_log_in">You must log in to save a highlight</string>
+    <string name="unlock_game_title">Want to stream this game thread?</string>
+    <string name="unlock_game_content">Watch a rewarded video to unlock this game for free or go premium and enjoy this and more awesome benefits</string>
+    <string name="unlock_game_watch_video">Watch Video</string>
+    <string name="game_unlocked">Game unlocked!</string>
 </resources>

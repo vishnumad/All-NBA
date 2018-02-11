@@ -39,6 +39,10 @@ import com.gmail.jorgegilcavazos.ballislife.util.RedditUtils;
 import com.gmail.jorgegilcavazos.ballislife.util.ThemeUtils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
 import net.dean.jraw.models.Comment;
 
@@ -62,7 +66,7 @@ import static com.gmail.jorgegilcavazos.ballislife.features.gamethread.CommentsA
         .HOME_TEAM_KEY;
 
 public class GameThreadFragment extends Fragment implements GameThreadView, SwipeRefreshLayout
-        .OnRefreshListener, CompoundButton.OnCheckedChangeListener {
+        .OnRefreshListener, CompoundButton.OnCheckedChangeListener, RewardedVideoAdListener {
 
     public static final String THREAD_TYPE_KEY = "THREAD_TYPE";
     public static final String GAME_DATE_KEY = "GAME_DATE";
@@ -87,9 +91,11 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     private Unbinder unbinder;
     private String homeTeam, awayTeam;
     private GameThreadType threadType;
+    private String gameId;
     private long gameDate;
     private Switch streamSwitch;
     private CommentDelay selectedCommentDelay = CommentDelay.NONE;
+    private RewardedVideoAd rewardedVideoAd;
 
     public GameThreadFragment() {
         // Required empty public constructor.
@@ -123,8 +129,14 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
             homeTeam = getArguments().getString(HOME_TEAM_KEY);
             awayTeam = getArguments().getString(AWAY_TEAM_KEY);
             threadType = (GameThreadType) getArguments().getSerializable(THREAD_TYPE_KEY);
+            gameId = getArguments().getString(CommentsActivity.GAME_ID_KEY);
             gameDate = getArguments().getLong(GAME_DATE_KEY);
         }
+
+        rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
+        rewardedVideoAd.setRewardedVideoAdListener(this);
+        rewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+                new AdRequest.Builder().build());
     }
 
     @Nullable
@@ -164,12 +176,33 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (premiumService.isPremium()) {
+        if (premiumService.isPremium() || localRepository.isGameStreamUnlocked(gameId)) {
             adView.setVisibility(View.GONE);
         } else {
             adView.loadAd(new AdRequest.Builder().build());
             adView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onResume() {
+        rewardedVideoAd.resume(getActivity());
+        super.onResume();
+        // Check if the user is premium or if the game is unlocked and hide ads if either is
+        // true, but don't load the ad again if false. This is necessary for when the user
+        // watches a rewarded video or purchases premium in a different activity and returns to
+        // this screen.
+        if (premiumService.isPremium() || localRepository.isGameStreamUnlocked(gameId)) {
+            adView.setVisibility(View.GONE);
+        } else {
+            adView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        rewardedVideoAd.pause(getActivity());
+        super.onPause();
     }
 
     @Override
@@ -185,6 +218,12 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         unbinder.unbind();
         presenter.detachView();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        rewardedVideoAd.destroy(getActivity());
+        super.onDestroy();
     }
 
     @Override
@@ -498,6 +537,69 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
         eventLogger.logEvent(SwishEvent.GO_PREMIUM, params);
     }
 
+    @Override
+    public void openUnlockVsPremiumDialog() {
+        new MaterialDialog.Builder(getActivity())
+                .title(R.string.unlock_game_title)
+                .content(R.string.unlock_game_content)
+                .positiveText(R.string.go_premium_no_excl)
+                .negativeText(R.string.unlock_game_watch_video)
+                .onPositive((dialog, which) -> {
+                    logGoPremiumFromStream();
+                    purchasePremium();
+                })
+                .onNegative((dialog, which) -> {
+                    rewardedVideoAd.show();
+                })
+                .build()
+                .show();
+    }
+
+    @NotNull
+    @Override
+    public String gameId() {
+        return gameId;
+    }
+
+    @Override
+    public void onRewardedVideoAdLoaded() {
+
+    }
+
+    @Override
+    public void onRewardedVideoAdOpened() {
+
+    }
+
+    @Override
+    public void onRewardedVideoStarted() {
+
+    }
+
+    @Override
+    public void onRewardedVideoAdClosed() {
+
+    }
+
+    @Override
+    public void onRewarded(RewardItem rewardItem) {
+        if (gameId == null) {
+            throw new IllegalStateException("Game ID should not be null");
+        }
+        localRepository.saveGameStreamAsUnlocked(gameId);
+        Toast.makeText(getActivity(), R.string.game_unlocked, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdLeftApplication() {
+
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int i) {
+
+    }
+
     private void showAddDelayDialog() {
         new MaterialDialog.Builder(getActivity())
                 .title(R.string.worried_about_spoilers)
@@ -505,7 +607,8 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
                 .items(R.array.add_delay_options)
                 .itemsCallbackSingleChoice(getIndexOfCommentDelay(selectedCommentDelay),
                         (dialog, itemView, which, text) -> {
-                            if (!isPremiumPurchased()) {
+                            if (!isPremiumPurchased()
+                                    && !localRepository.isGameStreamUnlocked(gameId)) {
                                 Bundle params = new Bundle();
                                 params.putString(SwishEventParam.GO_PREMIUM_ORIGIN.getKey(),
                                         GoPremiumOrigin.GAME_THREAD_DELAY.getOriginName());

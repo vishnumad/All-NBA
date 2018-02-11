@@ -11,6 +11,8 @@ import com.gmail.jorgegilcavazos.ballislife.analytics.EventLogger
 import com.gmail.jorgegilcavazos.ballislife.analytics.SwishScreen
 import com.gmail.jorgegilcavazos.ballislife.features.application.BallIsLifeApplication
 import com.gmail.jorgegilcavazos.ballislife.features.main.BaseNoActionBarActivity
+import com.gmail.jorgegilcavazos.ballislife.features.model.SwishTheme
+import com.gmail.jorgegilcavazos.ballislife.util.setDrawableTintList
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_go_premium.benefitContainer
@@ -65,6 +67,16 @@ class GoPremiumActivity : BaseNoActionBarActivity(), GoPremiumView {
     priceOptionLifetime.apply {
       priceOptionHeaderTitle.text = getString(R.string.lifetime_header)
       priceOptionText.text = getString(R.string.lifetime)
+    }
+
+    if (localRepository.appTheme == SwishTheme.LIGHT) {
+      setDrawableTintList(this, priceOptionMonthly.background, R.color.cardBackgroundLight)
+      setDrawableTintList(this, priceOptionYearly.background, R.color.cardBackgroundLight)
+      setDrawableTintList(this, priceOptionLifetime.background, R.color.cardBackgroundLight)
+    } else {
+      setDrawableTintList(this, priceOptionMonthly.background, R.color.cardBackgroundDark)
+      setDrawableTintList(this, priceOptionYearly.background, R.color.cardBackgroundDark)
+      setDrawableTintList(this, priceOptionLifetime.background, R.color.cardBackgroundDark)
     }
 
     presenter.attachView(this)
