@@ -135,7 +135,7 @@ public class GameThreadFragment extends Fragment implements GameThreadView, Swip
 
         rewardedVideoAd = MobileAds.getRewardedVideoAdInstance(getActivity());
         rewardedVideoAd.setRewardedVideoAdListener(this);
-        rewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+        rewardedVideoAd.loadAd(getString(R.string.video_reward_id),
                 new AdRequest.Builder().build());
     }
 
