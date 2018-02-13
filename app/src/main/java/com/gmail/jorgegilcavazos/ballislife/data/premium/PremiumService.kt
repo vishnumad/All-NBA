@@ -28,12 +28,9 @@ class PremiumService @Inject constructor(
     disposable: CompositeDisposable
 ) {
 
-  private var firestorePremiumStatus = false
   private val isPremiumUpdates = PublishRelay.create<Boolean>()
 
   init {
-    loadSubscriptionStatusInFirestore()
-
     rxPlayBilling.initialize()
     rxPlayBilling
         .startConnection()
@@ -49,7 +46,6 @@ class PremiumService @Inject constructor(
                 PlayBillingItems.SWISH_PREMIUM_YEARLY_SUB.sku,
                 PlayBillingItems.SWISH_PREMIUM_LIFETIME_IAP.sku -> {
                   Toast.makeText(context, R.string.purchase_complete, Toast.LENGTH_SHORT).show()
-                  saveSubscriptionStatusInFirestore(true)
                 }
               }
             }
@@ -83,37 +79,7 @@ class PremiumService @Inject constructor(
     return true
   }
 
-  private fun saveSubscriptionStatusInFirestore(active: Boolean) {
-    if (localRepository.username.isNullOrEmpty()) {
-      return
-    }
-
-    FirebaseFirestore.getInstance()
-        .collection(USERS_COLLECTION)
-        .document(localRepository.username)
-        .update(PREMIUM_STATUS, active)
-  }
-
-  private fun loadSubscriptionStatusInFirestore() {
-    if (localRepository.username.isNullOrEmpty()) {
-      return
-    }
-
-    FirebaseFirestore.getInstance()
-        .collection(USERS_COLLECTION)
-        .document(localRepository.username)
-        .get()
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            if (task.result.exists()) {
-              firestorePremiumStatus = task.result.getBoolean(PREMIUM_STATUS)
-            }
-          }
-        }
-  }
-
   companion object {
     private const val USERS_COLLECTION = "users"
-    private const val PREMIUM_STATUS = "isPremium"
   }
 }
