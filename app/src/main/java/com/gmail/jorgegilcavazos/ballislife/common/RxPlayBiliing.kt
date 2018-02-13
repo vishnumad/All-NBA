@@ -59,6 +59,9 @@ open class RxPlayBilling @Inject constructor(val context: Context) : PurchasesUp
           if (responseCode == BillingClient.BillingResponse.OK) {
             Timber.i("Billing connection successfully established")
             emitter.onComplete()
+          } else if (responseCode == BillingClient.BillingResponse.SERVICE_DISCONNECTED) {
+            emitter.onError(
+                ServiceDisconnectedException("Billing connection failed with code: $responseCode"))
           } else {
             emitter.onError(Exception("Billing connection failed with code: $responseCode"))
           }

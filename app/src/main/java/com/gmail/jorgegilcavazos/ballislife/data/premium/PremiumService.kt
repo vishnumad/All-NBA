@@ -7,9 +7,9 @@ import com.android.billingclient.api.Purchase
 import com.gmail.jorgegilcavazos.ballislife.R
 import com.gmail.jorgegilcavazos.ballislife.common.PlayBillingItems
 import com.gmail.jorgegilcavazos.ballislife.common.RxPlayBilling
+import com.gmail.jorgegilcavazos.ballislife.common.ServiceDisconnectedException
 import com.gmail.jorgegilcavazos.ballislife.data.local.LocalRepository
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
-import com.google.firebase.firestore.FirebaseFirestore
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -28,16 +28,18 @@ class PremiumService @Inject constructor(
     disposable: CompositeDisposable
 ) {
 
-  private var firestorePremiumStatus = false
   private val isPremiumUpdates = PublishRelay.create<Boolean>()
 
   init {
-    loadSubscriptionStatusInFirestore()
-
     rxPlayBilling.initialize()
     rxPlayBilling
         .startConnection()
         .doOnComplete { isPremiumUpdates.accept(isPremium()) }
+        .retry { throwable ->
+          // Retry if the Play Store service throws a disconnected error. This can occur when
+          // play services updates in the background while the app is open.
+          throwable is ServiceDisconnectedException
+        }
         .andThen(rxPlayBilling.purchaseUpdates())
         .subscribeOn(schedulerProvider.ui())
         .subscribe({ purchaseUpdate ->
@@ -49,7 +51,6 @@ class PremiumService @Inject constructor(
                 PlayBillingItems.SWISH_PREMIUM_YEARLY_SUB.sku,
                 PlayBillingItems.SWISH_PREMIUM_LIFETIME_IAP.sku -> {
                   Toast.makeText(context, R.string.purchase_complete, Toast.LENGTH_SHORT).show()
-                  saveSubscriptionStatusInFirestore(true)
                 }
               }
             }
@@ -81,39 +82,5 @@ class PremiumService @Inject constructor(
     }
     // Unlock premium features while the client connects.
     return true
-  }
-
-  private fun saveSubscriptionStatusInFirestore(active: Boolean) {
-    if (localRepository.username.isNullOrEmpty()) {
-      return
-    }
-
-    FirebaseFirestore.getInstance()
-        .collection(USERS_COLLECTION)
-        .document(localRepository.username)
-        .update(PREMIUM_STATUS, active)
-  }
-
-  private fun loadSubscriptionStatusInFirestore() {
-    if (localRepository.username.isNullOrEmpty()) {
-      return
-    }
-
-    FirebaseFirestore.getInstance()
-        .collection(USERS_COLLECTION)
-        .document(localRepository.username)
-        .get()
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            if (task.result.exists()) {
-              firestorePremiumStatus = task.result.getBoolean(PREMIUM_STATUS)
-            }
-          }
-        }
-  }
-
-  companion object {
-    private const val USERS_COLLECTION = "users"
-    private const val PREMIUM_STATUS = "isPremium"
   }
 }
