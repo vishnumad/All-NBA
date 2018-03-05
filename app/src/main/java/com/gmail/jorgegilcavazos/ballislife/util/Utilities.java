@@ -61,7 +61,8 @@ public final class Utilities {
             Submission submission = submissionWrapper.getSubmission();
             thumbnail = submission.getThumbnail();
             try {
-                highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl().toString();
+                highResThumbnail = submission.getOEmbedMedia().getThumbnail().getUrl()
+                        .toExternalForm().replace("&amp;", "&");
             } catch (NullPointerException e) {
                 highResThumbnail = null;
             }
