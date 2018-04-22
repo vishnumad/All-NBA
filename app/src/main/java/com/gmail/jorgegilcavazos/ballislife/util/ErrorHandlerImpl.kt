@@ -5,10 +5,11 @@ import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class ErrorHandlerImpl @Inject constructor(
-    private val crashReporter: CrashReporter) : ErrorHandler {
+    private val crashReporter: CrashReporter
+) : ErrorHandler {
 
   companion object {
-    private val SOCKET_TIMEOUT = 700
+    private const val SOCKET_TIMEOUT = 700
   }
 
   override fun handleError(t: Throwable): Int {
@@ -16,6 +17,8 @@ class ErrorHandlerImpl @Inject constructor(
       is HttpException -> t.code()
       is SocketTimeoutException -> SOCKET_TIMEOUT
       else -> {
+        crashReporter.log("Unknown error")
+        crashReporter.report(t)
         -1
       }
     }

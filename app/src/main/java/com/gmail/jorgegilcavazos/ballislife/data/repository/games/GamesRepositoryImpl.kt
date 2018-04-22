@@ -9,6 +9,8 @@ import com.gmail.jorgegilcavazos.ballislife.features.games.GamesUiModel
 import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import de.aaronoe.rxfirestore.getSingle
 import io.reactivex.Observable
 import io.reactivex.Single
 import java.util.*
@@ -22,9 +24,11 @@ import javax.inject.Singleton
 @Singleton
 class GamesRepositoryImpl @Inject constructor(
     private val gamesService: NbaGamesService,
-    private val schedulerProvider: BaseSchedulerProvider) : GamesRepository {
+    private val schedulerProvider: BaseSchedulerProvider
+) : GamesRepository {
 
   private val gamesMap = ConcurrentHashMap<String, GameV2>()
+  private val db = FirebaseFirestore.getInstance()
 
   override fun games(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
     val network = networkSource(date).toObservable()
@@ -122,6 +126,44 @@ class GamesRepositoryImpl @Inject constructor(
             "\"timeUtc\"",
             DateFormatUtil.getDateStartUtc(date),
             DateFormatUtil.getDateEndUtc(date))
+        .flatMap { map ->
+          val matchUpsRef = db.collection("playoff_picture").document("2018").collection("1")
+          matchUpsRef.getSingle<MatchUp>()
+              .observeOn(schedulerProvider.ui())
+              .map { matchUps ->
+                Pair<Map<String, GameV2>, List<MatchUp>>(map, matchUps)
+              }
+        }
+        .flatMap { (map, matchUps) ->
+          for ((_, game) in map) {
+            val team1 = game.homeTeamAbbr
+            val team2 = game.awayTeamAbbr
+
+            matchUps.firstOrNull { matchUp ->
+              (matchUp.team1 == team1 || matchUp.team1 == team2)
+                  && (matchUp.team2 == team1 || matchUp.team2 == team2)
+            }?.let { matchUp ->
+              game.seriesSummary = when {
+                matchUp.team1_wins == 4 -> {
+                  "${matchUp.team1} wins ${matchUp.team1_wins}-${matchUp.team2_wins}"
+                }
+                matchUp.team2_wins == 4 -> {
+                  "${matchUp.team2} wins ${matchUp.team2_wins}-${matchUp.team1_wins}"
+                }
+                matchUp.team1_wins == matchUp.team2_wins -> {
+                  "Series tied ${matchUp.team1_wins}-${matchUp.team2_wins}"
+                }
+                matchUp.team1_wins > matchUp.team2_wins -> {
+                  "${matchUp.team1} leads ${matchUp.team1_wins}-${matchUp.team2_wins}"
+                }
+                else -> {
+                  "${matchUp.team2} leads ${matchUp.team2_wins}-${matchUp.team1_wins}"
+                }
+              }
+            }
+          }
+          Single.just(map)
+        }
         .doOnSuccess { gamesMap.putAll(it) }
 
   }

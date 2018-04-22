@@ -132,6 +132,7 @@ dependencies {
     implementation 'com.android.billingclient:billing:1.0'
     implementation 'com.github.pchmn:MaterialChipsInput:1.0.8'
     implementation 'io.github.kobakei:ratethisapp:1.2.0'
+    implementation 'de.aaronoe:rxfirestorekt:0.1.1'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.8.9'
     testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
