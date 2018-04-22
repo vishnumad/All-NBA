@@ -10,6 +10,7 @@ import com.gmail.jorgegilcavazos.ballislife.features.model.GameV2
 import com.gmail.jorgegilcavazos.ballislife.util.DateFormatUtil
 import com.gmail.jorgegilcavazos.ballislife.util.schedulers.BaseSchedulerProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import de.aaronoe.rxfirestore.getSingle
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -29,6 +30,10 @@ class GamesRepositoryImpl @Inject constructor(
 
   private val gamesMap = ConcurrentHashMap<String, GameV2>()
   private val db = FirebaseFirestore.getInstance()
+
+  init {
+    db.firestoreSettings = FirebaseFirestoreSettings.Builder().setPersistenceEnabled(false).build()
+  }
 
   override fun games(date: Calendar, forceNetwork: Boolean): Observable<GamesUiModel> {
     val network = networkSource(date).toObservable()
@@ -126,11 +131,9 @@ class GamesRepositoryImpl @Inject constructor(
             "\"timeUtc\"",
             DateFormatUtil.getDateStartUtc(date),
             DateFormatUtil.getDateEndUtc(date))
-        .subscribeOn(schedulerProvider.io())
         .flatMap { map ->
           val matchUpsRef = db.collection("playoff_picture").document("2018").collection("1")
           matchUpsRef.getSingle<MatchUp>()
-              .subscribeOn(schedulerProvider.ui())
               .observeOn(schedulerProvider.ui())
               .map { matchUps ->
                 Pair<Map<String, GameV2>, List<MatchUp>>(map, matchUps)
