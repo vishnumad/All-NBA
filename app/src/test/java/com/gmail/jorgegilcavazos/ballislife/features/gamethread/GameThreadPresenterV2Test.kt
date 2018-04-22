@@ -496,7 +496,7 @@ class GameThreadPresenterV2Test {
 
     verify(mockView).isPremiumPurchased()
     verify(mockView).setStreamSwitch(false)
-    verify(mockView).purchasePremium()
+    verify(mockView).openUnlockVsPremiumDialog()
   }
 
   @Test

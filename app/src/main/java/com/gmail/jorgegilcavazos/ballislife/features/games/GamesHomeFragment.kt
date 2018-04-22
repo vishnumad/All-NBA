@@ -99,6 +99,7 @@ class GamesHomeFragment : Fragment(), DatePickerDialog.OnDateSetListener {
 
   override fun onResume() {
     super.onResume()
+    setNavigatorText()
     eventLogger.setCurrentScreen(activity, SwishScreen.GAMES)
   }
 

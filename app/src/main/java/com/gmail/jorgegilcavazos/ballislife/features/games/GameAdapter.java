@@ -102,6 +102,7 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.homeicon) ImageView ivHomeLogo;
         @BindView(R.id.awayicon) ImageView ivAwayLogo;
         @BindView(R.id.broadcaster) TextView tvBroadcaster;
+        @BindView(R.id.seriesSummary) TextView seriesSummary;
         @BindView(R.id.favoriteMarker) View favoriteMarker;
 
         private final LocalRepository localRepository;
@@ -157,6 +158,13 @@ public class GameAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             tvFinal.setVisibility(View.GONE);
             tvTime.setVisibility(View.GONE);
             tvBroadcaster.setVisibility(View.GONE);
+
+            if (nbaGame.getSeriesSummary() == null) {
+                seriesSummary.setVisibility(View.GONE);
+            } else {
+                seriesSummary.setVisibility(View.VISIBLE);
+                seriesSummary.setText(nbaGame.getSeriesSummary());
+            }
 
             String nationalBroadcaster = findNationalBroadcasters(nbaGame.getBroadcasters());
 

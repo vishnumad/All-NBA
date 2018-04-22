@@ -66,7 +66,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_toEndOf="@id/awayicon"
-                android:layout_toStartOf="@id/homeicon">
+                android:layout_toStartOf="@id/homeicon"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/text_time"
@@ -76,7 +77,7 @@
                     android:text="6:00 PM"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textSize="18sp"
-                    android:layout_centerInParent="true"/>
+                    android:layout_centerHorizontal="true"/>
 
                 <TextView
                     android:id="@+id/broadcaster"
@@ -88,6 +89,16 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/seriesSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="SAS leads 2-1"
+                android:textSize="10sp"
+                android:layout_alignParentBottom="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
             <TextView
                 android:id="@+id/text_final"
