@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import de.aaronoe.rxfirestore.getSingle
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.util.*
+import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -126,9 +126,11 @@ class GamesRepositoryImpl @Inject constructor(
             "\"timeUtc\"",
             DateFormatUtil.getDateStartUtc(date),
             DateFormatUtil.getDateEndUtc(date))
+        .subscribeOn(schedulerProvider.io())
         .flatMap { map ->
           val matchUpsRef = db.collection("playoff_picture").document("2018").collection("1")
           matchUpsRef.getSingle<MatchUp>()
+              .subscribeOn(schedulerProvider.ui())
               .observeOn(schedulerProvider.ui())
               .map { matchUps ->
                 Pair<Map<String, GameV2>, List<MatchUp>>(map, matchUps)
