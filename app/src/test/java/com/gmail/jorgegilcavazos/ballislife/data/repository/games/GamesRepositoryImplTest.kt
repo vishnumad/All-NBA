@@ -195,6 +195,7 @@ class GamesRepositoryImplTest {
         time = "",
         timeUtc = calendar.timeInMillis / 1000,
         totalPeriods = "",
-        broadcasters = mapOf())
+        broadcasters = mapOf(),
+        seriesSummary = null)
   }
 }

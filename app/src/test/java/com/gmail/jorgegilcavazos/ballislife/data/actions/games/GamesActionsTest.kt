@@ -85,7 +85,8 @@ class GamesActionsTest {
         time = "",
         timeUtc = 23894341,
         totalPeriods = "",
-        broadcasters = mapOf())
+        broadcasters = mapOf(),
+        seriesSummary = null)
   }
 
   private fun <T> anyObject(): T = Mockito.anyObject<T>()
