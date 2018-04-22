@@ -36,7 +36,7 @@ class GamesRepositoryImpl @Inject constructor(
           if (it.isEmpty()) {
             Observable.just(GamesUiModel.networkSuccess(emptyList()))
           } else {
-            Observable.just(GamesUiModel.networkSuccess(it.values.sortedBy { it.id }))
+            Observable.just(GamesUiModel.networkSuccess(it.values.sortedBy { it.timeUtc }))
           }
         }
         .subscribeOn(schedulerProvider.io())
@@ -48,7 +48,7 @@ class GamesRepositoryImpl @Inject constructor(
           if (it.isEmpty()) {
             Observable.just(GamesUiModel.memorySuccess(emptyList()))
           } else {
-            Observable.just(GamesUiModel.memorySuccess(it.values.sortedBy { it.id }))
+            Observable.just(GamesUiModel.memorySuccess(it.values.sortedBy { it.timeUtc }))
           }
         }
         .subscribeOn(schedulerProvider.io())
@@ -70,7 +70,7 @@ class GamesRepositoryImpl @Inject constructor(
           if (it.isEmpty()) {
             Observable.just(LoadGamesResult.NoGames)
           } else {
-            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.id }, date))
+            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.timeUtc }, date))
           }
         }
         .onErrorReturn { LoadGamesResult.Failure(it) }
@@ -81,7 +81,7 @@ class GamesRepositoryImpl @Inject constructor(
     val memory = memorySource(date).toObservable()
         .concatMap {
           if (it.isNotEmpty()) {
-            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.id }, date))
+            Observable.just(LoadGamesResult.Success(it.values.sortedBy { it.timeUtc }, date))
           } else {
             Observable.just(LoadGamesResult.NoCachedGames)
           }
