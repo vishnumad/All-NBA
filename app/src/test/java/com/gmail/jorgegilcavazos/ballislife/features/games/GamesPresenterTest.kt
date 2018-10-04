@@ -205,6 +205,7 @@ class GamesPresenterTest {
         time = "",
         timeUtc = 23894341,
         totalPeriods = "",
+        seriesSummary = null,
         broadcasters = mapOf())
   }
 
